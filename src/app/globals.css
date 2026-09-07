@@ -1,0 +1,92 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+@layer base {
+  :root {
+    --font-onest: "Onest", system-ui, sans-serif;
+    --font-instrument-serif: "Instrument Serif", Georgia, serif;
+    --font-geist-mono: "Geist Mono", monospace;
+
+    --color-cream: #F9F8F6;
+    --color-cream-warm: #F3F0EC;
+    --color-cream-deep: #EBE7E0;
+    
+    --color-ink: #141413;
+    --color-ink-muted: #5C5B56;
+    --color-ink-subtle: #8C8A82;
+    
+    --color-accent: #D95D39;
+    --color-accent-hover: #C84B27;
+    --color-accent-soft: rgba(217, 93, 57, 0.08);
+    --color-accent-line: rgba(217, 93, 57, 0.25);
+    
+    --color-border: #E5E2DC;
+    --color-border-strong: #D6D2C9;
+    
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+    
+    --shadow-sm: 0 1px 2px rgba(20, 20, 19, 0.05);
+    --shadow-md: 0 4px 12px rgba(20, 20, 19, 0.08);
+    --shadow-lg: 0 12px 32px rgba(20, 20, 19, 0.12);
+  }
+
+  .dark {
+    --color-cream: #141413;
+    --color-cream-warm: #1C1C1B;
+    --color-cream-deep: #242422;
+    
+    --color-ink: #F9F8F6;
+    --color-ink-muted: #B5B3AA;
+    --color-ink-subtle: #7A7870;
+    
+    --color-accent: #E06B49;
+    --color-accent-hover: #F07C5A;
+    --color-accent-soft: rgba(224, 107, 73, 0.15);
+    --color-accent-line: rgba(224, 107, 73, 0.35);
+    
+    --color-border: #2A2A28;
+    --color-border-strong: #383835;
+  }
+}
+
+body {
+  background-color: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-onest), system-ui, sans-serif;
+  overflow-x: hidden;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+.accent-serif {
+  font-family: var(--font-instrument-serif), Georgia, serif;
+  font-style: italic;
+  color: var(--color-accent);
+}
+
+.btn-primary {
+  background-color: var(--color-accent);
+  color: #FFFFFF;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-primary:hover {
+  background-color: var(--color-accent-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-secondary {
+  background-color: var(--color-cream-warm);
+  color: var(--color-ink);
+  border: 1px solid var(--color-border-strong);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-cream-deep);
+  border-color: var(--color-accent);
+}

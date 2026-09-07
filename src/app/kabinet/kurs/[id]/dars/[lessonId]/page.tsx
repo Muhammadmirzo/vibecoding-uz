@@ -1,0 +1,190 @@
+"use client";
+
+import * as React from "react";
+import Link from "next/link";
+import { CirclePlay, Copy, Check, FileText, Download, Send, ArrowLeft, ArrowRight, ShieldCheck } from "lucide-react";
+
+export default function LessonPlayerPage() {
+  const [activeTab, setActiveTab] = React.useState<"konspekt" | "prompts" | "materials" | "homework">("prompts");
+  const [copiedIndex, setCopiedIndex] = React.useState<number | null>(null);
+  const [submissionLink, setSubmissionLink] = React.useState("");
+  const [submissionSuccess, setSubmissionSuccess] = React.useState(false);
+
+  const prompts = [
+    {
+      title: "Drizzle ORM PostgreSQL Schema Generator",
+      prompt: `You are a PostgreSQL expert. Create a Drizzle ORM schema file for a SaaS learning platform with tables: users, courses, cohorts, and payments. Use uuid primary keys and strict TypeScript types.`,
+    },
+    {
+      title: "Payme JSON-RPC 2.0 Webhook Handler",
+      prompt: `Write a Next.js App Router POST handler for Payme JSON-RPC 2.0. Handle method CheckPerformTransaction, CreateTransaction, and PerformTransaction with authorization header check.`,
+    },
+  ];
+
+  const handleCopyPrompt = (text: string, idx: number) => {
+    navigator.clipboard.writeText(text);
+    setCopiedIndex(idx);
+    setTimeout(() => setCopiedIndex(null), 2000);
+  };
+
+  const handleSubmitHomework = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmissionSuccess(true);
+  };
+
+  return (
+    <div className="pt-24 pb-16 min-h-screen bg-[var(--color-cream)]">
+      <div className="mx-auto w-full max-w-[1360px] px-5 md:px-8 lg:px-10 space-y-6">
+        
+        {/* Navigation Breadcrumb */}
+        <div className="flex items-center justify-between text-xs font-mono">
+          <Link href="/kabinet" className="inline-flex items-center gap-1 text-[var(--color-accent)] font-semibold hover:underline">
+            <ArrowLeft className="w-3.5 h-3.5" /> Kabinetga qaytish
+          </Link>
+          <span className="text-[var(--color-ink-subtle)]">Vibe Coding Express · 4-Modul (4-Dars)</span>
+        </div>
+
+        {/* Lesson Title */}
+        <h1 className="text-2xl md:text-3xl font-extrabold text-[var(--color-ink)]">
+          4-Dars: PostgreSQL & Drizzle ORM Sxemasini Qurish
+        </h1>
+
+        {/* Main Player & Tabs Layout */}
+        <div className="grid lg:grid-cols-[1fr_420px] gap-8 items-start">
+          
+          {/* Video Player Container */}
+          <div className="space-y-6">
+            <div className="relative aspect-video rounded-[var(--radius-xl)] bg-[var(--color-ink)] overflow-hidden shadow-[var(--shadow-lg)] border border-[var(--color-border)] flex items-center justify-center">
+              <div className="text-center space-y-3 z-10">
+                <div className="w-16 h-16 rounded-full bg-[var(--color-accent)] text-white flex items-center justify-center mx-auto shadow-lg cursor-pointer hover:scale-105 transition-transform">
+                  <CirclePlay className="w-8 h-8 ml-0.5" />
+                </div>
+                <div className="text-white text-sm font-semibold">Darsni tomosha qilish (42 daqiqa)</div>
+              </div>
+            </div>
+
+            {/* Lesson Tabs Navigation */}
+            <div className="border-b border-[var(--color-border)] flex items-center gap-2 font-semibold text-sm">
+              {[
+                { id: "prompts", label: "Promptlar Kutubxonasi" },
+                { id: "konspekt", label: "Konspekt" },
+                { id: "materials", label: "Materiallar" },
+                { id: "homework", label: "Uy Ishi" },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as any)}
+                  className={`px-4 py-2.5 border-b-2 transition-colors ${
+                    activeTab === tab.id
+                      ? "border-[var(--color-accent)] text-[var(--color-accent)] font-bold"
+                      : "border-transparent text-[var(--color-ink-muted)] hover:text-[var(--color-ink)]"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Tab Content: Prompts */}
+            {activeTab === "prompts" && (
+              <div className="space-y-4">
+                <p className="text-xs text-[var(--color-ink-muted)]">
+                  Ushbu darsda ko'rsatilgan tayyor promptlarni bitta bosish bilan nusxalang (copy-paste):
+                </p>
+                {prompts.map((p, idx) => (
+                  <div key={idx} className="p-4 rounded-[var(--radius-lg)] bg-[var(--color-cream-warm)] border border-[var(--color-border-strong)] space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-mono font-bold text-[var(--color-ink)]">{p.title}</span>
+                      <button
+                        onClick={() => handleCopyPrompt(p.prompt, idx)}
+                        className="btn-secondary h-8 px-3 rounded text-xs font-semibold inline-flex items-center gap-1.5"
+                      >
+                        {copiedIndex === idx ? (
+                          <>
+                            <Check className="w-3.5 h-3.5 text-[#27C93F]" /> Nusxalandi
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3.5 h-3.5 text-[var(--color-accent)]" /> Nusxalash
+                          </>
+                        )}
+                      </button>
+                    </div>
+                    <pre className="p-3 rounded bg-[var(--color-cream)] text-xs font-mono text-[var(--color-ink-muted)] whitespace-pre-wrap border border-[var(--color-border)]">
+                      {p.prompt}
+                    </pre>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Tab Content: Homework */}
+            {activeTab === "homework" && (
+              <div className="p-6 rounded-[var(--radius-xl)] bg-[var(--color-cream-warm)] border border-[var(--color-border-strong)] space-y-4">
+                <h3 className="text-base font-bold text-[var(--color-ink)]">
+                  4-Modul Uy Vazifasi: PostgreSQL Schema va Drizzle Migratsiyasi
+                </h3>
+                <p className="text-xs text-[var(--color-ink-muted)] leading-relaxed">
+                  Loyiha ildizida `schema.ts` yaratib, `npm run db:generate` va `npm run db:seed` buyruqlarini bajaring. Tayyor kod yoki GitHub repozitoriyasi havolasini yuboring.
+                </p>
+
+                {submissionSuccess ? (
+                  <div className="p-4 rounded-[var(--radius-lg)] bg-[#27C93F]/15 border border-[#27C93F]/30 text-xs font-semibold text-[#27C93F] flex items-center gap-2">
+                    <Check className="w-4 h-4" /> Uy vazifangiz topshirildi va tekshirilmoqda. Mentor tez orada baholaydi!
+                  </div>
+                ) : (
+                  <form onSubmit={handleSubmitHomework} className="space-y-3">
+                    <input
+                      type="url"
+                      required
+                      placeholder="GitHub yoki Vercel loyihangiz havolasi (URL)"
+                      value={submissionLink}
+                      onChange={(e) => setSubmissionLink(e.target.value)}
+                      className="w-full h-11 px-4 rounded-[var(--radius-md)] border border-[var(--color-border-strong)] bg-[var(--color-cream)] text-xs text-[var(--color-ink)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+                    />
+                    <button type="submit" className="btn-primary h-11 px-6 rounded-[var(--radius-md)] text-xs font-semibold inline-flex items-center gap-2">
+                      <Send className="w-4 h-4" /> Vazifani Topshirish
+                    </button>
+                  </form>
+                )}
+              </div>
+            )}
+
+          </div>
+
+          {/* Right Sidebar: Curriculum Lessons Selector */}
+          <div className="bg-[var(--color-cream-warm)] border border-[var(--color-border-strong)] rounded-[var(--radius-xl)] p-5 space-y-4">
+            <div className="text-xs font-mono font-bold uppercase text-[var(--color-ink)] tracking-wider">
+              4-Modul Darslari Listi
+            </div>
+            <div className="space-y-2 text-xs">
+              {[
+                { title: "1. PostgreSQL va Drizzle ORM haqida", time: "15:00", done: true },
+                { title: "2. Database Tables va Enumlarni yaratish", time: "22:00", done: true },
+                { title: "3. Drizzle Kit & Seed skriptini yozish", time: "18:00", done: true },
+                { title: "4. Schema va API route integratsiyasi", time: "42:00", active: true },
+                { title: "5. Real Deploy & Cloud Database (Neon)", time: "30:00", locked: true },
+              ].map((l, i) => (
+                <div
+                  key={i}
+                  className={`p-3 rounded-[var(--radius-md)] border flex items-center justify-between cursor-pointer ${
+                    l.active
+                      ? "border-[var(--color-accent)] bg-[var(--color-accent-soft)] font-bold text-[var(--color-ink)]"
+                      : l.done
+                      ? "border-[var(--color-border)] bg-[var(--color-cream)] text-[var(--color-ink-muted)]"
+                      : "border-transparent text-[var(--color-ink-subtle)] opacity-60"
+                  }`}
+                >
+                  <span className="truncate pr-2">{l.title}</span>
+                  <span className="font-mono text-[10px]">{l.time}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  );
+}

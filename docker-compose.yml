@@ -1,0 +1,103 @@
+version: "3.8"
+
+services:
+  # ------------------------------------------
+  # 1. PostgreSQL Database Service
+  # ------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: vibecoding_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-vibecoding_secret_pass_2026}
+      POSTGRES_DB: ${POSTGRES_DB:-vibecoding_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-vibecoding_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - vibecoding_net
+
+  # ------------------------------------------
+  # 2. MinIO S3 Object Storage Service
+  # ------------------------------------------
+  minio:
+    image: minio/minio:RELEASE.2024-01-31T20-20-33Z
+    container_name: vibecoding_minio
+    restart: always
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-vibecoding_admin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-vibecoding_minio_secret_2026}
+    ports:
+      - "9000:9000" # S3 API
+      - "9001:9001" # Web Console UI
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - vibecoding_net
+
+  # Helper service to initialize S3 Bucket on MinIO startup
+  createbuckets:
+    image: minio/mc:RELEASE.2024-01-28T16-34-46Z
+    container_name: vibecoding_minio_buckets
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc alias set myminio http://minio:9000 ${MINIO_ROOT_USER:-vibecoding_admin} ${MINIO_ROOT_PASSWORD:-vibecoding_minio_secret_2026};
+      /usr/bin/mc mb --ignore-existing myminio/vibecoding-uploads;
+      /usr/bin/mc anonymous set public myminio/vibecoding-uploads;
+      exit 0;
+      "
+    networks:
+      - vibecoding_net
+
+  # ------------------------------------------
+  # 3. Vibecoding Next.js Web App Service
+  # ------------------------------------------
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vibecoding_app
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-vibecoding_secret_pass_2026}@postgres:5432/${POSTGRES_DB:-vibecoding_db}
+      S3_ENDPOINT: http://minio:9000
+      S3_ACCESS_KEY: ${MINIO_ROOT_USER:-vibecoding_admin}
+      S3_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-vibecoding_minio_secret_2026}
+      S3_BUCKET: vibecoding-uploads
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-super-secret-production-key-change-me-32chars}
+      UPSTASH_REDIS_REST_URL: ${UPSTASH_REDIS_REST_URL:-}
+      UPSTASH_REDIS_REST_TOKEN: ${UPSTASH_REDIS_REST_TOKEN:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    networks:
+      - vibecoding_net
+
+networks:
+  vibecoding_net:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  minio_data:

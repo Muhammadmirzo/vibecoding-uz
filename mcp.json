@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json.schemastore.org/mcp-config.json",
+  "mcpServers": {
+    "vibecoding-mcp-server": {
+      "command": "npx",
+      "args": ["tsx", "mcp-server/index.ts"],
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "description": "Vibecoding Native MCP Server (stdio transport) for Claude Desktop, Cursor, DeepSeek, and Z.ai"
+    },
+    "vibecoding-mcp-server-sse": {
+      "url": "http://localhost:3000/api/mcp/sse",
+      "transport": "sse",
+      "description": "Vibecoding Native MCP Server (SSE transport) for ChatGPT and Web/HTTP integrations"
+    }
+  },
+  "supportedClients": ["Claude Desktop", "Cursor", "ChatGPT", "DeepSeek", "Z.ai"],
+  "transports": {
+    "stdio": {
+      "command": "npx",
+      "args": ["tsx", "mcp-server/index.ts"]
+    },
+    "sse": {
+      "url": "http://localhost:3000/api/mcp/sse"
+    }
+  }
+}

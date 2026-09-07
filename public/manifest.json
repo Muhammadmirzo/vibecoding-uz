@@ -1,0 +1,24 @@
+{
+  "name": "Vibecoding.uz — AI bilan mahsulot qurish platformasi",
+  "short_name": "Vibecoding",
+  "description": "EduBaza (27 000+ o'qituvchi), Chatla (500+ biznes) — AI bilan qurilgan jonli mahsulotlar. Dasturlashsiz, g'oyadan jonli MVPgacha 8 haftada yetib boring.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F9F8F6",
+  "theme_color": "#FF5722",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
