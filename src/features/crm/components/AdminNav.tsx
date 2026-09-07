@@ -57,6 +57,12 @@ export function AdminNav() {
       exact: false,
     },
     {
+      href: "/admin/students",
+      label: "Talabalar Faolligi",
+      icon: Users,
+      exact: false,
+    },
+    {
       href: "/admin/users",
       label: "Foydalanuvchilar",
       icon: Users,
@@ -93,7 +99,7 @@ export function AdminNav() {
             <div className="h-4 w-px bg-border hidden sm:block" />
             <Link href="/admin" className="flex items-center space-x-2">
               <span className="font-bold text-lg tracking-tight text-ink">
-                Vibecoding <span className="accent-serif font-normal">CRM</span>
+                Mirzo Academy <span className="accent-serif font-normal">CRM</span>
               </span>
               <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-accent-soft text-accent border border-accent-line">
                 <ShieldCheck className="w-3 h-3 mr-1" />

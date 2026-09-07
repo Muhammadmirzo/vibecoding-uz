@@ -43,9 +43,18 @@ export const mcpGenerateDiscountPromocodeSchema = z.object({
   expiresInDays: z.number().positive().optional().default(7),
 });
 
+export const mcpGetStudentActivitySchema = z.object({
+  studentId: z.string().optional(),
+  email: z.string().optional(),
+  cohortId: z.string().optional(),
+  status: z.enum(["all", "active", "at_risk", "completed", "inactive"]).optional().default("all"),
+  limit: z.number().int().positive().optional().default(10),
+});
+
 export type McpGetPlatformKpisInput = z.infer<typeof mcpGetPlatformKpisSchema>;
 export type McpQueryLeadsPipelineInput = z.infer<typeof mcpQueryLeadsPipelineSchema>;
 export type McpGetCohortStatusInput = z.infer<typeof mcpGetCohortStatusSchema>;
 export type McpGradeHomeworkInput = z.infer<typeof mcpGradeHomeworkSchema>;
 export type McpBroadcastNotificationInput = z.infer<typeof mcpBroadcastNotificationSchema>;
 export type McpGenerateDiscountPromocodeInput = z.infer<typeof mcpGenerateDiscountPromocodeSchema>;
+export type McpGetStudentActivityInput = z.infer<typeof mcpGetStudentActivitySchema>;

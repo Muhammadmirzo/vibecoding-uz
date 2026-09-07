@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
-import { users, enrollments } from "@/db/schema";
+import { users, enrollments, auditLogs } from "@/db/schema";
+import { createStaffSchema } from "@/lib/validations";
+import { hashPassword, normalizePhone } from "@/lib/auth/password";
 import { desc, eq, like, or, count } from "drizzle-orm";
 
 export async function GET(request: Request) {
@@ -58,6 +60,101 @@ export async function GET(request: Request) {
     console.error("GET /api/admin/users error:", error);
     return NextResponse.json(
       { error: "Foydalanuvchilarni yuklashda xatolik yuz berdi" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+    const parseResult = createStaffSchema.safeParse(body);
+
+    if (!parseResult.success) {
+      return NextResponse.json(
+        {
+          error: "Ma'lumotlar noto'g'ri kiritildi",
+          details: parseResult.error.flatten(),
+        },
+        { status: 400 }
+      );
+    }
+
+    const { phone, fullName, email, password, role } = parseResult.data;
+
+    const normalized = normalizePhone(phone);
+
+    // Check existing phone
+    const [existing] = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.phone, normalized))
+      .limit(1);
+
+    if (existing) {
+      return NextResponse.json(
+        { error: "Ushbu telefon raqamli foydalanuvchi allaqachon mavjud" },
+        { status: 400 }
+      );
+    }
+
+    // Check existing email if provided
+    if (email) {
+      const [existingEmail] = await db
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.email, email.trim()))
+        .limit(1);
+
+      if (existingEmail) {
+        return NextResponse.json(
+          { error: "Ushbu email adresi boshqa foydalanuvchi tomonidan ishlatilmoqda" },
+          { status: 400 }
+        );
+      }
+    }
+
+    const passwordHash = await hashPassword(password);
+
+    const [newUser] = await db
+      .insert(users)
+      .values({
+        phone: normalized,
+        fullName,
+        email: email ? email.trim() : null,
+        passwordHash,
+        role,
+      })
+      .returning({
+        id: users.id,
+        phone: users.phone,
+        email: users.email,
+        fullName: users.fullName,
+        role: users.role,
+        createdAt: users.createdAt,
+      });
+
+    // Record audit log
+    await db.insert(auditLogs).values({
+      action: "user.create",
+      entityType: "user",
+      entityId: newUser.id,
+      details: {
+        fullName: newUser.fullName,
+        phone: newUser.phone,
+        role: newUser.role,
+      },
+      ipAddress: request.headers.get("x-forwarded-for") || "127.0.0.1",
+    });
+
+    return NextResponse.json({
+      success: true,
+      user: newUser,
+    });
+  } catch (error) {
+    console.error("POST /api/admin/users error:", error);
+    return NextResponse.json(
+      { error: "Yangi xodim yaratishda xatolik yuz berdi" },
       { status: 500 }
     );
   }

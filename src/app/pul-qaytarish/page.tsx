@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { ShieldCheck } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "7 Kunlik Pul Qaytarish Kafolati | Vibecoding.uz",
-  description: "Vibecoding.uz platformasining 100% pul qaytarish shartlari va siyosati.",
+  title: "7 Kunlik Pul Qaytarish Kafolati | Mirzo Academy",
+  description: "academy.mirzo.uz platformasining 100% pul qaytarish shartlari va siyosati.",
 };
 
 export default function PulQaytarishPage() {
@@ -27,7 +27,7 @@ export default function PulQaytarishPage() {
           <section className="space-y-2">
             <h2 className="text-lg font-bold text-[var(--color-ink)]">1. Kafolat shartlari</h2>
             <p>
-              Vibecoding.uz platformasida ta'lim sifatiga 100% ishonamiz. Agar siz kursga yozilib, birinchi 2 modulni to'liq yakunlasangiz, barcha uy vazifalarini topshirsangiz va shunda ham amaliy foyda ko'rmaganingizni his qilsangiz — kurs kirish havolasi ochilganidan keyin <strong>7 kun ichida</strong> to'lagan pulingizni 100% qaytarib beramiz.
+              Mirzo Academy (academy.mirzo.uz) platformasida ta'lim sifatiga 100% ishonamiz. Agar siz kursga yozilib, birinchi 2 modulni to'liq yakunlasangiz, barcha uy vazifalarini topshirsangiz va shunda ham amaliy foyda ko'rmaganingizni his qilsangiz — kurs kirish havolasi ochilganidan keyin <strong>7 kun ichida</strong> to'lagan pulingizni 100% qaytarib beramiz.
             </p>
           </section>
 

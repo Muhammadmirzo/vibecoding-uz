@@ -8,6 +8,7 @@ import {
   mcpGradeHomeworkSchema,
   mcpBroadcastNotificationSchema,
   mcpGenerateDiscountPromocodeSchema,
+  mcpGetStudentActivitySchema,
 } from "../src/lib/validations/mcp";
 
 /**
@@ -159,6 +160,35 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             },
           },
           required: ["code", "discountType", "discountValue"],
+        },
+      },
+      {
+        name: "get_student_activity",
+        description: "Returns detailed student activity metrics: lesson progress %, last active timestamp, homework submission status, quiz scores, and active status for external AI agents.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            studentId: {
+              type: "string",
+              description: "Optional specific student ID filter",
+            },
+            email: {
+              type: "string",
+              description: "Optional student email filter",
+            },
+            cohortId: {
+              type: "string",
+              description: "Optional cohort ID filter",
+            },
+            status: {
+              type: "string",
+              description: "Student status filter: 'all', 'active', 'at_risk', 'completed', 'inactive' (default: 'all')",
+            },
+            limit: {
+              type: "number",
+              description: "Maximum number of records to return (default 10)",
+            },
+          },
         },
       },
     ],
@@ -350,6 +380,77 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                 status: "active",
                 createdAt: new Date().toISOString(),
               },
+            },
+            null,
+            2
+          ),
+        },
+      ],
+    };
+  }
+
+  if (name === "get_student_activity") {
+    const parsed = mcpGetStudentActivitySchema.parse(args || {});
+    return {
+      content: [
+        {
+          type: "text",
+          text: JSON.stringify(
+            {
+              status: "success",
+              filter: parsed,
+              students: [
+                {
+                  studentId: parsed.studentId || "std_01",
+                  fullName: "Sardorbek Jo'rayev",
+                  phone: "+998901234567",
+                  email: parsed.email || "sardor@vibecoding.uz",
+                  cohortId: parsed.cohortId || "cohort_oct_2026",
+                  cohortName: "Vibe Coding Express (Oktyabr 2026)",
+                  lessonProgressPercent: 85,
+                  completedLessonsCount: 17,
+                  totalLessonsCount: 20,
+                  lastActiveAt: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
+                  homeworkStats: {
+                    submitted: 5,
+                    total: 5,
+                    approved: 4,
+                    pending: 1,
+                    rejected: 0,
+                  },
+                  quizScores: {
+                    diagnosticQuizPercent: 92,
+                    midtermQuizPercent: 88,
+                    avgQuizScorePercent: 90,
+                  },
+                  status: parsed.status !== "all" ? parsed.status : "active",
+                },
+                {
+                  studentId: "std_02",
+                  fullName: "Nigora Umarova",
+                  phone: "+998939876543",
+                  email: "nigora@gmail.com",
+                  cohortId: "cohort_oct_2026",
+                  cohortName: "Vibe Coding Express (Oktyabr 2026)",
+                  lessonProgressPercent: 40,
+                  completedLessonsCount: 8,
+                  totalLessonsCount: 20,
+                  lastActiveAt: new Date(Date.now() - 4 * 24 * 3600 * 1000).toISOString(),
+                  homeworkStats: {
+                    submitted: 2,
+                    total: 5,
+                    approved: 1,
+                    pending: 0,
+                    rejected: 1,
+                  },
+                  quizScores: {
+                    diagnosticQuizPercent: 65,
+                    midtermQuizPercent: 60,
+                    avgQuizScorePercent: 62.5,
+                  },
+                  status: "at_risk",
+                },
+              ],
             },
             null,
             2

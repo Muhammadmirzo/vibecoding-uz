@@ -125,7 +125,7 @@ export default function BlogListPage() {
         {/* Header Section */}
         <div className="text-center max-w-[760px] mx-auto space-y-4">
           <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-md border border-accent-line bg-cream-warm text-[12px] tracking-wider text-accent uppercase font-mono font-bold">
-            <BookOpen className="w-4 h-4" /> Vibecoding.uz Maqolalari
+            <BookOpen className="w-4 h-4" /> Mirzo Academy Maqolalari
           </span>
           <h1 className="text-3xl md:text-5xl font-extrabold text-ink tracking-tight">
             AI va Vibe Coding bo'yicha{" "}

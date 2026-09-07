@@ -34,21 +34,21 @@ async function main() {
   const seededUsersData = [
     {
       phone: "+998901234567",
-      email: "admin@vibecoding.uz",
+      email: "admin@academy.mirzo.uz",
       fullName: "Jasur Bekmuradov",
       role: "superadmin" as const,
       tgUsername: "jasur_vibecoding",
     },
     {
       phone: "+998909876543",
-      email: "mentor@vibecoding.uz",
+      email: "mentor@academy.mirzo.uz",
       fullName: "Alisher Zokirov",
       role: "mentor" as const,
       tgUsername: "alisher_mentor",
     },
     {
       phone: "+998935551122",
-      email: "manager@vibecoding.uz",
+      email: "manager@academy.mirzo.uz",
       fullName: "Malika Karimova",
       role: "manager" as const,
       tgUsername: "malika_sales",
@@ -130,7 +130,7 @@ async function main() {
           profession: u.role === "student" ? "Startapchi / Tadbirkor" : "AI Injiniring Mutaxassisi",
           goal: "AI yordamida tezkor mahsulotlar qurish va biznesni avtomatlashtirish",
           source: "Telegram Mini App",
-          bio: `${u.fullName} Vibecoding jamiyatining faol a'zosi.`,
+          bio: `${u.fullName} Mirzo Academy jamiyatining faol a'zosi.`,
         })
         .onConflictDoNothing();
     }
@@ -396,7 +396,7 @@ async function main() {
             attemptNo: 1,
             payload: {
               githubUrl: `https://github.com/${student.tgUsername || "student"}/vibe-project-${i + 1}`,
-              fileUrls: ["https://vibecoding.uz/uploads/demo-submission.png"],
+              fileUrls: ["https://academy.mirzo.uz/uploads/demo-submission.png"],
               note: `Assalomu alaykum mentor. 1-vazifamni bajardim, iltimos tekshirib bering.`,
             },
             status,

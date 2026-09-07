@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Download, ExternalLink, Briefcase, Megaphone, GraduationCap, Calculator } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Bepul AI Resurslar Hubi | Vibecoding.uz",
+  title: "Bepul AI Resurslar Hubi | Mirzo Academy",
   description: "Sohangiz bo'yicha tayyor promptlar to'plami, checklistlar va qo'llanmalarni bepul yuklab oling.",
 };
 

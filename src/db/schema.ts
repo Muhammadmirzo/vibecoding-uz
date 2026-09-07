@@ -266,7 +266,7 @@ export const blogPosts = pgTable("blog_posts", {
   excerpt: text("excerpt"),
   contentMd: text("content_md").notNull(),
   coverUrl: text("cover_url"),
-  authorName: text("author_name").default("Vibecoding Team").notNull(),
+  authorName: text("author_name").default("Mirzo Academy Team").notNull(),
   category: text("category").default("Vibe Coding").notNull(),
   seoTitle: text("seo_title"),
   seoDescription: text("seo_description"),

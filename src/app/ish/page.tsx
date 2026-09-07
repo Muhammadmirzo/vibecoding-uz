@@ -40,7 +40,7 @@ export default function JobsPage() {
             <Briefcase className="w-4 h-4" /> Karyera va Hamkorlik
           </span>
           <h1 className="text-3xl md:text-5xl font-extrabold text-ink tracking-tight">
-            Vibecoding.uz jamoasiga{" "}
+            Mirzo Academy jamoasiga{" "}
             <span className="accent-serif">qo'shiling</span>
           </h1>
           <p className="text-sm md:text-base text-ink-muted leading-relaxed">

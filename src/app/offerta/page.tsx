@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Ommaviy Oferta | Vibecoding.uz",
-  description: "Vibecoding.uz ta'lim xizmatlarini ko'rsatish bo'yicha ommaviy oferta shartnomasi.",
+  title: "Ommaviy Oferta | Mirzo Academy",
+  description: "academy.mirzo.uz ta'lim xizmatlarini ko'rsatish bo'yicha ommaviy oferta shartnomasi.",
 };
 
 export default function OffertaPage() {
@@ -11,7 +11,7 @@ export default function OffertaPage() {
       <div className="mx-auto w-full max-w-[800px] px-5 md:px-8 space-y-8">
         <h1 className="text-3xl font-extrabold text-[var(--color-ink)]">Ommaviy Oferta Shartnomasi</h1>
         <div className="bg-[var(--color-cream-warm)] border border-[var(--color-border-strong)] rounded-[var(--radius-xl)] p-8 text-sm text-[var(--color-ink-muted)] leading-relaxed space-y-4">
-          <p>Ushbu hujjat Vibecoding.uz platformasi va ta'lim oluvchi o'rtasidagi rasmiy shartnoma hisoblanadi.</p>
+          <p>Ushbu hujjat Mirzo Academy (academy.mirzo.uz) platformasi va ta'lim oluvchi o'rtasidagi rasmiy shartnoma hisoblanadi.</p>
           <h2 className="text-base font-bold text-[var(--color-ink)]">1. Shartnoma mavzusi</h2>
           <p>Ijrochi Buyurtmachiga sun'iy intellekt va Vibe Coding bo'yicha masofaviy ta'lim xizmatlarini taqdim etadi.</p>
           <h2 className="text-base font-bold text-[var(--color-ink)]">2. To'lov tartibi</h2>

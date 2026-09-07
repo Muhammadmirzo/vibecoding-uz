@@ -94,6 +94,52 @@ export const updateProfileSchema = z.object({
 
 export const updateMeSchema = updateProfileSchema;
 
+export const changePasswordSchema = z
+  .object({
+    oldPassword: z.string().min(1, { message: "Eski parol kiritilishi shart" }),
+    newPassword: z.string().min(8, { message: "Yangi parol kamida 8 ta belgidan iborat bo'lishi kerak" }),
+    confirmPassword: z.string().min(8, { message: "Parol tasdiqlashi kamida 8 ta belgidan iborat bo'lishi kerak" }),
+    phone: z
+      .string()
+      .regex(uzbekPhoneRegex, {
+        message: "Telefon raqam +998 bilan boshlanishi va 12 xonali bo'lishi kerak",
+      })
+      .optional()
+      .or(z.literal("")),
+    email: z.string().email({ message: "Email formati noto'g'ri" }).optional().or(z.literal("")),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Yangi parollar bir-biriga mos kelmadi",
+    path: ["confirmPassword"],
+  });
+
+export const updateCredentialsSchema = z
+  .object({
+    oldPassword: z.string().min(1, { message: "Eski parol kiritilishi shart" }),
+    newPassword: z.string().min(8, { message: "Yangi parol kamida 8 ta belgidan iborat bo'lishi kerak" }).optional().or(z.literal("")),
+    confirmPassword: z.string().optional().or(z.literal("")),
+    phone: z
+      .string()
+      .regex(uzbekPhoneRegex, {
+        message: "Telefon raqam +998 bilan boshlanishi va 12 xonali bo'lishi kerak",
+      })
+      .optional()
+      .or(z.literal("")),
+    email: z.string().email({ message: "Email formati noto'g'ri" }).optional().or(z.literal("")),
+  })
+  .refine(
+    (data) => {
+      if (data.newPassword) {
+        return data.newPassword === data.confirmPassword;
+      }
+      return true;
+    },
+    {
+      message: "Yangi parollar bir-biriga mos kelmadi",
+      path: ["confirmPassword"],
+    }
+  );
+
 export type User = z.infer<typeof userSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginPasswordInput = z.infer<typeof loginPasswordSchema>;
@@ -101,3 +147,5 @@ export type OtpRequestInput = z.infer<typeof otpRequestSchema>;
 export type OtpVerifyInput = z.infer<typeof otpVerifySchema>;
 export type PasswordResetInput = z.infer<typeof passwordResetSchema>;
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
+export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
+export type UpdateCredentialsInput = z.infer<typeof updateCredentialsSchema>;

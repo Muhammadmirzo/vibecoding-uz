@@ -2,8 +2,8 @@ import { ReactNode } from "react";
 import { AdminNav } from "@/features/crm/components/AdminNav";
 
 export const metadata = {
-  title: "Admin Panel & CRM | Vibecoding Platform",
-  description: "Vibecoding platformasi admin va CRM boshqaruv paneli",
+  title: "Admin Panel & CRM | Mirzo Academy Platform",
+  description: "Mirzo Academy platformasi admin va CRM boshqaruv paneli",
 };
 
 export default function AdminLayout({ children }: { children: ReactNode }) {

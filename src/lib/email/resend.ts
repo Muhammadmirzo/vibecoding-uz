@@ -21,7 +21,7 @@ export async function sendEmail(input: SendEmailInput): Promise<SendEmailResult>
   const validated = sendEmailSchema.parse(input);
 
   const apiKey = process.env.RESEND_API_KEY;
-  const fromEmail = validated.from || process.env.RESEND_FROM_EMAIL || "Vibecoding <no-reply@vibecoding.uz>";
+  const fromEmail = validated.from || process.env.RESEND_FROM_EMAIL || "Mirzo Academy <no-reply@academy.mirzo.uz>";
   const toList = Array.isArray(validated.to) ? validated.to : [validated.to];
 
   if (!apiKey) {
@@ -99,16 +99,16 @@ export async function sendWelcomeEmail(input: WelcomeEmailInput): Promise<SendEm
     <body>
       <div class="card">
         <div class="header">
-          <a href="https://vibecoding.uz" class="brand">Vibecoding.uz</a>
+          <a href="https://academy.mirzo.uz" class="brand">Mirzo Academy</a>
         </div>
         <div class="title">Xush kelibsiz, ${validated.fullName}! 🎉</div>
         <p>Siz <strong>${courseName}</strong> platformasida muvaffaqiyatli ro'yxatdan o'tdingiz.</p>
         <p>AI yordamida dasturlashsiz real mahsulotlar qurish va amaliy ko'nikmalarni egallash safaringiz boshlandi!</p>
         <div style="text-align: center;">
-          <a href="https://vibecoding.uz/kabinet" class="btn">Shaxsiy kabinetga o'tish</a>
+          <a href="https://academy.mirzo.uz/kabinet" class="btn">Shaxsiy kabinetga o'tish</a>
         </div>
         <div class="footer">
-          &copy; ${new Date().getFullYear()} Vibecoding.uz. Barcha huquqlar himoyalangan.
+          &copy; ${new Date().getFullYear()} Mirzo Academy. Barcha huquqlar himoyalangan.
         </div>
       </div>
     </body>
@@ -117,7 +117,7 @@ export async function sendWelcomeEmail(input: WelcomeEmailInput): Promise<SendEm
 
   return sendEmail({
     to: validated.to,
-    subject: `Vibecoding.uz ga xush kelibsiz, ${validated.fullName}!`,
+    subject: `Mirzo Academy'ga xush kelibsiz, ${validated.fullName}!`,
     html,
   });
 }
@@ -144,7 +144,7 @@ export async function sendDripUnlockEmail(input: DripUnlockEmailInput): Promise<
     </head>
     <body>
       <div class="card">
-        <a href="https://vibecoding.uz" class="brand">Vibecoding.uz</a>
+        <a href="https://academy.mirzo.uz" class="brand">Mirzo Academy</a>
         <div class="title">Yangi darsingiz ochildi! 🚀</div>
         <p>Salom, ${validated.fullName}. Kursingizdagi navbatdagi dars tayyor:</p>
         <div class="lesson-box">

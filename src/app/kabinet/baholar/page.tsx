@@ -3,8 +3,8 @@ import { Award, CheckCircle2, Star } from "lucide-react";
 import { KabinetNav } from "@/features/lms/components/KabinetNav";
 
 export const metadata: Metadata = {
-  title: "Baholar va Modul Reytingi | Vibecoding.uz",
-  description: "Vibe Coding Express kursi bo'yicha modullarning ballari va mentor baholari.",
+  title: "Baholar va Modul Reytingi | Mirzo Academy",
+  description: "Talabaning har bir modul bo'yicha baholari, mentor izohlari va guruh reytingi.",
 };
 
 export default function BaholarPage() {

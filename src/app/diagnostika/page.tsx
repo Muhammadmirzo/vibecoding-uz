@@ -2,7 +2,7 @@ import { DiagnosticQuiz } from "@/features/quiz/DiagnosticQuiz";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "2-Daqiqalik Diagnostika Kvizi | Vibecoding.uz",
+  title: "2-Daqiqalik Diagnostika Kvizi | Mirzo Academy",
   description: "9 ta tezkor savol orqali maqsadingizga mos keluvchi AI va Vibe Coding kursini aniqlang.",
 };
 

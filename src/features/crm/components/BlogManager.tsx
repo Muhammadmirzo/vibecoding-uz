@@ -48,7 +48,7 @@ export function BlogManager() {
   const [formTitle, setFormTitle] = useState("");
   const [formSlug, setFormSlug] = useState("");
   const [formCategory, setFormCategory] = useState("Vibe Coding");
-  const [formAuthor, setFormAuthor] = useState("Vibecoding Team");
+  const [formAuthor, setFormAuthor] = useState("Mirzo Academy Team");
   const [formCoverUrl, setFormCoverUrl] = useState("");
   const [formExcerpt, setFormExcerpt] = useState("");
   const [formContentMd, setFormContentMd] = useState("");
@@ -85,7 +85,7 @@ export function BlogManager() {
     setFormTitle("");
     setFormSlug("");
     setFormCategory("Vibe Coding");
-    setFormAuthor("Vibecoding Team");
+    setFormAuthor("Mirzo Academy Team");
     setFormCoverUrl("");
     setFormExcerpt("");
     setFormContentMd("");

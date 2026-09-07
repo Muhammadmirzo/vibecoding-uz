@@ -225,7 +225,7 @@ export default function ToLovlarPage() {
                 100% Pul Qaytarish Kafolati
               </h3>
               <p className="text-xs text-ink-muted leading-relaxed">
-                Vibecoding.uz har bir talabaga rasmiy oferta asosida 7 kunlik to'liq qaytarish kafolatini taqdim etadi. Agar o'quv dasturi sizga to'g'ri kelmasa, hech qanday ortiqcha savollarsiz to'lovingiz to'liq qaytariladi.
+                Mirzo Academy (academy.mirzo.uz) har bir talabaga rasmiy oferta asosida 7 kunlik to'liq qaytarish kafolatini taqdim etadi. Agar o'quv dasturi sizga to'g'ri kelmasa, hech qanday ortiqcha savollarsiz to'lovingiz to'liq qaytariladi.
               </p>
             </div>
 

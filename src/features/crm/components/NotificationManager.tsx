@@ -134,7 +134,7 @@ export function NotificationManager() {
     .replace(/{{fullName}}/g, "Alisher Zokirov")
     .replace(/{{phone}}/g, "+998 90 123 45 67")
     .replace(/{{courseTitle}}/g, "Vibe Coding Express")
-    .replace(/{{loginUrl}}/g, "https://vibecoding.uz/lms");
+    .replace(/{{loginUrl}}/g, "https://academy.mirzo.uz/kabinet");
 
   const audienceLabels: Record<string, string> = {
     all_users: "Barcha foydalanuvchilar",
@@ -348,10 +348,10 @@ export function NotificationManager() {
               <div className="bg-[#0e1621] text-white rounded-2xl p-4 shadow-md font-sans text-xs space-y-3">
                 <div className="flex items-center gap-2 border-b border-gray-800 pb-2">
                   <div className="w-7 h-7 rounded-full bg-accent flex items-center justify-center font-bold text-white text-xs">
-                    V
+                    M
                   </div>
                   <div>
-                    <div className="font-semibold text-white">Vibecoding Bot</div>
+                    <div className="font-semibold text-white">Mirzo Academy Bot</div>
                     <div className="text-[10px] text-gray-400">rasmiy bildirishnoma bot</div>
                   </div>
                 </div>
@@ -366,7 +366,7 @@ export function NotificationManager() {
             {channel === "sms" && (
               <div className="bg-gray-100 text-ink rounded-2xl p-4 shadow-md text-xs space-y-2 border border-gray-300">
                 <div className="flex items-center justify-between text-gray-500 text-[10px] border-b pb-1">
-                  <span>SMS (VibecodingUz)</span>
+                  <span>SMS (MirzoAcademy)</span>
                   <span>Hozir</span>
                 </div>
                 <div className="bg-white p-3 rounded-xl border border-gray-200 text-ink leading-relaxed whitespace-pre-wrap">
@@ -380,10 +380,10 @@ export function NotificationManager() {
               <div className="bg-white text-ink rounded-xl p-4 shadow-md text-xs space-y-3 border border-border">
                 <div className="border-b border-gray-100 pb-2 space-y-1">
                   <div className="text-gray-500">
-                    Kimdan: <span className="text-ink font-medium">info@vibecoding.uz</span>
+                    Kimdan: <span className="text-ink font-medium">info@academy.mirzo.uz</span>
                   </div>
                   <div className="text-gray-500">
-                    Mavzu: <span className="text-ink font-bold">{title || "Vibecoding Bildirishnoma"}</span>
+                    Mavzu: <span className="text-ink font-bold">{title || "Mirzo Academy Bildirishnoma"}</span>
                   </div>
                 </div>
                 <div className="text-ink leading-relaxed whitespace-pre-wrap pt-1">{previewText}</div>

@@ -13,20 +13,31 @@ import {
   Eye,
   EyeOff,
   Loader2,
+  Lock,
+  UserCheck,
 } from "lucide-react";
 
 export function SettingsManager() {
-  const [activeTab, setActiveTab] = useState<"general" | "pricing" | "guarantee" | "integrations" | "features">("general");
+  const [activeTab, setActiveTab] = useState<"general" | "pricing" | "guarantee" | "integrations" | "features" | "security">("general");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [showKeys, setShowKeys] = useState<Record<string, boolean>>({});
 
   // Settings State
-  const [siteTitle, setSiteTitle] = useState("Vibecoding Uz");
+  const [siteTitle, setSiteTitle] = useState("Mirzo Academy");
   const [supportPhone, setSupportPhone] = useState("+998 71 200 00 00");
-  const [supportTelegram, setSupportTelegram] = useState("@vibecoding_support_bot");
+  const [supportTelegram, setSupportTelegram] = useState("@mirzo_academy_support_bot");
   const [maintenanceMode, setMaintenanceMode] = useState(false);
+
+  // Dynamic CTA, URLs & Announcement Banner State
+  const [headerCtaText, setHeaderCtaText] = useState("Kurs tanlash");
+  const [headerCtaLink, setHeaderCtaLink] = useState("/#kurs-tanlash");
+  const [enrollmentUrl, setEnrollmentUrl] = useState("https://academy.mirzo.uz/kabinet");
+  const [telegramBotLink, setTelegramBotLink] = useState("https://t.me/m/ODAfK_QIMjky");
+  const [announcementBannerText, setAnnouncementBannerText] = useState("Yangi Vibe Coding Express guruhiga qabul boshlandi! Mashg'ulotlar tez orada start oladi.");
+  const [announcementBannerLink, setAnnouncementBannerLink] = useState("/kurs/vibe-coding-express");
+  const [enableAnnouncementBanner, setEnableAnnouncementBanner] = useState(true);
 
   const [defaultCoursePrice, setDefaultCoursePrice] = useState("2990000.00");
   const [installmentRate3Months, setInstallmentRate3Months] = useState(0);
@@ -53,6 +64,19 @@ export function SettingsManager() {
   const [enableLevelGating, setEnableLevelGating] = useState(true);
   const [enableGuaranteeTrust, setEnableGuaranteeTrust] = useState(true);
 
+  // Security / Credentials State
+  const [credPhone, setCredPhone] = useState("");
+  const [credEmail, setCredEmail] = useState("");
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showOldPass, setShowOldPass] = useState(false);
+  const [showNewPass, setShowNewPass] = useState(false);
+  const [showConfirmPass, setShowConfirmPass] = useState(false);
+  const [credSaving, setCredSaving] = useState(false);
+  const [credSuccess, setCredSuccess] = useState<string | null>(null);
+  const [credError, setCredError] = useState<string | null>(null);
+
   const fetchSettings = async () => {
     setLoading(true);
     try {
@@ -76,6 +100,15 @@ export function SettingsManager() {
         if (s.telegramBotToken !== undefined) setTelegramBotToken(String(s.telegramBotToken));
         if (s.smsApiKey !== undefined) setSmsApiKey(String(s.smsApiKey));
 
+        // Dynamic CTA, URLs & Announcement Banner
+        if (s.headerCtaText !== undefined) setHeaderCtaText(String(s.headerCtaText));
+        if (s.headerCtaLink !== undefined) setHeaderCtaLink(String(s.headerCtaLink));
+        if (s.enrollmentUrl !== undefined) setEnrollmentUrl(String(s.enrollmentUrl));
+        if (s.telegramBotLink !== undefined) setTelegramBotLink(String(s.telegramBotLink));
+        if (s.announcementBannerText !== undefined) setAnnouncementBannerText(String(s.announcementBannerText ?? ""));
+        if (s.announcementBannerLink !== undefined) setAnnouncementBannerLink(String(s.announcementBannerLink ?? ""));
+        if (s.enableAnnouncementBanner !== undefined) setEnableAnnouncementBanner(Boolean(s.enableAnnouncementBanner));
+
         // Feature flags
         if (s.enableGamification !== undefined) setEnableGamification(Boolean(s.enableGamification));
         if (s.enableCommunityForum !== undefined) setEnableCommunityForum(Boolean(s.enableCommunityForum));
@@ -92,8 +125,22 @@ export function SettingsManager() {
     }
   };
 
+  const fetchUserProfile = async () => {
+    try {
+      const res = await fetch("/api/me");
+      const data = await res.json();
+      if (data.user) {
+        if (data.user.phone) setCredPhone(data.user.phone);
+        if (data.user.email) setCredEmail(data.user.email);
+      }
+    } catch (err) {
+      console.error("Fetch user profile error:", err);
+    }
+  };
+
   useEffect(() => {
     fetchSettings();
+    fetchUserProfile();
   }, []);
 
   const handleSave = async (e: React.FormEvent) => {
@@ -118,6 +165,13 @@ export function SettingsManager() {
         clickSecretKey,
         telegramBotToken,
         smsApiKey,
+        headerCtaText,
+        headerCtaLink,
+        enrollmentUrl,
+        telegramBotLink,
+        announcementBannerText,
+        announcementBannerLink,
+        enableAnnouncementBanner,
         enableGamification,
         enableCommunityForum,
         enableInteractiveQuizzes,
@@ -148,6 +202,50 @@ export function SettingsManager() {
     }
   };
 
+  const handleCredentialsSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCredSaving(true);
+    setCredError(null);
+    setCredSuccess(null);
+
+    if (newPassword && newPassword !== confirmPassword) {
+      setCredError("Yangi parollar bir-biriga mos kelmadi");
+      setCredSaving(false);
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/auth/change-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          phone: credPhone,
+          email: credEmail,
+          oldPassword,
+          newPassword,
+          confirmPassword,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        setCredSuccess(data.message || "Parol va ma'lumotlar muvaffaqiyatli yangilandi");
+        setOldPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+        setTimeout(() => setCredSuccess(null), 5000);
+      } else {
+        setCredError(data.error || "Ma'lumotlarni yangilashda xatolik yuz berdi");
+      }
+    } catch (err) {
+      console.error("Credentials submit error:", err);
+      setCredError("Kutilmagan xatolik yuz berdi");
+    } finally {
+      setCredSaving(false);
+    }
+  };
+
   const toggleKeyVisibility = (key: string) => {
     setShowKeys((prev) => ({ ...prev, [key]: !prev[key] }));
   };
@@ -158,6 +256,7 @@ export function SettingsManager() {
     { id: "guarantee", label: "Kafolat Shartlari", icon: ShieldCheck },
     { id: "integrations", label: "Integratsiya Kalitlari", icon: Key },
     { id: "features", label: "Rejalar & Modullarni Ishga Tushirish", icon: CheckCircle },
+    { id: "security", label: "Parol & Login", icon: Lock },
   ] as const;
 
   return (
@@ -170,18 +269,20 @@ export function SettingsManager() {
             Tizim Sozlamalari & Konfiguratsiya
           </h1>
           <p className="text-sm text-ink-muted mt-1">
-            Sayt parametrlari, tariflar, qaytarish kafolati va to'lov tizimlari kalitlarini boshqarish.
+            Sayt parametrlari, tariflar, qaytarish kafolati, integratsiyalar va xavfsizlik sozlamalari.
           </p>
         </div>
 
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-accent text-white font-medium text-sm hover:bg-accent/90 transition-all shadow-sm gap-2 disabled:opacity-50"
-        >
-          {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-          Sozlamalarni Saqlash
-        </button>
+        {activeTab !== "security" && (
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-accent text-white font-medium text-sm hover:bg-accent/90 transition-all shadow-sm gap-2 disabled:opacity-50"
+          >
+            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+            Sozlamalarni Saqlash
+          </button>
+        )}
       </div>
 
       {savedSuccess && (
@@ -192,7 +293,7 @@ export function SettingsManager() {
       )}
 
       {/* Navigation Tabs */}
-      <div className="flex space-x-1 border-b border-border bg-cream-warm p-1 rounded-xl">
+      <div className="flex space-x-1 border-b border-border bg-cream-warm p-1 rounded-xl overflow-x-auto">
         {tabs.map((t) => {
           const Icon = t.icon;
           const isActive = activeTab === t.id;
@@ -201,7 +302,7 @@ export function SettingsManager() {
               key={t.id}
               type="button"
               onClick={() => setActiveTab(t.id)}
-              className={`flex items-center space-x-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
+              className={`flex items-center space-x-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
                 isActive
                   ? "bg-accent text-white shadow-sm"
                   : "text-ink-muted hover:text-ink hover:bg-cream"
@@ -219,6 +320,138 @@ export function SettingsManager() {
         <div className="flex items-center justify-center py-20">
           <Loader2 className="w-8 h-8 animate-spin text-accent" />
         </div>
+      ) : activeTab === "security" ? (
+        /* TAB 6: SECURITY & CREDENTIALS FORM */
+        <form onSubmit={handleCredentialsSubmit} className="bg-cream-warm border border-border rounded-xl p-6 space-y-6">
+          <div className="space-y-4">
+            <h2 className="text-base font-bold text-ink border-b border-border pb-3 flex items-center gap-2">
+              <Lock className="w-4 h-4 text-accent" />
+              Login (Email / Telefon) va Parolni O'zgartirish
+            </h2>
+
+            <p className="text-xs text-ink-muted">
+              Ushbu bo'lim orqali admin/xodim tizimga kirish telefon raqami, email hamda parolini xavfsiz holatda yangilashi mumkin.
+            </p>
+
+            {credSuccess && (
+              <div className="flex items-center gap-2 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-medium animate-in fade-in">
+                <CheckCircle className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                {credSuccess}
+              </div>
+            )}
+
+            {credError && (
+              <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-sm font-medium animate-in fade-in">
+                {credError}
+              </div>
+            )}
+
+            {/* Login Credentials Inputs */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-medium text-ink mb-1">Kirish Telefon Raqami</label>
+                <input
+                  type="text"
+                  value={credPhone}
+                  onChange={(e) => setCredPhone(e.target.value)}
+                  placeholder="+998901234567"
+                  className="w-full px-3.5 py-2 text-sm bg-cream border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent font-mono"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-ink mb-1">Kirish Email Adresi</label>
+                <input
+                  type="email"
+                  value={credEmail}
+                  onChange={(e) => setCredEmail(e.target.value)}
+                  placeholder="admin@academy.mirzo.uz"
+                  className="w-full px-3.5 py-2 text-sm bg-cream border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+                />
+              </div>
+            </div>
+
+            <div className="border-t border-border pt-4 space-y-4">
+              <h3 className="text-xs font-bold uppercase text-ink tracking-wider">Parolni Yangilash</h3>
+
+              {/* Old Password */}
+              <div>
+                <label className="block text-xs font-medium text-ink mb-1">Eski Parol (Tasdiqlash uchun)</label>
+                <div className="relative">
+                  <input
+                    type={showOldPass ? "text" : "password"}
+                    required
+                    value={oldPassword}
+                    onChange={(e) => setOldPassword(e.target.value)}
+                    placeholder="Eski parolingizni kiriting"
+                    className="w-full px-3.5 py-2 text-sm bg-cream border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent font-mono pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowOldPass(!showOldPass)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-muted hover:text-ink"
+                  >
+                    {showOldPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* New Password & Confirm Password */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-ink mb-1">Yangi Parol (Kamida 8 ta belgi)</label>
+                  <div className="relative">
+                    <input
+                      type={showNewPass ? "text" : "password"}
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="w-full px-3.5 py-2 text-sm bg-cream border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent font-mono pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPass(!showNewPass)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-muted hover:text-ink"
+                    >
+                      {showNewPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-ink mb-1">Yangi Parolni Tasdiqlash</label>
+                  <div className="relative">
+                    <input
+                      type={showConfirmPass ? "text" : "password"}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="w-full px-3.5 py-2 text-sm bg-cream border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent font-mono pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPass(!showConfirmPass)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-muted hover:text-ink"
+                    >
+                      {showConfirmPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-end border-t border-border pt-4">
+            <button
+              type="submit"
+              disabled={credSaving}
+              className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-medium text-white bg-accent rounded-lg hover:bg-accent/90 transition-colors shadow-sm disabled:opacity-50 gap-2"
+            >
+              {credSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              Parol va Loginni Yangilash
+            </button>
+          </div>
+        </form>
       ) : (
         <form onSubmit={handleSave} className="bg-cream-warm border border-border rounded-xl p-6 space-y-6">
           {/* TAB 1: General Site Settings */}
@@ -269,6 +502,92 @@ export function SettingsManager() {
                     type="checkbox"
                     checked={maintenanceMode}
                     onChange={(e) => setMaintenanceMode(e.target.checked)}
+                    className="w-5 h-5 accent-accent rounded cursor-pointer"
+                  />
+                </div>
+              </div>
+
+              <h2 className="text-base font-bold text-ink border-b border-border pt-4 pb-3 flex items-center gap-2">
+                <Globe className="w-4 h-4 text-accent" />
+                Dinamik CTA, Havolalar va E'lon Banneri
+              </h2>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-ink mb-1">Header CTA Tugmasi Matni</label>
+                  <input
+                    type="text"
+                    value={headerCtaText}
+                    onChange={(e) => setHeaderCtaText(e.target.value)}
+                    placeholder="Kurs tanlash"
+                    className="w-full px-3.5 py-2 text-sm bg-cream border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-ink mb-1">Header CTA Tugmasi Havolasi</label>
+                  <input
+                    type="text"
+                    value={headerCtaLink}
+                    onChange={(e) => setHeaderCtaLink(e.target.value)}
+                    placeholder="/#kurs-tanlash"
+                    className="w-full px-3.5 py-2 text-sm bg-cream border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-ink mb-1">Ro'yxatdan O'tish / Kabinet Havolasi (Enrollment URL)</label>
+                  <input
+                    type="text"
+                    value={enrollmentUrl}
+                    onChange={(e) => setEnrollmentUrl(e.target.value)}
+                    placeholder="https://academy.mirzo.uz/kabinet"
+                    className="w-full px-3.5 py-2 text-sm bg-cream border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-ink mb-1">Telegram Bot / Maslahat Havolasi</label>
+                  <input
+                    type="text"
+                    value={telegramBotLink}
+                    onChange={(e) => setTelegramBotLink(e.target.value)}
+                    placeholder="https://t.me/m/ODAfK_QIMjky"
+                    className="w-full px-3.5 py-2 text-sm bg-cream border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-ink mb-1">E'lon Banner Matni</label>
+                  <input
+                    type="text"
+                    value={announcementBannerText}
+                    onChange={(e) => setAnnouncementBannerText(e.target.value)}
+                    placeholder="Yangi Vibe Coding Express guruhiga qabul boshlandi!"
+                    className="w-full px-3.5 py-2 text-sm bg-cream border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-ink mb-1">E'lon Banner Havolasi</label>
+                  <input
+                    type="text"
+                    value={announcementBannerLink}
+                    onChange={(e) => setAnnouncementBannerLink(e.target.value)}
+                    placeholder="/kurs/vibe-coding-express"
+                    className="w-full px-3.5 py-2 text-sm bg-cream border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent font-mono"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between p-3.5 bg-cream border border-border rounded-lg md:col-span-2">
+                  <div>
+                    <span className="block text-sm font-semibold text-ink">E'lon Bannerini Ko'rsatish (Announcement Banner)</span>
+                    <span className="block text-xs text-ink-muted">Sayt yuqorisida e'lon tasmasini namoyish etish</span>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={enableAnnouncementBanner}
+                    onChange={(e) => setEnableAnnouncementBanner(e.target.checked)}
                     className="w-5 h-5 accent-accent rounded cursor-pointer"
                   />
                 </div>

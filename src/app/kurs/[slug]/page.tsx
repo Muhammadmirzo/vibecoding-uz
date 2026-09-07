@@ -66,7 +66,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!course) return { title: "Kurs Topilmadi" };
 
   return {
-    title: `${course.title} — ${course.subtitle} | Vibecoding.uz`,
+    title: `${course.title} — ${course.subtitle} | Mirzo Academy`,
     description: course.description,
   };
 }

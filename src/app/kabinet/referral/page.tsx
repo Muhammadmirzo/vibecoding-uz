@@ -46,7 +46,7 @@ export default function ReferralPage() {
 
   const referralUrl = typeof window !== "undefined"
     ? `${window.location.origin}/ref/${referralCode}`
-    : `https://vibecoding.uz/ref/${referralCode}`;
+    : `https://academy.mirzo.uz/ref/${referralCode}`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(referralUrl);
@@ -217,7 +217,7 @@ export default function ReferralPage() {
               href={`https://t.me/share/url?url=${encodeURIComponent(
                 referralUrl
               )}&text=${encodeURIComponent(
-                "Vibecoding.uz da AI va Vibe Coding bo'yicha 8 haftalik intensiv kursga qo'shiling va 10% chegirmaga ega bo'ling!"
+                "Mirzo Academy (academy.mirzo.uz) da AI va Vibe Coding bo'yicha 8 haftalik intensiv kursga qo'shiling va 10% chegirmaga ega bo'ling!"
               )}`}
               target="_blank"
               rel="noreferrer"

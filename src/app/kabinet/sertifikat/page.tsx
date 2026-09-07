@@ -4,7 +4,7 @@ import { Award, Download, ExternalLink, ShieldCheck } from "lucide-react";
 import { KabinetNav } from "@/features/lms/components/KabinetNav";
 
 export const metadata: Metadata = {
-  title: "Mening Sertifikatim | Vibecoding.uz",
+  title: "Mening Sertifikatim | Mirzo Academy",
   description: "Vibe Coding Express kursini muvaffaqiyatli yakunlaganlik to'g'risidagi rasmiy sertifikat.",
 };
 
@@ -21,7 +21,7 @@ export default function SertifikatPage() {
             <Award className="w-3.5 h-3.5" /> Rasmiy Sertifikat
           </span>
           <h1 className="text-2xl md:text-3xl font-extrabold text-[var(--color-ink)]">
-            Vibecoding.uz Sertifikati
+            Mirzo Academy Sertifikati
           </h1>
           <p className="text-xs text-[var(--color-ink-muted)]">
             Noyob kodi: <strong className="font-mono text-[var(--color-accent)]">{certificateCode}</strong>

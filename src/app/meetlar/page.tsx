@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { Calendar, Video, Play, ExternalLink } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Jonli Meetlar va Vebinarlar Archive | Vibecoding.uz",
-  description: "Ibrohim Qodirov bilan haftalik jonli sessiyalar va o'tgan meetlar yozuvlari.",
+  title: "Jonli Meetlar va Vebinarlar Archive | Mirzo Academy",
+  description: "Ibrohim Qodirov va AI ekspertlari bilan o'tkazilgan ochiq muloqotlar yozuvi.",
 };
 
 export default function MeetlarPage() {

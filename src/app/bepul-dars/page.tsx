@@ -3,7 +3,7 @@ import { Check, ShieldCheck, Sparkles } from "lucide-react";
 import { FreeLessonForm } from "./FreeLessonForm";
 
 export const metadata: Metadata = {
-  title: "Bepul Dars — AI bilan 30 Daqiqada Mahsulot Qurish | Vibecoding.uz",
+  title: "Bepul Dars — AI bilan 30 Daqiqada Mahsulot Qurish | Mirzo Academy",
   description: "Claude Code va Cursor yordamida dasturchilarsiz ilova va botlar qurish metodikasi bilan tanishing.",
 };
 

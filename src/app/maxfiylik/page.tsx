@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Maxfiylik Siyosati | Vibecoding.uz",
+  title: "Maxfiylik Siyosati | Mirzo Academy",
   description: "Foydalanuvchilarning shaxsiy ma'lumotlarini himoya qilish siyosati.",
 };
 

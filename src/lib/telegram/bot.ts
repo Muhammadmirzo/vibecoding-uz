@@ -269,7 +269,7 @@ export function initTelegramBot(): Telegraf | null {
 
     if (existing.length > 0) {
       return ctx.reply(
-        `Assalomu alaykum, ${existing[0].fullName}!\n\nVibecoding platformasining rasmiy botiga xush kelibsiz. Hisobingiz ulangan.`,
+        `Assalomu alaykum, ${existing[0].fullName}!\n\nMirzo Academy platformasining rasmiy botiga xush kelibsiz. Hisobingiz ulangan.`,
         Markup.keyboard([
           [Markup.button.text("🆘 Operator bilan bog'lanish")],
         ]).resize()
@@ -277,7 +277,7 @@ export function initTelegramBot(): Telegraf | null {
     }
 
     return ctx.reply(
-      "Assalomu alaykum! Vibecoding platformasiga xush kelibsiz.\n\nHisobingizni ulash uchun pastdagi tugma orqali telefon raqamingizni yuboring:",
+      "Assalomu alaykum! Mirzo Academy platformasiga xush kelibsiz.\n\nHisobingizni ulash uchun pastdagi tugma orqali telefon raqamingizni yuboring:",
       Markup.keyboard([
         [Markup.button.contactRequest("📱 Telefon raqamni yuborish")],
         [Markup.button.text("🆘 Operator bilan bog'lanish")],

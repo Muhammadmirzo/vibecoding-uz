@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { BadgeCheck, Star, Award } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Bitiruvchi Ekspertlar Reyestri | Vibecoding.uz",
-  description: "Vibe Coding kursini muvaffaqiyatli yakunlagan verified bitiruvchilar va ularning baholangan loyihalari.",
+  title: "Bitiruvchi Ekspertlar Reyestri | Mirzo Academy",
+  description: "Mirzo Academy Vibe Coding Express kursi bitiruvchilari va sertifikatlangan AI mutaxassislari katalogi.",
 };
 
 export default function EkspertlarPage() {

@@ -8,7 +8,7 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { code } = await params;
   return {
-    title: `Sertifikat Tekshiruvi ${code} | Vibecoding.uz`,
+    title: `Sertifikat Tekshiruvi ${code} | Mirzo Academy`,
     description: "Sertifikatning haqiqiyligini ommaviy tekshirish sahifasi.",
   };
 }

@@ -38,7 +38,7 @@ export const STATIC_BLOG_POSTS: BlogPostItem[] = [
     excerpt: "Dasturchi kabi sintaksis yozmasdan, AI agentlariga aniq arxitektura va prompt berib to'liq ishlaydigan dasturiy mahsulotlar yaratish metodologiyasi.",
     coverUrl: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80",
     authorName: "Ibrohim Qodirov",
-    authorRole: "Vibecoding.uz Asoschisi & Bosh Instruktor",
+    authorRole: "Mirzo Academy Asoschisi & Bosh Instruktor",
     authorAvatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
     category: "Vibe Coding",
     readTimeMin: 6,
@@ -147,7 +147,7 @@ Terminal agentlari dasturchining o'rnini to'liq egallamaydi, ammo Claude Code'da
     excerpt: "Real keys: qanday qilib Cursor Composer va zamonaviy Next.js App Router yordamida buyurtmalar qabul qiluvchi platforma noldan ishga tushirildi.",
     coverUrl: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80",
     authorName: "Ibrohim Qodirov",
-    authorRole: "Vibecoding.uz Asoschisi",
+    authorRole: "Mirzo Academy Asoschisi",
     authorAvatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
     category: "Keyslar",
     readTimeMin: 7,
@@ -278,7 +278,7 @@ Shu sababli kompaniyalar kodni noldan sekin yozuvchi emas, balki AI vositalari o
 
 - ChatGPT va Claude bilan professional muloqotni o'zlashtiring;
 - Git va terminal asoslarini o'rganing;
-- Vibecoding.uz kabi amaliy mentorlik kurslarida real loyihalar ustida ishlang.
+- Mirzo Academy (academy.mirzo.uz) kabi amaliy mentorlik kurslarida real loyihalar ustida ishlang.
 
 ## Xulosa: Kelajakka Sarmoya {#xulosa}
 

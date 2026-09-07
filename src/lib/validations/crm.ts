@@ -76,6 +76,14 @@ export const analyticsQuerySchema = z.object({
   endDate: z.string().optional(),
 });
 
+export const studentActivityFilterSchema = z.object({
+  search: z.string().optional(),
+  cohortId: z.string().optional(),
+  status: z.enum(["all", "active", "at_risk", "completed", "inactive"]).default("all"),
+  page: z.number().int().positive().optional().default(1),
+  limit: z.number().int().positive().optional().default(10),
+});
+
 export type LeadStatus = z.infer<typeof leadStatusSchema>;
 export type LeadSource = z.infer<typeof leadSourceSchema>;
 export type CreateLeadInput = z.infer<typeof createLeadSchema>;
@@ -85,3 +93,4 @@ export type UpdateCohortInput = z.infer<typeof updateCohortSchema>;
 export type CriterionResult = z.infer<typeof criterionResultSchema>;
 export type GradeHomeworkInput = z.infer<typeof gradeHomeworkSchema>;
 export type AnalyticsQueryInput = z.infer<typeof analyticsQuerySchema>;
+export type StudentActivityFilterInput = z.infer<typeof studentActivityFilterSchema>;

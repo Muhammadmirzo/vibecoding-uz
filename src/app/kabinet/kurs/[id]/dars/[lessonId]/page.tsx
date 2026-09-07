@@ -2,13 +2,20 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { CirclePlay, Copy, Check, FileText, Download, Send, ArrowLeft, ArrowRight, ShieldCheck } from "lucide-react";
+import { CirclePlay, Copy, Check, FileText, Download, Send, ArrowLeft, ArrowRight, ShieldCheck, Video, Youtube } from "lucide-react";
+import { VideoPlayer } from "@/features/lms/components/VideoPlayer";
 
 export default function LessonPlayerPage() {
   const [activeTab, setActiveTab] = React.useState<"konspekt" | "prompts" | "materials" | "homework">("prompts");
   const [copiedIndex, setCopiedIndex] = React.useState<number | null>(null);
   const [submissionLink, setSubmissionLink] = React.useState("");
   const [submissionSuccess, setSubmissionSuccess] = React.useState(false);
+  const [videoSource, setVideoSource] = React.useState<"youtube" | "direct">("youtube");
+
+  const sampleVideoUrls = {
+    youtube: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    direct: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+  };
 
   const prompts = [
     {
@@ -45,23 +52,46 @@ export default function LessonPlayerPage() {
         </div>
 
         {/* Lesson Title */}
-        <h1 className="text-2xl md:text-3xl font-extrabold text-[var(--color-ink)]">
-          4-Dars: PostgreSQL & Drizzle ORM Sxemasini Qurish
-        </h1>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <h1 className="text-2xl md:text-3xl font-extrabold text-[var(--color-ink)]">
+            4-Dars: PostgreSQL & Drizzle ORM Sxemasini Qurish
+          </h1>
+          {/* Hybrid Video Source Switcher */}
+          <div className="inline-flex items-center gap-1.5 p-1 rounded-lg bg-cream-warm border border-border text-xs font-semibold">
+            <button
+              onClick={() => setVideoSource("youtube")}
+              className={`px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-all ${
+                videoSource === "youtube"
+                  ? "bg-accent text-white shadow-sm"
+                  : "text-ink-muted hover:text-ink"
+              }`}
+            >
+              <Youtube className="w-3.5 h-3.5" />
+              <span>YouTube Embed</span>
+            </button>
+            <button
+              onClick={() => setVideoSource("direct")}
+              className={`px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-all ${
+                videoSource === "direct"
+                  ? "bg-accent text-white shadow-sm"
+                  : "text-ink-muted hover:text-ink"
+              }`}
+            >
+              <Video className="w-3.5 h-3.5" />
+              <span>Direct MP4 Stream</span>
+            </button>
+          </div>
+        </div>
 
         {/* Main Player & Tabs Layout */}
         <div className="grid lg:grid-cols-[1fr_420px] gap-8 items-start">
           
           {/* Video Player Container */}
           <div className="space-y-6">
-            <div className="relative aspect-video rounded-[var(--radius-xl)] bg-[var(--color-ink)] overflow-hidden shadow-[var(--shadow-lg)] border border-[var(--color-border)] flex items-center justify-center">
-              <div className="text-center space-y-3 z-10">
-                <div className="w-16 h-16 rounded-full bg-[var(--color-accent)] text-white flex items-center justify-center mx-auto shadow-lg cursor-pointer hover:scale-105 transition-transform">
-                  <CirclePlay className="w-8 h-8 ml-0.5" />
-                </div>
-                <div className="text-white text-sm font-semibold">Darsni tomosha qilish (42 daqiqa)</div>
-              </div>
-            </div>
+            <VideoPlayer
+              videoUrl={sampleVideoUrls[videoSource]}
+              title="4-Dars: PostgreSQL & Drizzle ORM Sxemasini Qurish"
+            />
 
             {/* Lesson Tabs Navigation */}
             <div className="border-b border-[var(--color-border)] flex items-center gap-2 font-semibold text-sm">

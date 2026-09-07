@@ -52,6 +52,18 @@ export function UserManager() {
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
 
+  // Staff Creation Modal
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [createForm, setCreateForm] = useState({
+    fullName: "",
+    phone: "+998",
+    email: "",
+    password: "",
+    role: "admin" as "superadmin" | "admin" | "manager" | "mentor" | "student",
+  });
+  const [creatingStaff, setCreatingStaff] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
+
   // Role Edit Modal
   const [selectedUser, setSelectedUser] = useState<UserItem | null>(null);
   const [newRole, setNewRole] = useState<"superadmin" | "admin" | "manager" | "mentor" | "student">("student");
@@ -110,6 +122,40 @@ export function UserManager() {
     }
   }, [activeTab, search, roleFilter, auditSearch, actionFilter]);
 
+  const handleCreateStaff = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCreatingStaff(true);
+    setCreateError(null);
+
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(createForm),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setIsCreateModalOpen(false);
+        setCreateForm({
+          fullName: "",
+          phone: "+998",
+          email: "",
+          password: "",
+          role: "admin",
+        });
+        fetchUsers();
+      } else {
+        setCreateError(data.error || "Xodim yaratishda xatolik");
+      }
+    } catch (err) {
+      console.error("Create staff error:", err);
+      setCreateError("Xodim yaratishda kutilmagan xatolik yuz berdi");
+    } finally {
+      setCreatingStaff(false);
+    }
+  };
+
   const handleOpenRoleModal = (user: UserItem) => {
     setSelectedUser(user);
     setNewRole(user.role);
@@ -152,7 +198,7 @@ export function UserManager() {
     superadmin: "Super Admin",
     admin: "Administrator",
     manager: "Menejer",
-    mentor: "Mentor",
+    mentor: "Mentor (Kurator)",
     student: "Talaba",
   };
 
@@ -169,6 +215,17 @@ export function UserManager() {
             Xodimlar huquqlarini boshqarish va tizimda amalga oshirilgan barcha harakatlarni kuzatish.
           </p>
         </div>
+
+        <button
+          onClick={() => {
+            setCreateError(null);
+            setIsCreateModalOpen(true);
+          }}
+          className="inline-flex items-center justify-center px-4 py-2.5 rounded-lg bg-accent text-white font-medium text-sm hover:bg-accent/90 transition-all shadow-sm gap-2 self-start sm:self-auto"
+        >
+          <UserPlus className="w-4 h-4" />
+          Yangi Xodim Yaratish
+        </button>
       </div>
 
       {/* Navigation Tabs */}
@@ -224,7 +281,7 @@ export function UserManager() {
                 <option value="superadmin">Super Admin</option>
                 <option value="admin">Administrator</option>
                 <option value="manager">Menejer</option>
-                <option value="mentor">Mentor</option>
+                <option value="mentor">Mentor (Kurator)</option>
                 <option value="student">Talaba</option>
               </select>
             </div>
@@ -276,7 +333,7 @@ export function UserManager() {
                         <td className="px-4 py-3.5">
                           <span
                             className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
-                              roleColors[user.role] || "bg-gray-100 text-gray-800"
+                              roleColors[user.role] || "bg-cream text-ink border-border"
                             }`}
                           >
                             <ShieldCheck className="w-3 h-3 mr-1" />
@@ -332,6 +389,8 @@ export function UserManager() {
               >
                 <option value="all">Barcha amallar</option>
                 <option value="user.role_change">Rol o'zgarishi</option>
+                <option value="user.create">Xodim yaratilishi</option>
+                <option value="auth.change_password">Parol/Login yangilanishi</option>
                 <option value="blog.create">Blog yaratish</option>
                 <option value="blog.update">Blog tahrirlash</option>
                 <option value="blog.delete">Blog o'chirish</option>
@@ -406,9 +465,118 @@ export function UserManager() {
         </div>
       )}
 
+      {/* Create Staff Modal */}
+      {isCreateModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
+          <div className="bg-cream-warm border border-border rounded-2xl max-w-md w-full p-6 space-y-5 shadow-xl">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <h3 className="text-base font-bold text-ink flex items-center gap-2">
+                <UserPlus className="w-5 h-5 text-accent" />
+                Yangi Xodim Accounti Yaratish
+              </h3>
+              <button
+                onClick={() => setIsCreateModalOpen(false)}
+                className="p-1 rounded-lg text-ink-muted hover:text-ink hover:bg-cream"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {createError && (
+              <div className="p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 text-xs font-medium">
+                {createError}
+              </div>
+            )}
+
+            <form onSubmit={handleCreateStaff} className="space-y-4">
+              <div>
+                <label className="block text-xs font-medium text-ink mb-1">F.I.SH. (To'liq Ism)</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Masalan: Jamshid Alimov"
+                  value={createForm.fullName}
+                  onChange={(e) => setCreateForm({ ...createForm, fullName: e.target.value })}
+                  className="w-full px-3.5 py-2 text-sm bg-cream border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-ink mb-1">Telefon Raqam (+998)</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="+998901234567"
+                  value={createForm.phone}
+                  onChange={(e) => setCreateForm({ ...createForm, phone: e.target.value })}
+                  className="w-full px-3.5 py-2 text-sm bg-cream border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent font-mono"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-ink mb-1">Email Adres (Ixtiyoriy)</label>
+                <input
+                  type="email"
+                  placeholder="jamshid@academy.mirzo.uz"
+                  value={createForm.email}
+                  onChange={(e) => setCreateForm({ ...createForm, email: e.target.value })}
+                  className="w-full px-3.5 py-2 text-sm bg-cream border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-ink mb-1">Parol (kamida 8 ta belgi)</label>
+                <input
+                  type="password"
+                  required
+                  minLength={8}
+                  placeholder="••••••••"
+                  value={createForm.password}
+                  onChange={(e) => setCreateForm({ ...createForm, password: e.target.value })}
+                  className="w-full px-3.5 py-2 text-sm bg-cream border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent font-mono"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-ink mb-1">Xodimlarga Rol Biriktirish</label>
+                <select
+                  value={createForm.role}
+                  onChange={(e) => setCreateForm({ ...createForm, role: e.target.value as any })}
+                  className="w-full px-3.5 py-2.5 text-sm bg-cream border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+                >
+                  <option value="superadmin">Super Admin - To'liq tizim va sozlamalar</option>
+                  <option value="admin">Administrator - To'liq CRM kirishi</option>
+                  <option value="mentor">Mentor (Kurator) - Uy vazifalarini baholash</option>
+                  <option value="manager">Menejer - Leads Kanban & Sotuvlar</option>
+                  <option value="student">Talaba - Oddiy LMS o'quvchi</option>
+                </select>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-border">
+                <button
+                  type="button"
+                  onClick={() => setIsCreateModalOpen(false)}
+                  className="px-4 py-2 text-xs font-medium text-ink-muted hover:text-ink"
+                >
+                  Bekor qilish
+                </button>
+                <button
+                  type="submit"
+                  disabled={creatingStaff}
+                  className="inline-flex items-center justify-center px-4 py-2 text-xs font-medium text-white bg-accent rounded-lg hover:bg-accent/90 transition-colors shadow-sm disabled:opacity-50 gap-2"
+                >
+                  {creatingStaff ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
+                  Xodim Yaratish
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Role Change Modal */}
       {selectedUser && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
           <div className="bg-cream-warm border border-border rounded-2xl max-w-md w-full p-6 space-y-5 shadow-xl">
             <div className="flex items-center justify-between border-b border-border pb-3">
               <h3 className="text-base font-bold text-ink flex items-center gap-2">
@@ -438,7 +606,7 @@ export function UserManager() {
                   className="w-full px-3.5 py-2.5 text-sm bg-cream border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
                 >
                   <option value="student">Talaba (Student) - LMS o'quvchi</option>
-                  <option value="mentor">Mentor - Uy vazifasini baholovchi</option>
+                  <option value="mentor">Mentor (Kurator) - Uy vazifasini baholovchi</option>
                   <option value="manager">Menejer - Leads Kanban & Sotuv</option>
                   <option value="admin">Administrator - To'liq CRM kirishi</option>
                   <option value="superadmin">Super Admin - Tizim va Sozlamalar</option>
@@ -470,7 +638,7 @@ export function UserManager() {
 
       {/* Audit Log Details Modal */}
       {viewDetailsLog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
           <div className="bg-cream-warm border border-border rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-xl">
             <div className="flex items-center justify-between border-b border-border pb-3">
               <h3 className="text-sm font-bold text-ink font-mono">

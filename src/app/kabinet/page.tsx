@@ -4,8 +4,8 @@ import { BookOpen, CirclePlay, CheckCircle2, Flame, Award, Clock, ArrowRight } f
 import { KabinetNav } from "@/features/lms/components/KabinetNav";
 
 export const metadata: Metadata = {
-  title: "Talaba Kabineti | Vibecoding.uz",
-  description: "Darslarni ko'rish, uy vazifalarini topshirish va o'zlashtirish progressini kuzatish.",
+  title: "Talaba Kabineti | Mirzo Academy",
+  description: "Barcha o'quv modullari, vazifalar, baholar va sertifikat holatini boshqarish.",
 };
 
 export default function KabinetDashboardPage() {

@@ -25,6 +25,15 @@ import {
 export const Header = React.memo(function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [scrolled, setScrolled] = React.useState(false);
+  const [siteSettings, setSiteSettings] = React.useState<{
+    headerCtaText?: string;
+    headerCtaLink?: string;
+    enrollmentUrl?: string;
+    telegramBotLink?: string;
+    announcementBannerText?: string;
+    announcementBannerLink?: string;
+    enableAnnouncementBanner?: boolean;
+  }>({});
 
   const { user, isLoading, openAuthModal, logout } = useAuth();
 
@@ -36,6 +45,17 @@ export const Header = React.memo(function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  React.useEffect(() => {
+    fetch("/api/admin/settings")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.settings) {
+          setSiteSettings(data.settings);
+        }
+      })
+      .catch((err) => console.error("Failed to fetch settings in Header:", err));
+  }, []);
+
   const getUserInitials = (name: string) => {
     if (!name) return "U";
     const parts = name.trim().split(" ");
@@ -45,14 +65,34 @@ export const Header = React.memo(function Header() {
     return name.slice(0, 2).toUpperCase();
   };
 
+  const ctaText = siteSettings.headerCtaText || "Kurs tanlash";
+  const ctaLink = siteSettings.headerCtaLink || "/#kurs-tanlash";
+  const tgLink = siteSettings.telegramBotLink || "https://t.me/m/ODAfK_QIMjky";
+  const bannerText = siteSettings.announcementBannerText ?? "Yangi Vibe Coding Express guruhiga qabul boshlandi!";
+  const bannerLink = siteSettings.announcementBannerLink ?? "/kurs/vibe-coding-express";
+  const showBanner = siteSettings.enableAnnouncementBanner ?? true;
+
   return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-200 ${
-        scrolled
-          ? "bg-[var(--color-cream)]/90 backdrop-blur-md border-b border-[var(--color-border)] shadow-[var(--shadow-sm)]"
-          : "bg-transparent border-b border-transparent"
-      }`}
-    >
+    <>
+      {showBanner && bannerText && (
+        <div className="bg-[var(--color-accent)] text-white text-xs font-semibold py-2 px-4 text-center z-[51] relative flex items-center justify-center gap-2">
+          {bannerLink ? (
+            <Link href={bannerLink} className="hover:underline inline-flex items-center gap-1">
+              <span>{bannerText}</span>
+              <ArrowRight className="w-3.5 h-3.5 inline" />
+            </Link>
+          ) : (
+            <span>{bannerText}</span>
+          )}
+        </div>
+      )}
+      <header
+        className={`fixed ${showBanner && bannerText ? "top-8" : "top-0"} left-0 right-0 z-50 transition-all duration-200 ${
+          scrolled
+            ? "bg-[var(--color-cream)]/90 backdrop-blur-md border-b border-[var(--color-border)] shadow-[var(--shadow-sm)]"
+            : "bg-transparent border-b border-transparent"
+        }`}
+      >
       <div className="mx-auto w-full max-w-[1360px] px-5 md:px-8 lg:px-10 flex items-center justify-between gap-4 h-16 md:h-[72px]">
         {/* Brand Logo & Main Nav */}
         <div className="flex items-center gap-6 min-w-0">
@@ -152,7 +192,7 @@ export const Header = React.memo(function Header() {
         <div className="flex items-center gap-2 md:gap-3">
           {/* Telegram Online Advice Headset */}
           <a
-            href="https://t.me/m/ODAfK_QIMjky"
+            href={tgLink}
             target="_blank"
             rel="noreferrer"
             className="hidden md:inline-flex items-center justify-center w-10 h-10 rounded-[var(--radius-md)] text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] hover:bg-[var(--color-cream-warm)] transition-colors relative"
@@ -272,9 +312,9 @@ export const Header = React.memo(function Header() {
           )}
 
           {/* Primary CTA Button */}
-          <a href="/#kurs-tanlash" className="hidden md:inline-flex">
+          <a href={ctaLink} className="hidden md:inline-flex">
             <button type="button" className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] font-medium btn-primary h-10 px-5 text-sm">
-              Kurs tanlash
+              {ctaText}
               <ArrowRight className="w-4 h-4" />
             </button>
           </a>
@@ -308,7 +348,7 @@ export const Header = React.memo(function Header() {
               </div>
               <div className="pt-2 border-t border-[var(--color-border)] flex items-center justify-between">
                 <Link
-                  href="/kabinet"
+                  href={siteSettings.enrollmentUrl || "/kabinet"}
                   prefetch={true}
                   onClick={() => setMobileMenuOpen(false)}
                   className="text-xs font-semibold text-[var(--color-accent)] flex items-center gap-1"
@@ -398,14 +438,15 @@ export const Header = React.memo(function Header() {
             Resurslar
           </Link>
           <a
-            href="/#kurs-tanlash"
+            href={ctaLink}
             onClick={() => setMobileMenuOpen(false)}
             className="block w-full text-center py-3 rounded-[var(--radius-md)] btn-primary text-sm font-semibold"
           >
-            Kurs tanlash
+            {ctaText}
           </a>
         </div>
       )}
     </header>
+    </>
   );
 });
