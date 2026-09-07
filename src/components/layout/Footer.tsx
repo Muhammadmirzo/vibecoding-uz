@@ -13,9 +13,9 @@ export const Footer = React.memo(function Footer() {
           <div className="space-y-3 md:col-span-1">
             <Link href="/" prefetch={true} className="flex items-center gap-2 font-bold text-lg text-[var(--color-ink)]">
               <span className="w-7 h-7 rounded-md bg-[var(--color-accent)] text-white flex items-center justify-center font-mono text-sm font-black">
-                V
+                M
               </span>
-              <span>Vibecoding.uz</span>
+              <span>academy.mirzo.uz</span>
             </Link>
             <p className="text-xs leading-relaxed text-[var(--color-ink-muted)]">
               AI bilan mahsulotlar qurishni jonli loyihalar muallifidan o'rganing. Dasturchilarsiz, g'oyadan ishlaydigan MVPgacha.
@@ -73,7 +73,7 @@ export const Footer = React.memo(function Footer() {
 
         {/* Bottom copyright line */}
         <div className="pt-6 border-t border-[var(--color-border)] flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-mono text-[var(--color-ink-subtle)]">
-          <div>© {new Date().getFullYear()} Vibecoding.uz. Barcha huquqlar himoyalangan.</div>
+          <div>© {new Date().getFullYear()} academy.mirzo.uz. Barcha huquqlar himoyalangan.</div>
           <div>Toshkent, O'zbekiston · Ibrohim Qodirov</div>
         </div>
       </div>

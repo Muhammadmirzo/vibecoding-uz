@@ -14,9 +14,9 @@ const instrumentSerif = { variable: "font-serif" };
 const geistMono = { variable: "font-mono" };
 
 export const metadata: Metadata = {
-  title: "Vibecoding.uz — AI bilan mahsulot qurishni jonli mentordan o'rganing | Ibrohim Qodirov",
+  title: "Mirzo Academy — AI bilan mahsulot qurishni jonli mentordan o'rganing | academy.mirzo.uz",
   description: "EduBaza (27 000+ o'qituvchi), Chatla (500+ biznes) — AI bilan qurilgan jonli mahsulotlar. Dasturlashsiz, g'oyadan jonli MVPgacha 8 haftada yetib boring.",
-  keywords: ["vibecoding kursi", "vibe coding O'zbekiston", "Claude Code kursi", "AI bilan dasturlash", "Ibrohim Qodirov"],
+  keywords: ["Mirzo Academy", "vibecoding kursi", "vibe coding O'zbekiston", "Claude Code kursi", "AI bilan dasturlash"],
   manifest: "/manifest.json",
   icons: {
     icon: "/favicon.ico",
@@ -24,14 +24,14 @@ export const metadata: Metadata = {
   },
   appleWebApp: {
     capable: true,
-    title: "Vibecoding",
+    title: "Mirzo Academy",
     statusBarStyle: "default",
   },
   openGraph: {
-    title: "Vibecoding.uz — AI bilan mahsulot qurishni o'rganing",
+    title: "Mirzo Academy — academy.mirzo.uz",
     description: "EduBaza va Chatla loyihalarini 100% AI bilan qurgan mentordan o'rganing.",
-    url: "https://vibecoding.uz",
-    siteName: "Vibecoding.uz",
+    url: "https://academy.mirzo.uz",
+    siteName: "Mirzo Academy",
     locale: "uz_UZ",
     type: "website",
   },

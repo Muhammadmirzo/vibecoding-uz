@@ -5,9 +5,9 @@ import { siteSettingsSchema } from "@/lib/validations";
 import { eq } from "drizzle-orm";
 
 const DEFAULT_SETTINGS = {
-  siteTitle: "Vibecoding Uz",
+  siteTitle: "Mirzo Academy",
   supportPhone: "+998 71 200 00 00",
-  supportTelegram: "@vibecoding_support_bot",
+  supportTelegram: "@mirzo_academy_support_bot",
   maintenanceMode: false,
   defaultCoursePrice: "2990000.00",
   installmentRate3Months: 0,

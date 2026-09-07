@@ -106,7 +106,7 @@ export async function generateCertificatePdf(
   };
 
   // 4. Header Badge / Emblem
-  drawCenteredText("VIBECODING ACADEMY", height - 85, 14, fontHelveticaBold, accentGold);
+  drawCenteredText("MIRZO ACADEMY", height - 85, 14, fontHelveticaBold, accentGold);
   drawCenteredText("RASMIY TA'LIM SERTIFIKATI", height - 108, 11, fontHelvetica, textMuted);
 
   // 5. Main Title
@@ -148,7 +148,7 @@ export async function generateCertificatePdf(
   // Right: Signature
   const rightX = width - 240;
   page.drawText("Platforma Rahiari:", { x: rightX, y: 110, size: 10, font: fontHelvetica, color: textMuted });
-  page.drawText("Vibecoding Expert Team", { x: rightX, y: 92, size: 12, font: fontHelveticaBold, color: darkInk });
+  page.drawText("Mirzo Academy Team", { x: rightX, y: 92, size: 12, font: fontHelveticaBold, color: darkInk });
   page.drawLine({
     start: { x: rightX, y: 85 },
     end: { x: rightX + 170, y: 85 },
@@ -166,7 +166,7 @@ export async function generateCertificatePdf(
     color: borderNavy,
   });
 
-  const verifyUrl = `https://vibecoding.uz/sertifikat?code=${certCode}`;
+  const verifyUrl = `https://academy.mirzo.uz/shahodatnoma/${certCode}`;
   const verifyText = `Haqiqiyligini tekshirish: ${verifyUrl}`;
   const verifyWidth = fontHelvetica.widthOfTextAtSize(verifyText, 9);
   page.drawText(verifyText, {

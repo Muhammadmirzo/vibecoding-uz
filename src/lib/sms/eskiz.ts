@@ -205,7 +205,7 @@ export async function sendSms(input: SendSmsInput): Promise<SendSmsResult> {
  */
 export async function sendOtpSms(input: SendOtpSmsInput): Promise<SendSmsResult> {
   const validated = sendOtpSmsSchema.parse(input);
-  const message = `Vibecoding.uz — Tasdiqlash kodingiz: ${validated.code}. Kodni hech kimga bermang!`;
+  const message = `academy.mirzo.uz — Tasdiqlash kodingiz: ${validated.code}. Kodni hech kimga bermang!`;
   return sendSms({
     phone: validated.phone,
     message,

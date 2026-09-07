@@ -62,10 +62,10 @@ export const Header = React.memo(function Header() {
             className="flex items-center gap-2 shrink-0 font-bold text-xl tracking-tight text-[var(--color-ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] rounded-md"
           >
             <span className="w-8 h-8 rounded-lg bg-[var(--color-accent)] text-white flex items-center justify-center font-mono text-lg font-black">
-              V
+              M
             </span>
             <span className="font-extrabold tracking-tight text-lg">
-              Vibecoding<span className="text-[var(--color-accent)]">.uz</span>
+              academy<span className="text-[var(--color-accent)]">.mirzo.uz</span>
             </span>
           </Link>
 

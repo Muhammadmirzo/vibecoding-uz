@@ -187,7 +187,7 @@ describe("Infrastructure Integrations: SMS, Email, Cron, Search & PWA", () => {
 
       const content = fs.readFileSync(manifestPath, "utf-8");
       const parsed = JSON.parse(content);
-      expect(parsed.name).toContain("Vibecoding");
+      expect(parsed.name).toContain("Mirzo Academy");
       expect(parsed.start_url).toBe("/");
       expect(parsed.display).toBe("standalone");
     });
