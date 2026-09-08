@@ -84,7 +84,7 @@ export default function TestimoniyalarPage() {
           </div>
 
           <div className="bg-cream-warm border border-border-strong rounded-xl p-5 text-center space-y-1 shadow-sm">
-            <div className="text-2xl md:text-3xl font-extrabold text-[#27C93F] font-mono">
+            <div className="text-2xl md:text-3xl font-extrabold text-success font-mono">
               45+
             </div>
             <div className="text-xs text-ink-muted">Jonli MVP & Startaplar</div>
@@ -197,7 +197,7 @@ export default function TestimoniyalarPage() {
           <span>
             Sharhlar soni: <strong className="text-accent">{filteredReviews.length} ta</strong>
           </span>
-          <span className="flex items-center gap-1.5 text-[#27C93F]">
+          <span className="flex items-center gap-1.5 text-success">
             <ShieldCheck className="w-4 h-4" /> Barcha sharhlar haqiqiy bitiruvchilar tomonidan qoldirilgan
           </span>
         </div>
@@ -284,7 +284,7 @@ export default function TestimoniyalarPage() {
                           {item.fullName}
                           {item.verified && (
                             <span title="Tasdiqlangan bitiruvchi">
-                              <CheckCircle2 className="w-3.5 h-3.5 text-[#27C93F]" />
+                              <CheckCircle2 className="w-3.5 h-3.5 text-success" />
                             </span>
                           )}
                         </div>

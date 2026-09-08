@@ -150,7 +150,7 @@ export default async function CourseDetailPage({ params }: Props) {
                 "7 kunlik 100% Pul qaytarish kafolati",
               ].map((item, idx) => (
                 <div key={idx} className="flex items-start gap-2.5 text-xs font-medium text-[var(--color-ink)]">
-                  <Check className="w-4 h-4 text-[#27C93F] flex-shrink-0 mt-0.5" />
+                  <Check className="w-4 h-4 text-success flex-shrink-0 mt-0.5" />
                   <span>{item}</span>
                 </div>
               ))}

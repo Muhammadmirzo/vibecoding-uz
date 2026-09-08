@@ -46,7 +46,7 @@ export default function BaholarPage() {
                   <span className="font-mono font-bold text-[var(--color-accent)] flex items-center gap-1">
                     <Star className="w-3.5 h-3.5 fill-current" /> {g.score}
                   </span>
-                  <span className="px-2.5 py-0.5 rounded bg-[#27C93F]/15 text-[#27C93F] font-mono font-semibold">
+                  <span className="px-2.5 py-0.5 rounded bg-success-soft text-success font-mono font-semibold">
                     {g.status}
                   </span>
                 </div>

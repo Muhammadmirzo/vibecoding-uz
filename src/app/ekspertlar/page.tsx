@@ -54,7 +54,7 @@ export default function EkspertlarPage() {
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <h3 className="text-xl font-bold text-[var(--color-ink)]">{item.name}</h3>
-                    <BadgeCheck className="w-5 h-5 text-[#27C93F]" />
+                    <BadgeCheck className="w-5 h-5 text-success" />
                   </div>
                   <div className="text-xs text-[var(--color-accent)] font-semibold">{item.tagline}</div>
                 </div>
@@ -81,8 +81,8 @@ export default function EkspertlarPage() {
               </div>
 
               <div className="pt-3 border-t border-[var(--color-border)] flex items-center justify-between">
-                <div className="flex items-center gap-2 text-xs text-[#27C93F] font-semibold">
-                  <span className="w-2 h-2 rounded-full bg-[#27C93F] animate-pulse"></span>
+                <div className="flex items-center gap-2 text-xs text-success font-semibold">
+                  <span className="w-2 h-2 rounded-full bg-success animate-pulse"></span>
                   {item.status}
                 </div>
                 <button className="btn-secondary h-9 px-4 rounded-[var(--radius-md)] text-xs font-semibold inline-flex items-center gap-1.5">

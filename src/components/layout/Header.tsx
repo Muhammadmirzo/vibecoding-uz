@@ -99,7 +99,7 @@ export const Header = React.memo(function Header() {
       <header
         className="sticky top-0 left-0 right-0 z-50 bg-[var(--color-cream)] border-b border-[var(--color-border)] shadow-[var(--shadow-sm)] transition-all duration-200"
       >
-        <div className="mx-auto w-full max-w-[1360px] px-3 sm:px-5 md:px-8 flex items-center justify-between gap-2 overflow-hidden h-16 md:h-[72px]">
+        <div className="mx-auto w-full max-w-[1360px] px-3 sm:px-5 md:px-8 flex items-center justify-between gap-2 h-16 md:h-[72px]">
           {/* Brand Logo & Main Nav */}
           <div className="flex items-center gap-3 md:gap-5 min-w-0 shrink-0">
             <Link
@@ -396,7 +396,7 @@ export const Header = React.memo(function Header() {
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-[var(--radius-md)] text-[var(--color-ink)] hover:bg-[var(--color-cream-warm)] transition-colors"
+            className="lg:hidden inline-flex items-center justify-center w-10 h-10 rounded-[var(--radius-md)] text-[var(--color-ink)] hover:bg-[var(--color-cream-warm)] transition-colors"
             aria-label="Toggle Navigation Menu"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -405,7 +405,7 @@ export const Header = React.memo(function Header() {
 
       {/* Mobile Drawer Navigation */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-b border-[var(--color-border)] bg-[var(--color-cream)] px-5 py-4 space-y-3 shadow-[var(--shadow-lg)]">
+        <div className="lg:hidden border-b border-[var(--color-border)] bg-[var(--color-cream)] px-5 py-4 space-y-3 shadow-[var(--shadow-lg)]">
           {/* Mobile Auth Button / User Card */}
           {user ? (
             <div className="p-3 rounded-[var(--radius-md)] bg-[var(--color-cream-warm)] border border-[var(--color-border)] space-y-2">

@@ -131,7 +131,7 @@ export default function LessonPlayerPage() {
                       >
                         {copiedIndex === idx ? (
                           <>
-                            <Check className="w-3.5 h-3.5 text-[#27C93F]" /> Nusxalandi
+                            <Check className="w-3.5 h-3.5 text-success" /> Nusxalandi
                           </>
                         ) : (
                           <>
@@ -159,7 +159,7 @@ export default function LessonPlayerPage() {
                 </p>
 
                 {submissionSuccess ? (
-                  <div className="p-4 rounded-[var(--radius-lg)] bg-[#27C93F]/15 border border-[#27C93F]/30 text-xs font-semibold text-[#27C93F] flex items-center gap-2">
+                  <div className="p-4 rounded-[var(--radius-lg)] bg-success-soft border border-success-line text-xs font-semibold text-success flex items-center gap-2">
                     <Check className="w-4 h-4" /> Uy vazifangiz topshirildi va tekshirilmoqda. Mentor tez orada baholaydi!
                   </div>
                 ) : (

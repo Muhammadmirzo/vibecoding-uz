@@ -251,7 +251,7 @@ export default function SozlamalarPage() {
             </div>
 
             {profileSuccess && (
-              <div className="p-3.5 rounded-lg bg-[#27C93F]/15 border border-[#27C93F]/30 text-[#27C93F] text-xs font-semibold flex items-center gap-2">
+              <div className="p-3.5 rounded-lg bg-success-soft border border-success-line text-success text-xs font-semibold flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4" />
                 <span>Profilingiz muvaffaqiyatli saqlandi!</span>
               </div>
@@ -396,7 +396,7 @@ export default function SozlamalarPage() {
             </div>
 
             {passwordSuccess && (
-              <div className="p-3.5 rounded-lg bg-[#27C93F]/15 border border-[#27C93F]/30 text-[#27C93F] text-xs font-semibold flex items-center gap-2">
+              <div className="p-3.5 rounded-lg bg-success-soft border border-success-line text-success text-xs font-semibold flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4" />
                 <span>Parolingiz muvaffaqiyatli yangilandi!</span>
               </div>
@@ -469,7 +469,7 @@ export default function SozlamalarPage() {
             </div>
 
             {notifSaved && (
-              <div className="p-3.5 rounded-lg bg-[#27C93F]/15 border border-[#27C93F]/30 text-[#27C93F] text-xs font-semibold flex items-center gap-2">
+              <div className="p-3.5 rounded-lg bg-success-soft border border-success-line text-success text-xs font-semibold flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4" />
                 <span>Bildirishnoma sozlamalari saqlandi!</span>
               </div>
@@ -478,13 +478,13 @@ export default function SozlamalarPage() {
             {/* Telegram Bot Card */}
             <div className="p-5 rounded-xl bg-cream border border-accent-line flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-[#24A1DE]/15 text-[#24A1DE] flex items-center justify-center shrink-0">
+                <div className="w-12 h-12 rounded-xl bg-telegram-soft text-telegram flex items-center justify-center shrink-0">
                   <Send className="w-6 h-6" />
                 </div>
                 <div className="space-y-0.5">
                   <div className="text-sm font-bold text-ink flex items-center gap-2">
                     Telegram Bot Ulanishi
-                    <span className="text-[11px] font-mono font-bold text-[#27C93F] bg-[#27C93F]/15 px-2 py-0.5 rounded-full">
+                    <span className="text-[11px] font-mono font-bold text-success bg-success-soft px-2 py-0.5 rounded-full">
                       Faol Ulangan
                     </span>
                   </div>
@@ -501,7 +501,7 @@ export default function SozlamalarPage() {
                 className="shrink-0"
               >
                 <button className="btn-secondary h-10 px-4 rounded-lg text-xs font-semibold inline-flex items-center gap-2">
-                  <Send className="w-3.5 h-3.5 text-[#24A1DE]" />
+                  <Send className="w-3.5 h-3.5 text-telegram" />
                   <span>Bot sozlamalarini yangilash</span>
                 </button>
               </a>

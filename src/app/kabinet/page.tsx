@@ -21,7 +21,7 @@ export default function KabinetDashboardPage() {
               <span className="text-xs font-mono font-bold text-[var(--color-accent)] bg-[var(--color-accent-soft)] px-3 py-1 rounded-full">
                 Guruh: Oktyabr 2026
               </span>
-              <span className="text-xs font-mono font-bold text-[#27C93F] bg-[#27C93F]/15 px-3 py-1 rounded-full flex items-center gap-1">
+              <span className="text-xs font-mono font-bold text-success bg-success-soft px-3 py-1 rounded-full flex items-center gap-1">
                 <Flame className="w-3.5 h-3.5 fill-current" /> 3 Hafta Streak
               </span>
             </div>
@@ -67,7 +67,7 @@ export default function KabinetDashboardPage() {
             <div className="space-y-2 pt-2">
               <div className="p-3.5 rounded-[var(--radius-lg)] bg-[var(--color-cream)] border border-[var(--color-border)] flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2.5 font-semibold text-[var(--color-ink)]">
-                  <CheckCircle2 className="w-4 h-4 text-[#27C93F]" />
+                  <CheckCircle2 className="w-4 h-4 text-success" />
                   <span>3-Dars: Tailind CSS & UI Komponentlar</span>
                 </div>
                 <span className="text-[11px] font-mono text-[var(--color-ink-subtle)]">Bajarildi</span>

@@ -26,7 +26,11 @@
 
     --color-success: #27C93F;
     --color-success-soft: rgba(39, 201, 63, 0.12);
-    
+    --color-success-line: rgba(39, 201, 63, 0.3);
+
+    --color-telegram: #24A1DE;
+    --color-telegram-soft: rgba(36, 161, 222, 0.15);
+
     --radius-sm: 6px;
     --radius-md: 10px;
     --radius-lg: 16px;
@@ -56,6 +60,10 @@
 
     --color-success: #27C93F;
     --color-success-soft: rgba(39, 201, 63, 0.2);
+    --color-success-line: rgba(39, 201, 63, 0.35);
+
+    --color-telegram: #24A1DE;
+    --color-telegram-soft: rgba(36, 161, 222, 0.2);
   }
 
   .likely {
@@ -77,6 +85,10 @@
 
     --color-success: #25A237;
     --color-success-soft: rgba(37, 162, 55, 0.15);
+    --color-success-line: rgba(37, 162, 55, 0.3);
+
+    --color-telegram: #229ED9;
+    --color-telegram-soft: rgba(34, 158, 217, 0.15);
   }
 }
 

@@ -57,7 +57,7 @@ export function FreeLessonForm() {
 
       {submitted ? (
         <div className="text-center py-4 space-y-4">
-          <div className="w-12 h-12 rounded-full bg-[#27C93F]/15 text-[#27C93F] mx-auto flex items-center justify-center">
+          <div className="w-12 h-12 rounded-full bg-success-soft text-success mx-auto flex items-center justify-center">
             <CheckCircle2 className="w-8 h-8" />
           </div>
           <div className="space-y-1">

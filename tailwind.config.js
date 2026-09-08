@@ -33,6 +33,11 @@ module.exports = {
         success: {
           DEFAULT: "var(--color-success)",
           soft: "var(--color-success-soft)",
+          line: "var(--color-success-line)",
+        },
+        telegram: {
+          DEFAULT: "var(--color-telegram)",
+          soft: "var(--color-telegram-soft)",
         },
       },
       fontFamily: {

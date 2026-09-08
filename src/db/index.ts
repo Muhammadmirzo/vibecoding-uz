@@ -2,9 +2,13 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import * as schema from "./schema";
 
-const connectionString =
-  process.env.DATABASE_URL ||
-  "postgresql://postgres.gvfzomtdswzlxstjvwiv:AcademyMirzo2026SecureDBPass!@aws-0-ap-southeast-2.pooler.supabase.com:6543/postgres";
+const connectionString = process.env.DATABASE_URL;
+
+if (!connectionString) {
+  throw new Error(
+    "DATABASE_URL environment variable is not set. Copy .env.example to .env and configure it."
+  );
+}
 
 const maxConnections = process.env.DATABASE_MAX_CONNECTIONS
   ? parseInt(process.env.DATABASE_MAX_CONNECTIONS, 10) || 10

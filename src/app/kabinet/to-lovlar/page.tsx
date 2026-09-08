@@ -117,7 +117,7 @@ export default function ToLovlarPage() {
                   Vibe Coding Express (8 hafta)
                 </h2>
               </div>
-              <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-[#27C93F]/15 text-[#27C93F] border border-[#27C93F]/30">
+              <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-success-soft text-success border border-success-line">
                 Bo'lib to'lash (2/3 to'landi)
               </span>
             </div>
@@ -218,7 +218,7 @@ export default function ToLovlarPage() {
           {/* Card 2: 7-Day Guarantee Policy */}
           <div className="bg-cream-warm border border-border-strong rounded-2xl p-6 space-y-5 shadow-sm flex flex-col justify-between">
             <div className="space-y-3">
-              <div className="w-12 h-12 rounded-xl bg-[#27C93F]/15 text-[#27C93F] flex items-center justify-center">
+              <div className="w-12 h-12 rounded-xl bg-success-soft text-success flex items-center justify-center">
                 <ShieldCheck className="w-7 h-7" />
               </div>
               <h3 className="text-base font-bold text-ink">
@@ -232,7 +232,7 @@ export default function ToLovlarPage() {
             <div className="p-4 rounded-xl bg-cream border border-border space-y-2">
               <div className="flex items-center justify-between text-xs font-mono">
                 <span className="text-ink-subtle">Kafolat holati:</span>
-                <span className="text-[#27C93F] font-bold">Faol (yana 5 kun)</span>
+                <span className="text-success font-bold">Faol (yana 5 kun)</span>
               </div>
               <Link href="/pul-qaytarish" className="text-[11px] font-semibold text-accent hover:underline flex items-center gap-1">
                 <span>Kafolat shartlari bilan tanishish</span>
@@ -295,7 +295,7 @@ export default function ToLovlarPage() {
                       {inv.provider}
                     </td>
                     <td className="py-4 px-4 whitespace-nowrap">
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#27C93F]/15 text-[#27C93F] inline-flex items-center gap-1">
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-success-soft text-success inline-flex items-center gap-1">
                         <CheckCircle2 className="w-3 h-3" /> To'langan
                       </span>
                     </td>

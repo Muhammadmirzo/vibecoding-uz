@@ -53,7 +53,7 @@ export default function MeetlarPage() {
                   </span>
                   <span className={`text-[11px] font-mono font-bold px-2.5 py-0.5 rounded ${
                     meet.isLive
-                      ? "bg-[#27C93F]/15 text-[#27C93F] border border-[#27C93F]/30"
+                      ? "bg-success-soft text-success border border-success-line"
                       : "bg-[var(--color-cream)] text-[var(--color-ink-muted)] border border-[var(--color-border)]"
                   }`}>
                     {meet.status}

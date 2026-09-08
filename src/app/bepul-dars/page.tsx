@@ -35,7 +35,7 @@ export default function BepulDarsPage() {
                 "Kod yozmasdan to'lov tizimlarini ulayotgan real misollar",
               ].map((item, idx) => (
                 <div key={idx} className="flex items-start gap-3 text-sm font-semibold text-[var(--color-ink)]">
-                  <Check className="w-5 h-5 text-[#27C93F] flex-shrink-0 mt-0.5" />
+                  <Check className="w-5 h-5 text-success flex-shrink-0 mt-0.5" />
                   <span>{item}</span>
                 </div>
               ))}

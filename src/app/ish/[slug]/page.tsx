@@ -211,7 +211,7 @@ export default function JobDetailPage() {
               <ul className="space-y-3">
                 {job.requirements.map((req, i) => (
                   <li key={i} className="flex items-start gap-3 text-xs md:text-sm text-ink-muted leading-relaxed">
-                    <CheckCircle2 className="w-4 h-4 text-[#27C93F] shrink-0 mt-0.5" />
+                    <CheckCircle2 className="w-4 h-4 text-success shrink-0 mt-0.5" />
                     <span>{req}</span>
                   </li>
                 ))}
@@ -252,7 +252,7 @@ export default function JobDetailPage() {
 
               {submitted ? (
                 <div className="py-8 text-center space-y-4">
-                  <div className="w-14 h-14 rounded-full bg-[#27C93F]/15 text-[#27C93F] flex items-center justify-center mx-auto">
+                  <div className="w-14 h-14 rounded-full bg-success-soft text-success flex items-center justify-center mx-auto">
                     <CheckCircle2 className="w-8 h-8" />
                   </div>
                   <h4 className="text-xl font-extrabold text-ink">

@@ -20,12 +20,12 @@ export default async function CertificateVerificationPage({ params }: Props) {
     <div className="pt-28 pb-20 min-h-screen bg-[var(--color-cream)]">
       <div className="mx-auto w-full max-w-[700px] px-5 md:px-8 space-y-6 text-center">
         
-        <div className="w-16 h-16 rounded-full bg-[#27C93F]/15 text-[#27C93F] mx-auto flex items-center justify-center">
+        <div className="w-16 h-16 rounded-full bg-success-soft text-success mx-auto flex items-center justify-center">
           <ShieldCheck className="w-10 h-10" />
         </div>
 
         <div className="space-y-2">
-          <span className="text-xs font-mono font-bold text-[#27C93F] bg-[#27C93F]/15 px-3 py-1 rounded-full border border-[#27C93F]/30">
+          <span className="text-xs font-mono font-bold text-success bg-success-soft px-3 py-1 rounded-full border border-success-line">
             Haqiqiy Sertifikat (Verified)
           </span>
           <h1 className="text-3xl font-extrabold text-[var(--color-ink)]">

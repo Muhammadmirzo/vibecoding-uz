@@ -299,7 +299,7 @@ export default function BlogPostDetailPage() {
                 className="btn-secondary h-9 px-3.5 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5"
                 title="Havolani nusxalash"
               >
-                {copied ? <Check className="w-3.5 h-3.5 text-[#27C93F]" /> : <Copy className="w-3.5 h-3.5" />}
+                {copied ? <Check className="w-3.5 h-3.5 text-success" /> : <Copy className="w-3.5 h-3.5" />}
                 <span>{copied ? "Nusxalandi!" : "Havola"}</span>
               </button>
 
@@ -309,7 +309,7 @@ export default function BlogPostDetailPage() {
                 )}&text=${encodeURIComponent(post.title)}`}
                 target="_blank"
                 rel="noreferrer"
-                className="btn-secondary h-9 px-3.5 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 text-[#24A1DE]"
+                className="btn-secondary h-9 px-3.5 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 text-telegram"
                 title="Telegram'da ulashish"
               >
                 <Send className="w-3.5 h-3.5" />
@@ -361,7 +361,7 @@ export default function BlogPostDetailPage() {
                   onClick={handleCopyLink}
                   className="btn-secondary h-9 px-4 rounded-md text-xs font-semibold inline-flex items-center gap-1.5"
                 >
-                  {copied ? <Check className="w-3.5 h-3.5 text-[#27C93F]" /> : <Copy className="w-3.5 h-3.5" />}
+                  {copied ? <Check className="w-3.5 h-3.5 text-success" /> : <Copy className="w-3.5 h-3.5" />}
                   <span>{copied ? "Nusxalandi!" : "Nusxalash"}</span>
                 </button>
               </div>

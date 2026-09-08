@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { code: string } }
+  { params }: { params: Promise<{ code: string }> }
 ) {
-  const code = params.code || "";
+  const { code: refCode } = await params;
+  const code = refCode || "";
   const targetUrl = new URL("/diagnostika", request.url);
   targetUrl.searchParams.set("ref", code);
 

@@ -31,7 +31,7 @@ export default function SertifikatPage() {
         {/* Certificate Preview Card */}
         <div className="bg-[var(--color-cream-warm)] border-4 border-[var(--color-accent-line)] rounded-[var(--radius-xl)] p-8 md:p-12 text-center space-y-6 shadow-[var(--shadow-lg)] relative overflow-hidden">
           <div className="absolute top-4 right-4 text-xs font-mono text-[var(--color-ink-subtle)] flex items-center gap-1">
-            <ShieldCheck className="w-4 h-4 text-[#27C93F]" /> Verified PDF
+            <ShieldCheck className="w-4 h-4 text-success" /> Verified PDF
           </div>
 
           <div className="font-mono text-xs font-bold text-[var(--color-accent)] uppercase tracking-widest">
