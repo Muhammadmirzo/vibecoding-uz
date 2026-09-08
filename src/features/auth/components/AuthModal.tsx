@@ -63,6 +63,16 @@ export function AuthModal() {
 
           {/* Form Content */}
           {authStep === "login" ? <LoginForm /> : <OtpForm />}
+
+          <div className="mt-4 pt-4 border-t border-[var(--color-border)] text-center">
+            <a
+              href="/admin/login"
+              onClick={closeAuthModal}
+              className="text-xs font-mono text-[var(--color-accent)] hover:underline"
+            >
+              Admin yoki Xodimlar uchun kirish &rarr;
+            </a>
+          </div>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>

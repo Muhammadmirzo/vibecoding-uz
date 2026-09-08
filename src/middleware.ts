@@ -31,12 +31,25 @@ export async function middleware(request: NextRequest) {
 
   const session = token ? verifySessionToken(token) : null;
 
+  // Allow public access to /admin/login
+  if (pathname === "/admin/login") {
+    if (session && session.role && ADMIN_ROLES.includes(session.role)) {
+      return NextResponse.redirect(new URL("/admin", request.url));
+    }
+    return NextResponse.next();
+  }
+
   if (!session) {
     if (pathname.startsWith("/api/")) {
       return NextResponse.json(
         { error: "Autentifikatsiya talab qilinadi (Unauthorized)" },
         { status: 401 }
       );
+    }
+    if (isAdminRoute) {
+      const adminLoginUrl = new URL("/admin/login", request.url);
+      adminLoginUrl.searchParams.set("redirect", pathname);
+      return NextResponse.redirect(adminLoginUrl);
     }
     const loginUrl = new URL("/", request.url);
     loginUrl.searchParams.set("redirect", pathname);

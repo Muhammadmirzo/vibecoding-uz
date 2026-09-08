@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { users, sessions, userProfiles } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, or } from "drizzle-orm";
 import { loginSchema } from "@/lib/validations";
 import { normalizePhone, verifyPassword } from "@/lib/auth/password";
 import { createSessionToken, setSessionCookie } from "@/lib/auth/session";
@@ -29,9 +29,14 @@ export async function POST(request: Request) {
     }
 
     const { phone, password = "" } = parseResult.data;
-    const normalized = normalizePhone(phone);
+    const inputVal = phone.trim();
+    const normalizedPhone = normalizePhone(inputVal);
 
-    const userList = await db.select().from(users).where(eq(users.phone, normalized)).limit(1);
+    const userList = await db
+      .select()
+      .from(users)
+      .where(or(eq(users.phone, normalizedPhone), eq(users.email, inputVal.toLowerCase())))
+      .limit(1);
     const user = userList[0];
 
     if (!user || !user.passwordHash) {
