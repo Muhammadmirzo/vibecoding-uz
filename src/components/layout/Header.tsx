@@ -205,20 +205,6 @@ export const Header = React.memo(function Header() {
                 </button>
                 <div className="absolute top-full left-0 mt-1.5 w-80 rounded-2xl border border-border bg-cream p-3 shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50 space-y-1.5">
                   <Link
-                    href="/resurslar"
-                    prefetch={true}
-                    className="flex items-start gap-3.5 p-3 rounded-xl hover:bg-cream-warm transition-colors group/item"
-                  >
-                    <div className="w-10 h-10 rounded-xl bg-cream-warm border border-border flex items-center justify-center shrink-0 mt-0.5 text-accent shadow-xs group-hover/item:border-accent-line transition-colors">
-                      <FileText className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <div className="text-sm font-bold text-ink group-hover/item:text-accent transition-colors">Bepul resurslar</div>
-                      <div className="text-xs text-ink-muted leading-relaxed mt-0.5">Qo'llanmalar va soha hublari</div>
-                    </div>
-                  </Link>
-
-                  <Link
                     href="/blog"
                     prefetch={true}
                     className="flex items-start gap-3.5 p-3 rounded-xl hover:bg-cream-warm transition-colors group/item"
@@ -229,6 +215,20 @@ export const Header = React.memo(function Header() {
                     <div>
                       <div className="text-sm font-bold text-ink group-hover/item:text-accent transition-colors">Blog</div>
                       <div className="text-xs text-ink-muted leading-relaxed mt-0.5">Maqolalar va tahlillar</div>
+                    </div>
+                  </Link>
+
+                  <Link
+                    href="/resurslar"
+                    prefetch={true}
+                    className="flex items-start gap-3.5 p-3 rounded-xl hover:bg-cream-warm transition-colors group/item"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-cream-warm border border-border flex items-center justify-center shrink-0 mt-0.5 text-accent shadow-xs group-hover/item:border-accent-line transition-colors">
+                      <FileText className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-bold text-ink group-hover/item:text-accent transition-colors">Bepul resurslar</div>
+                      <div className="text-xs text-ink-muted leading-relaxed mt-0.5">Qo'llanmalar va soha hublari</div>
                     </div>
                   </Link>
 
