@@ -105,112 +105,112 @@ export const Header = React.memo(function Header() {
               </span>
             </Link>
 
-            {/* Desktop Navigation Links (Responsive XL flex) */}
-            <nav className="hidden lg:flex items-center gap-1 overflow-x-auto no-scrollbar">
-            <div className="relative group">
-              <button className="inline-flex items-center gap-1.5 h-10 px-3 rounded-[var(--radius-md)] text-sm font-semibold text-[var(--color-ink)] hover:bg-[var(--color-cream-warm)] transition-colors">
-                <BookOpen className="w-4 h-4 text-[var(--color-accent)]" />
-                Kurslar
-                <ChevronDown className="w-3.5 h-3.5 text-[var(--color-ink-subtle)]" />
-              </button>
-              <div className="absolute top-full left-0 mt-1 w-56 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-cream)] p-2 shadow-[var(--shadow-lg)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150">
-                <Link
-                  href="/kurs/vibe-coding-express"
-                  prefetch={true}
-                  className="block p-2.5 rounded-[var(--radius-md)] hover:bg-[var(--color-cream-warm)] transition-colors"
-                >
-                  <div className="text-sm font-semibold text-[var(--color-ink)]">Vibe Coding Express</div>
-                  <div className="text-xs text-[var(--color-ink-muted)]">8 haftalik intensiv mentorlik</div>
-                </Link>
-                <Link
-                  href="/kurs/ai-asoslari"
-                  prefetch={true}
-                  className="block p-2.5 rounded-[var(--radius-md)] hover:bg-[var(--color-cream-warm)] transition-colors"
-                >
-                  <div className="text-sm font-semibold text-[var(--color-ink)]">AI Asoslari</div>
-                  <div className="text-xs text-[var(--color-ink-muted)]">Prompt-injiniring va AI vositalari</div>
-                </Link>
+            {/* Desktop Navigation Links (Responsive Flex Layout) */}
+            <nav className="hidden lg:flex items-center gap-1 shrink min-w-0">
+              <div className="relative group shrink-0">
+                <button className="inline-flex items-center gap-1.5 h-10 px-3 rounded-[var(--radius-md)] text-sm font-semibold text-[var(--color-ink)] hover:bg-[var(--color-cream-warm)] transition-colors whitespace-nowrap">
+                  <BookOpen className="w-4 h-4 text-[var(--color-accent)]" />
+                  Kurslar
+                  <ChevronDown className="w-3.5 h-3.5 text-[var(--color-ink-subtle)]" />
+                </button>
+                <div className="absolute top-full left-0 mt-1 w-56 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-cream)] p-2 shadow-[var(--shadow-lg)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50">
+                  <Link
+                    href="/kurs/vibe-coding-express"
+                    prefetch={true}
+                    className="block p-2.5 rounded-[var(--radius-md)] hover:bg-[var(--color-cream-warm)] transition-colors"
+                  >
+                    <div className="text-sm font-semibold text-[var(--color-ink)]">Vibe Coding Express</div>
+                    <div className="text-xs text-[var(--color-ink-muted)]">8 haftalik intensiv mentorlik</div>
+                  </Link>
+                  <Link
+                    href="/kurs/ai-asoslari"
+                    prefetch={true}
+                    className="block p-2.5 rounded-[var(--radius-md)] hover:bg-[var(--color-cream-warm)] transition-colors"
+                  >
+                    <div className="text-sm font-semibold text-[var(--color-ink)]">AI Asoslari</div>
+                    <div className="text-xs text-[var(--color-ink-muted)]">Prompt-injiniring va AI vositalari</div>
+                  </Link>
+                </div>
               </div>
-            </div>
 
-            <Link
-              href="/bepul-dars"
-              prefetch={true}
-              className="inline-flex h-10 items-center gap-1.5 rounded-[var(--radius-md)] px-3 text-sm font-semibold text-[var(--color-accent)] transition-colors hover:bg-[var(--color-accent-soft)]"
+              <Link
+                href="/bepul-dars"
+                prefetch={true}
+                className="inline-flex h-10 items-center gap-1.5 rounded-[var(--radius-md)] px-3 text-sm font-semibold text-[var(--color-accent)] transition-colors hover:bg-[var(--color-accent-soft)] whitespace-nowrap shrink-0"
+              >
+                <CirclePlay className="w-4 h-4" />
+                Bepul dars
+              </Link>
+
+              <Link
+                href="/meetlar"
+                prefetch={true}
+                className="inline-flex h-10 items-center rounded-[var(--radius-md)] px-3 text-sm font-semibold text-[var(--color-ink)] hover:bg-[var(--color-cream-warm)] transition-colors whitespace-nowrap shrink-0"
+              >
+                Meetlar
+              </Link>
+
+              <Link
+                href="/blog"
+                prefetch={true}
+                className="inline-flex h-10 items-center rounded-[var(--radius-md)] px-3 text-sm font-semibold text-[var(--color-ink)] hover:bg-[var(--color-cream-warm)] transition-colors whitespace-nowrap shrink-0"
+              >
+                Blog
+              </Link>
+
+              <Link
+                href="/testimoniyalar"
+                prefetch={true}
+                className="hidden xl:inline-flex h-10 items-center rounded-[var(--radius-md)] px-3 text-sm font-semibold text-[var(--color-ink)] hover:bg-[var(--color-cream-warm)] transition-colors whitespace-nowrap shrink-0"
+              >
+                Natijalar
+              </Link>
+
+              <Link
+                href="/ish"
+                prefetch={true}
+                className="hidden xl:inline-flex h-10 items-center rounded-[var(--radius-md)] px-3 text-sm font-semibold text-[var(--color-ink)] hover:bg-[var(--color-cream-warm)] transition-colors whitespace-nowrap shrink-0"
+              >
+                Vakansiyalar
+              </Link>
+
+              <Link
+                href="/resurslar"
+                prefetch={true}
+                className="hidden 2xl:inline-flex h-10 items-center rounded-[var(--radius-md)] px-3 text-sm font-semibold text-[var(--color-ink)] hover:bg-[var(--color-cream-warm)] transition-colors whitespace-nowrap shrink-0"
+              >
+                Resurslar
+              </Link>
+            </nav>
+          </div>
+
+          {/* Right CTA Cluster */}
+          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0 ml-auto">
+            {/* Telegram Online Advice Headset */}
+            <a
+              href={tgLink}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center justify-center w-10 h-10 rounded-[var(--radius-md)] text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] hover:bg-[var(--color-cream-warm)] transition-colors relative shrink-0"
+              title="Maslahat olish (Telegram)"
             >
-              <CirclePlay className="w-4 h-4" />
-              Bepul dars
-            </Link>
+              <Headset className="w-5 h-5 text-[var(--color-accent)]" />
+              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-success border border-cream"></span>
+            </a>
 
-            <Link
-              href="/meetlar"
-              prefetch={true}
-              className="inline-flex h-10 items-center rounded-[var(--radius-md)] px-3 text-sm font-semibold text-[var(--color-ink)] hover:bg-[var(--color-cream-warm)] transition-colors"
+            {/* Global Search Button */}
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new CustomEvent("toggle-search-modal"))}
+              className="inline-flex items-center justify-center gap-2 h-10 px-3 rounded-md text-ink-muted hover:text-ink hover:bg-cream-warm border border-border bg-cream-warm/50 transition-colors text-xs font-medium focus:outline-none focus:ring-2 focus:ring-accent shrink-0"
+              title="Qidiruv (Ctrl+K)"
             >
-              Meetlar
-            </Link>
-
-            <Link
-              href="/blog"
-              prefetch={true}
-              className="inline-flex h-10 items-center rounded-[var(--radius-md)] px-3 text-sm font-semibold text-[var(--color-ink)] hover:bg-[var(--color-cream-warm)] transition-colors"
-            >
-              Blog
-            </Link>
-
-            <Link
-              href="/testimoniyalar"
-              prefetch={true}
-              className="inline-flex h-10 items-center rounded-[var(--radius-md)] px-3 text-sm font-semibold text-[var(--color-ink)] hover:bg-[var(--color-cream-warm)] transition-colors"
-            >
-              Natijalar
-            </Link>
-
-            <Link
-              href="/ish"
-              prefetch={true}
-              className="inline-flex h-10 items-center rounded-[var(--radius-md)] px-3 text-sm font-semibold text-[var(--color-ink)] hover:bg-[var(--color-cream-warm)] transition-colors"
-            >
-              Vakansiyalar
-            </Link>
-
-            <Link
-              href="/resurslar"
-              prefetch={true}
-              className="inline-flex h-10 items-center rounded-[var(--radius-md)] px-3 text-sm font-semibold text-[var(--color-ink)] hover:bg-[var(--color-cream-warm)] transition-colors"
-            >
-              Resurslar
-            </Link>
-          </nav>
-        </div>
-
-        {/* Right CTA Cluster */}
-        <div className="flex items-center gap-2 md:gap-3">
-          {/* Telegram Online Advice Headset */}
-          <a
-            href={tgLink}
-            target="_blank"
-            rel="noreferrer"
-            className="hidden md:inline-flex items-center justify-center w-10 h-10 rounded-[var(--radius-md)] text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] hover:bg-[var(--color-cream-warm)] transition-colors relative"
-            title="Maslahat olish (Telegram)"
-          >
-            <Headset className="w-5 h-5" />
-            <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-success border-2 border-cream"></span>
-          </a>
-
-          {/* Global Search Button */}
-          <button
-            type="button"
-            onClick={() => window.dispatchEvent(new CustomEvent("toggle-search-modal"))}
-            className="inline-flex items-center gap-2 h-10 px-3 rounded-md text-ink-muted hover:text-ink hover:bg-cream-warm border border-border bg-cream-warm/50 transition-colors text-xs font-medium focus:outline-none focus:ring-2 focus:ring-accent"
-            title="Qidiruv (Ctrl+K)"
-          >
-            <Search className="w-4 h-4 text-accent" />
-            <span className="hidden lg:inline text-ink-muted">Qidirish...</span>
-            <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono bg-cream border border-border rounded text-ink-muted">
-              ⌘K
-            </kbd>
-          </button>
+              <Search className="w-4 h-4 text-accent" />
+              <span className="hidden 2xl:inline text-ink-muted">Qidirish...</span>
+              <kbd className="hidden 2xl:inline-block px-1.5 py-0.5 text-[10px] font-mono bg-cream border border-border rounded text-ink-muted">
+                ⌘K
+              </kbd>
+            </button>
 
           {/* Theme Toggle (Light / Dark / Likely) */}
           <ThemeToggle />
