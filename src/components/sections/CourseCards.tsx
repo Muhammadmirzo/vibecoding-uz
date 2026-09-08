@@ -34,6 +34,9 @@ export const CourseCards = React.memo(function CourseCards() {
             <h3 className="font-serif text-2xl md:text-3xl font-bold text-[var(--color-ink)] mb-2">
               Vibe Coding Express
             </h3>
+            <div className="overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] mb-4">
+              <img src="/images/vibe-coding-course.jpg" alt="Vibe Coding Express" className="w-full h-44 object-cover" />
+            </div>
             <p className="text-sm text-[var(--color-ink-muted)] mb-6 leading-relaxed">
               AI bilan ishlaydigan mahsulot (web, bot, MVP) qurmoqchi bo'lsangiz.
             </p>
@@ -79,6 +82,9 @@ export const CourseCards = React.memo(function CourseCards() {
             <h3 className="font-serif text-2xl md:text-3xl font-bold text-[var(--color-ink)] mb-2">
               AI Asoslari
             </h3>
+            <div className="overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] mb-4">
+              <img src="/images/ai-asoslari-course.jpg" alt="AI Asoslari & Prompt Injeneriya" className="w-full h-44 object-cover" />
+            </div>
             <p className="text-sm text-[var(--color-ink-muted)] mb-6 leading-relaxed">
               AI vositalari va prompt-injiniringni noldan o'rganmoqchi bo'lsangiz.
             </p>

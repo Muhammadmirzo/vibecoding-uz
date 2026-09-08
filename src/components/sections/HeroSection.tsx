@@ -54,23 +54,18 @@ export const HeroSection = React.memo(function HeroSection() {
           </div>
 
           {/* Right Instructor Profile Card */}
-          <div className="relative mx-auto w-full max-w-[400px] lg:max-w-[420px]">
+          <div className="relative mx-auto w-full max-w-[440px] lg:max-w-[480px]">
             <div className="rounded-[var(--radius-xl)] border border-[var(--color-border-strong)] bg-[var(--color-cream)] overflow-hidden shadow-[var(--shadow-lg)]">
-              <div className="relative aspect-[4/5] bg-[var(--color-cream-deep)] flex items-center justify-center overflow-hidden">
-                <div className="w-full h-full bg-gradient-to-t from-[var(--color-ink)]/60 to-transparent absolute inset-0 z-10"></div>
-                <div className="text-8xl font-black font-mono text-[var(--color-accent)] opacity-20 select-none">
-                  IQ
-                </div>
-                <div className="absolute top-4 right-4 z-20 px-3 py-1.5 rounded-full bg-ink/85 backdrop-blur text-white text-xs font-mono font-medium flex items-center gap-2">
+              <div className="relative aspect-[16/9] bg-[var(--color-cream-deep)] flex items-center justify-center overflow-hidden">
+                <img src="/images/hero-banner.jpg" alt="Mirzo Academy Vibe Coding Hero" className="w-full h-full object-cover" />
+                <div className="absolute top-3 right-3 z-20 px-3 py-1 rounded-full bg-ink/85 backdrop-blur text-white text-xs font-mono font-medium flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-success"></span>
                   3 jonli mahsulot asoschisi
                 </div>
-                <div className="absolute bottom-4 left-4 z-20 text-white">
-                  <div className="text-xl font-bold">Ibrohim Qodirov</div>
-                  <div className="text-xs text-[var(--color-accent)] font-medium">EdTech tadbirkor · vibe coding mentori</div>
-                </div>
               </div>
               <div className="p-5 bg-[var(--color-cream)]">
+                <div className="text-lg font-bold text-[var(--color-ink)] mb-1">Ibrohim Qodirov</div>
+                <div className="text-xs text-[var(--color-accent)] font-medium mb-3">EdTech tadbirkor · vibe coding mentori</div>
                 <p className="text-xs text-[var(--color-ink-muted)] leading-relaxed flex gap-2.5">
                   <Quote className="w-4 h-4 text-[var(--color-accent)] flex-shrink-0 mt-0.5" />
                   <span>Sizga quruq nazariya bermayman — kurslarimizda faqat real amaliyot va jonli loyihalar quriladi.</span>
