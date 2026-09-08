@@ -130,10 +130,13 @@ export async function POST(request: Request) {
         avatarUrl: user.avatarUrl,
       },
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Login error:", error);
     return NextResponse.json(
-      { error: "Tizimda xatolik yuz berdi. Qaytadan urinib ko'ring." },
+      {
+        error: "Tizimda xatolik yuz berdi. Qaytadan urinib ko'ring.",
+        detail: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 }
     );
   }
