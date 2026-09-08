@@ -25,7 +25,7 @@ export default function BepulDarsPage() {
             </h1>
 
             <p className="text-base text-[var(--color-ink-muted)] leading-relaxed">
-              Ushbu 30 daqiqalik intensiv darsda Ibrohim Qodirov dasturchilarsiz, faqat sun'iy intellekt agentlariga to'g mezoniy ko'rsatma berib mahsulot yaratish sir-asrorlarini ko'rsatib beradi.
+              Ushbu 30 daqiqalik intensiv darsda Mirzo dasturchilarsiz, faqat sun'iy intellekt agentlariga to'g mezoniy ko'rsatma berib mahsulot yaratish sir-asrorlarini ko'rsatib beradi.
             </p>
 
             <div className="space-y-3 pt-2">

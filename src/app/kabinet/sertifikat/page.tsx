@@ -50,7 +50,7 @@ export default function SertifikatPage() {
 
           <div className="pt-6 border-t border-[var(--color-border)] flex items-center justify-between text-xs font-mono text-[var(--color-ink-subtle)]">
             <div>Berilgan sana: 07.09.2026</div>
-            <div>Instruktor: Ibrohim Qodirov</div>
+            <div>Instruktor: Mirzo</div>
           </div>
         </div>
 

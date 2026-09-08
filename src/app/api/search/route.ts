@@ -27,7 +27,7 @@ const staticSearchData: SearchItem[] = [
   {
     id: "blog-1",
     title: "Vibe Coding: Nega 2026-yilda dasturlash tili emas, g'oya muhim?",
-    subtitle: "Ibrohim Qodirov bilan jonli suhbat va real Keyslar",
+    subtitle: "Mirzo bilan jonli suhbat va real Keyslar",
     category: "blog",
     url: "/bepul-dars",
     badge: "Vebinar",

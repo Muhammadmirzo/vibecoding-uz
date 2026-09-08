@@ -3,7 +3,7 @@ import { Calendar, Video, Play, ExternalLink } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Jonli Meetlar va Vebinarlar Archive | Mirzo Academy",
-  description: "Ibrohim Qodirov va AI ekspertlari bilan o'tkazilgan ochiq muloqotlar yozuvi.",
+  description: "Mirzo va AI ekspertlari bilan o'tkazilgan ochiq muloqotlar yozuvi.",
 };
 
 export default function MeetlarPage() {

@@ -74,7 +74,7 @@ export const Footer = React.memo(function Footer() {
         {/* Bottom copyright line */}
         <div className="pt-6 border-t border-[var(--color-border)] flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-mono text-[var(--color-ink-subtle)]">
           <div>© {new Date().getFullYear()} academy.mirzo.uz. Barcha huquqlar himoyalangan.</div>
-          <div>Toshkent, O'zbekiston · Ibrohim Qodirov</div>
+          <div>Toshkent, O'zbekiston · Mirzo</div>
         </div>
       </div>
     </footer>

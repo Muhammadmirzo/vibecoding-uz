@@ -15,7 +15,7 @@ export const HeroSection = React.memo(function HeroSection() {
             {/* Instructor Badge */}
             <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-[var(--radius-md)] border border-[var(--color-accent-line)] bg-[var(--color-cream)] text-[12px] md:text-[13px] tracking-wider text-[var(--color-accent)] uppercase font-mono font-bold mb-5 shadow-sm">
               <BadgeCheck className="w-4 h-4 text-[var(--color-accent)] flex-shrink-0" />
-              <span>Ibrohim Qodirov · Dizayner · metodolog · AI ekspert</span>
+              <span>Mirzo · Dizayner · metodolog · AI ekspert</span>
             </span>
 
             {/* H1 Heading with Instrument Serif Accent */}
@@ -64,7 +64,7 @@ export const HeroSection = React.memo(function HeroSection() {
                 </div>
               </div>
               <div className="p-5 bg-[var(--color-cream)]">
-                <div className="text-lg font-bold text-[var(--color-ink)] mb-1">Ibrohim Qodirov</div>
+                <div className="text-lg font-bold text-[var(--color-ink)] mb-1">Mirzo</div>
                 <div className="text-xs text-[var(--color-accent)] font-medium mb-3">EdTech tadbirkor · vibe coding mentori</div>
                 <p className="text-xs text-[var(--color-ink-muted)] leading-relaxed flex gap-2.5">
                   <Quote className="w-4 h-4 text-[var(--color-accent)] flex-shrink-0 mt-0.5" />

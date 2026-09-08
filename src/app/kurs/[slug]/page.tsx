@@ -146,7 +146,7 @@ export default async function CourseDetailPage({ params }: Props) {
               {[
                 "8 haftalik jonli sessiyalar va yozuvlar",
                 "Telegram bot orqali uy vazifalari tekshiruvi",
-                "Mentor Ibrohim Qodirovdan shaxsiy feedback",
+                "Mentor Mirzodan shaxsiy feedback",
                 "7 kunlik 100% Pul qaytarish kafolati",
               ].map((item, idx) => (
                 <div key={idx} className="flex items-start gap-2.5 text-xs font-medium text-[var(--color-ink)]">
