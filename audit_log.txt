@@ -60,3 +60,11 @@ Verification: tsc=0_errors vitest=135/135 build=OK
 ZAHAR-ORKESTRATOR: spec v1.1 — 9 yangi agent (3 daraja: P0 TESTER/DB/LEDGER, P1 PERF/LANG/SEO, P2 ACCESS/SUPPORT/COST), Xatolar Ledgeri (10 tarixiy xato -> doimiy check), Model Siyosati (sifat > token tejash, 2-strike escalation).
 LEDGER gate birinchi ishga tushirildi: secret grep OK, token grep OK, dead-link grep ilk false positive aniqlandi va check refinelyandi (markdown link pattern).
 Verification: tsc=0_errors vitest=135/135 build=OK
+
+=== Audit Log Entry: 2026-09-09 (P0 redesign — Orca antigravity workerlar) ===
+ZAHAR-ORKESTRATOR: docs/REDESIGN_ROADMAP.md P0 royxati 3 Orca antigravity (Gemini) worker orqali bajarildi.
+- A (soxta kontent): Rickroll video badge+URL olib tashlandi (testimonialsData), Unsplash avatarlar -> initials, ekspertlar oluk tugma + fake status/reytinglar olib tashlandi, "4.95" manbasiz davo olib tashlandi
+- B (konversiya): FreeLessonForm endi halol Telegram CTA beradi ("yuborildi" yolg'oni yoq), DiagnosticQuiz res.ok tekshiradi + xato xabari + "Qayta urinish", seed.ts Rickroll URL lar toza
+- C (config): YANGI src/lib/siteConfig.ts (zod, har qiymatda TODO(mirzo) izohi), kurs sahifasi sana/narx configdan, HeroSection/ProofStats raqamlar configdan (250+ YAGONA), oluk "portfelni korish" -> real Linklar, landing halol isbot strip
+Darslik: claude workerlar TUI da qotdi (trust+bypass dialoglari) -> antigravity agentga otkazildi (codex-trust-workspace trust qoshildi)
+Verification: tsc=0_errors vitest=135/135 build=OK LEDGER_greps=OK

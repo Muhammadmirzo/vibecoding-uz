@@ -204,7 +204,7 @@ async function main() {
         {
           slug: "1-1-vibe-coding-nima",
           title: "1.1 Vibe Coding falsafasi va AI davrida dasturlash",
-          videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+          videoUrl: "",
           durationSec: 1200,
           contentMd: "# Vibe Coding Asoslari\n\nVibe coding - bu dastur sintaksisini qo'lda yozmasdan, AI agentlariga (Claude Code, Cursor) aniq va tizimli ko'rsatma berib mahsulot yaratish Usulidir.",
           isFreePreview: true,
@@ -214,7 +214,7 @@ async function main() {
         {
           slug: "1-2-cursor-ide-setup",
           title: "1.2 Cursor IDE va Rule fayllarni sozlash (AGENTS.md)",
-          videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgWgQ",
+          videoUrl: "",
           durationSec: 1500,
           contentMd: "# Cursor IDE Konfiguratsiyasi\n\nAGENTS.md va .cursorrules fayllari orqali AI ga loyiha qoidalarini singdirish.",
           isFreePreview: false,
@@ -231,7 +231,7 @@ async function main() {
         {
           slug: "2-1-tailwind-ui-components",
           title: "2.1 UI Komponentlar va Dizayn Sistemasi",
-          videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+          videoUrl: "",
           durationSec: 1800,
           contentMd: "# UI Komponentlar\n\nCream va Ink mavzusi asosida landing page va dashboard komponentlarini yaratish.",
           isFreePreview: false,
@@ -248,7 +248,7 @@ async function main() {
         {
           slug: "3-1-drizzle-orm-schema",
           title: "3.1 Drizzle ORM sxemalari va PostgreSQL",
-          videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+          videoUrl: "",
           durationSec: 2100,
           contentMd: "# Database Architecture\n\nDrizzle ORM bilan relational jadvallar va migrationlar yaratish.",
           isFreePreview: false,

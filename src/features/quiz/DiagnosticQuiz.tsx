@@ -119,18 +119,20 @@ export const DiagnosticQuiz = React.memo(function DiagnosticQuiz() {
       });
 
       if (!res.ok) {
-        const data = await res.json();
+        const data = await res.json().catch(() => ({}));
         if (res.status === 429) {
           setErrorMsg(data.error || "Juda ko'p urinish joylandi. Birozdan so'ng qayta urinib ko'ring.");
         } else {
-          setErrorMsg(data.error || "Xatolik yuz berdi");
+          setErrorMsg(data.error || "Natijalarni saqlashda xatolik yuz berdi. Iltimos, qayta urinib ko'ring.");
         }
+      } else {
+        setSubmitted(true);
       }
-    } catch {
-      // Continue locally even if server call fails in dev/offline
+    } catch (err) {
+      console.error("Quiz yuborishda xatolik:", err);
+      setErrorMsg("Tarmoqda xatolik yuz berdi. Iltimos, ulanishingizni tekshirib, qayta urinib ko'ring.");
     } finally {
       setLoading(false);
-      setSubmitted(true);
     }
   }, [calculateRecommendation, name, phone, answers]);
 
@@ -264,6 +266,11 @@ export const DiagnosticQuiz = React.memo(function DiagnosticQuiz() {
               {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" /> Saqlanmoqda...
+                </>
+              ) : errorMsg ? (
+                <>
+                  Qayta urinish
+                  <ArrowRight className="w-4 h-4" />
                 </>
               ) : (
                 <>

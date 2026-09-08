@@ -3,6 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { BadgeCheck, ArrowRight, CirclePlay, Quote } from "lucide-react";
+import { siteConfig } from "@/lib/siteConfig";
 
 export const HeroSection = React.memo(function HeroSection() {
   return (
@@ -60,7 +61,7 @@ export const HeroSection = React.memo(function HeroSection() {
                 <img src="/images/hero-banner.jpg" alt="Mirzo Academy Vibe Coding Hero" className="w-full h-full object-cover" />
                 <div className="absolute top-3 right-3 z-20 px-3 py-1 rounded-full bg-ink/85 backdrop-blur text-white text-xs font-mono font-medium flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-success"></span>
-                  3 jonli mahsulot asoschisi
+                  {siteConfig.stats.liveStartupsCount} jonli mahsulot asoschisi
                 </div>
               </div>
               <div className="p-5 bg-[var(--color-cream)]">

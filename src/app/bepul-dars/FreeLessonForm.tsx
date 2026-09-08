@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { CirclePlay, ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
+import { ArrowRight, CheckCircle2, Loader2, BookOpen, Send } from "lucide-react";
 
 export function FreeLessonForm() {
   const [name, setName] = React.useState("");
@@ -45,14 +45,26 @@ export function FreeLessonForm() {
 
   return (
     <div className="bg-[var(--color-cream-warm)] border border-[var(--color-border-strong)] rounded-[var(--radius-xl)] p-8 shadow-[var(--shadow-lg)] space-y-6">
-      {/* Video Placeholder Container */}
-      <div className="relative aspect-video rounded-[var(--radius-lg)] bg-[var(--color-ink)] overflow-hidden flex items-center justify-center group cursor-pointer border border-[var(--color-border)]">
-        <div className="w-16 h-16 rounded-full bg-[var(--color-accent)] text-white flex items-center justify-center shadow-lg transition-transform group-hover:scale-110">
-          <CirclePlay className="w-8 h-8 ml-0.5" />
-        </div>
-        <div className="absolute bottom-3 left-3 px-3 py-1 rounded bg-black/70 text-white text-xs font-mono">
-          30:00 · 1080p Full HD
-        </div>
+      {/* Lesson Details Info Card */}
+      <div className="p-5 rounded-[var(--radius-lg)] bg-[var(--color-cream)] border border-[var(--color-border-strong)] space-y-3">
+        <h3 className="text-sm font-bold font-mono text-[var(--color-ink)] uppercase tracking-wide flex items-center gap-2">
+          <BookOpen className="w-4 h-4 text-[var(--color-accent)]" />
+          Bu darsda nima bor?
+        </h3>
+        <ul className="space-y-2 text-xs text-[var(--color-ink-muted)]">
+          <li className="flex items-start gap-2">
+            <CheckCircle2 className="w-4 h-4 text-success flex-shrink-0 mt-0.5" />
+            <span>AI agentlari yordamida 30 daqiqada MVP yaratish</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <CheckCircle2 className="w-4 h-4 text-success flex-shrink-0 mt-0.5" />
+            <span>Claude Code va Cursor yordamida dasturchilarsiz ishlash</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <CheckCircle2 className="w-4 h-4 text-success flex-shrink-0 mt-0.5" />
+            <span>Telegram bot va to'lov tizimlarini integratsiya qilish</span>
+          </li>
+        </ul>
       </div>
 
       {submitted ? (
@@ -60,14 +72,23 @@ export function FreeLessonForm() {
           <div className="w-12 h-12 rounded-full bg-success-soft text-success mx-auto flex items-center justify-center">
             <CheckCircle2 className="w-8 h-8" />
           </div>
-          <div className="space-y-1">
+          <div className="space-y-2">
             <h3 className="text-lg font-bold text-[var(--color-ink)]">
               Darsga kirish muvaffaqiyatli tashkil etildi!
             </h3>
             <p className="text-xs text-[var(--color-ink-muted)]">
-              Rahmat, <strong>{name}</strong>! Video dars havolasi va qo'shimcha materiallar <strong>{phone}</strong> raqamingizga yuborildi.
+              Rahmat, <strong>{name}</strong>! Dars havolasi Telegram botda — quyidagi tugma orqali oching.
             </p>
           </div>
+          <a
+            href="https://t.me/m/ODAfK_QIMjky"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-primary h-12 px-6 rounded-[var(--radius-md)] text-sm font-semibold inline-flex items-center justify-center gap-2 w-full mt-2"
+          >
+            <Send className="w-4 h-4" />
+            Darsni Telegram botda olish
+          </a>
         </div>
       ) : (
         <>

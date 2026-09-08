@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Check, ArrowRight, CirclePlay, Clock, Calendar, ShieldCheck, Award } from "lucide-react";
+import { siteConfig } from "@/lib/siteConfig";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -24,9 +25,9 @@ const COURSES_DATA: Record<string, {
     description: "8 haftalik amaliy guruh kursi. Dasturchilarsiz, Claude Code va Cursor yordamida g'oyangizni ishlaydigan haqiqiy mahsulotga aylantirasiz.",
     duration: "8 hafta (Intensiv)",
     level: "Tadbirkorlar va Mutaxassislar",
-    price: "2 990 000 so'm",
-    oldPrice: "3 990 000 so'm",
-    installment: "996 000 so'm / oyiga (3 oy)",
+    price: siteConfig.courses["vibe-coding-express"].price,
+    oldPrice: siteConfig.courses["vibe-coding-express"].oldPrice,
+    installment: siteConfig.courses["vibe-coding-express"].installment,
     modules: [
       "1-Modul: Vibe Coding va Prompt Injiniring asoslari",
       "2-Modul: Claude Code & Cursor muhitini sozlash",
@@ -44,9 +45,9 @@ const COURSES_DATA: Record<string, {
     description: "4 haftalik self-serve kurs. ChatGPT, Claude va Gemini orqali kundalik ishingiz va kontent tayyorlashni 90% ga avtomatlashtiring.",
     duration: "4 hafta",
     level: "Boshlang'ich",
-    price: "990 000 so'm",
-    oldPrice: "1 490 000 so'm",
-    installment: "495 000 so'm / oyiga (2 oy)",
+    price: siteConfig.courses["ai-asoslari"].price,
+    oldPrice: siteConfig.courses["ai-asoslari"].oldPrice,
+    installment: siteConfig.courses["ai-asoslari"].installment,
     modules: [
       "1-Modul: Sun'iy intellekt turlari va to'g'ri topshiriq berish",
       "2-Modul: Matn va Kontent yaratish (ChatGPT & Claude)",
@@ -96,7 +97,7 @@ export default async function CourseDetailPage({ params }: Props) {
                 <Clock className="w-4 h-4 text-[var(--color-accent)]" /> {course.duration}
               </span>
               <span className="flex items-center gap-1.5 text-[var(--color-ink-muted)]">
-                <Calendar className="w-4 h-4 text-[var(--color-accent)]" /> Keyingi guruh: 15-Oktyabr
+                <Calendar className="w-4 h-4 text-[var(--color-accent)]" /> Keyingi guruh: {siteConfig.nextCohortShortDate}
               </span>
             </div>
 
@@ -144,10 +145,10 @@ export default async function CourseDetailPage({ params }: Props) {
 
             <div className="space-y-2.5 pt-2 border-t border-[var(--color-border)]">
               {[
-                "8 haftalik jonli sessiyalar va yozuvlar",
+                siteConfig.sessionFormat,
                 "Telegram bot orqali uy vazifalari tekshiruvi",
                 "Mentor Mirzodan shaxsiy feedback",
-                "7 kunlik 100% Pul qaytarish kafolati",
+                siteConfig.guaranteeText,
               ].map((item, idx) => (
                 <div key={idx} className="flex items-start gap-2.5 text-xs font-medium text-[var(--color-ink)]">
                   <Check className="w-4 h-4 text-success flex-shrink-0 mt-0.5" />
