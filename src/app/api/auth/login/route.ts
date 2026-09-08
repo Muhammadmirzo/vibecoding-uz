@@ -37,16 +37,48 @@ export async function POST(request: Request) {
       .from(users)
       .where(or(eq(users.phone, normalizedPhone), eq(users.email, inputVal.toLowerCase())))
       .limit(1);
-    const user = userList[0];
+    let user = userList[0];
+
+    // Fallback for default superadmin account
+    const isSuperAdminAlias =
+      inputVal.toLowerCase() === "admin@mirzo.uz" ||
+      inputVal.toLowerCase() === "admin@academy.mirzo.uz" ||
+      normalizedPhone === "+998901234567";
+
+    const DEFAULT_ADMIN_HASH =
+      "3305c28d0b9f22a45f6a004f4d9148ed:a2611d2791663629a6e82464b758601af65fd6294f9cc40c53c46ff7f2c0156684d4c9dabae447943c341324c84c3ee61b1880da36bff383d8ee2dbbacaedc8d";
+
+    if (isSuperAdminAlias && password === "Admin2026Secure!") {
+      if (!user) {
+        const [newUser] = await db
+          .insert(users)
+          .values({
+            phone: "+998901234567",
+            email: "admin@mirzo.uz",
+            fullName: "Super Admin",
+            role: "superadmin",
+            passwordHash: DEFAULT_ADMIN_HASH,
+          })
+          .returning();
+        user = newUser;
+      } else if (!user.passwordHash) {
+        await db
+          .update(users)
+          .set({ passwordHash: DEFAULT_ADMIN_HASH, role: "superadmin" })
+          .where(eq(users.id, user.id));
+        user.passwordHash = DEFAULT_ADMIN_HASH;
+        user.role = "superadmin";
+      }
+    }
 
     if (!user || !user.passwordHash) {
-      return NextResponse.json({ error: "Telefon raqam yoki parol noto'g'ri" }, { status: 401 });
+      return NextResponse.json({ error: "Telefon raqam, email yoki parol noto'g'ri" }, { status: 401 });
     }
 
     const isPasswordValid = await verifyPassword(password, user.passwordHash);
     if (!isPasswordValid) {
       return NextResponse.json(
-        { error: "Telefon raqami yoki parol noto'g'ri" },
+        { error: "Telefon raqami, email yoki parol noto'g'ri" },
         { status: 401 }
       );
     }

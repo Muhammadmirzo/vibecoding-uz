@@ -2,7 +2,9 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import * as schema from "./schema";
 
-const connectionString = process.env.DATABASE_URL || "postgresql://postgres:postgres@localhost:5432/mirzo_academy_db";
+const connectionString =
+  process.env.DATABASE_URL ||
+  "postgresql://postgres:AcademyMirzo2026SecureDBPass!@db.gvfzomtdswzlxstjvwiv.supabase.co:5432/postgres";
 
 const maxConnections = process.env.DATABASE_MAX_CONNECTIONS
   ? parseInt(process.env.DATABASE_MAX_CONNECTIONS, 10) || 10
