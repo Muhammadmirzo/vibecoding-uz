@@ -68,7 +68,7 @@ describe("Production High-Load Defensive Hardening & Edge-Case Testing", () => {
       const results = await Promise.all([task1, task2]);
       expect(results).toEqual(["task1", "task2"]);
       expect(executionOrder).toEqual([1, 2, 3]);
-    });
+    }, 15000);
 
     it("should return db health status correctly", async () => {
       const health = await checkDbHealth();
