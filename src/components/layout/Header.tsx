@@ -118,32 +118,32 @@ export const Header = React.memo(function Header() {
                   <span>Kurslar</span>
                   <ChevronDown className="w-3.5 h-3.5 text-ink-subtle group-hover:rotate-180 transition-transform duration-200" />
                 </button>
-                <div className="absolute top-full left-0 mt-1.5 w-80 rounded-xl border border-border bg-cream p-2.5 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50 space-y-1">
+                <div className="absolute top-full left-0 mt-1.5 w-80 rounded-2xl border border-border bg-cream p-3 shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50 space-y-1.5">
                   <Link
                     href="/kurs/vibe-coding-express"
                     prefetch={true}
-                    className="flex items-start gap-3 p-2.5 rounded-lg hover:bg-cream-warm transition-colors group/item"
+                    className="flex items-start gap-3.5 p-3 rounded-xl hover:bg-cream-warm transition-colors group/item"
                   >
-                    <div className="w-9 h-9 rounded-lg bg-cream-warm border border-border flex items-center justify-center shrink-0 mt-0.5 text-accent">
-                      <BookOpen className="w-4.5 h-4.5" />
+                    <div className="w-10 h-10 rounded-xl bg-cream-warm border border-border flex items-center justify-center shrink-0 mt-0.5 text-accent shadow-xs group-hover/item:border-accent-line transition-colors">
+                      <BookOpen className="w-5 h-5" />
                     </div>
                     <div>
                       <div className="text-sm font-bold text-ink group-hover/item:text-accent transition-colors">Vibe Coding Express</div>
-                      <div className="text-xs text-ink-muted leading-snug mt-0.5">8 hafta — Claude Code bilan ilovangizni qurib, internetga chiqarasiz</div>
+                      <div className="text-xs text-ink-muted leading-relaxed mt-0.5">8 hafta — Claude Code bilan ilovangizni qurib, internetga chiqarasiz</div>
                     </div>
                   </Link>
 
                   <Link
                     href="/kurs/ai-asoslari"
                     prefetch={true}
-                    className="flex items-start gap-3 p-2.5 rounded-lg hover:bg-cream-warm transition-colors group/item"
+                    className="flex items-start gap-3.5 p-3 rounded-xl hover:bg-cream-warm transition-colors group/item"
                   >
-                    <div className="w-9 h-9 rounded-lg bg-cream-warm border border-border flex items-center justify-center shrink-0 mt-0.5 text-accent">
-                      <BookOpen className="w-4.5 h-4.5" />
+                    <div className="w-10 h-10 rounded-xl bg-cream-warm border border-border flex items-center justify-center shrink-0 mt-0.5 text-accent shadow-xs group-hover/item:border-accent-line transition-colors">
+                      <BookOpen className="w-5 h-5" />
                     </div>
                     <div>
                       <div className="text-sm font-bold text-ink group-hover/item:text-accent transition-colors">AI Asoslari</div>
-                      <div className="text-xs text-ink-muted leading-snug mt-0.5">Prompt-injiniring va AI vositalari — noldan amaliyotgacha</div>
+                      <div className="text-xs text-ink-muted leading-relaxed mt-0.5">Prompt-injiniring va AI vositalari — noldan amaliyotgacha</div>
                     </div>
                   </Link>
 
@@ -152,7 +152,7 @@ export const Header = React.memo(function Header() {
                   <Link
                     href="/testimoniyalar"
                     prefetch={true}
-                    className="flex items-center justify-between p-2.5 rounded-lg hover:bg-cream-warm transition-colors group/item"
+                    className="flex items-center justify-between p-2.5 rounded-xl hover:bg-cream-warm transition-colors group/item"
                   >
                     <div>
                       <div className="text-xs font-bold text-ink">Bitiruvchilar fikrlari</div>
@@ -164,7 +164,7 @@ export const Header = React.memo(function Header() {
                   <Link
                     href="/#kurs-tanlash"
                     prefetch={true}
-                    className="flex items-center justify-between p-2.5 rounded-lg bg-cream-warm/50 hover:bg-cream-warm transition-colors group/item"
+                    className="flex items-center justify-between p-2.5 rounded-xl bg-cream-warm/50 hover:bg-cream-warm transition-colors group/item"
                   >
                     <span className="text-xs font-bold text-accent">Barcha kurslar</span>
                     <ArrowRight className="w-4 h-4 text-accent" />
@@ -197,46 +197,46 @@ export const Header = React.memo(function Header() {
                   <span>Resurslar</span>
                   <ChevronDown className="w-3.5 h-3.5 text-ink-subtle group-hover:rotate-180 transition-transform duration-200" />
                 </button>
-                <div className="absolute top-full left-0 mt-1.5 w-72 rounded-xl border border-border bg-cream p-2.5 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50 space-y-1">
+                <div className="absolute top-full left-0 mt-1.5 w-80 rounded-2xl border border-border bg-cream p-3 shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50 space-y-1.5">
                   <Link
                     href="/resurslar"
                     prefetch={true}
-                    className="flex items-start gap-3 p-2.5 rounded-lg hover:bg-cream-warm transition-colors group/item"
+                    className="flex items-start gap-3.5 p-3 rounded-xl hover:bg-cream-warm transition-colors group/item"
                   >
-                    <div className="w-9 h-9 rounded-lg bg-cream-warm border border-border flex items-center justify-center shrink-0 mt-0.5 text-accent">
-                      <FileText className="w-4.5 h-4.5" />
+                    <div className="w-10 h-10 rounded-xl bg-cream-warm border border-border flex items-center justify-center shrink-0 mt-0.5 text-accent shadow-xs group-hover/item:border-accent-line transition-colors">
+                      <FileText className="w-5 h-5" />
                     </div>
                     <div>
                       <div className="text-sm font-bold text-ink group-hover/item:text-accent transition-colors">Bepul resurslar</div>
-                      <div className="text-xs text-ink-muted leading-snug mt-0.5">Qo'llanmalar va soha hublari</div>
+                      <div className="text-xs text-ink-muted leading-relaxed mt-0.5">Qo'llanmalar va soha hublari</div>
                     </div>
                   </Link>
 
                   <Link
                     href="/blog"
                     prefetch={true}
-                    className="flex items-start gap-3 p-2.5 rounded-lg hover:bg-cream-warm transition-colors group/item"
+                    className="flex items-start gap-3.5 p-3 rounded-xl hover:bg-cream-warm transition-colors group/item"
                   >
-                    <div className="w-9 h-9 rounded-lg bg-cream-warm border border-border flex items-center justify-center shrink-0 mt-0.5 text-accent">
-                      <Pencil className="w-4.5 h-4.5" />
+                    <div className="w-10 h-10 rounded-xl bg-cream-warm border border-border flex items-center justify-center shrink-0 mt-0.5 text-accent shadow-xs group-hover/item:border-accent-line transition-colors">
+                      <Pencil className="w-5 h-5" />
                     </div>
                     <div>
                       <div className="text-sm font-bold text-ink group-hover/item:text-accent transition-colors">Blog</div>
-                      <div className="text-xs text-ink-muted leading-snug mt-0.5">Maqolalar va tahlillar</div>
+                      <div className="text-xs text-ink-muted leading-relaxed mt-0.5">Maqolalar va tahlillar</div>
                     </div>
                   </Link>
 
                   <Link
                     href="/ish"
                     prefetch={true}
-                    className="flex items-start gap-3 p-2.5 rounded-lg hover:bg-cream-warm transition-colors group/item"
+                    className="flex items-start gap-3.5 p-3 rounded-xl hover:bg-cream-warm transition-colors group/item"
                   >
-                    <div className="w-9 h-9 rounded-lg bg-cream-warm border border-border flex items-center justify-center shrink-0 mt-0.5 text-accent">
-                      <Briefcase className="w-4.5 h-4.5" />
+                    <div className="w-10 h-10 rounded-xl bg-cream-warm border border-border flex items-center justify-center shrink-0 mt-0.5 text-accent shadow-xs group-hover/item:border-accent-line transition-colors">
+                      <Briefcase className="w-5 h-5" />
                     </div>
                     <div>
                       <div className="text-sm font-bold text-ink group-hover/item:text-accent transition-colors">Ish o'rinlari</div>
-                      <div className="text-xs text-ink-muted leading-snug mt-0.5">Vakansiyalar</div>
+                      <div className="text-xs text-ink-muted leading-relaxed mt-0.5">Vakansiyalar</div>
                     </div>
                   </Link>
                 </div>
