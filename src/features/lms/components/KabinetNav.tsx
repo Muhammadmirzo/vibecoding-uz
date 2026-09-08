@@ -9,7 +9,6 @@ import {
   CreditCard,
   Share2,
   Settings,
-  Flame,
 } from "lucide-react";
 
 export function KabinetNav() {
@@ -89,11 +88,6 @@ export function KabinetNav() {
             })}
           </nav>
 
-          <div className="hidden lg:flex items-center gap-2 pl-4 border-l border-border shrink-0">
-            <span className="text-xs font-mono font-bold text-success bg-success-soft px-2.5 py-1 rounded-full flex items-center gap-1">
-              <Flame className="w-3.5 h-3.5 fill-current" /> 3 Hafta Streak
-            </span>
-          </div>
         </div>
       </div>
     </div>

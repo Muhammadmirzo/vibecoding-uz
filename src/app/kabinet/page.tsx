@@ -1,116 +1,183 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import { BookOpen, CirclePlay, CheckCircle2, Flame, Award, Clock, ArrowRight } from "lucide-react";
-import { KabinetNav } from "@/features/lms/components/KabinetNav";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Talaba Kabineti | Mirzo Academy",
-  description: "Barcha o'quv modullari, vazifalar, baholar va sertifikat holatini boshqarish.",
-};
+import Link from "next/link";
+import {
+  BookOpen,
+  CirclePlay,
+  Award,
+  ArrowRight,
+  MessageCircle,
+  Calendar,
+  FileCheck,
+  Sparkles,
+} from "lucide-react";
+import { KabinetNav } from "@/features/lms/components/KabinetNav";
+import { useAuth } from "@/context/AuthContext";
+import { siteConfig } from "@/lib/siteConfig";
 
 export default function KabinetDashboardPage() {
+  const { user } = useAuth();
+  const userName = user?.fullName ? user.fullName : "Talaba";
+
   return (
     <div className="pt-24 pb-16 min-h-screen bg-cream">
       <KabinetNav />
       <div className="mx-auto w-full max-w-[1360px] px-5 md:px-8 lg:px-10 space-y-8">
         
         {/* Welcome Banner */}
-        <div className="bg-[var(--color-cream-warm)] border border-[var(--color-border-strong)] rounded-[var(--radius-xl)] p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-[var(--shadow-md)]">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-mono font-bold text-[var(--color-accent)] bg-[var(--color-accent-soft)] px-3 py-1 rounded-full">
-                Guruh: Oktyabr 2026
-              </span>
-              <span className="text-xs font-mono font-bold text-success bg-success-soft px-3 py-1 rounded-full flex items-center gap-1">
-                <Flame className="w-3.5 h-3.5 fill-current" /> 3 Hafta Streak
+        <div className="bg-cream-warm border border-border-strong rounded-xl md:rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-md">
+          <div className="space-y-3 max-w-2xl">
+            {/* Hierarchy: Badge -> Sarlavha -> Tavsif */}
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-mono font-bold text-accent bg-accent-soft px-3 py-1 rounded-full border border-accent-line flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5" />
+                Kurs boshlanishi: {siteConfig.nextCohortDate}
               </span>
             </div>
-            <h1 className="text-2xl md:text-3xl font-extrabold text-[var(--color-ink)]">
-              Xush kelibsiz, Jamshid! 👋
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-ink tracking-tight">
+              Xush kelibsiz, {userName}!
             </h1>
-            <p className="text-xs text-[var(--color-ink-muted)]">
-              Vibe Coding Express mentori guruhida umumiy ilgarilash ko'rsatgichingiz: <strong>45%</strong>
+            <p className="text-xs sm:text-sm text-ink-muted leading-relaxed">
+              Vibe Coding Express o'quv dasturi, amaliy topshiriqlar va dars materiallari boshqaruv paneli.
             </p>
           </div>
 
-          <Link href="/kabinet/kurs/vibe-coding-express/dars/lesson-04">
-            <button className="btn-primary h-12 px-6 rounded-[var(--radius-md)] text-xs font-semibold inline-flex items-center gap-2 w-full md:w-auto">
-              <CirclePlay className="w-4 h-4" /> Keyingi Darsni Boshlash
+          <Link href="/kabinet/kurs/vibe-coding-express" className="w-full md:w-auto shrink-0">
+            <button className="btn-primary h-12 px-6 rounded-lg text-xs md:text-sm font-semibold inline-flex items-center justify-center gap-2 w-full md:w-auto shadow-sm">
+              <CirclePlay className="w-4 h-4" />
+              <span>Darslarni Ko'rish</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </Link>
         </div>
 
-        {/* Dashboard Grid */}
-        <div className="grid md:grid-cols-3 gap-6">
+        {/* Dashboard Grid - 4 Breakpoint Responsive */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           
-          {/* Active Course Card */}
-          <div className="md:col-span-2 bg-[var(--color-cream-warm)] border border-[var(--color-border-strong)] rounded-[var(--radius-xl)] p-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 font-bold text-lg text-[var(--color-ink)]">
-                <BookOpen className="w-5 h-5 text-[var(--color-accent)]" /> Vibe Coding Express (8 hafta)
+          {/* Card 1: Active Course Card */}
+          <div className="sm:col-span-2 lg:col-span-2 bg-cream-warm border border-border-strong rounded-xl md:rounded-2xl p-6 space-y-4 shadow-sm flex flex-col justify-between">
+            <div className="space-y-3">
+              {/* Badge -> Sarlavha -> Tavsif */}
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-xs font-mono font-bold text-accent bg-accent-soft px-2.5 py-1 rounded-full border border-accent-line">
+                  Faol Kurs
+                </span>
+                <span className="text-xs font-mono font-semibold text-ink-subtle">
+                  8 hafta
+                </span>
               </div>
-              <span className="text-xs font-mono text-[var(--color-accent)] font-bold">4 / 8 Modul</span>
+
+              <div className="flex items-center gap-2.5 text-lg font-bold text-ink">
+                <BookOpen className="w-5 h-5 text-accent shrink-0" />
+                <h2>Vibe Coding Express</h2>
+              </div>
+
+              <p className="text-xs text-ink-muted leading-relaxed">
+                Sun'iy intellekt va zamonaviy no-code/low-code vositalari yordamida tezkor dasturlash, arxitektura qurish va real loyihalarni ishga tushirish kursi.
+              </p>
             </div>
 
-            <div className="space-y-1">
-              <div className="flex items-center justify-between text-xs font-mono text-[var(--color-ink-muted)]">
-                <span>Kurs o'zlashtirilishi</span>
-                <span>45%</span>
+            <div className="pt-4 border-t border-border flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+              <div className="text-xs font-mono text-ink-subtle flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-accent" />
+                <span>Barcha dars videolari ochiq</span>
               </div>
-              <div className="w-full h-2.5 bg-[var(--color-cream-deep)] rounded-full overflow-hidden">
-                <div className="h-full bg-[var(--color-accent)] w-[45%] rounded-full"></div>
-              </div>
-            </div>
-
-            {/* Lessons List */}
-            <div className="space-y-2 pt-2">
-              <div className="p-3.5 rounded-[var(--radius-lg)] bg-[var(--color-cream)] border border-[var(--color-border)] flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2.5 font-semibold text-[var(--color-ink)]">
-                  <CheckCircle2 className="w-4 h-4 text-success" />
-                  <span>3-Dars: Tailind CSS & UI Komponentlar</span>
-                </div>
-                <span className="text-[11px] font-mono text-[var(--color-ink-subtle)]">Bajarildi</span>
-              </div>
-
-              <div className="p-3.5 rounded-[var(--radius-lg)] bg-[var(--color-accent-soft)] border border-[var(--color-accent-line)] flex items-center justify-between text-xs font-bold text-[var(--color-ink)]">
-                <div className="flex items-center gap-2.5">
-                  <CirclePlay className="w-4 h-4 text-[var(--color-accent)]" />
-                  <span>4-Dars: PostgreSQL & Drizzle ORM sxemasini qurish</span>
-                </div>
-                <span className="text-[11px] font-mono text-[var(--color-accent)]">Davom etish →</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Deadlines & Notice Card */}
-          <div className="bg-[var(--color-cream-warm)] border border-[var(--color-border-strong)] rounded-[var(--radius-xl)] p-6 space-y-4">
-            <div className="font-bold text-base text-[var(--color-ink)] flex items-center gap-2">
-              <Clock className="w-4 h-4 text-[var(--color-accent)]" /> Uy Vazifalari Muddatlari
-            </div>
-
-            <div className="p-4 rounded-[var(--radius-lg)] bg-[var(--color-cream)] border border-[var(--color-border)] space-y-2">
-              <div className="text-xs font-bold text-[var(--color-ink)]">
-                4-Modul Uy Vazifasi: PostgreSQL schema definition
-              </div>
-              <div className="text-[11px] font-mono text-[var(--color-accent)]">
-                Deadline: Ertaga, 23:59 ga qadar
-              </div>
-              <Link href="/kabinet/uy-ishi/assignment-04">
-                <button className="btn-secondary h-8 px-3 rounded-md text-[11px] font-semibold w-full mt-2">
-                  Topshirish →
+              <Link href="/kabinet/kurs/vibe-coding-express">
+                <button className="btn-secondary h-10 px-4 rounded-lg text-xs font-semibold inline-flex items-center justify-center gap-2 w-full sm:w-auto">
+                  <span>Dars modullariga o'tish</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               </Link>
             </div>
+          </div>
 
-            <div className="p-4 rounded-[var(--radius-lg)] bg-[var(--color-cream)] border border-[var(--color-border)] space-y-1">
-              <div className="text-xs font-bold text-[var(--color-ink)] flex items-center gap-1.5">
-                <Award className="w-4 h-4 text-[var(--color-accent)]" /> Sertifikat Holati
+          {/* Card 2: Homework / Tasks Card */}
+          <div className="bg-cream-warm border border-border-strong rounded-xl md:rounded-2xl p-6 space-y-4 shadow-sm flex flex-col justify-between">
+            <div className="space-y-3">
+              {/* Badge -> Sarlavha -> Tavsif */}
+              <span className="inline-block text-xs font-mono font-bold text-accent bg-accent-soft px-2.5 py-1 rounded-full border border-accent-line">
+                Amaliy Vazifalar
+              </span>
+
+              <div className="flex items-center gap-2 text-base font-bold text-ink">
+                <FileCheck className="w-5 h-5 text-accent shrink-0" />
+                <h2>Uy Vazifalari</h2>
               </div>
-              <div className="text-xs text-[var(--color-ink-muted)]">
-                Barcha modullar tugagach (min. 8.0 ball) sertifikat avtomatik yaratiladi.
+
+              <p className="text-xs text-ink-muted leading-relaxed">
+                Uy vazifalari Telegram bot orqali tekshiriladi. Har bir modul topshiriqlari bot va mentorlar tomonidan baholanadi.
+              </p>
+            </div>
+
+            <div className="pt-4 border-t border-border">
+              <Link href="/kabinet/kurs/vibe-coding-express" className="block">
+                <button className="btn-secondary h-10 px-4 rounded-lg text-xs font-semibold inline-flex items-center justify-center gap-2 w-full">
+                  <span>Modul vazifalariga o'tish</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </Link>
+            </div>
+          </div>
+
+          {/* Card 3: Mentor Telegram CTA Card */}
+          <div className="bg-cream-warm border border-border-strong rounded-xl md:rounded-2xl p-6 space-y-4 shadow-sm flex flex-col justify-between">
+            <div className="space-y-3">
+              {/* Badge -> Sarlavha -> Tavsif */}
+              <span className="inline-block text-xs font-mono font-bold text-telegram bg-telegram-soft px-2.5 py-1 rounded-full border border-telegram/20">
+                Jonli Muloqot
+              </span>
+
+              <div className="flex items-center gap-2 text-base font-bold text-ink">
+                <MessageCircle className="w-5 h-5 text-telegram shrink-0" />
+                <h2>Mentor Bilan Bog'lanish</h2>
+              </div>
+
+              <p className="text-xs text-ink-muted leading-relaxed">
+                O'quv jarayonida yuzaga kelgan barcha savollaringizga mentor o'zi javob beradi.
+              </p>
+            </div>
+
+            <div className="pt-4 border-t border-border">
+              <a
+                href="https://t.me/m/ODAfK_QIMjky"
+                target="_blank"
+                rel="noreferrer"
+                className="block"
+              >
+                <button className="btn-primary h-10 px-4 rounded-lg text-xs font-semibold inline-flex items-center justify-center gap-2 w-full bg-telegram hover:bg-telegram/90">
+                  <MessageCircle className="w-4 h-4" />
+                  <span>Telegramda Yozish</span>
+                </button>
+              </a>
+            </div>
+          </div>
+
+          {/* Card 4: Certificate Info Card */}
+          <div className="sm:col-span-2 lg:col-span-3 xl:col-span-4 bg-cream-warm border border-border-strong rounded-xl md:rounded-2xl p-6 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-accent-soft text-accent border border-accent-line flex items-center justify-center shrink-0">
+                <Award className="w-5 h-5" />
+              </div>
+              <div className="space-y-0.5">
+                {/* Badge -> Sarlavha -> Tavsif */}
+                <div className="text-xs font-mono font-bold text-ink-subtle uppercase tracking-wider">
+                  Sertifikat Holati
+                </div>
+                <h3 className="text-sm font-bold text-ink">
+                  Bitiruv Sertifikati
+                </h3>
+                <p className="text-xs text-ink-muted">
+                  Barcha modullar va topshiriqlar muvaffaqiyatli yakunlangach, rasmiy sertifikat avtomatik taqdim etiladi.
+                </p>
               </div>
             </div>
+
+            <Link href="/kabinet/sertifikat" className="w-full sm:w-auto shrink-0">
+              <button className="btn-secondary h-9 px-4 rounded-lg text-xs font-semibold inline-flex items-center justify-center gap-2 w-full sm:w-auto">
+                <span>Sertifikat sahifasi</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </Link>
           </div>
 
         </div>

@@ -68,3 +68,10 @@ ZAHAR-ORKESTRATOR: docs/REDESIGN_ROADMAP.md P0 royxati 3 Orca antigravity (Gemin
 - C (config): YANGI src/lib/siteConfig.ts (zod, har qiymatda TODO(mirzo) izohi), kurs sahifasi sana/narx configdan, HeroSection/ProofStats raqamlar configdan (250+ YAGONA), oluk "portfelni korish" -> real Linklar, landing halol isbot strip
 Darslik: claude workerlar TUI da qotdi (trust+bypass dialoglari) -> antigravity agentga otkazildi (codex-trust-workspace trust qoshildi)
 Verification: tsc=0_errors vitest=135/135 build=OK LEDGER_greps=OK
+
+=== Audit Log Entry: 2026-09-09 (Landing chuqurligi + kabinet halolligi — antigravity) ===
+ZAHAR-ORKESTRATOR: vibecoding.uz brauzerda organildi (12k px sahifa: hero real foto, qanday ishlaydi 5 qadam, kabinet demo, real fidbeklar, FAQ + shaxsiy aloqa). Bizniki 2449px — 5 barobar sayoz.
+- L1: HowItWorks.tsx (5 qadam) + FaqSection.tsx (6 savol + shaxsiy aloqa kartasi, bg-cream-deep ritm) landing ga ulandi. Landing 2449 -> ~4900px.
+- L2: kabinet/page.tsx soxta malumotlardan tozalandi (Jamshid/45%/streak/emoji) -> AuthContext real user + siteConfig; Mentor chat Telegram CTA + Vazifalar kartasi qoshildi.
+- Koordinator tuzatishi: HowItWorks dagi mavjud bolmagan MessageSquareCheck ikonkasi -> ClipboardCheck (gate topdi).
+Verification: tsc=0_errors vitest=135/135 build=OK LEDGER_greps=OK lokal_vizual=OK
