@@ -5,6 +5,14 @@ This document serves as your **primary system architecture map**, **token-optimi
 
 ---
 
+## 🚀 DEPLOYMENT & ENVIRONMENT FACTS (VERIFIED 2026-09-09)
+
+- **Vercel**: canonical project `master-2` (empty `vibecoding-uz` duplicate deleted 2026-09-09). Link: `vercel link --yes --project master-2`. Pull env: `vercel env pull .env`. Deploy: `git push origin main && git push origin main:master`. Gate before push: `npm run build` + `npx vitest run`.
+- **Supabase**: DB ref `gvfzomtdswzlxstjvwiv` (ap-southeast-2 pooler, port 6543). `DATABASE_URL` required — no hardcoded fallback (one previously leaked in this file's history). Secrets only via env/`vercel env pull`, never in code or docs.
+- Full verified details: [AGENTS.md → Deployment & Environment](AGENTS.md) and [WEBSITE_AUDIT_SPEC.md](WEBSITE_AUDIT_SPEC.md).
+
+---
+
 ## 🛑 TOKEN OPTIMIZATION & CONTEXT SCOPING RULES
 
 To keep context windows small, execution fast, and API costs minimal, all AI agents **MUST** abide by the following token-sparing protocols:

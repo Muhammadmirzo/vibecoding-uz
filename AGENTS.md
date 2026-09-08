@@ -13,7 +13,7 @@ This document serves as your **authoritative architectural map**, **token-sparin
 
 2. **Feature-First Scoping**:
    - Work exclusively within module boundaries: `src/features/[feature_name]/`.
-   - Refer to [docs/context/index.md](file:///home/mirzo/orca/workspaces/desktop-ai-app/master-2/docs/context/index.md) for module mappings.
+   - Refer to [docs/context/index.md](docs/context/index.md) for module mappings.
 
 3. **Theme Tokens Only (No Hardcoded Colors)**:
    - Never hardcode custom hex or RGB colors (e.g. `bg-[#f9f8f6]`, `text-[#1a1a1a]`).
@@ -68,6 +68,33 @@ This document serves as your **authoritative architectural map**, **token-sparin
 
 ---
 
+## 🚀 DEPLOYMENT & ENVIRONMENT (VERIFIED 2026-09-09)
+
+> Canonical facts — do not guess or re-discover. Verified working as of 2026-09-09.
+
+### Vercel
+- **Canonical production project**: `master-2` (the empty `vibecoding-uz` duplicate was DELETED 2026-09-09 — never link to it).
+- **Link local clone**: `vercel link --yes --project master-2`
+- **Pull environment variables** (all stored as Config, pullable): `vercel env pull .env`
+- **Production URL**: https://master-2-jade.vercel.app
+- **Deploy procedure**: commit on `main` → `git push origin main` → `git push origin main:master` (keep `main` and `master` synced; Vercel production follows the GitHub integration).
+- **Pre-deploy gate (mandatory)**: `npm run build` AND `npx vitest run` must pass before every push.
+
+### Supabase (PostgreSQL)
+- **App database project ref**: `gvfzomtdswzlxstjvwiv` (pooler `aws-0-ap-southeast-2`, port `6543`).
+- `DATABASE_URL` is a **required** env var (`src/db/index.ts` throws without it — no fallback by design).
+- Get it via `vercel env pull .env` after linking — do NOT ask the user to paste secrets and NEVER commit them.
+- Schema changes: `npm run db:generate` → review → `npm run db:migrate` (target the Supabase `DATABASE_URL`).
+
+### Secrets policy
+- `.env`, `.env*.local`, `.vercel/` are gitignored. Never hardcode credentials in source (a leaked DB password previously lived in `src/db/index.ts` and git history — see WEBSITE_AUDIT_SPEC.md).
+- Known stale artifact: `~/.supabase-db-password.txt` on the owner's machine holds an OLD password; the live credential is only in Supabase/Vercel.
+
+### Next.js 15 App Router conventions
+- Dynamic route `params` is a Promise: `{ params: Promise<{ id: string }> }` + `await params`.
+
+---
+
 ## 📁 MODULAR FEATURE SCOPING GUIDELINES
 
 When completing tasks, navigate directly to the target module directory:
@@ -82,4 +109,4 @@ When completing tasks, navigate directly to the target module directory:
 - `src/db/` -> Drizzle ORM schema (`schema.ts`), connection client (`index.ts`), seeder (`seed.ts`).
 - `mcp-server/` -> Native Model Context Protocol tools (`index.ts`).
 
-For comprehensive architecture details, see [docs/context/index.md](file:///home/mirzo/orca/workspaces/desktop-ai-app/master-2/docs/context/index.md).
+For comprehensive architecture details, see [docs/context/index.md](docs/context/index.md).

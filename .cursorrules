@@ -16,3 +16,9 @@
 - Test: `npm run test`
 - DB: `npm run db:generate` | `npm run db:migrate` | `npm run db:seed`
 - MCP: `npm run mcp:start`
+
+# 🚀 DEPLOYMENT & ENVIRONMENT (verified 2026-09-09)
+- Vercel canonical project: `master-2`. Link: `vercel link --yes --project master-2`. Pull env: `vercel env pull .env`. Do NOT link to `vibecoding-uz` (deleted duplicate).
+- Deploy: `git push origin main && git push origin main:master`. Mandatory gate before push: `npm run build` + `npx vitest run`.
+- `DATABASE_URL` is required (Supabase, ref `gvfzomtdswzlxstjvwiv`). Never hardcode secrets — pull from Vercel.
+- See AGENTS.md → "Deployment & Environment" and WEBSITE_AUDIT_SPEC.md for verified details.

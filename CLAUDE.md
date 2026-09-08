@@ -6,8 +6,18 @@
 
 ## 📌 Authoritative Documentation Pointers
 
-1. **[AGENTS.md](file:///home/mirzo/orca/workspaces/desktop-ai-app/master-2/AGENTS.md)**: Universal rules for AI agents, theme token mandates, TypeScript & Zod strictness, Tech Stack Matrix, Quick Command Reference, and Feature Scoping Guidelines.
-2. **[docs/context/index.md](file:///home/mirzo/orca/workspaces/desktop-ai-app/master-2/docs/context/index.md)**: Comprehensive repository & module map pointer, architecture overview, domain models, API specifications, and operational procedures.
+1. **[AGENTS.md](AGENTS.md)**: Universal rules for AI agents, theme token mandates, TypeScript & Zod strictness, Tech Stack Matrix, Quick Command Reference, Deployment & Environment, and Feature Scoping Guidelines.
+2. **[docs/context/index.md](docs/context/index.md)**: Comprehensive repository & module map pointer, architecture overview, domain models, API specifications, and operational procedures.
+3. **[WEBSITE_AUDIT_SPEC.md](WEBSITE_AUDIT_SPEC.md)**: Verified audit status, tokenization rules, and known open issues.
+
+---
+
+## 🚀 Deployment & Environment (quick facts, verified 2026-09-09)
+
+- Vercel canonical project: `master-2` — link with `vercel link --yes --project master-2`, pull env with `vercel env pull .env`. Do NOT link to `vibecoding-uz` (deleted duplicate).
+- Deploy: `git push origin main && git push origin main:master`. Gate: `npm run build` + `npx vitest run` must pass before every push.
+- `DATABASE_URL` (Supabase, ref `gvfzomtdswzlxstjvwiv`) is required — never hardcode secrets, pull from Vercel.
+- Full details in [AGENTS.md → Deployment & Environment](AGENTS.md).
 
 ---
 

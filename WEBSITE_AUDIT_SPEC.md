@@ -112,10 +112,12 @@ Diqqat: desktop nav `lg:flex` (≥1024px), drawer `lg:hidden` (<1024px) — bu i
 
 | # | Muammo | Ustuvorlik | Izoh |
 | :--- | :--- | :--- | :--- |
-| 1 | **Supabase DB paroli git tarixida qolgan** (eski commit'larda `src/db/index.ts` ichida ko'rinadi) | 🔴 P0 | Kod toza, lekin tarix ochiq. Supabase Dashboard → Database → parolni ROTATE qilish va Vercel env var'ini yangilash kerak. Bu kod o'zgarishi bilan hal bo'lmaydi! |
-| 2 | Vercel'da `DATABASE_URL` env var borligini tasdiqlash kerak | 🔴 P0 | Kod endi fallback'siz — env var bo'lmasa production ishga tushmaydi |
-| 3 | `WEBSITE_AUDIT_SPEC.md` avval repoga push qilinmagan edi | ℹ️ Ma'lumot | Bu fayl endi repoda — keyingi bor push qilinadi |
+| 1 | **Supabase DB paroli git tarixida qolgan** (eski commit'larda `src/db/index.ts` ichida ko'rinadi) | 🔴 P0 | Kod toza, lekin tarix ochiq. Supabase Dashboard → Database → parolni ROTATE qilish va Vercel env var'ini yangilash kerak. CLI boshqa Supabase accauntga ulangani uchun avtomatlashtirib bo'lmadi (app DB ref: `gvfzomtdswzlxstjvwiv`). |
+| 2 | AI hujjatlaridagi o'lik yo'llar (CLAUDE.md, AGENTS.md, docs/context) | ✅ **HAL QILINDI (2026-09-09)** | 16 ta `file:///home/mirzo/orca/...` yo'li relative path'larga o'tkazildi |
+| 3 | Vercel'da bo'sh `vibecoding-uz` duplikat loyiha (noto'g'ri linklanish manbasi) | ✅ **HAL QILINDI (2026-09-09)** | O'chirildi. Kanonik loyiha: `master-2`. Hujjatlarga "link faqat master-2" qoidasi yozildi |
+| 4 | `DATABASE_URL` Vercel'da faqat Production'da bor edi (preview build yiqilar edi) | ✅ **HAL QILINDI (2026-09-09)** | Uchala muhitga qo'yildi va Config tipiga o'tkazildi — `vercel env pull .env` istalgan mashinada ishlaydi |
+| 5 | AI agentlar uchun deploy/env hujjatlari yo'q edi | ✅ **HAL QILINDI (2026-09-09)** | AGENTS.md → "Deployment & Environment" bo'limi + CLAUDE.md, .cursorrules, AGENT_CONTEXT.md ko'rsatmalari |
 
 ---
 
-*So'nggi yangilash: 2026-09-08 — to'liq tekshiruv + tuzatishlar. Verifikatsiya: build ✅, 135/135 test ✅.*
+*So'nggi yangilash: 2026-09-09 — AI-agent-friendly deploy/env yechimi. Verifikatsiya: build ✅, 135/135 test ✅, `vercel env pull` ✅.*
