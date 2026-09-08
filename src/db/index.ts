@@ -4,7 +4,7 @@ import * as schema from "./schema";
 
 const connectionString =
   process.env.DATABASE_URL ||
-  "postgresql://postgres:AcademyMirzo2026SecureDBPass!@db.gvfzomtdswzlxstjvwiv.supabase.co:5432/postgres";
+  "postgresql://postgres.gvfzomtdswzlxstjvwiv:AcademyMirzo2026SecureDBPass!@aws-0-ap-southeast-2.pooler.supabase.com:6543/postgres";
 
 const maxConnections = process.env.DATABASE_MAX_CONNECTIONS
   ? parseInt(process.env.DATABASE_MAX_CONNECTIONS, 10) || 10
