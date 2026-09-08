@@ -206,7 +206,7 @@ export function LeadModal({
           </div>
 
           {/* Footer Buttons */}
-          <div className="flex items-center justify-end space-x-3 pt-4 border-t border-border">
+          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2.5 sm:gap-3 pt-4 border-t border-border">
             <button
               type="button"
               onClick={onClose}
@@ -217,7 +217,7 @@ export function LeadModal({
             </button>
             <button
               type="submit"
-              className="px-4 py-2 rounded-md text-sm font-medium btn-primary flex items-center"
+              className="px-4 py-2 rounded-md text-sm font-medium btn-primary flex items-center justify-center"
               disabled={loading}
             >
               {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}

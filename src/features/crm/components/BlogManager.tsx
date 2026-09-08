@@ -57,6 +57,27 @@ export function BlogManager() {
   const [formStatus, setFormStatus] = useState<"draft" | "published" | "scheduled" | "archived">("published");
   const [formPublishedAt, setFormPublishedAt] = useState("");
 
+  const insertMarkdownSyntax = (prefix: string, suffix: string = "", defaultText: string = "matn") => {
+    const textarea = document.getElementById("blog-content-textarea") as HTMLTextAreaElement | null;
+    if (!textarea) {
+      setFormContentMd((prev) => prev + `${prefix}${defaultText}${suffix}`);
+      return;
+    }
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = formContentMd.substring(start, end) || defaultText;
+    const replacement = `${prefix}${selectedText}${suffix}`;
+
+    const newContent = formContentMd.substring(0, start) + replacement + formContentMd.substring(end);
+    setFormContentMd(newContent);
+
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + prefix.length, start + prefix.length + selectedText.length);
+    }, 50);
+  };
+
   const fetchPosts = async () => {
     setLoading(true);
     try {
@@ -504,14 +525,98 @@ export function BlogManager() {
                 {/* Editor Content Area */}
                 <div className="min-h-[240px]">
                   {editorTab === "edit" && (
-                    <textarea
-                      rows={12}
-                      required
-                      placeholder="Markdown formatida maqola yozing: # Sarlavha, **qalin**, [havola](url)..."
-                      value={formContentMd}
-                      onChange={(e) => setFormContentMd(e.target.value)}
-                      className="w-full px-4 py-3 text-sm bg-cream border border-border rounded-lg font-mono focus:outline-none focus:ring-2 focus:ring-accent"
-                    />
+                    <div className="space-y-2">
+                      {/* Rich Text Quick Formatting Toolbar */}
+                      <div className="flex flex-wrap items-center gap-1.5 p-2 bg-cream border border-border rounded-lg text-xs font-mono">
+                        <button
+                          type="button"
+                          onClick={() => insertMarkdownSyntax("**", "**", "qalin matn")}
+                          className="px-2.5 py-1 rounded bg-cream-warm hover:bg-cream-deep border border-border text-ink font-bold transition-all"
+                          title="Qalin Matn (Bold)"
+                        >
+                          B
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => insertMarkdownSyntax("*", "*", "og'ma matn")}
+                          className="px-2.5 py-1 rounded bg-cream-warm hover:bg-cream-deep border border-border text-ink italic transition-all"
+                          title="Og'ma Matn (Italic)"
+                        >
+                          I
+                        </button>
+                        <div className="h-4 w-px bg-border mx-1" />
+                        <button
+                          type="button"
+                          onClick={() => insertMarkdownSyntax("# ", "", "Bosh Sarlavha")}
+                          className="px-2 py-1 rounded bg-cream-warm hover:bg-cream-deep border border-border text-ink font-bold transition-all"
+                          title="Asosiy Sarlavha (H1)"
+                        >
+                          H1
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => insertMarkdownSyntax("## ", "", "Kichik Sarlavha")}
+                          className="px-2 py-1 rounded bg-cream-warm hover:bg-cream-deep border border-border text-ink font-bold transition-all"
+                          title="Bo'lim Sarlavhasi (H2)"
+                        >
+                          H2
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => insertMarkdownSyntax("### ", "", "Sub-sarlavha")}
+                          className="px-2 py-1 rounded bg-cream-warm hover:bg-cream-deep border border-border text-ink font-bold transition-all"
+                          title="Kichik Bo'lim (H3)"
+                        >
+                          H3
+                        </button>
+                        <div className="h-4 w-px bg-border mx-1" />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const url = prompt("Havola (URL) manzilini kiriting:", "https://");
+                            if (url) insertMarkdownSyntax("[", `](${url})`, "so'z yoki havola matni");
+                          }}
+                          className="px-2.5 py-1 rounded bg-cream-warm hover:bg-cream-deep border border-border text-accent font-medium underline transition-all"
+                          title="URL Havola Ulash"
+                        >
+                          🔗 Link Ulash
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => insertMarkdownSyntax("- ", "", "Ro'yxat elementi")}
+                          className="px-2 py-1 rounded bg-cream-warm hover:bg-cream-deep border border-border text-ink transition-all"
+                          title="Ro'yxat (Bullet List)"
+                        >
+                          • Ro'yxat
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => insertMarkdownSyntax("> ", "", "Iqtibos matni...")}
+                          className="px-2 py-1 rounded bg-cream-warm hover:bg-cream-deep border border-border text-ink transition-all"
+                          title="Iqtibos (Blockquote)"
+                        >
+                          " Quote
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => insertMarkdownSyntax("`", "`", "kod")}
+                          className="px-2 py-1 rounded bg-cream-warm hover:bg-cream-deep border border-border font-mono text-ink transition-all"
+                          title="Kod bloki"
+                        >
+                          &lt;&gt; Code
+                        </button>
+                      </div>
+
+                      <textarea
+                        id="blog-content-textarea"
+                        rows={12}
+                        required
+                        placeholder="Markdown formatida maqola yozing: # Sarlavha, **qalin**, [so'zga havola ulash](https://)..."
+                        value={formContentMd}
+                        onChange={(e) => setFormContentMd(e.target.value)}
+                        className="w-full px-4 py-3 text-sm bg-cream border border-border rounded-lg font-mono focus:outline-none focus:ring-2 focus:ring-accent"
+                      />
+                    </div>
                   )}
 
                   {editorTab === "preview" && (
