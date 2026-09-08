@@ -20,9 +20,11 @@ export const Footer = React.memo(function Footer() {
           <div className="space-y-3 md:col-span-1">
             <Link href="/" prefetch={true} className="flex items-center gap-2 font-bold text-lg text-[var(--color-ink)]">
               <span className="w-7 h-7 rounded-md bg-[var(--color-accent)] text-white flex items-center justify-center font-mono text-sm font-black">
-                M
+                &gt;
               </span>
-              <span>academy.mirzo.uz</span>
+              <span className="font-black tracking-tight text-base whitespace-nowrap text-ink">
+                vibe<span className="text-[var(--color-accent)]">coding</span>
+              </span>
             </Link>
             <p className="text-xs leading-relaxed text-[var(--color-ink-muted)]">
               AI bilan mahsulotlar qurishni jonli loyihalar muallifidan o'rganing. Dasturchilarsiz, g'oyadan ishlaydigan MVPgacha.

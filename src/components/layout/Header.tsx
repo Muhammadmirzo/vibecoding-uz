@@ -105,13 +105,13 @@ export const Header = React.memo(function Header() {
             <Link
               href="/"
               prefetch={true}
-              className="flex items-center gap-2 shrink-0 font-bold text-base md:text-xl tracking-tight text-[var(--color-ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] rounded-md"
+              className="flex items-center gap-2 shrink-0 font-bold text-lg md:text-xl tracking-tight text-[var(--color-ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] rounded-md"
             >
-              <span className="w-8 h-8 rounded-lg bg-[var(--color-accent)] text-white flex items-center justify-center font-mono text-base font-black shrink-0">
-                M
+              <span className="w-8 h-8 rounded-lg bg-[var(--color-accent)] text-white flex items-center justify-center font-mono text-base font-black shrink-0 shadow-xs">
+                &gt;
               </span>
-              <span className="font-extrabold tracking-tight text-base md:text-lg whitespace-nowrap">
-                academy<span className="text-[var(--color-accent)]">.mirzo.uz</span>
+              <span className="font-black tracking-tight text-lg md:text-xl whitespace-nowrap text-ink">
+                vibe<span className="text-[var(--color-accent)]">coding</span>
               </span>
             </Link>
 
