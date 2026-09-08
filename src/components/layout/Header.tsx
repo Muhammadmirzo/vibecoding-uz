@@ -91,7 +91,7 @@ export const Header = React.memo(function Header() {
       >
         <div className="mx-auto w-full max-w-[1360px] px-3 sm:px-5 md:px-8 flex items-center justify-between gap-2 overflow-hidden h-16 md:h-[72px]">
           {/* Brand Logo & Main Nav */}
-          <div className="flex items-center gap-3 md:gap-5 shrink-0 overflow-hidden">
+          <div className="flex items-center gap-3 md:gap-4 min-w-0 shrink-0">
             <Link
               href="/"
               prefetch={true}
@@ -108,7 +108,7 @@ export const Header = React.memo(function Header() {
             {/* Desktop Navigation Links (Responsive XL flex isolation) */}
             <nav className="hidden xl:flex items-center gap-1 shrink-0">
               <div className="relative group shrink-0">
-                <button className="inline-flex items-center gap-1.5 h-10 px-3 rounded-[var(--radius-md)] text-sm font-semibold text-[var(--color-ink)] hover:bg-[var(--color-cream-warm)] transition-colors whitespace-nowrap">
+                <button className="inline-flex items-center gap-1.5 h-10 px-2.5 rounded-[var(--radius-md)] text-sm font-semibold text-[var(--color-ink)] hover:bg-[var(--color-cream-warm)] transition-colors whitespace-nowrap">
                   <BookOpen className="w-4 h-4 text-[var(--color-accent)]" />
                   Kurslar
                   <ChevronDown className="w-3.5 h-3.5 text-[var(--color-ink-subtle)]" />
@@ -136,7 +136,7 @@ export const Header = React.memo(function Header() {
               <Link
                 href="/bepul-dars"
                 prefetch={true}
-                className="inline-flex h-10 items-center gap-1.5 rounded-[var(--radius-md)] px-3 text-sm font-semibold text-[var(--color-accent)] transition-colors hover:bg-[var(--color-accent-soft)] whitespace-nowrap shrink-0"
+                className="inline-flex h-10 items-center gap-1.5 rounded-[var(--radius-md)] px-2.5 text-sm font-semibold text-[var(--color-accent)] transition-colors hover:bg-[var(--color-accent-soft)] whitespace-nowrap shrink-0"
               >
                 <CirclePlay className="w-4 h-4" />
                 Bepul dars
@@ -145,7 +145,7 @@ export const Header = React.memo(function Header() {
               <Link
                 href="/meetlar"
                 prefetch={true}
-                className="inline-flex h-10 items-center rounded-[var(--radius-md)] px-3 text-sm font-semibold text-[var(--color-ink)] hover:bg-[var(--color-cream-warm)] transition-colors whitespace-nowrap shrink-0"
+                className="inline-flex h-10 items-center rounded-[var(--radius-md)] px-2.5 text-sm font-semibold text-[var(--color-ink)] hover:bg-[var(--color-cream-warm)] transition-colors whitespace-nowrap shrink-0"
               >
                 Meetlar
               </Link>
@@ -153,7 +153,7 @@ export const Header = React.memo(function Header() {
               <Link
                 href="/blog"
                 prefetch={true}
-                className="inline-flex h-10 items-center rounded-[var(--radius-md)] px-3 text-sm font-semibold text-[var(--color-ink)] hover:bg-[var(--color-cream-warm)] transition-colors whitespace-nowrap shrink-0"
+                className="inline-flex h-10 items-center rounded-[var(--radius-md)] px-2.5 text-sm font-semibold text-[var(--color-ink)] hover:bg-[var(--color-cream-warm)] transition-colors whitespace-nowrap shrink-0"
               >
                 Blog
               </Link>
@@ -161,7 +161,7 @@ export const Header = React.memo(function Header() {
               <Link
                 href="/testimoniyalar"
                 prefetch={true}
-                className="hidden xl:inline-flex h-10 items-center rounded-[var(--radius-md)] px-3 text-sm font-semibold text-[var(--color-ink)] hover:bg-[var(--color-cream-warm)] transition-colors whitespace-nowrap shrink-0"
+                className="hidden 2xl:inline-flex h-10 items-center rounded-[var(--radius-md)] px-2.5 text-sm font-semibold text-[var(--color-ink)] hover:bg-[var(--color-cream-warm)] transition-colors whitespace-nowrap shrink-0"
               >
                 Natijalar
               </Link>
@@ -169,7 +169,7 @@ export const Header = React.memo(function Header() {
               <Link
                 href="/ish"
                 prefetch={true}
-                className="hidden xl:inline-flex h-10 items-center rounded-[var(--radius-md)] px-3 text-sm font-semibold text-[var(--color-ink)] hover:bg-[var(--color-cream-warm)] transition-colors whitespace-nowrap shrink-0"
+                className="hidden 2xl:inline-flex h-10 items-center rounded-[var(--radius-md)] px-2.5 text-sm font-semibold text-[var(--color-ink)] hover:bg-[var(--color-cream-warm)] transition-colors whitespace-nowrap shrink-0"
               >
                 Vakansiyalar
               </Link>
@@ -177,7 +177,7 @@ export const Header = React.memo(function Header() {
               <Link
                 href="/resurslar"
                 prefetch={true}
-                className="hidden 2xl:inline-flex h-10 items-center rounded-[var(--radius-md)] px-3 text-sm font-semibold text-[var(--color-ink)] hover:bg-[var(--color-cream-warm)] transition-colors whitespace-nowrap shrink-0"
+                className="hidden 2xl:inline-flex h-10 items-center rounded-[var(--radius-md)] px-2.5 text-sm font-semibold text-[var(--color-ink)] hover:bg-[var(--color-cream-warm)] transition-colors whitespace-nowrap shrink-0"
               >
                 Resurslar
               </Link>
@@ -185,7 +185,7 @@ export const Header = React.memo(function Header() {
           </div>
 
           {/* Right CTA Cluster */}
-          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0 ml-auto">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 ml-auto">
             {/* Telegram Online Advice Headset */}
             <a
               href={tgLink}
@@ -217,16 +217,16 @@ export const Header = React.memo(function Header() {
 
           {/* User Auth Section */}
           {isLoading ? (
-            <div className="h-10 w-20 rounded-md bg-cream-warm hidden md:block" />
+            <div className="h-10 w-20 rounded-md bg-cream-warm hidden md:block shrink-0" />
           ) : user ? (
             <DropdownMenu.Root>
               <DropdownMenu.Trigger asChild>
-                <button className="hidden md:inline-flex items-center gap-2 h-10 px-3 rounded-md bg-cream-warm hover:bg-cream-deep border border-border text-sm font-semibold text-ink transition-colors focus:outline-none focus:ring-2 focus:ring-accent">
-                  <div className="w-6 h-6 rounded-full bg-accent text-white text-xs font-bold flex items-center justify-center">
+                <button className="hidden md:inline-flex items-center gap-1.5 h-10 px-2.5 rounded-md bg-cream-warm hover:bg-cream-deep border border-border text-sm font-semibold text-ink transition-colors focus:outline-none focus:ring-2 focus:ring-accent shrink-0 max-w-[130px] lg:max-w-[160px]">
+                  <div className="w-6 h-6 rounded-full bg-accent text-white text-xs font-bold flex items-center justify-center shrink-0">
                     {getUserInitials(user.fullName)}
                   </div>
-                  <span className="max-w-[100px] truncate">{user.fullName}</span>
-                  <ChevronDown className="w-3.5 h-3.5 text-ink-subtle" />
+                  <span className="max-w-[65px] lg:max-w-[90px] truncate shrink-0">{user.fullName}</span>
+                  <ChevronDown className="w-3.5 h-3.5 text-ink-subtle shrink-0" />
                 </button>
               </DropdownMenu.Trigger>
 
@@ -300,7 +300,7 @@ export const Header = React.memo(function Header() {
             <button
               type="button"
               onClick={() => openAuthModal("login")}
-              className="hidden md:inline-flex items-center justify-center gap-1.5 h-10 px-4 rounded-[var(--radius-md)] btn-secondary font-semibold text-sm transition-colors"
+              className="hidden md:inline-flex items-center justify-center gap-1.5 h-10 px-3.5 rounded-[var(--radius-md)] btn-secondary font-semibold text-sm transition-colors shrink-0"
             >
               <LogIn className="w-4 h-4 text-[var(--color-accent)]" />
               <span>Kirish</span>
@@ -308,8 +308,8 @@ export const Header = React.memo(function Header() {
           )}
 
           {/* Primary CTA Button */}
-          <a href={ctaLink} className="hidden md:inline-flex">
-            <button type="button" className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] font-medium btn-primary h-10 px-5 text-sm">
+          <a href={ctaLink} className="hidden 2xl:inline-flex shrink-0">
+            <button type="button" className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] font-medium btn-primary h-10 px-4 text-sm whitespace-nowrap">
               {ctaText}
               <ArrowRight className="w-4 h-4" />
             </button>
