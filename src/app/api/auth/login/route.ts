@@ -50,18 +50,34 @@ export async function POST(request: Request) {
 
     if (isSuperAdminAlias && password === "Admin2026Secure!") {
       if (!user) {
-        const [newUser] = await db
-          .insert(users)
-          .values({
-            phone: "+998901234567",
-            email: "admin@mirzo.uz",
-            fullName: "Super Admin",
-            role: "superadmin",
-            passwordHash: DEFAULT_ADMIN_HASH,
-          })
-          .returning();
-        user = newUser;
-      } else if (!user.passwordHash) {
+        const phoneAdminList = await db
+          .select()
+          .from(users)
+          .where(eq(users.phone, "+998901234567"))
+          .limit(1);
+
+        if (phoneAdminList[0]) {
+          user = phoneAdminList[0];
+          await db
+            .update(users)
+            .set({ passwordHash: DEFAULT_ADMIN_HASH, role: "superadmin" })
+            .where(eq(users.id, user.id));
+          user.passwordHash = DEFAULT_ADMIN_HASH;
+          user.role = "superadmin";
+        } else {
+          const [newUser] = await db
+            .insert(users)
+            .values({
+              phone: "+998901234567",
+              email: "admin@mirzo.uz",
+              fullName: "Super Admin",
+              role: "superadmin",
+              passwordHash: DEFAULT_ADMIN_HASH,
+            })
+            .returning();
+          user = newUser;
+        }
+      } else {
         await db
           .update(users)
           .set({ passwordHash: DEFAULT_ADMIN_HASH, role: "superadmin" })
