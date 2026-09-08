@@ -89,13 +89,13 @@ export const Header = React.memo(function Header() {
       <header
         className="sticky top-0 left-0 right-0 z-50 bg-[var(--color-cream)] border-b border-[var(--color-border)] shadow-[var(--shadow-sm)] transition-all duration-200"
       >
-        <div className="mx-auto w-full max-w-[1360px] px-4 md:px-6 lg:px-8 flex items-center justify-between gap-3 h-16 md:h-[72px]">
+        <div className="mx-auto w-full max-w-[1360px] px-3 sm:px-5 md:px-8 flex items-center justify-between gap-2 overflow-hidden h-16 md:h-[72px]">
           {/* Brand Logo & Main Nav */}
-          <div className="flex items-center gap-4 min-w-0">
+          <div className="flex items-center gap-3 md:gap-5 shrink-0 overflow-hidden">
             <Link
               href="/"
               prefetch={true}
-              className="flex items-center gap-2 shrink-0 font-bold text-lg md:text-xl tracking-tight text-[var(--color-ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] rounded-md"
+              className="flex items-center gap-2 shrink-0 font-bold text-base md:text-xl tracking-tight text-[var(--color-ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] rounded-md"
             >
               <span className="w-8 h-8 rounded-lg bg-[var(--color-accent)] text-white flex items-center justify-center font-mono text-base font-black shrink-0">
                 M
@@ -105,8 +105,8 @@ export const Header = React.memo(function Header() {
               </span>
             </Link>
 
-            {/* Desktop Navigation Links (Responsive Flex Layout) */}
-            <nav className="hidden lg:flex items-center gap-1 shrink min-w-0">
+            {/* Desktop Navigation Links (Responsive XL flex isolation) */}
+            <nav className="hidden xl:flex items-center gap-1 shrink-0">
               <div className="relative group shrink-0">
                 <button className="inline-flex items-center gap-1.5 h-10 px-3 rounded-[var(--radius-md)] text-sm font-semibold text-[var(--color-ink)] hover:bg-[var(--color-cream-warm)] transition-colors whitespace-nowrap">
                   <BookOpen className="w-4 h-4 text-[var(--color-accent)]" />
