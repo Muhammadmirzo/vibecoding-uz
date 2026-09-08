@@ -16,6 +16,7 @@ Ishlash tartibi (qisqacha — spetsifikatada to'liq):
    - Har bir dispatch prompt'iga spetsifikatadagi UMUMIY PREAMBULA + o'sha rolni to'liq tavsifi (rol, vazifa, chiqish formati, cheklovlar) ko'chiriladi — subagent kontekstni meros qilmaydi.
    - Model matritsasi (qaysi rolni qaysi modelda yugurtirish) spetsifikatsianning 2-bo'limida; ZCode'da subagent sessiya modelini meros qiladi, rolni prompt bilan berish majburiy.
 3. Kod o'zgarishidan keyin verifikatsiya sikli (majburiy, o'tkazib bo'lmaydi):
-   `npx tsc --noEmit` → `npx vitest run` → `npm run build` → DIZAYNER token grep tekshiruvi → push (`git push origin main && git push origin main:master`) → `vercel ls` bilan Production Ready tasdiqlash.
-4. FILE-GIT formatida `audit_log.txt` ga yozuv qo'shing.
-5. Yakuniy hisobot PLAIN TEXT o'zbek tilida, markdown bezaklarisiz (**, *, #, ___ ishlatilmaydi).
+   `npx tsc --noEmit` → `npx vitest run` → `npm run build` → DIZAYNER token grep tekshiruvi → ZAHAR-LEDGER gate (secret grep + o'lik yo'l grep + da'vo-isbot mosligi, spec 7-bo'lim) → push (`git push origin main && git push origin main:master`) → `vercel ls` bilan Production Ready tasdiqlash.
+4. Har yangi topilgan xato LEDGER'ga yoziladi (xato → ildiz sabab → doimiy check) va mos checklist'ga kiritiladi — spec 7-bo'lim. LEDGER'ga kirmagan xato "yopildi" hisoblanmaydi.
+5. Model siyosati (spec 8-bo'lim) buzilmaydi: chuqur fikrlash (arxitektura, sxema, xavfsizlik, murakkab triage) hech qachon arzon modelga topshirilmaydi; token tejash faqat minimal kontekst, dispatch birlashtirish va 2-strike escalation orqali.
+6. Yakuniy hisobot PLAIN TEXT o'zbek tilida, markdown bezaklarisiz (**, *, #, ___ ishlatilmaydi), oxirida rol→model→dispatch jadvali.

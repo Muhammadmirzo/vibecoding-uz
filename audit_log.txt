@@ -55,3 +55,8 @@ ZAHAR-ORKESTRATOR + FILE-GIT: ZAHAR multi-agent tizimi yaratildi.
 - .agents/skills/zahar/SKILL.md + .agents/commands/zahar.md (/zahar) qo'shildi
 - AGENTS.md, CLAUDE.md ga ZAHAR ko'rsatkichlari qo'shildi
 Verification: tsc=0_errors vitest=135/135 build=OK
+
+=== Audit Log Entry: 2026-09-09 (ZAHAR v1.1 kengaytirish) ===
+ZAHAR-ORKESTRATOR: spec v1.1 — 9 yangi agent (3 daraja: P0 TESTER/DB/LEDGER, P1 PERF/LANG/SEO, P2 ACCESS/SUPPORT/COST), Xatolar Ledgeri (10 tarixiy xato -> doimiy check), Model Siyosati (sifat > token tejash, 2-strike escalation).
+LEDGER gate birinchi ishga tushirildi: secret grep OK, token grep OK, dead-link grep ilk false positive aniqlandi va check refinelyandi (markdown link pattern).
+Verification: tsc=0_errors vitest=135/135 build=OK

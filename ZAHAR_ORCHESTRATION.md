@@ -1,6 +1,6 @@
 # ZAHAR ORKESTRATSIYA TIZIMI — Multi-Agent Specification
 
-> Versiya: 1.0 (2026-09-09). Bu fayl ZAHAR tizimining yagona manbasi (single source of truth).
+> Versiya: 1.1 (2026-09-09). Bu fayl ZAHAR tizimining yagona manbasi (single source of truth).
 > Har bir AI agent (ZCode, Claude Code, Cursor, Codex, DeepSeek) bu faylni o'qib Orkestrator roliga kiradi.
 > Boshqalar uchun ko'rsatkichlar: AGENTS.md, CLAUDE.md, .cursorrules, WEBSITE_AUDIT_SPEC.md.
 
@@ -150,3 +150,109 @@ Vazifa: "Admin panelda leads kanbaniga yangi ustun qo'shish"
 5) SHIELD -> faqat agar lead status oqimi auth/permission'ga tegsa
 6) FILE-GIT -> commit+push+audit_log+vercel status
 7) Orkestrator -> plain text hisobot
+
+---
+
+## 6. KENGAYTMA AGENTLARI (3 DARAJA) — v1.1 da qo'shildi
+
+Asosiy 6 agent + quyidagilar. Daraja = qurilish va faollashtirish ustuvorligi.
+Muhim: agentlar faqat o'z domeni teganda dispatch qilinadi — har doim emas (token intizomi).
+
+### O'TA MUHIM (P0) — production sifat/xavf uchun bevosita qalqon. Birinchi navbatda quriladi.
+
+AGENT 7 — ZAHAR-TESTER (E2E-QA va Responsive Smoke)
+Nima uchun P0: 135 unit test o'tishi real oqim ishlayotganini anglatmaydi (audit tarixida "0 errors" da'vosi
+build buzgan holda yozilgan edi). Playwright allaqachon repoda bor (e2e/, playwright.config.ts).
+Vazifa: `npx playwright test` oqimlarini ishga tushirish (quiz funnel, auth, LMS dars oqimi, webhook sandbox),
+xatolarni flaky/real deb ajratish, 4 breakpoint viewport smoke (mobil/planshet/noutbuk/desktop).
+Model: GLM 5.3 Flash (ijro + retry) — murakkab triage 2 strike qoidasi bo'yicha Orkestratorga ko'tariladi.
+ZCode mapping: general-purpose agent.
+
+AGENT 8 — ZAHAR-DB (Data Guardian)
+Nima uchun P0: live Supabase ma'lumotlari — bitta yomon migratsiya pul va o'quvchi ma'lumotiga tegadi.
+Vazifa: drizzle migratsiya review (`db:generate` chiqiqini audit), destructive SQL guard (DROP/TRUNCATE/DELETE
+without WHERE), migratsiyadan oldin data snapshot/backup tavsiyasi, RLS siyosatlar tekshiruvi.
+Model: Claude Sonnet 4.5 — sxema dizayni chuqur fikrlash, arzon modelga topshirilmaydi (Model siyosati 1-qoida).
+ZCode mapping: general-purpose agent.
+
+AGENT 9 — ZAHAR-LEDGER (Xotira va Hujjat Guardian)
+Nima uchun P0: eng katta ikki tarixiy muammo — tekshirilmagan "bajarildi" da'volari va o'lik hujjat yo'llari
+(boshqa AI'larni chalg'itgan). Takrorlanmaslik mexanizmi shu agentda yashaydi (7-bo'lim LEDGER).
+Vazifa: (a) har push'dan oldin da'vo-isbot mosligini tekshirish (har "done" uchun buyruq chiqishi bo'lishi shart),
+(b) hujjatlar drift audit: AGENTS.md/CLAUDE.md/skills/WEBSITE_AUDIT_SPEC.md koddagi real holatga mosligi,
+o'lik yo'llar grep, (c) LEDGER yuritish va yangi xatoni doimiy check'ga aylantirish.
+Model: GLM 5.3 Flash (sweep) — da'vo-isbot bahosi murakkab bo'lsa Orkestratorga ko'tariladi.
+ZCode mapping: general-purpose agent.
+
+### MUHIM (P1) — o'sish va sifat uchun kuchli qo'shimcha. P0 barqarorlashgach quriladi.
+
+AGENT 10 — ZAHAR-PERF (Performance & Core Web Vitals)
+Vazifa: bundle hajmi nazorati (build First Load JS), LCP/CLS asosiy sahifalarda, rasm optimizatsiyasi,
+cache siyosati. Ta'lim funnel'ida tezlik = konversiya.
+Model: GLM 5.3 Flash. ZCode mapping: general-purpose agent.
+
+AGENT 11 — ZAHAR-LANG (O'zbek Til Sifati va Kontent QA)
+Vazifa: lotin/kirill aralashuvi, apostrof bir xilligi (' vs ʻ), terminologiya lug'ati mosligi (/atamalar),
+blog/LMS matn sifati. Mahsulot to'liq o'zbek tilida — kontent sifati brend sifati.
+Model: GLM 5.3 Flash. ZCode mapping: general-purpose agent.
+
+AGENT 12 — ZAHAR-SEO (Growth Texnik)
+Vazifa: meta/OG taglar, sitemap, robots, structured data (Course, FAQ schema.org), blog SEO audit.
+Model: GLM 5.3 Flash. ZCode mapping: general-purpose agent.
+
+### MEDIUM (P2) — maxsus ehtiyoj paydo bo'lganda quriladi.
+
+AGENT 13 — ZAHAR-ACCESS (Accessibility Auditor)
+Vazifa: WCAG AA kontrast (3 tema), aria attr, klaviatura navigatsiyasi. Radix allaqachon asos beradi.
+Model: Gemini 3 Flash (vision — screenshot kontrast/foydalanish tekshiruvi). ZCode mapping: general-purpose agent.
+
+AGENT 14 — ZAHAR-SUPPORT (Telegram Bot va CRM Oqimlari)
+Vazifa: Telegraf bot reply oqimlari test, notification dispatcher audit, CRM workflow smoke.
+Model: GLM 5.3 Flash. ZCode mapping: general-purpose agent.
+
+AGENT 15 — ZAHAR-COST (Token va Infra Xarajat Nazorati)
+Vazifa: dispatch hisobotlaridan token/model ishlatilish jadvali, qimmat model ortiqcha ishlatilgan joylarni
+aniqlash (LEKIN Model siyosati 1-qoidasiga zid bo'lgan tavsiya berish taqiqlanadi), Vercel usage smoke.
+Model: GLM 5.3 Flash. ZCode mapping: general-purpose agent.
+
+---
+
+## 7. XATOLAR LEDGERI — Takrorlanmaslik Protokoli
+
+Qoida: har topilgan xato uchun Orkestrator MAJBURIY (1) LEDGER'ga yozadi: xato -> ildiz sabab -> doimiy check,
+(2) shu check'ni verifikatsiya sikliga yoki DIZAYNER/REVIEWER/FILE-GIT checklist'iga kiritadi.
+LEDGER'ga kirmagan xato "yopildi" deb hisoblanmaydi. FILE-GIT har push'da audit_log.txt ga gate natijasini yozadi.
+
+| # | O'tgan xato | Ildiz sabab | Doimiy check (kim/buyruq) |
+| :--- | :--- | :--- | :--- |
+| 1 | "Bajarildi/0 errors" da'volari kodda tasdiqlanmagan (build aslida buzilgan edi) | isbotsiz da'vo | LEDGER: har "done" da'vosi uchun buyruq chiqishi majburiy (REVIEWER verbatim output loglaydi; ZAHAR-LEDGER mosligini tekshiradi) |
+| 2 | Supabase paroli kodga hardcode (git tarixida qoldi) | secret intizomi yo'q | FILE-GIT push-gate: grep -rEn "postgres://[^\\s]*:[^\\s]*@" src/ --include="*.ts" -l bo'sh bo'lishi shart |
+| 3 | Hujjatlarda o'lik absolyut yo'llar (boshqa AI'larni chalg'itdi) | mashinaga bog'liq yo'llar | ZAHAR-LEDGER: grep -rEn '\\]\\(file:///home' --include="*.md" . bo'sh bo'lishi shart (markdown LINK sintaksisi — hujjat matnidagi eslatmalar false positive bo'lmasin) |
+| 4 | 63 ta hardcoded hex class (audit "almashtirildi" degan edi) | da'vo tekshirilmagan | DIZAYNER: grep -rEn "text-\\[#\|bg-\\[#\|border-\\[#" src (istisnolar: WEBSITE_AUDIT_SPEC 3-QISM) |
+| 5 | Planshetda (768-1024px) navigatsiya butunlay yo'q edi | breakpoint juftliklari parallel yangilanmagan | DIZAYNER checklist: har nav/breakpoint o'zgarishida 4 viewport smoke (ZAHAR-TESTER bilan) |
+| 6 | overflow-hidden dropdown'larni kesib qo'ygan edi | vizual regression tekshirilmagan | DIZAYNER checklist: dropdown/drawer/modal o'zgarsa — och holatda screenshot tekshiruv |
+| 7 | Next.js 15 dinamik params (Promise) build buzgan edi | framework konventsiya bilimi | REVIEWER: tsc gate + AGENTS.md konventsiyasi (params — Promise) |
+| 8 | main/master desync (Vercel build chiqib ketgan) | deploy tartibi hujjatsiz | FILE-GIT: push main + main:master, keyin git log origin/main..origin/master bo'shlig'ini tekshirish |
+| 9 | bo'sh duplikat Vercel loyihaga linklanish | kanonik fakt hujjatlanmagan | FILE-GIT: vercel link oldin .vercel/project.json = master-2 tasdiqlash |
+| 10 | Preview muhitida DATABASE_URL yo'qligi build yiqitgan | env matritsasi tekshirilmagan | FILE-GIT: deploy oldin vercel env ls 3 muhitda DATABASE_URL borligini tekshirish |
+
+---
+
+## 8. MODEL SIYOSATI — Sifat > Token Tejash (qat'iy tartib)
+
+1-QOIDA (chuqur fikrlash qalqoni): arxitektura qarorlari, sxema dizayni, xavfsizlik dizayni, murakkab debug
+triage, kritik code review, migratsiya review — HECH QACHON arzon modelga topshirilmaydi, token tejayman deb ham.
+Token tejash hajm/kontekst tejash hisoblanadi, sifat hisobiga EMAS. Shu bo'limdagi agentlar: ORKESTRATOR
+(GLM 5.3 Flash MAX), ZAHAR-DB (Claude Sonnet 4.5) — ularning modeli pasaytirilmaydi.
+2-QOIDA (arzon model domeni): mexanik buyruq ijrosi, grep sweep, takroriy test run, audit log yozish,
+format/token tekshiruvlari — arzon modellarda (GLM 5.3 Flash / Gemini 3 Flash).
+3-QOIDA (2-strike escalation): arzon model vazifada 2 marta ortiq qaytsa (retry) yoki ishonchsiz/noaniq javob
+bersa — vazifa DARHOL bir ustki modelga (Orkestrator yoki fallback matritsadagi model) ko'tariladi.
+Qayta urinishlar o'rniga escalation — bu ham token, ham sifat tejash.
+4-QOIDA (minimal kontekst dispatch): har subagent prompt'i faqat o'z vazifasi uchun zarur fayl/faktlarni oladi;
+butun repo sweep taqiqlangan (RESEARCHER bundan mustasno — uning vazifasi shu). Natijalar file dump emas,
+xulosa shaklida qaytadi.
+5-QOIDA (dispatch birlashtirish): bir nechta kichik tekshiruv bitta subagentga birlashtiriladi — alohida
+dispatch overhead qilinmaydi (har dispatch = yangi kontekst = yangi token).
+6-QOIDA (hisobdorlik): Orkestrator yakuniy hisobotda qisqa jadval beradi: rol -> model -> dispatch soni ->
+asosiy natija. Bu jadval ZAHAR-COST (P2) ishga tushganda avtomatlashtiriladi.
