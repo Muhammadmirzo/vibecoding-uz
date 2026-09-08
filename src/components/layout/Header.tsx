@@ -87,30 +87,26 @@ export const Header = React.memo(function Header() {
         </div>
       )}
       <header
-        className={`fixed ${showBanner && bannerText ? "top-8" : "top-0"} left-0 right-0 z-50 transition-all duration-200 ${
-          scrolled
-            ? "bg-[var(--color-cream)]/90 backdrop-blur-md border-b border-[var(--color-border)] shadow-[var(--shadow-sm)]"
-            : "bg-transparent border-b border-transparent"
-        }`}
+        className="sticky top-0 left-0 right-0 z-50 bg-[var(--color-cream)] border-b border-[var(--color-border)] shadow-[var(--shadow-sm)] transition-all duration-200"
       >
-      <div className="mx-auto w-full max-w-[1360px] px-5 md:px-8 lg:px-10 flex items-center justify-between gap-4 h-16 md:h-[72px]">
-        {/* Brand Logo & Main Nav */}
-        <div className="flex items-center gap-6 min-w-0">
-          <Link
-            href="/"
-            prefetch={true}
-            className="flex items-center gap-2 shrink-0 font-bold text-xl tracking-tight text-[var(--color-ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] rounded-md"
-          >
-            <span className="w-8 h-8 rounded-lg bg-[var(--color-accent)] text-white flex items-center justify-center font-mono text-lg font-black">
-              M
-            </span>
-            <span className="font-extrabold tracking-tight text-lg">
-              academy<span className="text-[var(--color-accent)]">.mirzo.uz</span>
-            </span>
-          </Link>
+        <div className="mx-auto w-full max-w-[1360px] px-4 md:px-6 lg:px-8 flex items-center justify-between gap-3 h-16 md:h-[72px]">
+          {/* Brand Logo & Main Nav */}
+          <div className="flex items-center gap-4 min-w-0">
+            <Link
+              href="/"
+              prefetch={true}
+              className="flex items-center gap-2 shrink-0 font-bold text-lg md:text-xl tracking-tight text-[var(--color-ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] rounded-md"
+            >
+              <span className="w-8 h-8 rounded-lg bg-[var(--color-accent)] text-white flex items-center justify-center font-mono text-base font-black shrink-0">
+                M
+              </span>
+              <span className="font-extrabold tracking-tight text-base md:text-lg whitespace-nowrap">
+                academy<span className="text-[var(--color-accent)]">.mirzo.uz</span>
+              </span>
+            </Link>
 
-          {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center gap-1.5">
+            {/* Desktop Navigation Links (Responsive XL flex) */}
+            <nav className="hidden lg:flex items-center gap-1 overflow-x-auto no-scrollbar">
             <div className="relative group">
               <button className="inline-flex items-center gap-1.5 h-10 px-3 rounded-[var(--radius-md)] text-sm font-semibold text-[var(--color-ink)] hover:bg-[var(--color-cream-warm)] transition-colors">
                 <BookOpen className="w-4 h-4 text-[var(--color-accent)]" />

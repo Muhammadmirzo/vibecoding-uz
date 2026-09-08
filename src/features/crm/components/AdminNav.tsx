@@ -83,11 +83,11 @@ export function AdminNav() {
   ];
 
   return (
-    <header className="bg-cream-warm border-b border-border sticky top-0 z-40">
+    <header className="bg-cream-warm border-b border-border sticky top-0 z-50 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-16 gap-4">
           {/* Brand & Badge */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3 shrink-0">
             <Link
               href="/"
               className="flex items-center text-xs text-ink-muted hover:text-ink transition-colors"
@@ -98,7 +98,7 @@ export function AdminNav() {
             </Link>
             <div className="h-4 w-px bg-border hidden sm:block" />
             <Link href="/admin" className="flex items-center space-x-2">
-              <span className="font-bold text-lg tracking-tight text-ink">
+              <span className="font-bold text-base md:text-lg tracking-tight text-ink whitespace-nowrap">
                 Mirzo Academy <span className="accent-serif font-normal">CRM</span>
               </span>
               <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-accent-soft text-accent border border-accent-line">
@@ -109,7 +109,7 @@ export function AdminNav() {
           </div>
 
           {/* Navigation Links */}
-          <nav className="hidden md:flex space-x-1">
+          <nav className="hidden lg:flex items-center space-x-1 overflow-x-auto no-scrollbar py-1">
             {navItems.map((item) => {
               const isActive = item.exact
                 ? pathname === item.href
@@ -136,7 +136,7 @@ export function AdminNav() {
         </div>
 
         {/* Mobile Navigation Row */}
-        <div className="md:hidden flex space-x-1 overflow-x-auto pb-3 pt-1 scrollbar-none">
+        <div className="lg:hidden flex space-x-1.5 overflow-x-auto pb-3 pt-1 no-scrollbar">
           {navItems.map((item) => {
             const isActive = item.exact
               ? pathname === item.href
