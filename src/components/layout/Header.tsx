@@ -453,69 +453,101 @@ export const Header = React.memo(function Header() {
             </button>
           )}
 
-          <Link
-            href="/kurs/vibe-coding-express"
-            prefetch={true}
-            onClick={() => setMobileMenuOpen(false)}
-            className="block py-2 text-base font-semibold text-[var(--color-ink)]"
-          >
-            Vibe Coding Express
-          </Link>
-          <Link
-            href="/bepul-dars"
-            prefetch={true}
-            onClick={() => setMobileMenuOpen(false)}
-            className="block py-2 text-base font-semibold text-[var(--color-accent)] flex items-center gap-2"
-          >
-            <CirclePlay className="w-4 h-4" /> Bepul dars
-          </Link>
-          <Link
-            href="/meetlar"
-            prefetch={true}
-            onClick={() => setMobileMenuOpen(false)}
-            className="block py-2 text-base font-semibold text-[var(--color-ink)]"
-          >
-            Meetlar
-          </Link>
-          <Link
-            href="/blog"
-            prefetch={true}
-            onClick={() => setMobileMenuOpen(false)}
-            className="block py-2 text-base font-semibold text-[var(--color-ink)]"
-          >
-            Blog & Maqolalar
-          </Link>
-          <Link
-            href="/testimoniyalar"
-            prefetch={true}
-            onClick={() => setMobileMenuOpen(false)}
-            className="block py-2 text-base font-semibold text-[var(--color-ink)]"
-          >
-            Bitiruvchilar Natijalari
-          </Link>
-          <Link
-            href="/ish"
-            prefetch={true}
-            onClick={() => setMobileMenuOpen(false)}
-            className="block py-2 text-base font-semibold text-[var(--color-ink)]"
-          >
-            Bo'sh ish o'rinlari
-          </Link>
-          <Link
-            href="/resurslar"
-            prefetch={true}
-            onClick={() => setMobileMenuOpen(false)}
-            className="block py-2 text-base font-semibold text-[var(--color-ink)]"
-          >
-            Resurslar
-          </Link>
-          <a
-            href={ctaLink}
-            onClick={() => setMobileMenuOpen(false)}
-            className="block w-full text-center py-3 rounded-[var(--radius-md)] btn-primary text-sm font-semibold"
-          >
-            {ctaText}
-          </a>
+          {/* Mobile Navigation Links */}
+          <div className="space-y-4 pt-2 border-t border-[var(--color-border)]">
+            {/* Kurslar Group */}
+            <div className="space-y-1">
+              <p className="text-xs font-mono font-bold uppercase tracking-wider text-[var(--color-ink-muted)] px-1 mb-1">Kurslar</p>
+              <Link
+                href="/kurs/vibe-coding-express"
+                prefetch={true}
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-semibold text-[var(--color-ink)] hover:bg-[var(--color-cream-warm)] transition-colors"
+              >
+                <BookOpen className="w-4 h-4 text-[var(--color-accent)] shrink-0" />
+                <span>Vibe Coding Express</span>
+              </Link>
+              <Link
+                href="/kurs/ai-asoslari"
+                prefetch={true}
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-semibold text-[var(--color-ink)] hover:bg-[var(--color-cream-warm)] transition-colors"
+              >
+                <BookOpen className="w-4 h-4 text-[var(--color-accent)] shrink-0" />
+                <span>AI Asoslari</span>
+              </Link>
+            </div>
+
+            {/* Asosiy Links */}
+            <div className="space-y-1">
+              <p className="text-xs font-mono font-bold uppercase tracking-wider text-[var(--color-ink-muted)] px-1 mb-1">Asosiy</p>
+              <Link
+                href="/bepul-dars"
+                prefetch={true}
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-semibold text-[var(--color-accent)] hover:bg-[var(--color-accent-soft)] transition-colors"
+              >
+                <CirclePlay className="w-4 h-4 shrink-0" />
+                <span>Bepul dars</span>
+              </Link>
+              <Link
+                href="/meetlar"
+                prefetch={true}
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-semibold text-[var(--color-ink)] hover:bg-[var(--color-cream-warm)] transition-colors"
+              >
+                <span>Meetlar</span>
+              </Link>
+              <Link
+                href="/testimoniyalar"
+                prefetch={true}
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-semibold text-[var(--color-ink)] hover:bg-[var(--color-cream-warm)] transition-colors"
+              >
+                <span>Ekspertlar</span>
+              </Link>
+            </div>
+
+            {/* Resurslar Group */}
+            <div className="space-y-1">
+              <p className="text-xs font-mono font-bold uppercase tracking-wider text-[var(--color-ink-muted)] px-1 mb-1">Resurslar</p>
+              <Link
+                href="/blog"
+                prefetch={true}
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-semibold text-[var(--color-ink)] hover:bg-[var(--color-cream-warm)] transition-colors"
+              >
+                <Pencil className="w-4 h-4 text-[var(--color-accent)] shrink-0" />
+                <span>Blog</span>
+              </Link>
+              <Link
+                href="/resurslar"
+                prefetch={true}
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-semibold text-[var(--color-ink)] hover:bg-[var(--color-cream-warm)] transition-colors"
+              >
+                <FileText className="w-4 h-4 text-[var(--color-accent)] shrink-0" />
+                <span>Bepul resurslar</span>
+              </Link>
+              <Link
+                href="/ish"
+                prefetch={true}
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-semibold text-[var(--color-ink)] hover:bg-[var(--color-cream-warm)] transition-colors"
+              >
+                <Briefcase className="w-4 h-4 text-[var(--color-accent)] shrink-0" />
+                <span>Ish o'rinlari</span>
+              </Link>
+            </div>
+
+            <a
+              href={ctaLink}
+              onClick={() => setMobileMenuOpen(false)}
+              className="block w-full text-center py-3 rounded-[var(--radius-md)] btn-primary text-sm font-semibold shadow-sm"
+            >
+              {ctaText}
+            </a>
+          </div>
         </div>
       )}
     </header>
