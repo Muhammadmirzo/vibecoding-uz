@@ -56,12 +56,6 @@ function AdminLoginForm() {
     }
   };
 
-  const handleFillDemoAdmin = () => {
-    setLoginInput("admin@mirzo.uz");
-    setPassword("Admin2026Secure!");
-    setError(null);
-  };
-
   return (
     <div className="w-full max-w-md bg-[var(--color-cream)] border border-[var(--color-border-strong)] rounded-[var(--radius-xl)] p-6 sm:p-8 shadow-[var(--shadow-lg)] space-y-6">
       {/* Header Badge */}
@@ -139,20 +133,6 @@ function AdminLoginForm() {
           )}
         </button>
       </form>
-
-      {/* Demo Fast Fill Helper */}
-      <div className="pt-4 border-t border-[var(--color-border)] text-center space-y-2">
-        <p className="text-[11px] text-[var(--color-ink-subtle)]">
-          Test rejimida admin sifatida kirish:
-        </p>
-        <button
-          type="button"
-          onClick={handleFillDemoAdmin}
-          className="px-3 py-1.5 rounded-[var(--radius-md)] border border-[var(--color-border-strong)] bg-[var(--color-cream-warm)] hover:bg-[var(--color-cream-deep)] text-xs font-mono text-[var(--color-ink)] transition-colors"
-        >
-          admin@mirzo.uz (Superadmin ma'lumotlarini to'ldirish)
-        </button>
-      </div>
     </div>
   );
 }

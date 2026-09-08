@@ -2,8 +2,15 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export const Footer = React.memo(function Footer() {
+  const pathname = usePathname();
+
+  if (pathname?.startsWith("/admin")) {
+    return null;
+  }
+
   return (
     <footer className="w-full bg-[var(--color-cream-deep)] border-t border-[var(--color-border-strong)] py-12 text-sm text-[var(--color-ink-muted)]">
       <div className="mx-auto w-full max-w-[1360px] px-5 md:px-8 lg:px-10">

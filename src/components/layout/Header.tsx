@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { useAuth } from "@/context/AuthContext";
 import { ThemeToggle } from "./ThemeToggle";
@@ -27,6 +28,7 @@ import {
 } from "lucide-react";
 
 export const Header = React.memo(function Header() {
+  const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [scrolled, setScrolled] = React.useState(false);
   const [siteSettings, setSiteSettings] = React.useState<{
@@ -59,6 +61,10 @@ export const Header = React.memo(function Header() {
       })
       .catch((err) => console.error("Failed to fetch settings in Header:", err));
   }, []);
+
+  if (pathname?.startsWith("/admin")) {
+    return null;
+  }
 
   const getUserInitials = (name: string) => {
     if (!name) return "U";
