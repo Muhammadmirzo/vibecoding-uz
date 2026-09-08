@@ -110,16 +110,14 @@ export async function POST(request: Request) {
       .where(eq(users.id, user.id));
 
     // Generate token and set HTTP-only cookie
-    const token = await createSessionToken({
-      sessionId: session.id,
+    const token = createSessionToken({
+      sessionId: session ? session.id : user.id,
       userId: user.id,
       role: user.role,
       expiresAt: expiresAt.getTime(),
     });
 
-    await setSessionCookie(token, expiresAt);
-
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       user: {
         id: user.id,
@@ -130,6 +128,18 @@ export async function POST(request: Request) {
         avatarUrl: user.avatarUrl,
       },
     });
+
+    const cookieHeader = setSessionCookie(token, {
+      maxAgeSeconds: 30 * 24 * 3600,
+      path: "/",
+      httpOnly: true,
+      sameSite: "Lax",
+      secure: process.env.NODE_ENV === "production",
+    });
+
+    response.headers.set("Set-Cookie", cookieHeader);
+
+    return response;
   } catch (error: any) {
     console.error("Login error:", error);
     return NextResponse.json(
