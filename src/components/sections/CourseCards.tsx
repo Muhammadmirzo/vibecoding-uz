@@ -48,7 +48,7 @@ export const CourseCards = React.memo(function CourseCards() {
                 "Kod yozmasdan real mahsulot chiqarmoqchisiz",
               ].map((text, i) => (
                 <li key={i} className="flex items-start gap-2.5 text-sm font-medium text-[var(--color-ink)]">
-                  <Check className="w-4 h-4 text-[#27C93F] flex-shrink-0 mt-0.5" />
+                  <Check className="w-4 h-4 text-success flex-shrink-0 mt-0.5" />
                   <span>{text}</span>
                 </li>
               ))}
@@ -93,7 +93,7 @@ export const CourseCards = React.memo(function CourseCards() {
                 "Kundalik ish va kontentda AI'dan foydalanmoqchisiz",
               ].map((text, i) => (
                 <li key={i} className="flex items-start gap-2.5 text-sm font-medium text-[var(--color-ink)]">
-                  <Check className="w-4 h-4 text-[#27C93F] flex-shrink-0 mt-0.5" />
+                  <Check className="w-4 h-4 text-success flex-shrink-0 mt-0.5" />
                   <span>{text}</span>
                 </li>
               ))}

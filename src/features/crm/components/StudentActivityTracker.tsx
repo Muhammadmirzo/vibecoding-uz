@@ -132,13 +132,13 @@ export function StudentActivityTracker() {
   const statusBadgeStyle = (status: StudentActivityItem["status"]) => {
     switch (status) {
       case "active":
-        return "bg-emerald-500/10 text-emerald-700 border-emerald-500/30";
+        return "bg-success-soft text-success border-success/30 font-semibold";
       case "at_risk":
-        return "bg-amber-500/10 text-amber-700 border-amber-500/30 font-semibold";
+        return "bg-accent-soft text-accent border-accent-line font-semibold";
       case "completed":
-        return "bg-accent-soft text-accent border-accent-line";
+        return "bg-cream-deep text-ink border-border font-semibold";
       case "inactive":
-        return "bg-rose-500/10 text-rose-700 border-rose-500/30";
+        return "bg-cream-warm text-ink-muted border-border";
       default:
         return "bg-cream-deep text-ink-muted border-border";
     }
@@ -189,12 +189,12 @@ export function StudentActivityTracker() {
 
       {/* Notification Toast */}
       {notifySuccess && (
-        <div className="p-3.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-800 text-xs font-semibold flex items-center justify-between shadow-sm animate-fade-in">
+        <div className="p-3.5 rounded-xl bg-success-soft border border-success/30 text-success text-xs font-semibold flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            <CheckCircle2 className="w-4 h-4 text-success" />
             <span>{notifySuccess}</span>
           </div>
-          <button onClick={() => setNotifySuccess(null)} className="text-emerald-800 hover:text-emerald-950">
+          <button onClick={() => setNotifySuccess(null)} className="text-success hover:opacity-80">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -423,7 +423,7 @@ export function StudentActivityTracker() {
 
       {/* Student Activity Detail Modal */}
       {selectedStudent && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/50 backdrop-blur-sm animate-fade-in">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/50 backdrop-blur-sm">
           <div className="bg-cream-warm border border-border rounded-xl max-w-2xl w-full p-6 space-y-6 shadow-xl max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
             <div className="flex items-start justify-between border-b border-border pb-4">

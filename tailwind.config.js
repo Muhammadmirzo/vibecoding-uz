@@ -26,6 +26,14 @@ module.exports = {
           soft: "var(--color-accent-soft)",
           line: "var(--color-accent-line)",
         },
+        border: {
+          DEFAULT: "var(--color-border)",
+          strong: "var(--color-border-strong)",
+        },
+        success: {
+          DEFAULT: "var(--color-success)",
+          soft: "var(--color-success-soft)",
+        },
       },
       fontFamily: {
         sans: ["var(--font-onest)", "system-ui", "sans-serif"],

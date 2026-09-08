@@ -286,8 +286,8 @@ export function SettingsManager() {
       </div>
 
       {savedSuccess && (
-        <div className="flex items-center gap-2 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-medium animate-in fade-in">
-          <CheckCircle className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+        <div className="flex items-center gap-2 p-4 rounded-xl bg-success-soft border border-success/30 text-success text-sm font-medium">
+          <CheckCircle className="w-5 h-5 text-success flex-shrink-0" />
           Barcha tizim sozlamalari muvaffaqiyatli saqlandi!
         </div>
       )}
@@ -334,14 +334,14 @@ export function SettingsManager() {
             </p>
 
             {credSuccess && (
-              <div className="flex items-center gap-2 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-medium animate-in fade-in">
-                <CheckCircle className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+              <div className="flex items-center gap-2 p-4 rounded-xl bg-success-soft border border-success/30 text-success text-sm font-medium">
+                <CheckCircle className="w-5 h-5 text-success flex-shrink-0" />
                 {credSuccess}
               </div>
             )}
 
             {credError && (
-              <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-sm font-medium animate-in fade-in">
+              <div className="p-4 rounded-xl bg-accent-soft border border-accent-line text-accent text-sm font-medium">
                 {credError}
               </div>
             )}

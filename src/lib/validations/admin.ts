@@ -62,6 +62,7 @@ export const broadcastAudienceSchema = z.enum([
   "leads_new",
   "leads_consultation",
   "cohort_students",
+  "pending_homework",
 ]);
 
 export const createBroadcastSchema = z.object({

@@ -184,7 +184,7 @@ export function VideoPlayer({
       <div
         className={`relative aspect-video rounded-xl bg-ink text-white flex flex-col items-center justify-center p-6 border border-border shadow-lg ${className}`}
       >
-        <Video className="w-12 h-12 text-ink-muted mb-3 animate-pulse" />
+        <Video className="w-12 h-12 text-ink-muted mb-3" />
         <p className="text-sm font-medium text-ink-muted">Dars videosi mavjud emas yoki havola berilmadi</p>
       </div>
     );

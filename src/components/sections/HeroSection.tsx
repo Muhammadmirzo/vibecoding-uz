@@ -61,8 +61,8 @@ export const HeroSection = React.memo(function HeroSection() {
                 <div className="text-8xl font-black font-mono text-[var(--color-accent)] opacity-20 select-none">
                   IQ
                 </div>
-                <div className="absolute top-4 right-4 z-20 px-3 py-1.5 rounded-full bg-[var(--color-ink)]/85 backdrop-blur text-white text-xs font-mono font-medium flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-[#27C93F] animate-pulse"></span>
+                <div className="absolute top-4 right-4 z-20 px-3 py-1.5 rounded-full bg-ink/85 backdrop-blur text-white text-xs font-mono font-medium flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-success"></span>
                   3 jonli mahsulot asoschisi
                 </div>
                 <div className="absolute bottom-4 left-4 z-20 text-white">

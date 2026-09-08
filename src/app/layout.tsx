@@ -64,7 +64,7 @@ export default async function RootLayout({
   return (
     <html lang="uz" suppressHydrationWarning className={`${onest.variable} ${instrumentSerif.variable} ${geistMono.variable}`}>
       <body className="antialiased selection:bg-[var(--color-accent-soft)] selection:text-[var(--color-accent)]">
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} themes={["light", "dark", "likely"]}>
           <AuthProvider initialUser={initialUser}>
             <Header />
             <main id="main">{children}</main>

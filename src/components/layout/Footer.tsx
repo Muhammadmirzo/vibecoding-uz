@@ -20,8 +20,8 @@ export const Footer = React.memo(function Footer() {
             <p className="text-xs leading-relaxed text-[var(--color-ink-muted)]">
               AI bilan mahsulotlar qurishni jonli loyihalar muallifidan o'rganing. Dasturchilarsiz, g'oyadan ishlaydigan MVPgacha.
             </p>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--color-cream)] border border-[var(--color-border)] text-xs font-mono">
-              <span className="w-2 h-2 rounded-full bg-[#27C93F] animate-pulse"></span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cream border border-border text-xs font-mono">
+              <span className="w-2 h-2 rounded-full bg-success"></span>
               Keyingi guruh: 15-Oktyabr
             </div>
           </div>

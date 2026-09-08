@@ -199,45 +199,45 @@ export const Header = React.memo(function Header() {
             title="Maslahat olish (Telegram)"
           >
             <Headset className="w-5 h-5" />
-            <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-[#27C93F] border-2 border-[var(--color-cream)]"></span>
+            <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-success border-2 border-cream"></span>
           </a>
 
           {/* Global Search Button */}
           <button
             type="button"
             onClick={() => window.dispatchEvent(new CustomEvent("toggle-search-modal"))}
-            className="inline-flex items-center gap-2 h-10 px-3 rounded-[var(--radius-md)] text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] hover:bg-[var(--color-cream-warm)] border border-[var(--color-border)] bg-[var(--color-cream-warm)]/50 transition-colors text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+            className="inline-flex items-center gap-2 h-10 px-3 rounded-md text-ink-muted hover:text-ink hover:bg-cream-warm border border-border bg-cream-warm/50 transition-colors text-xs font-medium focus:outline-none focus:ring-2 focus:ring-accent"
             title="Qidiruv (Ctrl+K)"
           >
-            <Search className="w-4 h-4 text-[var(--color-accent)]" />
-            <span className="hidden lg:inline text-[var(--color-ink-muted)]">Qidirish...</span>
-            <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono bg-[var(--color-cream)] border border-[var(--color-border)] rounded text-[var(--color-ink-muted)]">
+            <Search className="w-4 h-4 text-accent" />
+            <span className="hidden lg:inline text-ink-muted">Qidirish...</span>
+            <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono bg-cream border border-border rounded text-ink-muted">
               ⌘K
             </kbd>
           </button>
 
-          {/* Theme Toggle (Light / Dark) */}
+          {/* Theme Toggle (Light / Dark / Likely) */}
           <ThemeToggle />
 
           {/* User Auth Section */}
           {isLoading ? (
-            <div className="h-10 w-20 rounded-[var(--radius-md)] bg-[var(--color-cream-warm)] animate-pulse hidden md:block" />
+            <div className="h-10 w-20 rounded-md bg-cream-warm hidden md:block" />
           ) : user ? (
             <DropdownMenu.Root>
               <DropdownMenu.Trigger asChild>
-                <button className="hidden md:inline-flex items-center gap-2 h-10 px-3 rounded-[var(--radius-md)] bg-[var(--color-cream-warm)] hover:bg-[var(--color-cream-deep)] border border-[var(--color-border)] text-sm font-semibold text-[var(--color-ink)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]">
-                  <div className="w-6 h-6 rounded-full bg-[var(--color-accent)] text-white text-xs font-bold flex items-center justify-center">
+                <button className="hidden md:inline-flex items-center gap-2 h-10 px-3 rounded-md bg-cream-warm hover:bg-cream-deep border border-border text-sm font-semibold text-ink transition-colors focus:outline-none focus:ring-2 focus:ring-accent">
+                  <div className="w-6 h-6 rounded-full bg-accent text-white text-xs font-bold flex items-center justify-center">
                     {getUserInitials(user.fullName)}
                   </div>
                   <span className="max-w-[100px] truncate">{user.fullName}</span>
-                  <ChevronDown className="w-3.5 h-3.5 text-[var(--color-ink-subtle)]" />
+                  <ChevronDown className="w-3.5 h-3.5 text-ink-subtle" />
                 </button>
               </DropdownMenu.Trigger>
 
               <DropdownMenu.Portal>
                 <DropdownMenu.Content
                   align="end"
-                  className="z-50 w-56 p-1.5 bg-[var(--color-cream)] border border-[var(--color-border)] rounded-[var(--radius-lg)] shadow-[var(--shadow-lg)] animate-in fade-in-80 zoom-in-95 duration-100"
+                  className="z-50 w-56 p-1.5 bg-cream border border-border rounded-lg shadow-lg"
                 >
                   <div className="px-3 py-2 border-b border-[var(--color-border)] mb-1">
                     <p className="text-sm font-semibold text-[var(--color-ink)] truncate">{user.fullName}</p>

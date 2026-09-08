@@ -160,7 +160,7 @@ export const DiagnosticQuiz = React.memo(function DiagnosticQuiz() {
       {/* Submitted Result Screen */}
       {submitted ? (
         <div className="text-center py-6 space-y-6">
-          <div className="w-16 h-16 rounded-full bg-[#27C93F]/15 text-[#27C93F] mx-auto flex items-center justify-center">
+          <div className="w-16 h-16 rounded-full bg-success-soft text-success mx-auto flex items-center justify-center">
             <CheckCircle2 className="w-10 h-10" />
           </div>
 

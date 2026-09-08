@@ -65,7 +65,7 @@ export const gradeHomeworkSchema = z.object({
   submissionId: z.string().uuid({ message: "Topshiriq ID si noto'g'ri" }),
   mentorId: z.string().uuid().optional(),
   criteriaResults: z.array(criterionResultSchema).min(1, { message: "Kamida 1 ta mezon baholanishi kerak" }),
-  score: z.number().min(0).max(10, { message: "Baho 0 dan 10 gacha bo'lishi kerak" }),
+  score: z.number().min(0).max(100, { message: "Baho 0 dan 100 gacha bo'lishi kerak" }),
   feedbackMd: z.string().optional(),
   status: z.enum(["approved", "rejected"]),
 });

@@ -140,7 +140,7 @@ export function ApplyJobModal({ isOpen, onClose, job }: ApplyJobModalProps) {
 
           {success ? (
             <div className="py-10 text-center space-y-4">
-              <div className="w-16 h-16 rounded-full bg-[#27C93F]/15 text-[#27C93F] flex items-center justify-center mx-auto">
+              <div className="w-16 h-16 rounded-full bg-success-soft text-success flex items-center justify-center mx-auto">
                 <CheckCircle2 className="w-9 h-9" />
               </div>
               <h3 className="text-2xl font-extrabold text-ink">
