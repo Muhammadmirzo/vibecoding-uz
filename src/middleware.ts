@@ -32,7 +32,7 @@ export async function middleware(request: NextRequest) {
   const session = token ? verifySessionToken(token) : null;
 
   // Allow public access to /admin/login
-  if (pathname === "/admin/login") {
+  if (pathname.startsWith("/admin/login")) {
     if (session && session.role && ADMIN_ROLES.includes(session.role)) {
       return NextResponse.redirect(new URL("/admin", request.url));
     }
