@@ -28,34 +28,42 @@ Asosiy qoidalar (Buzilmaydigan):
 
 ---
 
-## 2. MODEL TAQSIMOTI MATRITSASI
+## 2. MODEL TAQSIMOTI MATRITSASI (Haqiqiy Mavjud Modellar — 2026-09-09 yangilandi)
 
 Orkestrator — eng kuchli modelda ishlaydi. Subagent modellari vazifa xususiyatiga qarab tanlangan
-(mantiqiy chuqurlik / tezlik / narx / vizyon qobiliyati). Multi-model runtime'larda (OpenRouter, LangChain,
- Custom API gateway) quyidagi env var orqali sozlanadi. ZCode'da subagent'lar sessiya modelini meros qiladi
-(shuning uchun ZCode'da dispatch'da rolni prompt orqali berish majburiy).
+(mantiqiy chuqurlik / tezlik / narx / vizyon qobiliyati).
 
-| Agent | Roli | Asosiy model | Negadir bu model | Fallback |
+MAVJUD MODELLAR RO'YXATI:
+  1. Claude Opus 4.6 (Thinking) — eng kuchli, chuqur fikrlash va arxitektura modeli
+  2. Gemini 3.1 Pro — yuqori darajadagi strategik tahlil va xavfsizlik auditi modeli
+  3. Gemini 3.8 Flash (High) — tezkor va sifatli kod auditi va dizayn tekshiruvi modeli
+  4. Gemini 3.7 Flash — o'rtacha tezlik/sifat balansli tadqiqot modeli
+  5. Gemini 3.6 Flash (High) — yengil mexanik operatsiyalar va log yuritish modeli
+
+Antigravity invoke_subagent Model parametri moslashuvi:
+  'inherit' = Claude Opus 4.6 (ota agentdan meros)
+  'pro'     = Gemini 3.1 Pro
+  'flash'   = Gemini 3.8 Flash (High) yoki Gemini 3.7 Flash
+  'flash_lite' = Gemini 3.6 Flash (High)
+
+| Agent | Roli | Haqiqiy Model | invoke_subagent param | Negadir bu model |
 | :--- | :--- | :--- | :--- | :--- |
-| ZAHAR-ORKESTRATOR | Rejalash, taqsimlash, verifikatsiya, arxitektura qarorlari | GLM 5.3 Flash MAX | Eng kuchli mantiq + kod sintezi, kontekst intizomi | GPT-5.2 Thinking |
-| ZAHAR-STRATEGY | Mahsulot strategiyasi, RICE, retention funnel, monetizatsiya | Gemini 3 Pro | Uzun kontekst bozor tadqiqoti, strukturali tahlil | GPT-5.2 Thinking |
-| ZAHAR-SHIELD | Payme/Click webhook xavfsizligi, anti-fraud, SMS rate-limit, JWT | Claude Sonnet 4.5 | Adversarial xavfsizlik tafakkuri, ehtiyotkor kod audit | GPT-5.2 Thinking |
-| REVIEWER | tsc + vitest + Zod sifat audit, swallow-exception ovlash | GLM 5.3 Flash | Tez, arzon, yuqori hajmda takroriy ishga chiqadi | DeepSeek V4 |
-| DIZAYNER | UI token audit, 3 tema mosligi, responsive overlap tekshiruvi | Gemini 3 Flash (vision) | Screenshot asosida vizual tekshiruv, tez va arzon | GLM 5.3 Flash |
-| RESEARCHER | Kodbaza struktura audit (read-only), modul chegaralari | Gemini 3 Flash (1M kontekst) | Butun repo sweep uchun arzon uzun kontekst | GLM 5.3 Flash |
-| FILE-GIT | Git sinxron, branch'lar, audit_log.txt yuritish | GLM 5.3 Flash | Deterministik operatsiyalar, arzon | DeepSeek V4 |
-
-Multi-model runtime sozlash namunasi (env):
-
-ZAHAR_ORCHESTRATOR_MODEL=glm-5.3-flash-max
-ZAHAR_STRATEGY_MODEL=google/gemini-3-pro
-ZAHAR_SHIELD_MODEL=anthropic/claude-sonnet-4.5
-ZAHAR_REVIEWER_MODEL=z-ai/glm-5.3-flash
-ZAHAR_DESIGNER_MODEL=google/gemini-3-flash
-ZAHAR_RESEARCHER_MODEL=google/gemini-3-flash
-ZAHAR_FILEGIT_MODEL=z-ai/glm-5.3-flash
-
-(ID'lar namuna sifatida — provider'ning amaldagi katalogiga moslab tekshiring.)
+| ZAHAR-ORKESTRATOR | Rejalash, taqsimlash, verifikatsiya, arxitektura qarorlari | Claude Opus 4.6 (Thinking) | N/A (asosiy agent) | Eng kuchli mantiq + chuqur fikrlash + kod sintezi |
+| ZAHAR-STRATEGY | Mahsulot strategiyasi, RICE, retention funnel, monetizatsiya | Gemini 3.1 Pro | 'pro' | Chuqur strategik va bozor tahlili uchun kuchli mantiq |
+| ZAHAR-SHIELD | Payme/Click webhook xavfsizligi, anti-fraud, SMS rate-limit, JWT | Gemini 3.1 Pro | 'pro' | Xavfsizlik auditi va adversarial tafakkur uchun pro-tier |
+| ZAHAR-DB | Migratsiya review, destructive SQL guard, RLS siyosat | Gemini 3.1 Pro | 'pro' | Ma'lumotlar bazasi sxemasi chuqur fikrlash talab qiladi |
+| REVIEWER | tsc + vitest + Zod sifat audit, swallow-exception ovlash | Gemini 3.8 Flash (High) | 'flash' | Tez, sifatli, takroriy code review uchun optimal |
+| DIZAYNER | UI token audit, 3 tema mosligi, responsive overlap tekshiruvi | Gemini 3.8 Flash (High) | 'flash' | Vizual tekshiruv va CSS audit uchun tezkor model |
+| RESEARCHER | Kodbaza struktura audit (read-only), modul chegaralari | Gemini 3.7 Flash | 'flash' | Fayllar daraxtini o'qish va qidirish uchun arzon uzun kontekst |
+| FILE-GIT | Git sinxron, branch'lar, audit_log.txt yuritish | Gemini 3.6 Flash (High) | 'flash_lite' | Deterministik git operatsiyalari uchun yengil model |
+| ZAHAR-TESTER | E2E-QA va Responsive Smoke (Playwright) | Gemini 3.8 Flash (High) | 'flash' | Test ijrosi va retry uchun tezkor model |
+| ZAHAR-LEDGER | Da'vo-isbot mosligi, hujjat drift audit | Gemini 3.7 Flash | 'flash' | Grep sweep va moslik tekshiruvlari uchun arzon model |
+| ZAHAR-PERF | Bundle hajmi, Core Web Vitals, cache siyosati | Gemini 3.7 Flash | 'flash' | Performance metrikalarini yig'ish uchun arzon model |
+| ZAHAR-LANG | O'zbek til sifati, terminologiya, kontent QA | Gemini 3.6 Flash (High) | 'flash_lite' | Matn tahlili uchun yengil model |
+| ZAHAR-SEO | Meta/OG taglar, sitemap, structured data | Gemini 3.6 Flash (High) | 'flash_lite' | SEO tekshiruv uchun yengil model |
+| ZAHAR-ACCESS | WCAG AA kontrast, aria attr, klaviatura nav | Gemini 3.7 Flash | 'flash' | Accessibility tekshiruvi uchun o'rtacha model |
+| ZAHAR-SUPPORT | Telegram Bot va CRM oqimlari test | Gemini 3.7 Flash | 'flash' | Bot oqimlari smoke test uchun arzon model |
+| ZAHAR-COST | Token va Infra xarajat nazorati | Gemini 3.6 Flash (High) | 'flash_lite' | Hisobot va statistika uchun eng yengil model |
 
 ---
 
@@ -165,14 +173,14 @@ Nima uchun P0: 135 unit test o'tishi real oqim ishlayotganini anglatmaydi (audit
 build buzgan holda yozilgan edi). Playwright allaqachon repoda bor (e2e/, playwright.config.ts).
 Vazifa: `npx playwright test` oqimlarini ishga tushirish (quiz funnel, auth, LMS dars oqimi, webhook sandbox),
 xatolarni flaky/real deb ajratish, 4 breakpoint viewport smoke (mobil/planshet/noutbuk/desktop).
-Model: GLM 5.3 Flash (ijro + retry) — murakkab triage 2 strike qoidasi bo'yicha Orkestratorga ko'tariladi.
+Model: Gemini 3.8 Flash (High) (ijro + retry) — murakkab triage 2 strike qoidasi bo'yicha Orkestratorga ko'tariladi.
 ZCode mapping: general-purpose agent.
 
 AGENT 8 — ZAHAR-DB (Data Guardian)
 Nima uchun P0: live Supabase ma'lumotlari — bitta yomon migratsiya pul va o'quvchi ma'lumotiga tegadi.
 Vazifa: drizzle migratsiya review (`db:generate` chiqiqini audit), destructive SQL guard (DROP/TRUNCATE/DELETE
 without WHERE), migratsiyadan oldin data snapshot/backup tavsiyasi, RLS siyosatlar tekshiruvi.
-Model: Claude Sonnet 4.5 — sxema dizayni chuqur fikrlash, arzon modelga topshirilmaydi (Model siyosati 1-qoida).
+Model: Gemini 3.1 Pro — sxema dizayni chuqur fikrlash, arzon modelga topshirilmaydi (Model siyosati 1-qoida).
 ZCode mapping: general-purpose agent.
 
 AGENT 9 — ZAHAR-LEDGER (Xotira va Hujjat Guardian)
@@ -181,7 +189,7 @@ Nima uchun P0: eng katta ikki tarixiy muammo — tekshirilmagan "bajarildi" da'v
 Vazifa: (a) har push'dan oldin da'vo-isbot mosligini tekshirish (har "done" uchun buyruq chiqishi bo'lishi shart),
 (b) hujjatlar drift audit: AGENTS.md/CLAUDE.md/skills/WEBSITE_AUDIT_SPEC.md koddagi real holatga mosligi,
 o'lik yo'llar grep, (c) LEDGER yuritish va yangi xatoni doimiy check'ga aylantirish.
-Model: GLM 5.3 Flash (sweep) — da'vo-isbot bahosi murakkab bo'lsa Orkestratorga ko'tariladi.
+Model: Gemini 3.7 Flash (sweep) — da'vo-isbot bahosi murakkab bo'lsa Orkestratorga ko'tariladi.
 ZCode mapping: general-purpose agent.
 
 ### MUHIM (P1) — o'sish va sifat uchun kuchli qo'shimcha. P0 barqarorlashgach quriladi.
@@ -189,31 +197,31 @@ ZCode mapping: general-purpose agent.
 AGENT 10 — ZAHAR-PERF (Performance & Core Web Vitals)
 Vazifa: bundle hajmi nazorati (build First Load JS), LCP/CLS asosiy sahifalarda, rasm optimizatsiyasi,
 cache siyosati. Ta'lim funnel'ida tezlik = konversiya.
-Model: GLM 5.3 Flash. ZCode mapping: general-purpose agent.
+Model: Gemini 3.7 Flash. ZCode mapping: general-purpose agent.
 
 AGENT 11 — ZAHAR-LANG (O'zbek Til Sifati va Kontent QA)
 Vazifa: lotin/kirill aralashuvi, apostrof bir xilligi (' vs ʻ), terminologiya lug'ati mosligi (/atamalar),
 blog/LMS matn sifati. Mahsulot to'liq o'zbek tilida — kontent sifati brend sifati.
-Model: GLM 5.3 Flash. ZCode mapping: general-purpose agent.
+Model: Gemini 3.6 Flash (High). ZCode mapping: general-purpose agent.
 
 AGENT 12 — ZAHAR-SEO (Growth Texnik)
 Vazifa: meta/OG taglar, sitemap, robots, structured data (Course, FAQ schema.org), blog SEO audit.
-Model: GLM 5.3 Flash. ZCode mapping: general-purpose agent.
+Model: Gemini 3.6 Flash (High). ZCode mapping: general-purpose agent.
 
 ### MEDIUM (P2) — maxsus ehtiyoj paydo bo'lganda quriladi.
 
 AGENT 13 — ZAHAR-ACCESS (Accessibility Auditor)
 Vazifa: WCAG AA kontrast (3 tema), aria attr, klaviatura navigatsiyasi. Radix allaqachon asos beradi.
-Model: Gemini 3 Flash (vision — screenshot kontrast/foydalanish tekshiruvi). ZCode mapping: general-purpose agent.
+Model: Gemini 3.7 Flash. ZCode mapping: general-purpose agent.
 
 AGENT 14 — ZAHAR-SUPPORT (Telegram Bot va CRM Oqimlari)
 Vazifa: Telegraf bot reply oqimlari test, notification dispatcher audit, CRM workflow smoke.
-Model: GLM 5.3 Flash. ZCode mapping: general-purpose agent.
+Model: Gemini 3.7 Flash. ZCode mapping: general-purpose agent.
 
 AGENT 15 — ZAHAR-COST (Token va Infra Xarajat Nazorati)
 Vazifa: dispatch hisobotlaridan token/model ishlatilish jadvali, qimmat model ortiqcha ishlatilgan joylarni
 aniqlash (LEKIN Model siyosati 1-qoidasiga zid bo'lgan tavsiya berish taqiqlanadi), Vercel usage smoke.
-Model: GLM 5.3 Flash. ZCode mapping: general-purpose agent.
+Model: Gemini 3.6 Flash (High). ZCode mapping: general-purpose agent.
 
 ---
 
@@ -243,11 +251,11 @@ LEDGER'ga kirmagan xato "yopildi" deb hisoblanmaydi. FILE-GIT har push'da audit_
 1-QOIDA (chuqur fikrlash qalqoni): arxitektura qarorlari, sxema dizayni, xavfsizlik dizayni, murakkab debug
 triage, kritik code review, migratsiya review — HECH QACHON arzon modelga topshirilmaydi, token tejayman deb ham.
 Token tejash hajm/kontekst tejash hisoblanadi, sifat hisobiga EMAS. Shu bo'limdagi agentlar: ORKESTRATOR
-(GLM 5.3 Flash MAX), ZAHAR-DB (Claude Sonnet 4.5) — ularning modeli pasaytirilmaydi.
+(Claude Opus 4.6 Thinking), ZAHAR-DB (Gemini 3.1 Pro), ZAHAR-SHIELD (Gemini 3.1 Pro) — ularning modeli pasaytirilmaydi.
 2-QOIDA (arzon model domeni): mexanik buyruq ijrosi, grep sweep, takroriy test run, audit log yozish,
-format/token tekshiruvlari — arzon modellarda (GLM 5.3 Flash / Gemini 3 Flash).
+format/token tekshiruvlari — arzon modellarda (Gemini 3.8 Flash / Gemini 3.7 Flash / Gemini 3.6 Flash).
 3-QOIDA (2-strike escalation): arzon model vazifada 2 marta ortiq qaytsa (retry) yoki ishonchsiz/noaniq javob
-bersa — vazifa DARHOL bir ustki modelga (Orkestrator yoki fallback matritsadagi model) ko'tariladi.
+bersa — vazifa DARHOL bir ustki modelga (Orkestrator yoki Gemini 3.1 Pro) ko'tariladi.
 Qayta urinishlar o'rniga escalation — bu ham token, ham sifat tejash.
 4-QOIDA (minimal kontekst dispatch): har subagent prompt'i faqat o'z vazifasi uchun zarur fayl/faktlarni oladi;
 butun repo sweep taqiqlangan (RESEARCHER bundan mustasno — uning vazifasi shu). Natijalar file dump emas,
