@@ -14,7 +14,6 @@ export default function HomePage() {
     <>
       <HeroSection />
       <ProofStats />
-      <PortfolioSection />
 
       {/* Halol Isbot Strip Section */}
       <section className="w-full py-6 bg-cream border-b border-border">
@@ -53,6 +52,7 @@ export default function HomePage() {
       </section>
 
       <CourseCards />
+      <PortfolioSection />
 
       {/* Quiz tie-in bar ostida */}
       <div className="w-full py-4 bg-cream border-t border-b border-border">

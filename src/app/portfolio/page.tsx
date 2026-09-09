@@ -23,7 +23,7 @@ export default function PortfolioPage() {
   }, [selectedCategory]);
 
   return (
-    <div className="min-h-screen bg-cream text-ink flex flex-col">
+    <div className="min-h-screen bg-[#141413] text-white flex flex-col">
       <Header />
 
       <main className="flex-1 pt-24 pb-16">
@@ -32,39 +32,39 @@ export default function PortfolioPage() {
           <div className="mb-6 flex items-center justify-between">
             <Link
               href="/"
-              className="inline-flex items-center gap-2 text-xs md:text-sm font-semibold text-ink-muted hover:text-accent transition-colors"
+              className="inline-flex items-center gap-2 text-xs md:text-sm font-semibold text-white/70 hover:text-white transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Bosh sahifaga qaytish</span>
             </Link>
 
-            <span className="text-xs font-mono font-bold text-accent bg-accent-soft px-3 py-1 rounded-full flex items-center gap-1.5">
+            <span className="text-xs font-mono font-bold text-accent bg-accent/10 border border-accent/30 px-3 py-1 rounded-full flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5" /> {PORTFOLIO_DATA.length} ta Jonli Loyiha
             </span>
           </div>
 
           {/* Page Header */}
           <div className="text-center max-w-[760px] mx-auto mb-10">
-            <h1 className="text-3xl md:text-5xl font-extrabold text-ink mb-4">
+            <h1 className="text-3xl md:text-5xl font-extrabold text-white mb-4">
               Vibe Coding Portfoliolari — <span className="font-serif italic font-normal text-accent">Jonli Loyihalar</span>
             </h1>
-            <p className="text-sm md:text-base text-ink-muted leading-relaxed">
+            <p className="text-sm md:text-base text-white/70 leading-relaxed">
               Dasturlashsiz, sun&apos;iy intellekt yordamida yaratilgan va bozorda faol ishlayotgan real startap va platformalar to&apos;plami.
             </p>
           </div>
 
           {/* Category Filter Tabs */}
           <div className="flex items-center justify-center gap-2 mb-10 overflow-x-auto pb-2 scrollbar-none">
-            <div className="flex items-center gap-1.5 bg-cream-warm p-1.5 rounded-2xl border border-border">
-              <Filter className="w-4 h-4 text-ink-subtle ml-2 mr-1" />
+            <div className="flex items-center gap-1.5 bg-white/[0.05] p-1.5 rounded-2xl border border-white/10">
+              <Filter className="w-4 h-4 text-white/50 ml-2 mr-1" />
               {categories.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-4 py-2 rounded-xl text-xs md:text-sm font-semibold whitespace-nowrap transition-all ${
+                  className={`px-4 py-2 rounded-xl text-xs md:text-sm font-semibold whitespace-nowrap transition-colors ${
                     selectedCategory === cat
                       ? "bg-accent text-white shadow-xs"
-                      : "text-ink-muted hover:text-ink hover:bg-cream-deep"
+                      : "text-white/70 hover:text-white hover:bg-white/10"
                   }`}
                 >
                   {cat}
@@ -76,12 +76,12 @@ export default function PortfolioPage() {
           {/* Portfolios MacBook Gallery Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {filteredItems.map((item) => (
-              <PortfolioCard key={item.id} item={item} />
+              <PortfolioCard key={item.id} item={item} variant="dark" />
             ))}
           </div>
 
           {filteredItems.length === 0 && (
-            <div className="py-16 text-center text-ink-muted">
+            <div className="py-16 text-center text-white/60">
               Ushbu kategoriyada hali loyihalar mavjud emas.
             </div>
           )}
