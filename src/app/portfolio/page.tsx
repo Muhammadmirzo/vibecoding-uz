@@ -54,8 +54,8 @@ export default function PortfolioPage() {
           </div>
 
           {/* Category Filter Tabs */}
-          <div className="flex items-center justify-center gap-2 mb-10 overflow-x-auto pb-2 scrollbar-none">
-            <div className="flex items-center gap-1.5 bg-white/[0.05] p-1.5 rounded-2xl border border-white/10">
+          <div className="flex items-center justify-start md:justify-center gap-2 mb-10 overflow-x-auto pb-2 scrollbar-none w-full px-1">
+            <div className="flex items-center gap-1.5 bg-white/[0.05] p-1.5 rounded-2xl border border-white/10 shrink-0">
               <Filter className="w-4 h-4 text-white/50 ml-2 mr-1" />
               {categories.map((cat) => (
                 <button

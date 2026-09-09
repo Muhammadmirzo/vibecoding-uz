@@ -7,7 +7,7 @@ export interface PortfolioItem {
   category: "Startup MVP" | "EdTech" | "AI Bot" | "B2B SaaS";
   description: string;
   imageUrl: string;
-  userCount?: string;
+  userCount?: string | null;
   badgeText: string;
   isFeatured: boolean;
   sortOrder: number;

@@ -69,8 +69,8 @@ export function KabinetNav() {
   return (
     <div className="w-full bg-cream-warm border-b border-border mb-8 sticky top-16 md:top-[72px] z-30 shadow-sm backdrop-blur-sm">
       <div className="mx-auto w-full max-w-[1360px] px-5 md:px-8 lg:px-10">
-        <div className="flex items-center justify-between py-2 overflow-x-auto scrollbar-none">
-          <nav className="flex items-center gap-1.5 md:gap-2">
+        <div className="flex items-center justify-start py-2 overflow-x-auto scrollbar-none w-full">
+          <nav className="flex items-center gap-1.5 md:gap-2 w-max shrink-0">
             {navItems.map((item) => {
               const isActive = item.exact
                 ? pathname === item.href

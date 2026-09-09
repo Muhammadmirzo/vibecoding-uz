@@ -76,9 +76,9 @@ export function PortfolioCard({
 
       {/* Card Content Footer */}
       <div className="flex flex-col flex-1 p-5">
-        <div className="flex items-start justify-between gap-3">
+        <div className="flex items-start justify-between gap-3 min-w-0">
           <h3
-            className={`text-lg md:text-xl font-bold leading-snug group-hover:text-accent transition-colors ${
+            className={`text-lg md:text-xl font-bold leading-snug group-hover:text-accent transition-colors min-w-0 break-words ${
               isDark ? "text-white" : "text-ink"
             }`}
           >

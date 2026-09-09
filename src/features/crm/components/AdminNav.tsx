@@ -14,6 +14,7 @@ import {
   FileText,
   Send,
   Settings,
+  Briefcase,
 } from "lucide-react";
 
 export function AdminNav() {
@@ -48,6 +49,12 @@ export function AdminNav() {
       href: "/admin/blog",
       label: "Blog CMS",
       icon: FileText,
+      exact: false,
+    },
+    {
+      href: "/admin/portfolio",
+      label: "Portfoliolar",
+      icon: Briefcase,
       exact: false,
     },
     {
@@ -109,7 +116,7 @@ export function AdminNav() {
           </div>
 
           {/* Navigation Links */}
-          <nav className="hidden lg:flex items-center space-x-1 overflow-x-auto no-scrollbar py-1">
+          <nav className="hidden lg:flex items-center justify-end space-x-1 overflow-x-auto no-scrollbar py-1 min-w-0 flex-1">
             {navItems.map((item) => {
               const isActive = item.exact
                 ? pathname === item.href
@@ -136,7 +143,7 @@ export function AdminNav() {
         </div>
 
         {/* Mobile Navigation Row */}
-        <div className="lg:hidden flex space-x-1.5 overflow-x-auto pb-3 pt-1 no-scrollbar">
+        <div className="lg:hidden flex space-x-1.5 overflow-x-auto pb-3 pt-1 no-scrollbar w-full">
           {navItems.map((item) => {
             const isActive = item.exact
               ? pathname === item.href

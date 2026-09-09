@@ -129,3 +129,15 @@ body {
   background-color: var(--color-cream-deep);
   border-color: var(--color-accent);
 }
+
+/* Scrollbar Utility Classes for cross-device horizontal sliders */
+.scrollbar-none::-webkit-scrollbar,
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none,
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
