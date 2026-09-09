@@ -48,7 +48,7 @@ Antigravity invoke_subagent Model parametri moslashuvi:
 
 | Agent | Roli | Haqiqiy Model | invoke_subagent param | Negadir bu model |
 | :--- | :--- | :--- | :--- | :--- |
-| ZAHAR-ORKESTRATOR | Rejalash, taqsimlash, verifikatsiya, arxitektura qarorlari | Gemini 3.8 Flash (High) | N/A (asosiy agent) | Tezkor agentik orkestratsiya, past latency, optimal token sarfi |
+| ZAHAR-ORKESTRATOR | Rejalash, taqsimlash, verifikatsiya, arxitektura qarorlari | Gemini 3.1 Pro (Thinking) | N/A (asosiy agent) | Chuqur mantiqiy fikrlash (Thinking), arxitektura rejalashtirish va yuqori darajadagi orkestratsiya |
 | ZAHAR-STRATEGY | Mahsulot strategiyasi, RICE, retention funnel, monetizatsiya | Gemini 3.1 Pro | 'pro' | Chuqur strategik va bozor tahlili uchun kuchli mantiq |
 | ZAHAR-SHIELD | Payme/Click webhook xavfsizligi, anti-fraud, SMS rate-limit, JWT | Gemini 3.1 Pro | 'pro' | Xavfsizlik auditi va adversarial tafakkur uchun pro-tier |
 | ZAHAR-DB | Migratsiya review, destructive SQL guard, RLS siyosat | Gemini 3.1 Pro | 'pro' | Ma'lumotlar bazasi sxemasi chuqur fikrlash talab qiladi |
@@ -251,7 +251,7 @@ LEDGER'ga kirmagan xato "yopildi" deb hisoblanmaydi. FILE-GIT har push'da audit_
 1-QOIDA (chuqur fikrlash qalqoni): arxitektura qarorlari, sxema dizayni, xavfsizlik dizayni, murakkab debug
 triage, kritik code review, migratsiya review — HECH QACHON arzon modelga topshirilmaydi, token tejayman deb ham.
 Token tejash hajm/kontekst tejash hisoblanadi, sifat hisobiga EMAS. Shu bo'limdagi agentlar: ORKESTRATOR
-(Claude Opus 4.6 Thinking), ZAHAR-DB (Gemini 3.1 Pro), ZAHAR-SHIELD (Gemini 3.1 Pro) — ularning modeli pasaytirilmaydi.
+(Gemini 3.1 Pro Thinking), ZAHAR-DB (Gemini 3.1 Pro), ZAHAR-SHIELD (Gemini 3.1 Pro) — ularning modeli pasaytirilmaydi.
 2-QOIDA (arzon model domeni): mexanik buyruq ijrosi, grep sweep, takroriy test run, audit log yozish,
 format/token tekshiruvlari — arzon modellarda (Gemini 3.8 Flash / Gemini 3.7 Flash / Gemini 3.6 Flash).
 3-QOIDA (2-strike escalation): arzon model vazifada 2 marta ortiq qaytsa (retry) yoki ishonchsiz/noaniq javob
