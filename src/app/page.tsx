@@ -3,6 +3,8 @@ import { HeroSection } from "@/components/sections/HeroSection";
 import { ProofStats } from "@/components/sections/ProofStats";
 import { CourseCards } from "@/components/sections/CourseCards";
 import { PortfolioSection } from "@/components/sections/PortfolioSection";
+import { IdeaSimulator } from "@/components/sections/IdeaSimulator";
+import { RiskFreeGuarantee } from "@/components/sections/RiskFreeGuarantee";
 import { TeaserBanner } from "@/components/sections/TeaserBanner";
 import { HowItWorks } from "@/components/sections/HowItWorks";
 import { FaqSection } from "@/components/sections/FaqSection";
@@ -51,8 +53,11 @@ export default function HomePage() {
         </div>
       </section>
 
+      <IdeaSimulator />
+
       <CourseCards />
       <PortfolioSection />
+      <RiskFreeGuarantee />
 
       {/* Quiz tie-in bar ostida */}
       <div className="w-full py-4 bg-cream border-t border-b border-border">

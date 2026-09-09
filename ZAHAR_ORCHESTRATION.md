@@ -64,6 +64,10 @@ Antigravity invoke_subagent Model parametri moslashuvi:
 | ZAHAR-ACCESS | WCAG AA kontrast, aria attr, klaviatura nav | Gemini 3.7 Flash | 'flash' | Accessibility tekshiruvi uchun o'rtacha model |
 | ZAHAR-SUPPORT | Telegram Bot va CRM oqimlari test | Gemini 3.7 Flash | 'flash' | Bot oqimlari smoke test uchun arzon model |
 | ZAHAR-COST | Token va Infra xarajat nazorati | Gemini 3.6 Flash (High) | 'flash_lite' | Hisobot va statistika uchun eng yengil model |
+| ZAHAR-FUNNEL | Konversiya, sotuv voronkasi, A/B hooklar va offerlar | Gemini 3.1 Pro (Thinking) | 'pro' | Chuqur xaridor psixologiyasi va konversiya strategiyasi |
+| ZAHAR-DEMO | Interaktiv sinovlar, Prompt Playground, vaqt/xarajat kalkulyatori | Gemini 3.8 Flash (High) | 'flash' | Tezkor interaktiv komponentlar va real keyslar qurish |
+| ZAHAR-BOT | Telegram sotuv boti, diagnostika va lead qizdirish | Gemini 3.7 Flash | 'flash' | Doimiy xabarlar oqimi va tezkor javoblar balansi |
+| ZAHAR-CONTENT | Talaba keyslari, virallik va ijtimoiy tarmoqlar posti | Gemini 3.6 Flash (High) | 'flash_lite' | Katta hajmli matn va kontent generatsiyasi uchun yengil model |
 
 ---
 
@@ -222,6 +226,29 @@ AGENT 15 — ZAHAR-COST (Token va Infra Xarajat Nazorati)
 Vazifa: dispatch hisobotlaridan token/model ishlatilish jadvali, qimmat model ortiqcha ishlatilgan joylarni
 aniqlash (LEKIN Model siyosati 1-qoidasiga zid bo'lgan tavsiya berish taqiqlanadi), Vercel usage smoke.
 Model: Gemini 3.6 Flash (High). ZCode mapping: general-purpose agent.
+
+### DAROMAD VA SOTUV QALQONI (P0/Revenue) — Biznes va konversiya o'sishi uchun 2026-09-09 da qo'shildi.
+
+AGENT 16 — ZAHAR-FUNNEL (Konversiya va Sotuv Voronkasi Agenti)
+Vazifa: Landing page bloklari konversiyasini tahlil qilish, A/B hooklar va sotuv offerlarini shakllantirish,
+friction pointlarni qisqartirish.
+Model: Gemini 3.1 Pro (Thinking) — xaridor psixologiyasi va konversiya chuqur tahlil talab qiladi.
+ZCode mapping: general-purpose agent.
+
+AGENT 17 — ZAHAR-DEMO (Interaktiv Sinov va Keyslar Agenti)
+Vazifa: Saytda interaktiv Prompt Playground, Vibe Coding kalkulyatorlari va "Qanday qurilgan?" keyslarini yaratish.
+Model: Gemini 3.8 Flash (High) — tezkor kod generatsiyasi va komponentlar qurilishi.
+ZCode mapping: general-purpose agent.
+
+AGENT 18 — ZAHAR-BOT (Telegram Sotuv va Lead Qizdirish Agenti)
+Vazifa: Telegram bot orqali diagnostika, leadlarni saralash, kurs tavsiyasi va to'lov eslatmalarini yuborish.
+Model: Gemini 3.7 Flash — uzluksiz xabarlar oqimi va tezkor avtomatizatsiya.
+ZCode mapping: general-purpose agent.
+
+AGENT 19 — ZAHAR-CONTENT (Keyslar va Virallik Agenti)
+Vazifa: Talabalar loyihalari asosida Telegram/Instagram va Blog uchun virallik potentsialiga ega postlar generatsiya qilish.
+Model: Gemini 3.6 Flash (High) — katta hajmdagi kontent generatsiyasi uchun yengil va tezkor.
+ZCode mapping: general-purpose agent.
 
 ---
 
