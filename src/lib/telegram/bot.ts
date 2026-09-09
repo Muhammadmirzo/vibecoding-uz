@@ -1,7 +1,7 @@
 import { Telegraf, Markup } from "telegraf";
-import { eq, or } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { db } from "@/db";
-import { users } from "@/db/schema";
+import { users, courses, leads } from "@/db/schema";
 import {
   tgAuthLinkSchema,
   operatorHandoffSchema,
@@ -15,9 +15,6 @@ import {
 
 let botInstance: Telegraf | null = null;
 
-/**
- * Normalizes phone numbers to format +998XXXXXXXXX
- */
 function normalizePhone(phone: string): string {
   let cleaned = phone.replace(/[^\d+]/g, "");
   if (!cleaned.startsWith("+")) {
@@ -30,9 +27,6 @@ function normalizePhone(phone: string): string {
   return cleaned;
 }
 
-/**
- * Links a Telegram User ID to a Vibecoding user account by phone or user ID.
- */
 export async function linkTelegramAccount(input: TgAuthLinkInput) {
   const validated = tgAuthLinkSchema.parse(input);
   const { tgUserId, tgUsername, phone, linkToken } = validated;
@@ -60,7 +54,6 @@ export async function linkTelegramAccount(input: TgAuthLinkInput) {
   }
 
   if (linkToken) {
-    // If token matches user ID or payload token
     const existingUser = await db
       .select()
       .from(users)
@@ -84,14 +77,10 @@ export async function linkTelegramAccount(input: TgAuthLinkInput) {
   return { success: false, error: "Foydalanuvchi topilmadi" };
 }
 
-/**
- * Handles operator handoff requests from students or leads.
- */
 export async function handleOperatorHandoff(input: OperatorHandoffInput) {
   const validated = operatorHandoffSchema.parse(input);
   const { tgUserId, tgUsername, userFullName, reason } = validated;
 
-  // Find linked user if exists
   const existingUser = await db
     .select()
     .from(users)
@@ -99,21 +88,20 @@ export async function handleOperatorHandoff(input: OperatorHandoffInput) {
     .limit(1);
 
   const name = userFullName || existingUser[0]?.fullName || `@${tgUsername}` || tgUserId;
-  const phone = existingUser[0]?.phone || "Nomalum";
+  const phone = existingUser[0]?.phone || "Noma'lum";
 
   const message = [
-    "🆘 <b>OPERATOR GA BOG'LANISH SO'ROVI</b>",
-    `<b>Foydalanuvchi:</b> ${name}`,
-    `<b>Telefon:</b> ${phone}`,
-    `<b>Telegram ID:</b> <code>${tgUserId}</code>`,
-    tgUsername ? `<b>Username:</b> @${tgUsername}` : "",
-    reason ? `<b>Sabab:</b> ${reason}` : "",
-    `<b>Vaqt:</b> ${new Date().toLocaleString("uz-UZ")}`,
+    "🆘 <b>YANGI OPERATOR SO'ROVI (LEAD)</b>",
+    `👤 <b>Foydalanuvchi:</b> ${name}`,
+    `📞 <b>Telefon:</b> ${phone}`,
+    `🆔 <b>Telegram ID:</b> <code>${tgUserId}</code>`,
+    tgUsername ? `🌐 <b>Username:</b> @${tgUsername}` : "",
+    reason ? `📝 <b>Sabab:</b> ${reason}` : "",
+    `🕒 <b>Vaqt:</b> ${new Date().toLocaleString("uz-UZ")}`,
   ]
     .filter(Boolean)
     .join("\n");
 
-  // Send notification to admin/manager channel if configured
   const adminChatId = process.env.TELEGRAM_ADMIN_CHAT_ID;
   if (adminChatId) {
     await sendTelegramMessage(adminChatId, message, "HTML");
@@ -121,18 +109,14 @@ export async function handleOperatorHandoff(input: OperatorHandoffInput) {
 
   return {
     success: true,
-    message: "Operator bilan bog'lanish so'rovingiz qabul qilindi. Tez orada menejer siz bilan bog'lanadi.",
+    message: "Operator bilan bog'lanish so'rovingiz qabul qilindi. Tez orada professional AI mentorimiz siz bilan bog'lanadi.",
   };
 }
 
-/**
- * Sends homework submission status updates or alerts.
- */
 export async function sendHomeworkSubmissionAlert(input: HomeworkAlertInput) {
   const validated = homeworkAlertSchema.parse(input);
   const { userId, assignmentTitle, status, score, feedbackMd } = validated;
 
-  // Find user to get tgUserId
   const userList = await db.select().from(users).where(eq(users.id, userId)).limit(1);
   if (userList.length === 0 || !userList[0].tgUserId) {
     return { success: false, reason: "User telegram ID not linked" };
@@ -142,15 +126,15 @@ export async function sendHomeworkSubmissionAlert(input: HomeworkAlertInput) {
 
   let message = "";
   if (status === "submitted") {
-    message = `📩 <b>Topshiriq yuborildi!</b>\n\n"<b>${assignmentTitle}</b>" bo'yicha javobingiz qabul qilindi. Mentor tez orada tekshiradi.`;
+    message = `📩 <b>Topshiriq qabul qilindi!</b>\n\n"<b>${assignmentTitle}</b>" bo'yicha javobingiz qabul qilindi. Mentor tez orada tekshiradi.`;
   } else if (status === "approved") {
-    message = `🎉 <b>TOPSHIRIQ QABUL QILINDI!</b>\n\n📚 <b>Mavzu:</b> ${assignmentTitle}\n⭐️ <b>Baho:</b> ${score ?? "-"}/10\n\n`;
+    message = `🎉 <b>TABRIKLAYMIZ! TOPSHIRIQ QABUL QILINDI!</b>\n\n📚 <b>Mavzu:</b> ${assignmentTitle}\n⭐️ <b>Baho:</b> ${score ?? "-"}/10\n\n`;
     if (feedbackMd) {
       message += `💬 <b>Mentor fikri:</b>\n${feedbackMd}\n\n`;
     }
-    message += `🚀 Keyingi darsingiz ochildi! Muvaffaqiyatlar tilaymiz.`;
+    message += `🚀 Keyingi amaliy darsingiz ochildi! Kabinetga kiring: https://master-2-jade.vercel.app/kabinet`;
   } else if (status === "rejected") {
-    message = `⚠️ <b>TOPSHIRIQ QAYTA ISHLASH UCHUN QAYTARILDI</b>\n\n📚 <b>Mavzu:</b> ${assignmentTitle}\n⭐️ <b>Baho:</b> ${score ?? "-"}/10\n\n`;
+    message = `⚠️ <b>TOPSHIRIQ QAYTA ISHLASHGA QAYTARILDI</b>\n\n📚 <b>Mavzu:</b> ${assignmentTitle}\n⭐️ <b>Baho:</b> ${score ?? "-"}/10\n\n`;
     if (feedbackMd) {
       message += `💬 <b>Mentor fikri:</b>\n${feedbackMd}\n\n`;
     }
@@ -160,9 +144,6 @@ export async function sendHomeworkSubmissionAlert(input: HomeworkAlertInput) {
   return await sendTelegramMessage(user.tgUserId!, message, "HTML");
 }
 
-/**
- * Sends upcoming live webinar / meeting reminders.
- */
 export async function sendMeetReminder(input: MeetReminderInput) {
   const validated = meetReminderSchema.parse(input);
   const { chatId, title, startsAt, meetingUrl } = validated;
@@ -170,7 +151,7 @@ export async function sendMeetReminder(input: MeetReminderInput) {
   const dateStr = typeof startsAt === "string" ? startsAt : startsAt.toLocaleString("uz-UZ");
 
   const message = [
-    "⏰ <b>LIVE MEET / VEBINAR ESLATMASI</b>",
+    "⏰ <b>JONLI MEET / VEBINAR ESLATMASI</b>",
     "",
     `📌 <b>Mavzu:</b> ${title}`,
     `📅 <b>Boshlanish vaqti:</b> ${dateStr}`,
@@ -184,9 +165,6 @@ export async function sendMeetReminder(input: MeetReminderInput) {
   return await sendTelegramMessage(chatId, message, "HTML");
 }
 
-/**
- * Generic function to send Telegram message using bot token.
- */
 export async function sendTelegramMessage(
   chatId: string | number,
   text: string,
@@ -194,44 +172,37 @@ export async function sendTelegramMessage(
 ) {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   if (!token) {
-    console.warn("TELEGRAM_BOT_TOKEN missing. Skipping Telegram notification.");
+    console.warn("TELEGRAM_BOT_TOKEN kiritilmagan. Bildirishnoma o'tkazib yuborildi.");
     return { success: false, error: "Bot token missing" };
   }
 
   try {
-    const bot = getTelegramBot();
-    if (!bot) {
-      // Fallback via HTTP fetch if bot instance is not initialized
-      const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          chat_id: chatId,
-          text,
-          parse_mode: parseMode,
-          disable_web_page_preview: false,
-        }),
-      });
+    const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text,
+        parse_mode: parseMode,
+        disable_web_page_preview: false,
+      }),
+    });
 
-      const data = await res.json();
-      return { success: data.ok, data };
-    }
-
-    await bot.telegram.sendMessage(chatId, text, { parse_mode: parseMode });
-    return { success: true };
+    const data = await res.json();
+    return { success: data.ok, data };
   } catch (err) {
-    console.error("Failed to send Telegram message:", err);
+    console.error("Telegram xabari yuborilmadi:", err);
     return { success: false, error: String(err) };
   }
 }
 
 /**
- * Initializes and configures the Telegraf bot instance.
+ * Ideal Telegram Bot Handlers for Vibecoding Platform.
+ * Supports /start, lead generation, course catalog, interactive demo, and operator handoff.
  */
 export function initTelegramBot(): Telegraf | null {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   if (!token) {
-    console.warn("TELEGRAM_BOT_TOKEN environment variable is not defined.");
     return null;
   }
 
@@ -239,9 +210,9 @@ export function initTelegramBot(): Telegraf | null {
 
   const bot = new Telegraf(token);
 
-  // Command /start handler with payload or phone link
+  // /start handler with rich menu
   bot.command("start", async (ctx) => {
-    const payload = ctx.payload; // /start <token>
+    const payload = ctx.payload;
     const tgUserId = ctx.from.id.toString();
     const tgUsername = ctx.from.username;
 
@@ -255,37 +226,135 @@ export function initTelegramBot(): Telegraf | null {
 
       if (result.success && result.user) {
         return ctx.reply(
-          `🎉 Xush kelibsiz, ${result.user.fullName}!\n\nHisobingiz platformaga muvaffaqiyatli ulandi.`
+          `🎉 Xush kelibsiz, <b>${result.user.fullName}</b>!\n\nHisobingiz Vibecoding platformasiga muvaffaqiyatli ulandi.\nBarcha dars yangiliklari va uyga vazifa baholari shu bot orqali boradi.`,
+          {
+            parse_mode: "HTML",
+            ...Markup.inlineKeyboard([
+              [Markup.button.url("🚀 Shaxsiy Kabinetga Kirish", "https://master-2-jade.vercel.app/kabinet")],
+            ]),
+          }
         );
       }
     }
 
-    // Check if user is already linked
-    const existing = await db
-      .select()
-      .from(users)
-      .where(eq(users.tgUserId, tgUserId))
-      .limit(1);
-
-    if (existing.length > 0) {
-      return ctx.reply(
-        `Assalomu alaykum, ${existing[0].fullName}!\n\nMirzo Academy platformasining rasmiy botiga xush kelibsiz. Hisobingiz ulangan.`,
-        Markup.keyboard([
-          [Markup.button.text("🆘 Operator bilan bog'lanish")],
-        ]).resize()
-      );
-    }
+    const welcomeText = [
+      "🚀 <b>Vibecoding — AI bilan real mahsulotlar yaratish akademiyasi</b>\n",
+      "Bu bot orqali siz:",
+      "• 8 haftada g'oyadan jonli dasturgacha chiqarish metodini o'rganasiz",
+      "• Dasturchilarsiz startap qurish bo'yicha bepul darslarni ko'rasiz",
+      "• O'zingizga mos kursni 2 daqiqada diagnostika qilasiz",
+      "• Shaxsiy kabinetingiz va uyga vazifalaringizni nazorat qilasiz\n",
+      "Quyidagi bo'limlardan birini tanlang:",
+    ].join("\n");
 
     return ctx.reply(
-      "Assalomu alaykum! Mirzo Academy platformasiga xush kelibsiz.\n\nHisobingizni ulash uchun pastdagi tugma orqali telefon raqamingizni yuboring:",
+      welcomeText,
+      {
+        parse_mode: "HTML",
+        ...Markup.keyboard([
+          ["📚 Kurslar va Narxlar", "🎯 Bepul Diagnostika"],
+          ["💡 G'oya Kalkulyatori", "🎁 Bepul Dars"],
+          ["📱 Hisobni Ulash (Telefon)", "🆘 Mentor / Operator"],
+        ]).resize(),
+      }
+    );
+  });
+
+  // Kurslar bo'limi
+  bot.hears("📚 Kurslar va Narxlar", async (ctx) => {
+    const text = [
+      "🎓 <b>BIZNING AMALIY KURSLARIMIZ:</b>\n",
+      "<b>1. Vibe Coding Express (8 hafta)</b>",
+      "• Dasturchilarsiz, g'oyadan jonli veb-sayt, bot va MVP gacha.",
+      "• Narxi: <b>2 990 000 so'm</b> (Muddatli to'lov: 3 oyga 996 000 so'mdan)",
+      "• 14 kunlik 100% pulni qaytarish kafolati mavjud.\n",
+      "<b>2. AI Asoslari & Prompt Injiniring (4 hafta)</b>",
+      "• Biznes va ishlarni 90% ga avtomatlashtirish, Claude & Cursor sirlari.",
+      "• Narxi: <b>990 000 so'm</b>\n",
+      "Batafsil ma'lumot va joy band qilish uchun quyidagi havolani bosing:",
+    ].join("\n");
+
+    return ctx.reply(text, {
+      parse_mode: "HTML",
+      ...Markup.inlineKeyboard([
+        [Markup.button.url("🌐 Saytda Ko'rish va Ro'yxatdan O'tish", "https://master-2-jade.vercel.app")],
+      ]),
+    });
+  });
+
+  // Bepul Diagnostika
+  bot.hears("🎯 Bepul Diagnostika", async (ctx) => {
+    return ctx.reply(
+      "🎯 <b>Qaysi kurs sizga eng ko'p foyda keltiradi?</b>\n\n2 daqiqalik 9 ta savoldan iborat bepul test orqali o'z darajangiz va maqsadingizga mos individual yo'nalishni aniqlang:",
+      {
+        parse_mode: "HTML",
+        ...Markup.inlineKeyboard([
+          [Markup.button.url("🚀 Diagnostikadan O'tish", "https://master-2-jade.vercel.app/diagnostika")],
+        ]),
+      }
+    );
+  });
+
+  // G'oya Kalkulyatori
+  bot.hears("💡 G'oya Kalkulyatori", async (ctx) => {
+    const text = [
+      "💡 <b>VIBE CODING BILAN QANCHA PUL VA VAQT TEJALADI?</b>\n",
+      "📊 <b>Oddiy dasturchilar yo'li:</b>",
+      "• Xarajat: <b>1 500$ — 4 000$</b>",
+      "• Muddat: <b>2 — 4 oy</b>",
+      "• Doimiy to'lov va qaramlik.\n",
+      "⚡️ <b>Vibecoding usuli (O'zingiz qurasiz):</b>",
+      "• Xarajat: <b>0$</b> (Faqat kurs narxi evaziga)",
+      "• Muddat: <b>4 — 7 kun</b>",
+      "• To'liq erkinlik va o'z qo'lingizdagi boshqaruv!\n",
+      "Saytda o'z g'oyangiz bo'yicha aniq tejash rejasini hisoblang:",
+    ].join("\n");
+
+    return ctx.reply(text, {
+      parse_mode: "HTML",
+      ...Markup.inlineKeyboard([
+        [Markup.button.url("🧮 Saytda Hisoblab Ko'rish", "https://master-2-jade.vercel.app#kalkulyator")],
+      ]),
+    });
+  });
+
+  // Bepul Dars
+  bot.hears("🎁 Bepul Dars", async (ctx) => {
+    return ctx.reply(
+      "🎁 <b>BEPUL AMALIY DARS:</b>\n\n\"AI yordamida dasturchilarsiz birinchi veb-saytni 15 daqiqada qurish\"\n\nHoziroq tomosha qiling va metodni amalda ko'ring:",
+      {
+        parse_mode: "HTML",
+        ...Markup.inlineKeyboard([
+          [Markup.button.url("▶️ Bepul Darsni Ochish", "https://master-2-jade.vercel.app/bepul-dars")],
+        ]),
+      }
+    );
+  });
+
+  // Telefon ulash tugmasi
+  bot.hears("📱 Hisobni Ulash (Telefon)", async (ctx) => {
+    return ctx.reply(
+      "Platformadagi akkauntingizni ushbu botga bog'lash uchun quyidagi tugma orqali telefon raqamingizni yuboring:",
       Markup.keyboard([
-        [Markup.button.contactRequest("📱 Telefon raqamni yuborish")],
-        [Markup.button.text("🆘 Operator bilan bog'lanish")],
+        [Markup.button.contactRequest("📱 Raqamimni tasdiqlash")],
+        ["🔙 Asosiy Menyu"],
       ]).resize()
     );
   });
 
-  // Contact sharing handler
+  // Asosiy menyuga qaytish
+  bot.hears("🔙 Asosiy Menyu", async (ctx) => {
+    return ctx.reply(
+      "Asosiy menyu:",
+      Markup.keyboard([
+        ["📚 Kurslar va Narxlar", "🎯 Bepul Diagnostika"],
+        ["💡 G'oya Kalkulyatori", "🎁 Bepul Dars"],
+        ["📱 Hisobni Ulash (Telefon)", "🆘 Mentor / Operator"],
+      ]).resize()
+    );
+  });
+
+  // Contact handler
   bot.on("contact", async (ctx) => {
     const contact = ctx.message.contact;
     if (!contact) return;
@@ -302,33 +371,26 @@ export function initTelegramBot(): Telegraf | null {
 
     if (result.success && result.user) {
       return ctx.reply(
-        `✅ Rahmat! ${result.user.fullName}, hisobingiz muvaffaqiyatli ulandi.`,
-        Markup.removeKeyboard()
+        `✅ Rahmat, <b>${result.user.fullName}</b>!\n\nHisobingiz muvaffaqiyatli ulandi. Endi darslar va vazifalar xabarnomalari to'g'ridan-to'g'ri shu yerga keladi.`,
+        {
+          parse_mode: "HTML",
+          ...Markup.keyboard([
+            ["📚 Kurslar va Narxlar", "🎯 Bepul Diagnostika"],
+            ["💡 G'oya Kalkulyatori", "🎁 Bepul Dars"],
+            ["📱 Hisobni Ulash (Telefon)", "🆘 Mentor / Operator"],
+          ]).resize(),
+        }
       );
     }
 
     return ctx.reply(
-      `⚠️ Telefon raqam (${phone}) bo'yicha foydalanuvchi topilmadi. Avval platformada ro'yxatdan o'ting.`
+      `⚠️ Telefon raqam (<b>${phone}</b>) bo'yicha platformada foydalanuvchi topilmadi.\nIltimos, avval saytda ro'yxatdan o'ting: https://master-2-jade.vercel.app`,
+      { parse_mode: "HTML" }
     );
   });
 
-  // Command /operator handoff
-  bot.command("operator", async (ctx) => {
-    const tgUserId = ctx.from.id.toString();
-    const tgUsername = ctx.from.username;
-    const userFullName = [ctx.from.first_name, ctx.from.last_name].filter(Boolean).join(" ");
-
-    const res = await handleOperatorHandoff({
-      tgUserId,
-      tgUsername,
-      userFullName,
-    });
-
-    return ctx.reply(res.message);
-  });
-
-  // Text message handler matching operator button
-  bot.hears("🆘 Operator bilan bog'lanish", async (ctx) => {
+  // Operator / Mentor
+  bot.hears(["🆘 Mentor / Operator", "🆘 Operator bilan bog'lanish"], async (ctx) => {
     const tgUserId = ctx.from.id.toString();
     const tgUsername = ctx.from.username;
     const userFullName = [ctx.from.first_name, ctx.from.last_name].filter(Boolean).join(" ");
@@ -346,9 +408,6 @@ export function initTelegramBot(): Telegraf | null {
   return bot;
 }
 
-/**
- * Returns active Telegram bot instance.
- */
 export function getTelegramBot(): Telegraf | null {
   if (!botInstance) {
     return initTelegramBot();
