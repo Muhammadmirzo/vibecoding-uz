@@ -1,8 +1,12 @@
 "use client";
 
 import * as React from "react";
-import { Lock, ArrowUpRight, Hammer } from "lucide-react";
+import { Lock, ArrowUpRight, Hammer, Globe, Sparkles } from "lucide-react";
 import type { PortfolioItem } from "@/features/portfolio/portfolioData";
+import {
+  getWebsiteScreenshotUrl,
+  resolvePortfolioImageUrl,
+} from "@/features/portfolio/portfolioUtils";
 
 interface PortfolioCardProps {
   item: PortfolioItem;
@@ -16,6 +20,25 @@ export function PortfolioCard({
   className = "",
 }: PortfolioCardProps) {
   const isDark = variant === "dark";
+  const [imgSrc, setImgSrc] = React.useState<string>(() =>
+    resolvePortfolioImageUrl(item)
+  );
+  const [hasError, setHasError] = React.useState<boolean>(false);
+
+  // Sync image source if item changes
+  React.useEffect(() => {
+    setImgSrc(resolvePortfolioImageUrl(item));
+    setHasError(false);
+  }, [item]);
+
+  const handleImageError = () => {
+    const fallbackScreenshot = getWebsiteScreenshotUrl(item.url);
+    if (imgSrc !== fallbackScreenshot && fallbackScreenshot !== "") {
+      setImgSrc(fallbackScreenshot);
+    } else {
+      setHasError(true);
+    }
+  };
 
   return (
     <a
@@ -23,7 +46,7 @@ export function PortfolioCard({
       target="_blank"
       rel="noreferrer"
       aria-label={`${item.title} — Saytni ochish`}
-      className={`group flex flex-col rounded-2xl overflow-hidden transition-colors ${
+      className={`group flex flex-col rounded-2xl overflow-hidden transition-all duration-300 ${
         isDark
           ? "border border-white/10 bg-white/[0.05] hover:border-accent/60 hover:bg-white/[0.08]"
           : "border border-border bg-cream-warm hover:border-accent-line hover:shadow-md"
@@ -66,12 +89,40 @@ export function PortfolioCard({
           isDark ? "bg-white/[0.03]" : "bg-cream-deep"
         }`}
       >
-        <img
-          src={item.imageUrl}
-          alt={item.title}
-          loading="lazy"
-          className="w-full h-full object-cover object-top"
-        />
+        {!hasError && imgSrc ? (
+          <img
+            src={imgSrc}
+            alt={item.title}
+            loading="lazy"
+            onError={handleImageError}
+            className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-104"
+          />
+        ) : (
+          /* High-Tech Fallback Mockup View */
+          <div className="w-full h-full p-6 flex flex-col justify-between bg-gradient-to-br from-ink/90 via-ink to-ink/95 text-white relative">
+            <div className="flex items-center justify-between">
+              <span className="px-2.5 py-1 rounded-full bg-accent/20 border border-accent/40 text-accent text-xs font-mono flex items-center gap-1">
+                <Sparkles className="w-3 h-3" />
+                <span>{item.category}</span>
+              </span>
+              <Globe className="w-5 h-5 text-white/40" />
+            </div>
+
+            <div className="my-auto text-center space-y-1">
+              <div className="text-xl md:text-2xl font-extrabold tracking-tight text-white">
+                {item.title}
+              </div>
+              <div className="text-xs font-mono text-white/60">
+                {item.domain}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between text-xs text-white/50 font-mono pt-2 border-t border-white/10">
+              <span>Status: Active</span>
+              <span className="text-accent">Vibe Coding MVP</span>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Card Content Footer */}

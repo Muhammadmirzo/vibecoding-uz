@@ -14,9 +14,14 @@ import {
   Sparkles,
   Globe,
   Loader2,
+  Camera,
 } from "lucide-react";
 import { PORTFOLIO_DATA, type PortfolioItem } from "@/features/portfolio/portfolioData";
 import { portfolioSchema, PORTFOLIO_CATEGORIES } from "@/lib/validations/portfolio";
+import {
+  getWebsiteScreenshotUrl,
+  resolvePortfolioImageUrl,
+} from "@/features/portfolio/portfolioUtils";
 
 export function PortfolioManager() {
   const [items, setItems] = React.useState<PortfolioItem[]>(PORTFOLIO_DATA);
@@ -71,7 +76,7 @@ export function PortfolioManager() {
       domain: "",
       category: "Startup MVP",
       description: "",
-      imageUrl: "/illustrations/founder/edubaza.webp",
+      imageUrl: getWebsiteScreenshotUrl("https://edubaza.uz"),
       userCount: "",
       badgeText: "Shu metod bilan qurilgan",
       isFeatured: true,
@@ -90,7 +95,7 @@ export function PortfolioManager() {
       domain: item.domain,
       category: item.category,
       description: item.description,
-      imageUrl: item.imageUrl,
+      imageUrl: resolvePortfolioImageUrl(item),
       userCount: item.userCount || "",
       badgeText: item.badgeText,
       isFeatured: item.isFeatured,
@@ -545,15 +550,44 @@ export function PortfolioManager() {
               </div>
 
               <div>
-                <label className="block font-semibold text-ink mb-1">Rasm Havolasi (Image URL) *</label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block font-semibold text-ink">Rasm Havolasi (Image URL) *</label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (formData.url && formData.url !== "https://") {
+                        setFormData((prev) => ({
+                          ...prev,
+                          imageUrl: getWebsiteScreenshotUrl(prev.url),
+                        }));
+                      }
+                    }}
+                    className="inline-flex items-center gap-1 text-xs font-semibold text-accent hover:underline cursor-pointer"
+                  >
+                    <Camera className="w-3.5 h-3.5" />
+                    <span>Saytdan skrinshot olish</span>
+                  </button>
+                </div>
                 <input
                   type="text"
                   required
                   value={formData.imageUrl}
                   onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-                  placeholder="/illustrations/founder/edubaza.webp"
-                  className="w-full px-3.5 py-2 bg-cream-warm border border-border rounded-lg font-mono focus:outline-none focus:ring-2 focus:ring-accent"
+                  placeholder="https://s.wordpress.com/mshots/v1/https%3A%2F%2Fedubaza.uz?w=1200&h=750"
+                  className="w-full px-3.5 py-2 bg-cream-warm border border-border rounded-lg font-mono text-xs focus:outline-none focus:ring-2 focus:ring-accent"
                 />
+                {formData.imageUrl && (
+                  <div className="mt-2.5 rounded-lg border border-border overflow-hidden bg-cream-deep aspect-[16/10] max-h-40">
+                    <img
+                      src={formData.imageUrl}
+                      alt="Preview"
+                      className="w-full h-full object-cover object-top"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = getWebsiteScreenshotUrl(formData.url);
+                      }}
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="flex items-center justify-between pt-2">
