@@ -83,3 +83,9 @@ ZAHAR-ORKESTRATOR: vibecoding.uz dan kataloglangan yana 3 unikal pattern bizda h
 - Testimoniyalar: halol xulosa paneli ("Fikrlar platforma ichidan — tahrirsiz", N ta fikr — soxta ortacha baho YOQ) + BadgeCheck mikro-belgi
 - Sahifa balandligi: 4900 -> 5240px
 Verification: tsc=0_errors vitest=135/135 build=OK LEDGER_greps=OK lokal_vizual=OK
+
+=== Audit Log Entry: 2026-09-09 (W1/W2 — kurs sahifasi boyitish, 404, LMS placeholder — antigravity) ===
+ZAHAR-ORKESTRATOR: P1 qolgan bandlar bajarildi.
+- W1: kurs sahifasiga "Bu kurs KIM UCHUN EMAS" (3 halol band), "Narxga nima kiradi?" shaffoflik royxati (siteConfig dan), "Tolov: Payme · Click · bolib tolash" ishonch satr kushildi.
+- W2: YANGI src/app/not-found.tsx (ozbekcha 404: "Bu sahifa hali yasalmagan" + 2 tugma), LMS dars sahifasidagi Rickroll youtube placeholder olib tashlanib neytral "video tez orada" holati qushildi.
+Verification: tsc=0_errors vitest=135/135 build=OK LEDGER_greps=OK

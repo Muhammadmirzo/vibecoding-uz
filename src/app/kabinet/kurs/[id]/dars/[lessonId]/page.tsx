@@ -2,18 +2,20 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { CirclePlay, Copy, Check, FileText, Download, Send, ArrowLeft, ArrowRight, ShieldCheck, Video, Youtube } from "lucide-react";
+import { CirclePlay, Copy, Check, FileText, Download, Send, ArrowLeft, ArrowRight, ShieldCheck, Video, Youtube, VideoOff } from "lucide-react";
 import { VideoPlayer } from "@/features/lms/components/VideoPlayer";
 
+type TabType = "konspekt" | "prompts" | "materials" | "homework";
+
 export default function LessonPlayerPage() {
-  const [activeTab, setActiveTab] = React.useState<"konspekt" | "prompts" | "materials" | "homework">("prompts");
+  const [activeTab, setActiveTab] = React.useState<TabType>("prompts");
   const [copiedIndex, setCopiedIndex] = React.useState<number | null>(null);
   const [submissionLink, setSubmissionLink] = React.useState("");
   const [submissionSuccess, setSubmissionSuccess] = React.useState(false);
   const [videoSource, setVideoSource] = React.useState<"youtube" | "direct">("youtube");
 
   const sampleVideoUrls = {
-    youtube: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    youtube: "",
     direct: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
   };
 
@@ -39,21 +41,23 @@ export default function LessonPlayerPage() {
     setSubmissionSuccess(true);
   };
 
+  const currentVideoUrl = sampleVideoUrls[videoSource];
+
   return (
-    <div className="pt-24 pb-16 min-h-screen bg-[var(--color-cream)]">
+    <div className="pt-24 pb-16 min-h-screen bg-cream">
       <div className="mx-auto w-full max-w-[1360px] px-5 md:px-8 lg:px-10 space-y-6">
         
         {/* Navigation Breadcrumb */}
         <div className="flex items-center justify-between text-xs font-mono">
-          <Link href="/kabinet" className="inline-flex items-center gap-1 text-[var(--color-accent)] font-semibold hover:underline">
+          <Link href="/kabinet" className="inline-flex items-center gap-1 text-accent font-semibold hover:underline">
             <ArrowLeft className="w-3.5 h-3.5" /> Kabinetga qaytish
           </Link>
-          <span className="text-[var(--color-ink-subtle)]">Vibe Coding Express · 4-Modul (4-Dars)</span>
+          <span className="text-ink-subtle">Vibe Coding Express · 4-Modul (4-Dars)</span>
         </div>
 
         {/* Lesson Title */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <h1 className="text-2xl md:text-3xl font-extrabold text-[var(--color-ink)]">
+          <h1 className="text-2xl md:text-3xl font-extrabold text-ink">
             4-Dars: PostgreSQL & Drizzle ORM Sxemasini Qurish
           </h1>
           {/* Hybrid Video Source Switcher */}
@@ -88,26 +92,40 @@ export default function LessonPlayerPage() {
           
           {/* Video Player Container */}
           <div className="space-y-6">
-            <VideoPlayer
-              videoUrl={sampleVideoUrls[videoSource]}
-              title="4-Dars: PostgreSQL & Drizzle ORM Sxemasini Qurish"
-            />
+            {currentVideoUrl ? (
+              <VideoPlayer
+                videoUrl={currentVideoUrl}
+                title="4-Dars: PostgreSQL & Drizzle ORM Sxemasini Qurish"
+              />
+            ) : (
+              <div className="relative aspect-video rounded-xl bg-cream-warm border border-border-strong flex flex-col items-center justify-center p-6 text-center shadow-sm">
+                <div className="w-14 h-14 rounded-full bg-cream-deep flex items-center justify-center mb-3">
+                  <VideoOff className="w-7 h-7 text-ink-muted" />
+                </div>
+                <h3 className="text-base font-bold text-ink mb-1">
+                  Bu darsning videosi tez orada qo'shiladi
+                </h3>
+                <p className="text-xs md:text-sm text-ink-muted max-w-md">
+                  Dars matni va vazifasi bilan tanishingiz mumkin
+                </p>
+              </div>
+            )}
 
             {/* Lesson Tabs Navigation */}
-            <div className="border-b border-[var(--color-border)] flex items-center gap-2 font-semibold text-sm">
+            <div className="border-b border-border flex items-center gap-2 font-semibold text-sm">
               {[
-                { id: "prompts", label: "Promptlar Kutubxonasi" },
-                { id: "konspekt", label: "Konspekt" },
-                { id: "materials", label: "Materiallar" },
-                { id: "homework", label: "Uy Ishi" },
+                { id: "prompts" as const, label: "Promptlar Kutubxonasi" },
+                { id: "konspekt" as const, label: "Konspekt" },
+                { id: "materials" as const, label: "Materiallar" },
+                { id: "homework" as const, label: "Uy Ishi" },
               ].map((tab) => (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
+                  onClick={() => setActiveTab(tab.id)}
                   className={`px-4 py-2.5 border-b-2 transition-colors ${
                     activeTab === tab.id
-                      ? "border-[var(--color-accent)] text-[var(--color-accent)] font-bold"
-                      : "border-transparent text-[var(--color-ink-muted)] hover:text-[var(--color-ink)]"
+                      ? "border-accent text-accent font-bold"
+                      : "border-transparent text-ink-muted hover:text-ink"
                   }`}
                 >
                   {tab.label}
@@ -118,13 +136,13 @@ export default function LessonPlayerPage() {
             {/* Tab Content: Prompts */}
             {activeTab === "prompts" && (
               <div className="space-y-4">
-                <p className="text-xs text-[var(--color-ink-muted)]">
+                <p className="text-xs text-ink-muted">
                   Ushbu darsda ko'rsatilgan tayyor promptlarni bitta bosish bilan nusxalang (copy-paste):
                 </p>
                 {prompts.map((p, idx) => (
-                  <div key={idx} className="p-4 rounded-[var(--radius-lg)] bg-[var(--color-cream-warm)] border border-[var(--color-border-strong)] space-y-2">
+                  <div key={idx} className="p-4 rounded-lg bg-cream-warm border border-border-strong space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-mono font-bold text-[var(--color-ink)]">{p.title}</span>
+                      <span className="text-xs font-mono font-bold text-ink">{p.title}</span>
                       <button
                         onClick={() => handleCopyPrompt(p.prompt, idx)}
                         className="btn-secondary h-8 px-3 rounded text-xs font-semibold inline-flex items-center gap-1.5"
@@ -135,12 +153,12 @@ export default function LessonPlayerPage() {
                           </>
                         ) : (
                           <>
-                            <Copy className="w-3.5 h-3.5 text-[var(--color-accent)]" /> Nusxalash
+                            <Copy className="w-3.5 h-3.5 text-accent" /> Nusxalash
                           </>
                         )}
                       </button>
                     </div>
-                    <pre className="p-3 rounded bg-[var(--color-cream)] text-xs font-mono text-[var(--color-ink-muted)] whitespace-pre-wrap border border-[var(--color-border)]">
+                    <pre className="p-3 rounded bg-cream text-xs font-mono text-ink-muted whitespace-pre-wrap border border-border">
                       {p.prompt}
                     </pre>
                   </div>
@@ -150,16 +168,16 @@ export default function LessonPlayerPage() {
 
             {/* Tab Content: Homework */}
             {activeTab === "homework" && (
-              <div className="p-6 rounded-[var(--radius-xl)] bg-[var(--color-cream-warm)] border border-[var(--color-border-strong)] space-y-4">
-                <h3 className="text-base font-bold text-[var(--color-ink)]">
+              <div className="p-6 rounded-xl bg-cream-warm border border-border-strong space-y-4">
+                <h3 className="text-base font-bold text-ink">
                   4-Modul Uy Vazifasi: PostgreSQL Schema va Drizzle Migratsiyasi
                 </h3>
-                <p className="text-xs text-[var(--color-ink-muted)] leading-relaxed">
+                <p className="text-xs text-ink-muted leading-relaxed">
                   Loyiha ildizida `schema.ts` yaratib, `npm run db:generate` va `npm run db:seed` buyruqlarini bajaring. Tayyor kod yoki GitHub repozitoriyasi havolasini yuboring.
                 </p>
 
                 {submissionSuccess ? (
-                  <div className="p-4 rounded-[var(--radius-lg)] bg-success-soft border border-success-line text-xs font-semibold text-success flex items-center gap-2">
+                  <div className="p-4 rounded-lg bg-success-soft border border-success-line text-xs font-semibold text-success flex items-center gap-2">
                     <Check className="w-4 h-4" /> Uy vazifangiz topshirildi va tekshirilmoqda. Mentor tez orada baholaydi!
                   </div>
                 ) : (
@@ -170,9 +188,9 @@ export default function LessonPlayerPage() {
                       placeholder="GitHub yoki Vercel loyihangiz havolasi (URL)"
                       value={submissionLink}
                       onChange={(e) => setSubmissionLink(e.target.value)}
-                      className="w-full h-11 px-4 rounded-[var(--radius-md)] border border-[var(--color-border-strong)] bg-[var(--color-cream)] text-xs text-[var(--color-ink)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+                      className="w-full h-11 px-4 rounded-md border border-border-strong bg-cream text-xs text-ink focus:outline-none focus:ring-2 focus:ring-accent"
                     />
-                    <button type="submit" className="btn-primary h-11 px-6 rounded-[var(--radius-md)] text-xs font-semibold inline-flex items-center gap-2">
+                    <button type="submit" className="btn-primary h-11 px-6 rounded-md text-xs font-semibold inline-flex items-center gap-2">
                       <Send className="w-4 h-4" /> Vazifani Topshirish
                     </button>
                   </form>
@@ -183,8 +201,8 @@ export default function LessonPlayerPage() {
           </div>
 
           {/* Right Sidebar: Curriculum Lessons Selector */}
-          <div className="bg-[var(--color-cream-warm)] border border-[var(--color-border-strong)] rounded-[var(--radius-xl)] p-5 space-y-4">
-            <div className="text-xs font-mono font-bold uppercase text-[var(--color-ink)] tracking-wider">
+          <div className="bg-cream-warm border border-border-strong rounded-xl p-5 space-y-4">
+            <div className="text-xs font-mono font-bold uppercase text-ink tracking-wider">
               4-Modul Darslari Listi
             </div>
             <div className="space-y-2 text-xs">
@@ -197,12 +215,12 @@ export default function LessonPlayerPage() {
               ].map((l, i) => (
                 <div
                   key={i}
-                  className={`p-3 rounded-[var(--radius-md)] border flex items-center justify-between cursor-pointer ${
+                  className={`p-3 rounded-md border flex items-center justify-between cursor-pointer ${
                     l.active
-                      ? "border-[var(--color-accent)] bg-[var(--color-accent-soft)] font-bold text-[var(--color-ink)]"
+                      ? "border-accent bg-accent-soft font-bold text-ink"
                       : l.done
-                      ? "border-[var(--color-border)] bg-[var(--color-cream)] text-[var(--color-ink-muted)]"
-                      : "border-transparent text-[var(--color-ink-subtle)] opacity-60"
+                      ? "border-border bg-cream text-ink-muted"
+                      : "border-transparent text-ink-subtle opacity-60"
                   }`}
                 >
                   <span className="truncate pr-2">{l.title}</span>

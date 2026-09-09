@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Check, ArrowRight, CirclePlay, Clock, Calendar, ShieldCheck, Award } from "lucide-react";
+import { Check, ArrowRight, CirclePlay, Clock, Calendar, ShieldCheck, Award, XCircle, X } from "lucide-react";
 import { siteConfig } from "@/lib/siteConfig";
 
 interface Props {
@@ -127,6 +127,28 @@ export default async function CourseDetailPage({ params }: Props) {
               </div>
             </div>
 
+            {/* Bu kurs KIM UCHUN EMAS */}
+            <div className="pt-6 space-y-4">
+              <div className="p-6 md:p-7 rounded-[var(--radius-xl)] bg-[var(--color-cream-warm)] border border-[var(--color-border-strong)] space-y-4">
+                <h3 className="text-xl font-bold text-[var(--color-ink)] flex items-center gap-2">
+                  <XCircle className="w-5 h-5 text-[var(--color-accent)] flex-shrink-0" />
+                  <span>Bu kurs KIM UCHUN EMAS</span>
+                </h3>
+                <ul className="space-y-3">
+                  {[
+                    "Tayyor pullik video kurslarni kuzatib o'tirishni istaganlar — bizda har darsda o'zingiz qurasiz",
+                    "Dasturlashsiz AI ni imkoniyat deb biluvchilar — kod yozamiz, lekin AI bilan",
+                    "Bir kechada boy beradigan sir izlayotganlar — natija 8 hafta mehnat",
+                  ].map((item, idx) => (
+                    <li key={idx} className="flex items-start gap-2.5 text-sm text-[var(--color-ink-muted)] leading-relaxed">
+                      <X className="w-4 h-4 text-[var(--color-ink-subtle)] flex-shrink-0 mt-0.5" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
           </div>
 
           {/* Pricing & Checkout Card */}
@@ -143,18 +165,25 @@ export default async function CourseDetailPage({ params }: Props) {
               </div>
             </div>
 
-            <div className="space-y-2.5 pt-2 border-t border-[var(--color-border)]">
-              {[
-                siteConfig.sessionFormat,
-                "Telegram bot orqali uy vazifalari tekshiruvi",
-                "Mentor Mirzodan shaxsiy feedback",
-                siteConfig.guaranteeText,
-              ].map((item, idx) => (
-                <div key={idx} className="flex items-start gap-2.5 text-xs font-medium text-[var(--color-ink)]">
-                  <Check className="w-4 h-4 text-success flex-shrink-0 mt-0.5" />
-                  <span>{item}</span>
-                </div>
-              ))}
+            {/* Narxga nima kiradi? */}
+            <div className="space-y-3 pt-2 border-t border-[var(--color-border)]">
+              <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-[var(--color-accent)]">
+                Narxga nima kiradi?
+              </h3>
+              <div className="space-y-2.5">
+                {[
+                  siteConfig.sessionFormat,
+                  "Telegram bot orqali uy vazifalari tekshiruvi",
+                  "Mirzodan shaxsiy feedback",
+                  "Bitiruv sertifikati",
+                  siteConfig.guaranteeText,
+                ].map((item, idx) => (
+                  <div key={idx} className="flex items-start gap-2.5 text-xs font-medium text-[var(--color-ink)]">
+                    <Check className="w-4 h-4 text-success flex-shrink-0 mt-0.5" />
+                    <span>{item}</span>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div className="space-y-3 pt-2">
@@ -171,6 +200,11 @@ export default async function CourseDetailPage({ params }: Props) {
               </Link>
             </div>
 
+            {/* CTA yonida / ostida Payme va Click matn belgilari */}
+            <div className="p-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-cream)] font-mono text-xs text-[var(--color-ink-muted)] text-center">
+              To'lov: Payme · Click · bo'lib to'lash
+            </div>
+
             <div className="flex items-center gap-2 text-[11px] text-[var(--color-ink-muted)] pt-2 border-t border-[var(--color-border)]">
               <ShieldCheck className="w-4 h-4 text-[var(--color-accent)] flex-shrink-0" />
               <span>Click va Payme orqali xavfsiz to'lov</span>
@@ -183,3 +217,4 @@ export default async function CourseDetailPage({ params }: Props) {
     </div>
   );
 }
+
