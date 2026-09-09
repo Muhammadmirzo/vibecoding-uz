@@ -99,7 +99,7 @@ export async function sendWelcomeEmail(input: WelcomeEmailInput): Promise<SendEm
     <body>
       <div class="card">
         <div class="header">
-          <a href="https://academy.mirzo.uz" class="brand">Mirzo Academy</a>
+          <a href="https://vibecoding.uz" class="brand">Mirzo Academy</a>
         </div>
         <div class="title">Xush kelibsiz, ${validated.fullName}! 🎉</div>
         <p>Siz <strong>${courseName}</strong> platformasida muvaffaqiyatli ro'yxatdan o'tdingiz.</p>
@@ -144,7 +144,7 @@ export async function sendDripUnlockEmail(input: DripUnlockEmailInput): Promise<
     </head>
     <body>
       <div class="card">
-        <a href="https://academy.mirzo.uz" class="brand">Mirzo Academy</a>
+        <a href="https://vibecoding.uz" class="brand">Mirzo Academy</a>
         <div class="title">Yangi darsingiz ochildi! 🚀</div>
         <p>Salom, ${validated.fullName}. Kursingizdagi navbatdagi dars tayyor:</p>
         <div class="lesson-box">
