@@ -46,7 +46,7 @@ export default function ReferralPage() {
 
   const referralUrl = typeof window !== "undefined"
     ? `${window.location.origin}/ref/${referralCode}`
-    : `https://academy.mirzo.uz/ref/${referralCode}`;
+    : `https://vibecoding.uz/ref/${referralCode}`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(referralUrl);

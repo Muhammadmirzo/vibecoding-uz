@@ -119,7 +119,7 @@ async function handleCronRequest(req: NextRequest) {
                   to: item.userEmail,
                   fullName: item.userFullName,
                   lessonTitle: lesson.title,
-                  lessonUrl: `https://academy.mirzo.uz/kabinet`,
+                  lessonUrl: `https://vibecoding.uz/kabinet`,
                 });
               }
             }
@@ -216,7 +216,7 @@ async function handleCronRequest(req: NextRequest) {
       for (const u of inactiveUsers) {
         inactivityNudges.push(u.fullName);
 
-        const nudgeMessage = `Salom ${u.fullName}! Mirzo Academy platformasida darslaringiz kutmoqda. Bilimingizni oshirishda davom eting! 🚀 https://academy.mirzo.uz/kabinet`;
+        const nudgeMessage = `Salom ${u.fullName}! Mirzo Academy platformasida darslaringiz kutmoqda. Bilimingizni oshirishda davom eting! 🚀 https://vibecoding.uz/kabinet`;
 
         if (u.tgUserId) {
           await sendTelegramMessage(

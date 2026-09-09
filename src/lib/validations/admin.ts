@@ -39,7 +39,7 @@ export const siteSettingsSchema = z.object({
   // Dynamic CTA, URLs & Announcement Banner
   headerCtaText: z.string().default("Kurs tanlash"),
   headerCtaLink: z.string().default("/#kurs-tanlash"),
-  enrollmentUrl: z.string().default("https://academy.mirzo.uz/kabinet"),
+  enrollmentUrl: z.string().default("/kabinet"),
   telegramBotLink: z.string().default("https://t.me/m/ODAfK_QIMjky"),
   announcementBannerText: z.string().optional().nullable(),
   announcementBannerLink: z.string().optional().nullable(),

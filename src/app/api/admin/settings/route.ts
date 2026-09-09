@@ -24,7 +24,7 @@ const DEFAULT_SETTINGS = {
   // Dynamic CTA, URLs & Announcement Banner
   headerCtaText: "Kurs tanlash",
   headerCtaLink: "/#kurs-tanlash",
-  enrollmentUrl: "https://academy.mirzo.uz/kabinet",
+  enrollmentUrl: "/kabinet",
   telegramBotLink: "https://t.me/m/ODAfK_QIMjky",
   announcementBannerText: "Yangi Vibe Coding Express guruhiga qabul boshlandi! Mashg'ulotlar tez orada start oladi.",
   announcementBannerLink: "/kurs/vibe-coding-express",

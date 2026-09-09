@@ -134,7 +134,7 @@ export function NotificationManager() {
     .replace(/{{fullName}}/g, "Alisher Zokirov")
     .replace(/{{phone}}/g, "+998 90 123 45 67")
     .replace(/{{courseTitle}}/g, "Vibe Coding Express")
-    .replace(/{{loginUrl}}/g, "https://academy.mirzo.uz/kabinet");
+    .replace(/{{loginUrl}}/g, "https://vibecoding.uz/kabinet");
 
   const audienceLabels: Record<string, string> = {
     all_users: "Barcha foydalanuvchilar",

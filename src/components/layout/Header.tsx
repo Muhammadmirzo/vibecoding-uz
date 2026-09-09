@@ -292,7 +292,7 @@ export const Header = React.memo(function Header() {
 
             {/* Dashboard Pill Button (Matching Reference Design) */}
             <Link
-              href={user ? siteSettings.enrollmentUrl || "/kabinet" : "/#kurs-tanlash"}
+              href={user ? "/kabinet" : "/#kurs-tanlash"}
               prefetch={true}
               className="hidden md:inline-flex items-center gap-2 h-10 px-3.5 rounded-xl bg-cream border border-border text-ink font-semibold text-xs sm:text-sm shadow-xs hover:bg-cream-warm transition-all shrink-0"
             >
@@ -420,7 +420,7 @@ export const Header = React.memo(function Header() {
               </div>
               <div className="pt-2 border-t border-[var(--color-border)] flex items-center justify-between">
                 <Link
-                  href={siteSettings.enrollmentUrl || "/kabinet"}
+                  href="/kabinet"
                   prefetch={true}
                   onClick={() => setMobileMenuOpen(false)}
                   className="text-xs font-semibold text-[var(--color-accent)] flex items-center gap-1"

@@ -105,7 +105,7 @@ export async function sendWelcomeEmail(input: WelcomeEmailInput): Promise<SendEm
         <p>Siz <strong>${courseName}</strong> platformasida muvaffaqiyatli ro'yxatdan o'tdingiz.</p>
         <p>AI yordamida dasturlashsiz real mahsulotlar qurish va amaliy ko'nikmalarni egallash safaringiz boshlandi!</p>
         <div style="text-align: center;">
-          <a href="https://academy.mirzo.uz/kabinet" class="btn">Shaxsiy kabinetga o'tish</a>
+          <a href="https://vibecoding.uz/kabinet" class="btn">Shaxsiy kabinetga o'tish</a>
         </div>
         <div class="footer">
           &copy; ${new Date().getFullYear()} Mirzo Academy. Barcha huquqlar himoyalangan.

@@ -33,7 +33,7 @@ export function SettingsManager() {
   // Dynamic CTA, URLs & Announcement Banner State
   const [headerCtaText, setHeaderCtaText] = useState("Kurs tanlash");
   const [headerCtaLink, setHeaderCtaLink] = useState("/#kurs-tanlash");
-  const [enrollmentUrl, setEnrollmentUrl] = useState("https://academy.mirzo.uz/kabinet");
+  const [enrollmentUrl, setEnrollmentUrl] = useState("/kabinet");
   const [telegramBotLink, setTelegramBotLink] = useState("https://t.me/m/ODAfK_QIMjky");
   const [announcementBannerText, setAnnouncementBannerText] = useState("Yangi Vibe Coding Express guruhiga qabul boshlandi! Mashg'ulotlar tez orada start oladi.");
   const [announcementBannerLink, setAnnouncementBannerLink] = useState("/kurs/vibe-coding-express");
@@ -541,7 +541,7 @@ export function SettingsManager() {
                     type="text"
                     value={enrollmentUrl}
                     onChange={(e) => setEnrollmentUrl(e.target.value)}
-                    placeholder="https://academy.mirzo.uz/kabinet"
+                    placeholder="/kabinet"
                     className="w-full px-3.5 py-2 text-sm bg-cream border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent font-mono"
                   />
                 </div>
