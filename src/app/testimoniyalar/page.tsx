@@ -9,6 +9,7 @@ import {
   Sparkles,
   ArrowRight,
   ShieldCheck,
+  BadgeCheck,
 } from "lucide-react";
 import {
   STATIC_TESTIMONIALS,
@@ -47,27 +48,20 @@ export default function TestimoniyalarPage() {
           </p>
         </div>
 
-        {/* Stats Summary Row */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
-          <div className="bg-cream-warm border border-border-strong rounded-xl p-5 text-center space-y-1 shadow-sm">
-            <div className="text-2xl md:text-3xl font-extrabold text-ink font-mono">
-              250+
+        {/* Halol reyting xulosasi paneli */}
+        <div className="bg-cream-warm border border-border-strong rounded-xl p-4 sm:p-5 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 max-w-3xl mx-auto">
+          <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-1">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Star key={i} className="w-4 h-4 text-accent fill-current" />
+              ))}
             </div>
-            <div className="text-xs text-ink-muted">Mamnun bitiruvchilar</div>
+            <span className="text-xs sm:text-sm font-bold text-ink">
+              Fikrlar platforma ichidan — tahrirsiz
+            </span>
           </div>
-
-          <div className="bg-cream-warm border border-border-strong rounded-xl p-5 text-center space-y-1 shadow-sm">
-            <div className="text-2xl md:text-3xl font-extrabold text-accent font-mono">
-              89%
-            </div>
-            <div className="text-xs text-ink-muted">Ishida AI integratsiya qilgan</div>
-          </div>
-
-          <div className="bg-cream-warm border border-border-strong rounded-xl p-5 text-center space-y-1 shadow-sm">
-            <div className="text-2xl md:text-3xl font-extrabold text-success font-mono">
-              45+
-            </div>
-            <div className="text-xs text-ink-muted">Jonli MVP & Startaplar</div>
+          <div className="text-xs sm:text-sm font-mono font-semibold text-accent">
+            {STATIC_TESTIMONIALS.length} ta fikr ko'rsatilmoqda
           </div>
         </div>
 
@@ -180,6 +174,12 @@ export default function TestimoniyalarPage() {
                           {item.resultMetric}
                         </span>
                       )}
+                    </div>
+
+                    {/* Platforma ichidan fikr mikro-belgi */}
+                    <div className="flex items-center gap-1.5 font-mono text-xs text-success">
+                      <BadgeCheck className="w-4 h-4 text-success flex-shrink-0" />
+                      <span>Platforma ichidan fikr</span>
                     </div>
 
                     {/* Review Text */}

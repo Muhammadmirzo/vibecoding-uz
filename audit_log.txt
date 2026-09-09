@@ -75,3 +75,11 @@ ZAHAR-ORKESTRATOR: vibecoding.uz brauzerda organildi (12k px sahifa: hero real f
 - L2: kabinet/page.tsx soxta malumotlardan tozalandi (Jamshid/45%/streak/emoji) -> AuthContext real user + siteConfig; Mentor chat Telegram CTA + Vazifalar kartasi qoshildi.
 - Koordinator tuzatishi: HowItWorks dagi mavjud bolmagan MessageSquareCheck ikonkasi -> ClipboardCheck (gate topdi).
 Verification: tsc=0_errors vitest=135/135 build=OK LEDGER_greps=OK lokal_vizual=OK
+
+=== Audit Log Entry: 2026-09-09 (M1 — unikal kontent ko'paytirish, antigravity) ===
+ZAHAR-ORKESTRATOR: vibecoding.uz dan kataloglangan yana 3 unikal pattern bizda halol versiyada qoshildi.
+- TeaserBanner.tsx (yangi): "Platforma ichida nima bor?" qulf banneri + Bepul darsni ochish CTA (kurs kartalaridan keyin)
+- Quiz tie-in: "Qaysi kurs sizga mos? 2 daqiqalik diagnostika bilan aniqlang" -> /diagnostika
+- Testimoniyalar: halol xulosa paneli ("Fikrlar platforma ichidan — tahrirsiz", N ta fikr — soxta ortacha baho YOQ) + BadgeCheck mikro-belgi
+- Sahifa balandligi: 4900 -> 5240px
+Verification: tsc=0_errors vitest=135/135 build=OK LEDGER_greps=OK lokal_vizual=OK

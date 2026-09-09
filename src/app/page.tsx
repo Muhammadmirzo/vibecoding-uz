@@ -1,10 +1,12 @@
+import Link from "next/link";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { ProofStats } from "@/components/sections/ProofStats";
 import { CourseCards } from "@/components/sections/CourseCards";
+import { TeaserBanner } from "@/components/sections/TeaserBanner";
 import { HowItWorks } from "@/components/sections/HowItWorks";
 import { FaqSection } from "@/components/sections/FaqSection";
 import { siteConfig } from "@/lib/siteConfig";
-import { Video, Users, ShieldCheck } from "lucide-react";
+import { Video, Users, ShieldCheck, HelpCircle } from "lucide-react";
 
 export default function HomePage() {
   return (
@@ -49,6 +51,21 @@ export default function HomePage() {
       </section>
 
       <CourseCards />
+
+      {/* Quiz tie-in bar ostida */}
+      <div className="w-full py-4 bg-cream border-t border-b border-border">
+        <div className="mx-auto w-full max-w-[1360px] px-5 md:px-8 text-center">
+          <Link
+            href="/diagnostika"
+            className="inline-flex items-center justify-center gap-2 text-sm font-semibold text-accent hover:underline decoration-accent underline-offset-4 transition-all"
+          >
+            <HelpCircle className="w-4 h-4 text-accent flex-shrink-0" />
+            <span>Qaysi kurs sizga mos? 2 daqiqalik diagnostika bilan aniqlang</span>
+          </Link>
+        </div>
+      </div>
+
+      <TeaserBanner />
       <HowItWorks />
       <FaqSection />
     </>
