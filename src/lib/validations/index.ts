@@ -12,4 +12,6 @@ export * from "./jobs";
 export * from "./testimonials";
 export * from "./student";
 export * from "./mcp";
+export * from "./portfolio";
+
 

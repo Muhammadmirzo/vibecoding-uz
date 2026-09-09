@@ -329,3 +329,23 @@ export const jobOpenings = pgTable("job_openings", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const portfolios = pgTable("portfolios", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  slug: text("slug").notNull().unique(),
+  title: text("title").notNull(),
+  url: text("url").notNull(),
+  domain: text("domain").notNull(),
+  category: text("category").default("Startup MVP").notNull(),
+  description: text("description").notNull(),
+  imageUrl: text("image_url").notNull(),
+  userCount: text("user_count"),
+  badgeText: text("badge_text").default("Shu metod bilan qurilgan").notNull(),
+  isFeatured: boolean("is_featured").default(true).notNull(),
+  sortOrder: integer("sort_order").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("portfolios_slug_idx").on(table.slug),
+  index("portfolios_cat_idx").on(table.category),
+]);
+
+

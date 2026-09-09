@@ -245,6 +245,20 @@ export const Header = React.memo(function Header() {
                       <div className="text-xs text-ink-muted leading-relaxed mt-0.5">Vakansiyalar</div>
                     </div>
                   </Link>
+
+                  <Link
+                    href="/portfolio"
+                    prefetch={true}
+                    className="flex items-start gap-3.5 p-3 rounded-xl hover:bg-cream-warm transition-colors group/item"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-cream-warm border border-border flex items-center justify-center shrink-0 mt-0.5 text-accent shadow-xs group-hover/item:border-accent-line transition-colors">
+                      <LayoutGrid className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-bold text-ink group-hover/item:text-accent transition-colors">Portfoliolar</div>
+                      <div className="text-xs text-ink-muted leading-relaxed mt-0.5">Vibe Coding loyihalari</div>
+                    </div>
+                  </Link>
                 </div>
               </div>
 

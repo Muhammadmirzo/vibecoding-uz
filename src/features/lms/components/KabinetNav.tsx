@@ -9,6 +9,7 @@ import {
   CreditCard,
   Share2,
   Settings,
+  Briefcase,
 } from "lucide-react";
 
 export function KabinetNav() {
@@ -49,6 +50,12 @@ export function KabinetNav() {
       href: "/kabinet/referral",
       label: "Referral & Bonus",
       icon: Share2,
+      exact: true,
+    },
+    {
+      href: "/portfolio",
+      label: "Portfoliolar",
+      icon: Briefcase,
       exact: true,
     },
     {

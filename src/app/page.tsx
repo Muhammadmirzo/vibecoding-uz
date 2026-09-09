@@ -2,6 +2,7 @@ import Link from "next/link";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { ProofStats } from "@/components/sections/ProofStats";
 import { CourseCards } from "@/components/sections/CourseCards";
+import { PortfolioSection } from "@/components/sections/PortfolioSection";
 import { TeaserBanner } from "@/components/sections/TeaserBanner";
 import { HowItWorks } from "@/components/sections/HowItWorks";
 import { FaqSection } from "@/components/sections/FaqSection";
@@ -13,6 +14,7 @@ export default function HomePage() {
     <>
       <HeroSection />
       <ProofStats />
+      <PortfolioSection />
 
       {/* Halol Isbot Strip Section */}
       <section className="w-full py-6 bg-cream border-b border-border">
