@@ -48,7 +48,7 @@ Antigravity invoke_subagent Model parametri moslashuvi:
 
 | Agent | Roli | Haqiqiy Model | invoke_subagent param | Negadir bu model |
 | :--- | :--- | :--- | :--- | :--- |
-| ZAHAR-ORKESTRATOR | Rejalash, taqsimlash, verifikatsiya, arxitektura qarorlari | Claude Opus 4.6 (Thinking) | N/A (asosiy agent) | Eng kuchli mantiq + chuqur fikrlash + kod sintezi |
+| ZAHAR-ORKESTRATOR | Rejalash, taqsimlash, verifikatsiya, arxitektura qarorlari | Gemini 3.8 Flash (High) | N/A (asosiy agent) | Tezkor agentik orkestratsiya, past latency, optimal token sarfi |
 | ZAHAR-STRATEGY | Mahsulot strategiyasi, RICE, retention funnel, monetizatsiya | Gemini 3.1 Pro | 'pro' | Chuqur strategik va bozor tahlili uchun kuchli mantiq |
 | ZAHAR-SHIELD | Payme/Click webhook xavfsizligi, anti-fraud, SMS rate-limit, JWT | Gemini 3.1 Pro | 'pro' | Xavfsizlik auditi va adversarial tafakkur uchun pro-tier |
 | ZAHAR-DB | Migratsiya review, destructive SQL guard, RLS siyosat | Gemini 3.1 Pro | 'pro' | Ma'lumotlar bazasi sxemasi chuqur fikrlash talab qiladi |

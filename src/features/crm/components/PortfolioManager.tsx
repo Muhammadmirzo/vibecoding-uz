@@ -19,7 +19,7 @@ import {
 import { PORTFOLIO_DATA, type PortfolioItem } from "@/features/portfolio/portfolioData";
 import { portfolioSchema, PORTFOLIO_CATEGORIES } from "@/lib/validations/portfolio";
 import {
-  getWebsiteScreenshotUrl,
+  fetchOgImage,
   resolvePortfolioImageUrl,
 } from "@/features/portfolio/portfolioUtils";
 
@@ -76,7 +76,7 @@ export function PortfolioManager() {
       domain: "",
       category: "Startup MVP",
       description: "",
-      imageUrl: getWebsiteScreenshotUrl("https://edubaza.uz"),
+      imageUrl: "",
       userCount: "",
       badgeText: "Shu metod bilan qurilgan",
       isFeatured: true,
@@ -551,29 +551,31 @@ export function PortfolioManager() {
 
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="block font-semibold text-ink">Rasm Havolasi (Image URL) *</label>
+                  <label className="block font-semibold text-ink">Rasm Havolasi (Image URL)</label>
                   <button
                     type="button"
-                    onClick={() => {
+                    onClick={async () => {
                       if (formData.url && formData.url !== "https://") {
-                        setFormData((prev) => ({
-                          ...prev,
-                          imageUrl: getWebsiteScreenshotUrl(prev.url),
-                        }));
+                        const og = await fetchOgImage(formData.url);
+                        if (og) {
+                          setFormData((prev) => ({ ...prev, imageUrl: og }));
+                          showToast("Saytdan rasm topildi!");
+                        } else {
+                          showToast("Saytdan rasm topilmadi (standart ko'rinish ishlatiladi)");
+                        }
                       }
                     }}
                     className="inline-flex items-center gap-1 text-xs font-semibold text-accent hover:underline cursor-pointer"
                   >
                     <Camera className="w-3.5 h-3.5" />
-                    <span>Saytdan skrinshot olish</span>
+                    <span>Saytdan rasm olish (OG)</span>
                   </button>
                 </div>
                 <input
                   type="text"
-                  required
                   value={formData.imageUrl}
                   onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-                  placeholder="https://s.wordpress.com/mshots/v1/https%3A%2F%2Fedubaza.uz?w=1200&h=750"
+                  placeholder="Bo'sh qoldirilsa, avtomatik standart dizayn ko'rsatiladi"
                   className="w-full px-3.5 py-2 bg-cream-warm border border-border rounded-lg font-mono text-xs focus:outline-none focus:ring-2 focus:ring-accent"
                 />
                 {formData.imageUrl && (
@@ -582,8 +584,8 @@ export function PortfolioManager() {
                       src={formData.imageUrl}
                       alt="Preview"
                       className="w-full h-full object-cover object-top"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = getWebsiteScreenshotUrl(formData.url);
+                      onError={() => {
+                        setFormData((prev) => ({ ...prev, imageUrl: "" }));
                       }}
                     />
                   </div>

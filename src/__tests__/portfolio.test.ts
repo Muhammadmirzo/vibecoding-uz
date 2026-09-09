@@ -2,13 +2,13 @@ import { describe, it, expect } from "vitest";
 import { portfolioSchema } from "@/lib/validations/portfolio";
 import { PORTFOLIO_DATA } from "@/features/portfolio/portfolioData";
 import {
-  getWebsiteScreenshotUrl,
   resolvePortfolioImageUrl,
+  generatePlaceholderSvg,
 } from "@/features/portfolio/portfolioUtils";
 
 describe("Portfolio Module Tests", () => {
   describe("Zod Portfolio Validation Schema", () => {
-    it("should validate a correct portfolio object", () => {
+    it("should validate a correct portfolio object with imageUrl", () => {
       const validData = {
         title: "EduBaza",
         slug: "edubaza",
@@ -16,7 +16,7 @@ describe("Portfolio Module Tests", () => {
         domain: "edubaza.uz",
         category: "EdTech",
         description: "O'qituvchilar uchun platforma",
-        imageUrl: "https://s.wordpress.com/mshots/v1/https%3A%2F%2Fedubaza.uz?w=1200&h=750",
+        imageUrl: "https://edubaza.uz/og-image.png",
         userCount: "27 000+ o'qituvchi foydalanadi",
         badgeText: "Shu metod bilan qurilgan",
         isFeatured: true,
@@ -31,6 +31,23 @@ describe("Portfolio Module Tests", () => {
       }
     });
 
+    it("should allow empty imageUrl and default to empty string", () => {
+      const validWithoutImage = {
+        title: "Chatla",
+        slug: "chatla",
+        url: "https://chatla.uz",
+        domain: "chatla.uz",
+        category: "B2B SaaS",
+        description: "AI bot xizmati",
+      };
+
+      const result = portfolioSchema.safeParse(validWithoutImage);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.imageUrl).toBe("");
+      }
+    });
+
     it("should fail validation for invalid category enum", () => {
       const invalidData = {
         title: "EduBaza",
@@ -39,7 +56,6 @@ describe("Portfolio Module Tests", () => {
         domain: "edubaza.uz",
         category: "InvalidCategory",
         description: "O'qituvchilar uchun platforma",
-        imageUrl: "https://s.wordpress.com/mshots/v1/https%3A%2F%2Fedubaza.uz?w=1200&h=750",
       };
 
       const result = portfolioSchema.safeParse(invalidData);
@@ -54,7 +70,6 @@ describe("Portfolio Module Tests", () => {
         domain: "edubaza.uz",
         category: "EdTech",
         description: "O'qituvchilar uchun platforma",
-        imageUrl: "https://s.wordpress.com/mshots/v1/https%3A%2F%2Fedubaza.uz?w=1200&h=750",
       };
 
       const result = portfolioSchema.safeParse(invalidData);
@@ -62,28 +77,34 @@ describe("Portfolio Module Tests", () => {
     });
   });
 
-  describe("Portfolio Screenshot Utilities", () => {
-    it("should generate a valid WordPress mshots URL", () => {
-      const url = getWebsiteScreenshotUrl("https://edubaza.uz");
-      expect(url).toContain("https://s.wordpress.com/mshots/v1/");
-      expect(url).toContain(encodeURIComponent("https://edubaza.uz"));
-    });
-
-    it("should resolve missing/illustration imageUrl to website screenshot URL", () => {
-      const resolved = resolvePortfolioImageUrl({
-        url: "https://edubaza.uz",
-        imageUrl: "/illustrations/founder/edubaza.webp",
-      });
-      expect(resolved).toContain("s.wordpress.com/mshots/v1/");
-    });
-
-    it("should preserve custom valid HTTP image URL", () => {
-      const customUrl = "https://images.unsplash.com/photo-1555066931";
+  describe("Portfolio Image & Fallback Utilities", () => {
+    it("should resolve valid external HTTP image URL as-is", () => {
+      const customUrl = "https://edubaza.uz/static/og-banner.jpg";
       const resolved = resolvePortfolioImageUrl({
         url: "https://edubaza.uz",
         imageUrl: customUrl,
       });
       expect(resolved).toBe(customUrl);
+    });
+
+    it("should resolve empty or local illustration imageUrl to empty string (triggering fallback mockup)", () => {
+      const resolvedEmpty = resolvePortfolioImageUrl({
+        url: "https://edubaza.uz",
+        imageUrl: "",
+      });
+      expect(resolvedEmpty).toBe("");
+
+      const resolvedLocal = resolvePortfolioImageUrl({
+        url: "https://edubaza.uz",
+        imageUrl: "/illustrations/founder/edubaza.webp",
+      });
+      expect(resolvedLocal).toBe("");
+    });
+
+    it("should generate a valid SVG data URI placeholder", () => {
+      const svgUri = generatePlaceholderSvg("EduBaza", "edubaza.uz");
+      expect(svgUri).toContain("data:image/svg+xml");
+      expect(svgUri).toContain("edubaza.uz");
     });
   });
 
@@ -98,8 +119,7 @@ describe("Portfolio Module Tests", () => {
         expect(item.title).toBeDefined();
         expect(item.domain).toBeDefined();
         expect(item.url).toBeDefined();
-        expect(item.imageUrl).toBeDefined();
-        expect(item.imageUrl).toContain("s.wordpress.com/mshots/v1/");
+        expect(item.category).toBeDefined();
       });
     });
   });

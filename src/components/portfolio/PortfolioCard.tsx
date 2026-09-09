@@ -4,8 +4,8 @@ import * as React from "react";
 import { Lock, ArrowUpRight, Hammer, Globe, Sparkles } from "lucide-react";
 import type { PortfolioItem } from "@/features/portfolio/portfolioData";
 import {
-  getWebsiteScreenshotUrl,
   resolvePortfolioImageUrl,
+  generatePlaceholderSvg,
 } from "@/features/portfolio/portfolioUtils";
 
 interface PortfolioCardProps {
@@ -20,25 +20,16 @@ export function PortfolioCard({
   className = "",
 }: PortfolioCardProps) {
   const isDark = variant === "dark";
-  const [imgSrc, setImgSrc] = React.useState<string>(() =>
-    resolvePortfolioImageUrl(item)
-  );
-  const [hasError, setHasError] = React.useState<boolean>(false);
+  const resolvedSrc = resolvePortfolioImageUrl(item);
+  const hasImage = resolvedSrc !== "";
+  const [imgError, setImgError] = React.useState(false);
 
-  // Sync image source if item changes
+  // Reset error state when item changes
   React.useEffect(() => {
-    setImgSrc(resolvePortfolioImageUrl(item));
-    setHasError(false);
-  }, [item]);
+    setImgError(false);
+  }, [item.id, item.imageUrl]);
 
-  const handleImageError = () => {
-    const fallbackScreenshot = getWebsiteScreenshotUrl(item.url);
-    if (imgSrc !== fallbackScreenshot && fallbackScreenshot !== "") {
-      setImgSrc(fallbackScreenshot);
-    } else {
-      setHasError(true);
-    }
-  };
+  const showFallback = !hasImage || imgError;
 
   return (
     <a
@@ -89,16 +80,16 @@ export function PortfolioCard({
           isDark ? "bg-white/[0.03]" : "bg-cream-deep"
         }`}
       >
-        {!hasError && imgSrc ? (
+        {!showFallback ? (
           <img
-            src={imgSrc}
+            src={resolvedSrc}
             alt={item.title}
             loading="lazy"
-            onError={handleImageError}
-            className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-104"
+            onError={() => setImgError(true)}
+            className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.04]"
           />
         ) : (
-          /* High-Tech Fallback Mockup View */
+          /* High-Tech Fallback Mockup — zero network requests */
           <div className="w-full h-full p-6 flex flex-col justify-between bg-gradient-to-br from-ink/90 via-ink to-ink/95 text-white relative">
             <div className="flex items-center justify-between">
               <span className="px-2.5 py-1 rounded-full bg-accent/20 border border-accent/40 text-accent text-xs font-mono flex items-center gap-1">

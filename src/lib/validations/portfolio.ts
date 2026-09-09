@@ -17,7 +17,7 @@ export const rawPortfolioSchema = z.object({
   domain: z.string().min(3, "Domen nomi kiritilishi shart"),
   category: z.enum(PORTFOLIO_CATEGORIES),
   description: z.string().min(5, "Tavsif kiritilishi shart"),
-  imageUrl: z.string().min(1, "Rasm havolasi ko'rsatilishi shart"),
+  imageUrl: z.string().default(""),
   userCount: z.string().optional().nullable(),
   badgeText: z.string(),
   isFeatured: z.boolean(),

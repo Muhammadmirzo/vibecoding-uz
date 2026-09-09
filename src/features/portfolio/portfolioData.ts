@@ -1,5 +1,3 @@
-import { getWebsiteScreenshotUrl } from "./portfolioUtils";
-
 export interface PortfolioItem {
   id: string;
   slug: string;
@@ -15,6 +13,12 @@ export interface PortfolioItem {
   sortOrder: number;
 }
 
+/**
+ * Static portfolio seed data.
+ * imageUrl is empty for items that don't have a pre-fetched OG image yet.
+ * The PortfolioCard component will show a high-tech fallback mockup for empty imageUrl.
+ * Admin panel users can click "OG rasm olish" to auto-fetch the og:image from the site.
+ */
 export const PORTFOLIO_DATA: PortfolioItem[] = [
   {
     id: "edubaza",
@@ -24,7 +28,7 @@ export const PORTFOLIO_DATA: PortfolioItem[] = [
     domain: "edubaza.uz",
     category: "EdTech",
     description: "O'qituvchilar uchun interaktiv ta'lim resurslari va dars ishlanmalari platformasi.",
-    imageUrl: getWebsiteScreenshotUrl("https://edubaza.uz"),
+    imageUrl: "",
     userCount: "27 000+ o'qituvchi foydalanadi",
     badgeText: "Shu metod bilan qurilgan",
     isFeatured: true,
@@ -38,7 +42,7 @@ export const PORTFOLIO_DATA: PortfolioItem[] = [
     domain: "chatla.uz",
     category: "B2B SaaS",
     description: "Instagram va Telegram bizneslari uchun mijozlar savollariga avtomatik javob beruvchi sun'iy intellekt xizmati.",
-    imageUrl: getWebsiteScreenshotUrl("https://chatla.uz"),
+    imageUrl: "",
     userCount: "500+ biznes foydalanadi",
     badgeText: "Shu metod bilan qurilgan",
     isFeatured: true,
@@ -52,7 +56,7 @@ export const PORTFOLIO_DATA: PortfolioItem[] = [
     domain: "imkonday.uz",
     category: "Startup MVP",
     description: "Startaplarni investorlar va venchur fondlar bilan bog'laydigan har oylik pitch platformasi.",
-    imageUrl: getWebsiteScreenshotUrl("https://imkonday.uz"),
+    imageUrl: "",
     userCount: "30+ loyiha pitch qildi",
     badgeText: "Shu metod bilan qurilgan",
     isFeatured: true,
@@ -66,7 +70,7 @@ export const PORTFOLIO_DATA: PortfolioItem[] = [
     domain: "t.me/edubazabot",
     category: "AI Bot",
     description: "Pedagoglar uchun tezkor metodik yordamchi va hujjat generatsiyasi boti.",
-    imageUrl: getWebsiteScreenshotUrl("https://edubaza.uz"),
+    imageUrl: "",
     userCount: "15 000+ faol foydalanuvchi",
     badgeText: "Shu metod bilan qurilgan",
     isFeatured: true,
@@ -80,7 +84,7 @@ export const PORTFOLIO_DATA: PortfolioItem[] = [
     domain: "viberesume.uz",
     category: "B2B SaaS",
     description: "Nomzodlar uchun sun'iy intellekt yordamida rezume va portfolio yaratuvchi tezkor platforma.",
-    imageUrl: getWebsiteScreenshotUrl("https://viberesume.uz"),
+    imageUrl: "",
     userCount: "1 200+ rezume yaratildi",
     badgeText: "Talabalarimiz loyihasi",
     isFeatured: true,
@@ -94,7 +98,7 @@ export const PORTFOLIO_DATA: PortfolioItem[] = [
     domain: "fastform.uz",
     category: "Startup MVP",
     description: "Telegram bot va saytlar uchun 1 daqiqada aqlli forma generatori.",
-    imageUrl: getWebsiteScreenshotUrl("https://fastform.uz"),
+    imageUrl: "",
     userCount: "350+ shakl to'ldirildi",
     badgeText: "Talabalarimiz loyihasi",
     isFeatured: true,
@@ -108,7 +112,7 @@ export const PORTFOLIO_DATA: PortfolioItem[] = [
     domain: "legalbot.uz",
     category: "AI Bot",
     description: "Kichik biznes egalari uchun shartnoma va huquqiy konsultatsiyalar bo'yicha AI yordamchisi.",
-    imageUrl: getWebsiteScreenshotUrl("https://legalbot.uz"),
+    imageUrl: "",
     userCount: "800+ konsultatsiya",
     badgeText: "Talabalarimiz loyihasi",
     isFeatured: false,
@@ -122,7 +126,7 @@ export const PORTFOLIO_DATA: PortfolioItem[] = [
     domain: "shopspeed.uz",
     category: "B2B SaaS",
     description: "E-commerce do'konlar uchun mahsulot tavsiflarini avtomatik generatsiya qiluvchi tizim.",
-    imageUrl: getWebsiteScreenshotUrl("https://shopspeed.uz"),
+    imageUrl: "",
     userCount: "120+ do'kon ulangan",
     badgeText: "Talabalarimiz loyihasi",
     isFeatured: false,
