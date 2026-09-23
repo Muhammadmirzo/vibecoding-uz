@@ -91,3 +91,8 @@ Restore branch tayyor bo'lgach, PR orqali `main` ga qaytariladi — to'g'ridan-t
 - ProofStats/Hero/page/siteConfig: soxta raqamlar o'chirildi, Clash Nexus (https://clash-nexus.vercel.app/) jonli isbot.
 - Test: tsc 0, grep clean, vitest 17/17, build 0.
 - Qoldiq: narx/kafolat/sana qiymatlari egasi tasdig'ini kutmoqda (TODO olib tashlangan, qiymatlar o'zgarmagan).
+
+## 2026-09-23 — Pricing: 550 000 so'm
+- siteConfig.courses ikkalasi 550 000; CourseCards/kurs sahifa siteConfig'dan o'qiydi; teng narxda chegirma chizig'i chiqmaydi.
+- Test: tsc 0, vitest 25/25 (pricing 8 + telegram 7 + free-lesson 10), build 0.
+- Narxni o'zgartirish: src/lib/siteConfig.ts -> courses (izoh bor) -> build -> push.
