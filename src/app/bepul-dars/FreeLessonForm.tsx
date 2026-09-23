@@ -3,16 +3,81 @@
 import * as React from "react";
 import { ArrowRight, CheckCircle2, Loader2, BookOpen, Send } from "lucide-react";
 
+type ApiErrorBody = {
+  error?: string;
+  details?: { fieldErrors?: Record<string, string[]> };
+};
+
 export function FreeLessonForm() {
   const [name, setName] = React.useState("");
-  const [phone, setPhone] = React.useState("+998");
+  const [phone, setPhone] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const [submitted, setSubmitted] = React.useState(false);
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
 
+  const formatPhoneMask = (value: string): string => {
+    const digits = value.replace(/\D/g, "");
+    const localDigits = digits.startsWith("998") ? digits.slice(3) : digits;
+    const limited = localDigits.slice(0, 9);
+    let formatted = "+998";
+    if (limited.length > 0) formatted += " " + limited.slice(0, 2);
+    if (limited.length > 2) formatted += " " + limited.slice(2, 5);
+    if (limited.length > 5) formatted += "-" + limited.slice(5, 7);
+    if (limited.length > 7) formatted += "-" + limited.slice(7, 9);
+    return formatted;
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (errorMsg) setErrorMsg(null);
+    const raw = e.target.value;
+    if (raw.trimStart().startsWith("@")) {
+      setPhone(raw.replace(/\s/g, "").slice(0, 33));
+      return;
+    }
+    if (raw.trim() === "") {
+      setPhone("");
+      return;
+    }
+    setPhone(formatPhoneMask(raw));
+  };
+
+  const trimmedName = name.trim();
+  const trimmedPhone = phone.trim();
+  const isUsername = trimmedPhone.startsWith("@");
+  const phoneDigits = trimmedPhone.replace(/\D/g, "");
+  const isPhoneValid =
+    !isUsername && phoneDigits.length === 12 && phoneDigits.startsWith("998");
+  const isUsernameValid = isUsername && trimmedPhone.length >= 4;
+  const isContactValid = isPhoneValid || isUsernameValid;
+  const isFormValid = trimmedName.length >= 2 && isContactValid;
+
+  const phoneHint = isUsername
+    ? isUsernameValid ? "Telegram username qabul qilinadi." : "Telegram username kiriting: @ dan keyin kamida 3 belgi."
+    : phoneDigits.length === 0 ? "+998 XX XXX-XX-XX formatda yoki @username kiriting."
+    : isPhoneValid ? "Raqam to'g'ri formatda." : `To'liq kiriting: +998 XX XXX-XX-XX (${phoneDigits.length}/12 raqam).`;
+
+  const firstFieldError = (body: ApiErrorBody | null): string | null => {
+    const fieldErrors = body?.details?.fieldErrors;
+    if (!fieldErrors) return null;
+    for (const messages of Object.values(fieldErrors)) {
+      if (messages && messages.length > 0 && messages[0]) return messages[0];
+    }
+    return null;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
+    if (!isFormValid || loading) {
+      if (trimmedName.length < 2) {
+        setErrorMsg("Ismingizni kiriting (kamida 2 belgi).");
+      } else if (!isContactValid) {
+        setErrorMsg(
+          "Telefon raqamni to'liq kiriting (+998 XX XXX-XX-XX) yoki Telegram username (@username)."
+        );
+      }
+      return;
+    }
     setLoading(true);
 
     try {
@@ -27,11 +92,22 @@ export function FreeLessonForm() {
       });
 
       if (!res.ok) {
-        const data = await res.json();
+        let data: ApiErrorBody | null = null;
+        try {
+          data = (await res.json()) as ApiErrorBody;
+        } catch {
+          data = null;
+        }
         if (res.status === 429) {
-          setErrorMsg(data.error || "Juda ko'p urinish joylandi. Birozdan so'ng qayta urinib ko'ring.");
+          setErrorMsg(data?.error || "Juda ko'p urinish joylandi. Birozdan so'ng qayta urinib ko'ring.");
+        } else if (res.status === 400) {
+          setErrorMsg(
+            firstFieldError(data) ||
+              data?.error ||
+              "Ma'lumotlarni tekshirib, qayta urinib ko'ring."
+          );
         } else {
-          setErrorMsg(data.error || "Xatolik yuz berdi");
+          setErrorMsg(data?.error || "Xatolik yuz berdi");
         }
       } else {
         setSubmitted(true);
@@ -102,44 +178,54 @@ export function FreeLessonForm() {
           </div>
 
           {errorMsg && (
-            <div className="p-3 rounded-[var(--radius-md)] bg-red-500/10 border border-red-500/30 text-xs font-semibold text-red-600 dark:text-red-400">
+            <div role="alert" className="p-3 rounded-[var(--radius-md)] bg-red-500/10 border border-red-500/30 text-xs font-semibold text-red-600 dark:text-red-400">
               {errorMsg}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4" aria-label="Bepul dars uchun ro'yxatdan o'tish shakli">
             <div>
-              <label className="block text-xs font-mono font-bold text-[var(--color-ink)] mb-1 uppercase">
+              <label htmlFor="free-lesson-name" className="block text-xs font-mono font-bold text-[var(--color-ink)] mb-1 uppercase">
                 Ismingiz
               </label>
               <input
+                id="free-lesson-name"
                 type="text"
                 required
+                minLength={2}
                 placeholder="Ismingizni kiriting"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                aria-invalid={trimmedName.length > 0 && trimmedName.length < 2}
                 className="w-full h-12 px-4 rounded-[var(--radius-md)] border border-[var(--color-border-strong)] bg-[var(--color-cream)] text-[var(--color-ink)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-mono font-bold text-[var(--color-ink)] mb-1 uppercase">
+              <label htmlFor="free-lesson-phone" className="block text-xs font-mono font-bold text-[var(--color-ink)] mb-1 uppercase">
                 Telefon raqam / Telegram
               </label>
               <input
+                id="free-lesson-phone"
                 type="tel"
                 required
-                placeholder="+998 90 123 45 67"
+                placeholder="+998 90 123 45 67 yoki @username"
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                onChange={handlePhoneChange}
+                aria-invalid={!isContactValid}
+                aria-describedby="free-lesson-phone-hint"
                 className="w-full h-12 px-4 rounded-[var(--radius-md)] border border-[var(--color-border-strong)] bg-[var(--color-cream)] text-[var(--color-ink)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
               />
+              <p id="free-lesson-phone-hint" className="mt-1.5 text-xs text-[var(--color-ink-muted)]">
+                {phoneHint}
+              </p>
             </div>
 
             <button
               type="submit"
-              disabled={loading}
-              className="btn-primary h-13 px-8 rounded-[var(--radius-md)] text-sm font-semibold inline-flex items-center justify-center gap-2 w-full disabled:opacity-50"
+              disabled={loading || !isFormValid}
+              aria-label="Bepul darsni ko'rishni boshlash"
+              className="btn-primary h-12 min-h-[48px] px-8 rounded-[var(--radius-md)] text-sm font-semibold inline-flex items-center justify-center gap-2 w-full whitespace-nowrap active:scale-[0.98] transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <>
