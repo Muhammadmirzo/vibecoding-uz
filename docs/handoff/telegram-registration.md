@@ -78,3 +78,11 @@ Restore branch tayyor bo'lgach, PR orqali `main` ga qaytariladi — to'g'ridan-t
 - Button `h-13` (Tailwind'da yo'q → yupqa) → `h-12 min-h-48`.
 - Telefon `+998` yarim holatda 400 "saqlanmadi" berardi → maska + client validatsiya + serverda aniq 400 xabarlar (ism/phone/telegram).
 - Test: free-lesson-lead 10/10, telegram-auth 7/7, tsc 0, build 0.
+
+## 2026-09-23 — Honest Trust Slice 1 (commit 4140e17, branch feat/honest-trust-slice1)
+
+- Quiz: "9 savol" yolg'on → QUIZ_QUESTIONS.length (5), diagnostika + hero.
+- OtpForm: (Demo kod: 123456) o'chirildi; h-13 → h-12 min-h-48.
+- kurs/[slug]: h-13 → h-12 min-h-48.
+- Test: tsc 0, grep (h-13/9 savol/demo) clean, vitest 17/17, build 0.
+- Rollback tag: pre-honest-slice1-20260923.
