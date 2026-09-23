@@ -7,7 +7,9 @@ import { ShieldCheck, Lock, Mail, ArrowRight, Loader2, AlertCircle } from "lucid
 function AdminLoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTarget = searchParams.get("redirect") || "/admin";
+  const rawRedirect = searchParams.get("redirect") || "/admin";
+  const redirectTarget =
+    rawRedirect.startsWith("/") && !rawRedirect.startsWith("//") ? rawRedirect : "/admin";
 
   const [loginInput, setLoginInput] = useState("");
   const [password, setPassword] = useState("");
