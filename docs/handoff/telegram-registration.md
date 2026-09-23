@@ -96,3 +96,10 @@ Restore branch tayyor bo'lgach, PR orqali `main` ga qaytariladi — to'g'ridan-t
 - siteConfig.courses ikkalasi 550 000; CourseCards/kurs sahifa siteConfig'dan o'qiydi; teng narxda chegirma chizig'i chiqmaydi.
 - Test: tsc 0, vitest 25/25 (pricing 8 + telegram 7 + free-lesson 10), build 0.
 - Narxni o'zgartirish: src/lib/siteConfig.ts -> courses (izoh bor) -> build -> push.
+
+## 2026-09-23 — Admin kirish (backdoor o'chirildi)
+- login/route.ts: hardcoded Admin2026Secure!/hash o'chirildi, error detail leak yopildi.
+- scripts/create-admin.ts (npm run admin:create): ADMIN_PHONE/ADMIN_EMAIL/ADMIN_PASSWORD env → superadmin.
+- admin/login: redirect faqat ichki / path.
+- Test: tsc 0, vitest 25/25, build 0.
+- E'tibor: bu mashinadan Supabase pooler "tenant/user not found" berdi (local .env) — provision ishchi env'da bajariladi.
