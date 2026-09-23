@@ -6,6 +6,7 @@ import { useAuth } from "@/context/AuthContext";
 import { LoginForm } from "./LoginForm";
 import { OtpForm } from "./OtpForm";
 import { X, Sparkles, CheckCircle2, AlertCircle } from "lucide-react";
+import { TelegramLoginButton } from "./TelegramLoginButton";
 
 export function AuthModal() {
   const { isAuthModalOpen, closeAuthModal, authStep, toastMessage, toastType } = useAuth();
@@ -63,6 +64,18 @@ export function AuthModal() {
 
           {/* Form Content */}
           {authStep === "login" ? <LoginForm /> : <OtpForm />}
+
+          {/* Telegram alternative */}
+          <div className="mt-5" aria-label="Muqobil kirish usuli">
+            <div className="flex items-center gap-3" aria-hidden="true">
+              <span className="h-px flex-1 bg-border" />
+              <span className="text-xs font-medium text-ink-subtle">yoki</span>
+              <span className="h-px flex-1 bg-border" />
+            </div>
+            <div className="mt-3">
+              <TelegramLoginButton />
+            </div>
+          </div>
 
           <div className="mt-4 pt-4 border-t border-[var(--color-border)] text-center">
             <a

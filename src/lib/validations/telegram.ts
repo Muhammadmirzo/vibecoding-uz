@@ -30,6 +30,18 @@ export const meetReminderSchema = z.object({
   meetingUrl: z.string().url({ message: "Havola formati noto'g'ri" }).optional().nullable(),
 });
 
+export const telegramAuthSchema = z.object({
+  id: z.union([z.number(), z.string()]),
+  first_name: z.string().min(1),
+  last_name: z.string().optional(),
+  username: z.string().optional(),
+  photo_url: z.string().url().optional(),
+  auth_date: z.union([z.number(), z.string()]),
+  hash: z.string().min(1),
+});
+
+export type TelegramAuthInput = z.infer<typeof telegramAuthSchema>;
+
 export type TgAuthLinkInput = z.infer<typeof tgAuthLinkSchema>;
 export type OperatorHandoffInput = z.infer<typeof operatorHandoffSchema>;
 export type HomeworkAlertInput = z.infer<typeof homeworkAlertSchema>;

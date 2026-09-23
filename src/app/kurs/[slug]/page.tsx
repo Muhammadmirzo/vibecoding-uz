@@ -154,9 +154,11 @@ export default async function CourseDetailPage({ params }: Props) {
           {/* Pricing & Checkout Card */}
           <div className="sticky top-24 bg-[var(--color-cream-warm)] border-2 border-[var(--color-accent)] rounded-[var(--radius-xl)] p-7 space-y-6 shadow-[var(--shadow-lg)]">
             <div className="space-y-1">
-              <div className="text-xs font-mono font-bold text-[var(--color-ink-subtle)] line-through">
-                {course.oldPrice}
-              </div>
+              {course.oldPrice !== course.price && (
+                <div className="text-xs font-mono font-bold text-[var(--color-ink-subtle)] line-through">
+                  {course.oldPrice}
+                </div>
+              )}
               <div className="text-3xl font-extrabold text-[var(--color-ink)]">
                 {course.price}
               </div>
@@ -188,7 +190,7 @@ export default async function CourseDetailPage({ params }: Props) {
 
             <div className="space-y-3 pt-2">
               <a href="https://t.me/m/ODAfK_QIMjky" target="_blank" rel="noreferrer" className="block">
-                <button className="btn-primary h-13 px-6 rounded-[var(--radius-md)] text-sm font-semibold inline-flex items-center justify-center gap-2 w-full">
+                <button className="btn-primary h-12 min-h-[48px] px-6 rounded-[var(--radius-md)] text-sm font-semibold inline-flex items-center justify-center gap-2 w-full whitespace-nowrap active:scale-[0.98] transition-transform">
                   Joyni band qilish (Telegram)
                   <ArrowRight className="w-4 h-4" />
                 </button>

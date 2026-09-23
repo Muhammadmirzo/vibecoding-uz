@@ -39,54 +39,6 @@ export async function POST(request: Request) {
       .limit(1);
     let user = userList[0];
 
-    // Fallback for default superadmin account
-    const isSuperAdminAlias =
-      inputVal.toLowerCase() === "admin@mirzo.uz" ||
-      inputVal.toLowerCase() === "admin@academy.mirzo.uz" ||
-      normalizedPhone === "+998901234567";
-
-    const DEFAULT_ADMIN_HASH =
-      "3305c28d0b9f22a45f6a004f4d9148ed:a2611d2791663629a6e82464b758601af65fd6294f9cc40c53c46ff7f2c0156684d4c9dabae447943c341324c84c3ee61b1880da36bff383d8ee2dbbacaedc8d";
-
-    if (isSuperAdminAlias && password === "Admin2026Secure!") {
-      if (!user) {
-        const phoneAdminList = await db
-          .select()
-          .from(users)
-          .where(eq(users.phone, "+998901234567"))
-          .limit(1);
-
-        if (phoneAdminList[0]) {
-          user = phoneAdminList[0];
-          await db
-            .update(users)
-            .set({ passwordHash: DEFAULT_ADMIN_HASH, role: "superadmin" })
-            .where(eq(users.id, user.id));
-          user.passwordHash = DEFAULT_ADMIN_HASH;
-          user.role = "superadmin";
-        } else {
-          const [newUser] = await db
-            .insert(users)
-            .values({
-              phone: "+998901234567",
-              email: "admin@mirzo.uz",
-              fullName: "Super Admin",
-              role: "superadmin",
-              passwordHash: DEFAULT_ADMIN_HASH,
-            })
-            .returning();
-          user = newUser;
-        }
-      } else {
-        await db
-          .update(users)
-          .set({ passwordHash: DEFAULT_ADMIN_HASH, role: "superadmin" })
-          .where(eq(users.id, user.id));
-        user.passwordHash = DEFAULT_ADMIN_HASH;
-        user.role = "superadmin";
-      }
-    }
-
     if (!user || !user.passwordHash) {
       return NextResponse.json({ error: "Telefon raqam, email yoki parol noto'g'ri" }, { status: 401 });
     }
@@ -156,12 +108,11 @@ export async function POST(request: Request) {
     response.headers.set("Set-Cookie", cookieHeader);
 
     return response;
-  } catch (error: any) {
+  } catch (error) {
     console.error("Login error:", error);
     return NextResponse.json(
       {
         error: "Tizimda xatolik yuz berdi. Qaytadan urinib ko'ring.",
-        detail: error instanceof Error ? error.message : String(error),
       },
       { status: 500 }
     );

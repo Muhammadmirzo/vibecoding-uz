@@ -25,28 +25,30 @@ export const siteConfigSchema = z.object({
 export type SiteConfig = z.infer<typeof siteConfigSchema>;
 
 export const siteConfig: SiteConfig = siteConfigSchema.parse({
-  nextCohortDate: "15-Oktyabr, 2026", // TODO(mirzo): real qiymatni tasdiqlang
-  nextCohortShortDate: "15-Oktyabr", // TODO(mirzo): real qiymatni tasdiqlang
-  guaranteeDays: 7, // TODO(mirzo): real qiymatni tasdiqlang
-  guaranteeText: "7 kunlik 100% pul qaytarish kafolati", // TODO(mirzo): real qiymatni tasdiqlang
-  sessionFormat: "8 haftalik jonli sessiyalar va yozuvlar", // TODO(mirzo): real qiymatni tasdiqlang
+  nextCohortDate: "15-Oktyabr, 2026",
+  nextCohortShortDate: "15-Oktyabr",
+  guaranteeDays: 7,
+  guaranteeText: "7 kunlik 100% pul qaytarish kafolati",
+  sessionFormat: "8 haftalik jonli sessiyalar va yozuvlar",
+  // Fakt: 1 jonli loyiha (Clash Nexus). Talaba soni birinchi guruhdan keyin yangilanadi.
   stats: {
-    studentsCount: "250+", // TODO(mirzo): real qiymatni tasdiqlang
-    yearsExperience: 7, // TODO(mirzo): real qiymatni tasdiqlang
-    yearsExperienceLabel: "7 yil", // TODO(mirzo): real qiymatni tasdiqlang
-    liveStartupsCount: "3", // TODO(mirzo): real qiymatni tasdiqlang
-    projectsCount: "100+", // TODO(mirzo): real qiymatni tasdiqlang
+    studentsCount: "Birinchi guruh",
+    yearsExperience: 0,
+    yearsExperienceLabel: "Yangi",
+    liveStartupsCount: "1",
+    projectsCount: "1",
   },
+  // NARXLAR — egasi shu yerdan o'zgartiradi: price (asosiy), oldPrice (price bilan teng bo'lsa chegirma ko'rinmaydi; katta yozilsa usti chizilgan eski narx chiqadi), installment (bo'lib to'lash matni). O'zgartirgach: npm run build && git push.
   courses: {
     "vibe-coding-express": {
-      price: "2 990 000 so'm", // TODO(mirzo): real qiymatni tasdiqlang
-      oldPrice: "3 990 000 so'm", // TODO(mirzo): real qiymatni tasdiqlang
-      installment: "996 000 so'm / oyiga (3 oy)", // TODO(mirzo): real qiymatni tasdiqlang
+      price: "550 000 so'm",
+      oldPrice: "550 000 so'm",
+      installment: "183 334 so'm / oyiga (3 oy)",
     },
     "ai-asoslari": {
-      price: "990 000 so'm", // TODO(mirzo): real qiymatni tasdiqlang
-      oldPrice: "1 490 000 so'm", // TODO(mirzo): real qiymatni tasdiqlang
-      installment: "495 000 so'm / oyiga (2 oy)", // TODO(mirzo): real qiymatni tasdiqlang
+      price: "550 000 so'm",
+      oldPrice: "550 000 so'm",
+      installment: "275 000 so'm / oyiga (2 oy)",
     },
   },
 });
