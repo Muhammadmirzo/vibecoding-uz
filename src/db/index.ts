@@ -18,6 +18,20 @@ const client = postgres(connectionString, {
 
 export const db = drizzle(client, { schema });
 
+type DatabaseTransaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
+
+function getErrorDetails(error: unknown): { code: unknown; message: string } {
+  if (typeof error !== "object" || error === null) {
+    return { code: undefined, message: "" };
+  }
+
+  const candidate = error as { code?: unknown; message?: unknown };
+  return {
+    code: candidate.code,
+    message: typeof candidate.message === "string" ? candidate.message : "",
+  };
+}
+
 export interface RetryOptions {
   retries?: number;
   delayMs?: number;
@@ -35,14 +49,13 @@ export async function withRetry<T>(
   const delayMs = options.delayMs ?? 100;
   const backoffFactor = options.backoffFactor ?? 2;
 
-  let lastError: any;
+  let lastError: unknown;
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
       return await fn();
-    } catch (err: any) {
+    } catch (err: unknown) {
       lastError = err;
-      const errCode = err?.code;
-      const errMsg = typeof err?.message === "string" ? err.message : "";
+      const { code: errCode, message: errMsg } = getErrorDetails(err);
 
       const isTransient =
         errCode === "40001" || // serialization_failure
@@ -78,7 +91,7 @@ const localLocks = new Set<string>();
  */
 export async function withTransactionLock<T>(
   lockKey: string | number,
-  fn: (tx?: any) => Promise<T>
+  fn: (tx?: DatabaseTransaction | null) => Promise<T>
 ): Promise<T> {
   const strKey = String(lockKey);
 
@@ -101,12 +114,13 @@ export async function withTransactionLock<T>(
           }
           return await fn(tx);
         });
-      } catch (err: any) {
+      } catch (err: unknown) {
         // If DB connection is refused/offline (e.g. unit test environment), run with local in-memory lock
+        const { code, message } = getErrorDetails(err);
         if (
-          err?.code === "ECONNREFUSED" ||
-          err?.code === "ENOTFOUND" ||
-          (typeof err?.message === "string" && err.message.includes("ECONNREFUSED"))
+          code === "ECONNREFUSED" ||
+          code === "ENOTFOUND" ||
+          message.includes("ECONNREFUSED")
         ) {
           return await fn(null);
         }
@@ -126,8 +140,13 @@ export async function checkDbHealth(): Promise<{ status: "healthy" | "unhealthy"
   try {
     await db.execute("SELECT 1");
     return { status: "healthy", latencyMs: Date.now() - start };
-  } catch (err: any) {
-    return { status: "unhealthy", latencyMs: Date.now() - start, error: err?.message || String(err) };
+  } catch (err: unknown) {
+    const { message } = getErrorDetails(err);
+    return {
+      status: "unhealthy",
+      latencyMs: Date.now() - start,
+      error: message || String(err),
+    };
   }
 }
 

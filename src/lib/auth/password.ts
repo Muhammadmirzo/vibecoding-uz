@@ -27,9 +27,15 @@ export function hashOtpCode(code: string): string {
 }
 
 /**
- * Overloaded function: verifies string vs hash OR OtpRecord object.
+ * Verifies a code against its stored hash, or an input code against an OTP record.
  */
-export function verifyOtpCode(codeOrRecord: string | OtpRecord, storedHashOrCode: string, now?: Date): any {
+export function verifyOtpCode(code: string, storedHash: string, now?: Date): boolean;
+export function verifyOtpCode(record: OtpRecord, inputCode: string, now?: Date): OtpVerificationResult;
+export function verifyOtpCode(
+  codeOrRecord: string | OtpRecord,
+  storedHashOrCode: string,
+  now?: Date
+): boolean | OtpVerificationResult {
   if (typeof codeOrRecord === "object" && codeOrRecord !== null) {
     return verifyOtpRecordCode(codeOrRecord, storedHashOrCode, now);
   }

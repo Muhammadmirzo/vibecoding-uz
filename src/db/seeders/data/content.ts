@@ -1,12 +1,9 @@
-export const TESTIMONIALS_DATA = [
-  { body: "Vibe Coding Express kursida 8 haftada o'z startapim uchun to'liq ishlaydigan CRM va bot tizimini qurdim. Dasturchilarga sarflanadigan oylarni va millionlarni tejab qoldim!", rating: 5, status: "approved" },
-  { body: "Cursor IDE va Claude Code bilan ishlashni o'rganib, kompaniyamizdagi ichki vositalarni avtomatlashtirdik. AI Asoslari kursi mutaxassislar uchun juda qimmatli!", rating: 5, status: "approved" },
-];
+export const TESTIMONIALS_DATA: Array<{ body: string; rating: number; status: "approved" }> = [];
 
 export const FAQS_DATA = [
   { question: "Vibe Coding nima va kursda qatnashish uchun dasturlash tajribasi kerakmi?", answer: "Yo'q, dasturlash tajribasi shart emas. Vibe Coding - bu sintaksis yozmasdan AI agentlariga to'g' mezon prompt berib real mahsulotlar yaratish usuli.", category: "Umumiy", sortOrder: 1 },
   { question: "Bo'lib to'lash (Payme / Click) imkoniyati bormi?", answer: "Ha, Payme va Click tizimlari orqali 3 oygacha foizsiz bo'lib to'lash imkoniyati mavjud.", category: "To'lovlar", sortOrder: 2 },
-  { question: "100% pulni qaytarish kafolati qanday ishlaydi?", answer: "Dastlabki 14 kun davomida o'quv kursi ma'qul kelmasa, to'langan summa hech qanday savollarsiz 100% qaytarib beriladi.", category: "Kafolat", sortOrder: 3 },
+  { question: "100% pulni qaytarish kafolati qanday ishlaydi?", answer: "Dastlabki 7 kun davomida o'quv kursi ma'qul kelmasa, to'langan summa hech qanday savollarsiz 100% qaytarib beriladi.", category: "Kafolat", sortOrder: 3 },
   { question: "Kursni muvaffaqiyatli tugatgach sertifikat beriladimi?", answer: "Ha, amaliy topshiriqlarni va yakuniy loyihani muvaffaqiyatli topshirgan barcha o'quvchilarga QR-kodli rasmiy raqamli sertifikat taqdim etiladi.", category: "Sertifikat", sortOrder: 4 },
 ];
 
