@@ -33,7 +33,7 @@ export default function HomePage() {
                   <Users className="w-5 h-5 text-accent" />
                 </div>
                 <span className="text-sm font-semibold text-ink">
-                  {siteConfig.stats.studentsCount} O'quvchi va Bitiruvchilar
+                  Birinchi guruhga yozuv ochiq — natijalar shu yerda e&apos;lon qilinadi
                 </span>
               </div>
 
