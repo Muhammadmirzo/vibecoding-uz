@@ -103,3 +103,11 @@ Restore branch tayyor bo'lgach, PR orqali `main` ga qaytariladi — to'g'ridan-t
 - admin/login: redirect faqat ichki / path.
 - Test: tsc 0, vitest 25/25, build 0.
 - E'tibor: bu mashinadan Supabase pooler "tenant/user not found" berdi (local .env) — provision ishchi env'da bajariladi.
+
+## RELEASE 2026-09-23 (main=df0a46c)
+- Merge: feat/honest-trust-slice1 → main --no-ff (konfliktsiz; yo'lda main 87942e7 ga yurgan edi: portfolio, webhook, schema+20).
+- Gate: tsc 0, vitest 160/161 (1 ma'lum infra flake: hardening/withTransactionLock DNS), build 0.
+- Push: origin main ✅ + main:master ✅.
+- Deploy: ~3 daqiqada live (curl: 550k=1, ClashNexus=1, eski narx=0, 9savol=0, diagnostika "5 savol"=✅, admin/login=200, bepul-dars=200).
+- DB: bizning slice'larda schema o'zgarishi YO'Q (migrate shart emas). Upstream schema+20 (portfolio jadvallari) drizzle/ migrationsiz kelgan — /api/portfolio prod DB'da jadval bo'lmasa 500 berishi mumkin; local .env pooler "tenant not found" (ishchi env'da db:push/migrate kerak).
+- Rollback: pre-release-20260923-2202 tag + merge commit df0a46c ni revert qilish mumkin.
