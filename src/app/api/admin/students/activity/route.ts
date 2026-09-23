@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
       {
         id: "std_01",
         fullName: "Sardorbek Jo'rayev",
-        phone: "+998901234567",
+        phone: null,
         email: "sardor@vibecoding.uz",
         avatarUrl: null,
         cohortId: "cohort_oct_2026",
@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
       {
         id: "std_02",
         fullName: "Nigora Umarova",
-        phone: "+998939876543",
+        phone: null,
         email: "nigora@gmail.com",
         avatarUrl: null,
         cohortId: "cohort_oct_2026",
@@ -78,7 +78,7 @@ export async function GET(request: NextRequest) {
       {
         id: "std_03",
         fullName: "Boburmirzo Karimov",
-        phone: "+998974567890",
+        phone: null,
         email: "bobur@dev.uz",
         avatarUrl: null,
         cohortId: "cohort_sep_2026",
@@ -107,7 +107,7 @@ export async function GET(request: NextRequest) {
       {
         id: "std_04",
         fullName: "Dilnoza Rashidova",
-        phone: "+998912223344",
+        phone: null,
         email: "dilnoza@tech.uz",
         avatarUrl: null,
         cohortId: "cohort_oct_2026",
@@ -136,7 +136,7 @@ export async function GET(request: NextRequest) {
       {
         id: "std_05",
         fullName: "Jasur Ergashxo'jayev",
-        phone: "+998998887766",
+        phone: null,
         email: null,
         avatarUrl: null,
         cohortId: "cohort_oct_2026",
@@ -170,7 +170,7 @@ export async function GET(request: NextRequest) {
       filtered = filtered.filter(
         (s) =>
           s.fullName.toLowerCase().includes(q) ||
-          s.phone.includes(q) ||
+          String(s.phone ?? "").includes(q) ||
           (s.email && s.email.toLowerCase().includes(q))
       );
     }
@@ -201,10 +201,10 @@ export async function GET(request: NextRequest) {
       kpis,
       students: filtered,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Student activity API error:", error);
     return NextResponse.json(
-      { success: false, error: error.message || "Talabalar faolligi ma'lumotlarini olishda xatolik" },
+      { success: false, error: "Talabalar faolligi ma'lumotlarini olishda xatolik" },
       { status: 400 }
     );
   }

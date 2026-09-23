@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Check, ArrowRight, CirclePlay } from "lucide-react";
 import { siteConfig } from "@/lib/siteConfig";
@@ -36,7 +37,14 @@ export const CourseCards = React.memo(function CourseCards() {
               Vibe Coding Express
             </h3>
             <div className="overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] mb-4">
-              <img src="/images/vibe-coding-course.jpg" alt="Vibe Coding Express" className="w-full h-44 object-cover" />
+              <Image
+                src="/images/vibe-coding-course.jpg"
+                alt="Vibe Coding Express kursida AI yordamida web ilova va bot yaratish"
+                width={1376}
+                height={768}
+                sizes="(max-width: 1024px) calc(100vw - 64px), 480px"
+                className="h-44 w-full object-cover"
+              />
             </div>
             <p className="text-sm text-[var(--color-ink-muted)] mb-6 leading-relaxed">
               AI bilan ishlaydigan mahsulot (web, bot, MVP) qurmoqchi bo'lsangiz.
@@ -84,7 +92,14 @@ export const CourseCards = React.memo(function CourseCards() {
               AI Asoslari
             </h3>
             <div className="overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] mb-4">
-              <img src="/images/ai-asoslari-course.jpg" alt="AI Asoslari & Prompt Injeneriya" className="w-full h-44 object-cover" />
+              <Image
+                src="/images/ai-asoslari-course.jpg"
+                alt="AI Asoslari va prompt injiniringi kursida ish jarayoni"
+                width={1376}
+                height={768}
+                sizes="(max-width: 1024px) calc(100vw - 64px), 480px"
+                className="h-44 w-full object-cover"
+              />
             </div>
             <p className="text-sm text-[var(--color-ink-muted)] mb-6 leading-relaxed">
               AI vositalari va prompt-injiniringni noldan o'rganmoqchi bo'lsangiz.

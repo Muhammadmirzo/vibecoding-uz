@@ -1,7 +1,11 @@
 import type { TestimonialItem } from "@/lib/validations/testimonials";
-export type { TestimonialItem };
 
-export const STATIC_TESTIMONIALS: TestimonialItem[] = [
+export type { TestimonialItem };
+export type TestimonialExampleItem = TestimonialItem & {
+  isExample: true;
+};
+
+export const STATIC_TESTIMONIALS: TestimonialExampleItem[] = [
   {
     id: "test-01",
     fullName: "Azizbek Rahimov",
@@ -12,7 +16,8 @@ export const STATIC_TESTIMONIALS: TestimonialItem[] = [
     type: "text",
     body: "Dasturchilarga sarflanadigan 3 oylik vaqt va 45 million so'mni tejab qoldim. Claude Code va Cursor yordamida o'z logistika kompaniyamiz uchun yuk kuzatish tizimini atigi 8 kunda noldan ishga tushirdik. Bugun platformamizdan 200 dan ortiq haydovchilar foydalanmoqda!",
     rating: 5,
-    verified: true,
+    verified: false,
+    isExample: true,
     resultMetric: "8 kunda to'liq MVP ishga tushdi",
     publishedAt: "2026-08-25",
   },
@@ -26,7 +31,8 @@ export const STATIC_TESTIMONIALS: TestimonialItem[] = [
     type: "text",
     body: "Men ilgari faqat Figma'da dizayn chizardim. Lekin Vibecoding Express orqali o'zim o'ylagan dizaynni Next.js va Tailwind'da to'liq jonli saytga aylantirishni o'rgandim. Birinchi mijozim uchun ta'lim platformasini 1200$ ga muvaffaqiyatli topshirdim!",
     rating: 5,
-    verified: true,
+    verified: false,
+    isExample: true,
     resultMetric: "1200$ lik birinchi tijoriy buyurtma",
     publishedAt: "2026-09-02",
   },
@@ -40,7 +46,8 @@ export const STATIC_TESTIMONIALS: TestimonialItem[] = [
     type: "text",
     body: "Kompaniyamizda haftasiga 30+ soat vaqt oladigan reklama matnlari, tahlillar va hisobotlarni ChatGPT va Claude agentlariga topshirdik. AI Asoslari kursi jamoamiz unumdorligini 4 barobar oshirdi.",
     rating: 5,
-    verified: true,
+    verified: false,
+    isExample: true,
     resultMetric: "Haftasiga 30+ soat vaqt tejaldi",
     publishedAt: "2026-08-10",
   },
@@ -54,7 +61,8 @@ export const STATIC_TESTIMONIALS: TestimonialItem[] = [
     type: "text",
     body: "Kursgacha faqat HTML va CSS bilardim. 8 haftalik mentorlik davomida PostgreSQL, Drizzle ORM, Payme to'lovlari va xavfsiz JWT sessiyalarni o'rganib chiqdim. Mentorlar har bir uy vazifamni chuqur tahlil qilib berishgani juda foydali bo'ldi.",
     rating: 5,
-    verified: true,
+    verified: false,
+    isExample: true,
     resultMetric: "Junior'dan Mid-level AI Integratorga",
     publishedAt: "2026-08-28",
   },
@@ -68,7 +76,8 @@ export const STATIC_TESTIMONIALS: TestimonialItem[] = [
     type: "text",
     body: "Bizga bolalar uchun interaktiv testlar va ota-onalar uchun to'lov qabul qiluvchi shaxsiy tizim kerak edi. Vibe coding tufayli barcha logikani o'zim qurdim. Kurs puli dastlabki 1 haftada o'zini oqladi!",
     rating: 5,
-    verified: true,
+    verified: false,
+    isExample: true,
     resultMetric: "Kurs xarajati 1 haftada qoplandi",
     publishedAt: "2026-07-30",
   },
@@ -82,7 +91,8 @@ export const STATIC_TESTIMONIALS: TestimonialItem[] = [
     type: "text",
     body: "Oldin Upwork'da faqat kichik veb-saytlar qilardim. Vibe Coding'dan keyin SaaS platformalar va AI integratsiyalarni mustaqil topshira boshladim. Oylik buyurtmalarim qiymati 2 barobar oshdi.",
     rating: 4,
-    verified: true,
+    verified: false,
+    isExample: true,
     resultMetric: "Daromad 2 barobar oshdi",
     publishedAt: "2026-09-04",
   },
@@ -96,7 +106,8 @@ export const STATIC_TESTIMONIALS: TestimonialItem[] = [
     type: "text",
     body: "Mijozlar buyurtmalarini avtomatlashtiruvchi Telegram bot va oshxona buyurtmalarini boshqarish panelini o'zimiz yaratdik. Kursdagi materiallar juda amaliy va sodda tilda tushuntirilgan.",
     rating: 5,
-    verified: true,
+    verified: false,
+    isExample: true,
     resultMetric: "Ichki tizim 100% avtomatlashtirildi",
     publishedAt: "2026-08-18",
   },
@@ -110,7 +121,8 @@ export const STATIC_TESTIMONIALS: TestimonialItem[] = [
     type: "text",
     body: "Katta hajmdagi Excel jadvallari va soliq hisobotlarini AI yordamida daqiqalarda tahlil qilishni o'rgandim. Hisobotlardagi xatoliklar nolga tushdi.",
     rating: 5,
-    verified: true,
+    verified: false,
+    isExample: true,
     resultMetric: "Hisobot xatoliklari 0% ga tushdi",
     publishedAt: "2026-08-05",
   },

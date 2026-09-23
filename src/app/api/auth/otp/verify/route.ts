@@ -138,7 +138,7 @@ export async function POST(request: Request) {
       .returning();
 
     // Generate token and set HTTP-only cookie
-    const token = createSessionToken({
+    const token = await createSessionToken({
       sessionId: session.id,
       userId: user.id,
       role: user.role,

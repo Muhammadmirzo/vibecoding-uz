@@ -1,129 +1,120 @@
+import { and, eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
-import crypto from "crypto";
+import { z } from "zod";
 
-import {
-  clickStore,
-  computeClickSign,
-  ClickTransactionRecord,
-} from "@/features/payments/click";
+import { db, withTransactionLock } from "@/db";
+import { enrollments, payments } from "@/db/schema";
+import { clickAmountMatches, computeClickSign, createMerchantPrepareId, verifyClickSign } from "@/features/payments/click";
+import { clickWebhookSchema, type ClickWebhookInput } from "@/lib/validations/payment";
 
-export async function POST(req: NextRequest) {
-  try {
-    const formData = await req.formData().catch(() => new FormData());
-    const clickTransId = String(formData.get("click_trans_id") || "");
-    const serviceId = String(formData.get("service_id") || "");
-    const merchantTransId = String(formData.get("merchant_trans_id") || "");
-    const merchantPrepareIdParam = String(formData.get("merchant_prepare_id") || "");
-    const amount = String(formData.get("amount") || "");
-    const action = String(formData.get("action") || ""); // 0 = Prepare, 1 = Complete
-    const error = formData.get("error");
-    const signTime = String(formData.get("sign_time") || "");
-    const signString = String(formData.get("sign_string") || "");
+type PaymentRow = typeof payments.$inferSelect;
+type PaymentDatabase = Pick<typeof db, "select" | "update">;
 
-    const secretKey = process.env.CLICK_SECRET_KEY;
-    if (secretKey && signString) {
-      const expectedSign = computeClickSign(
-        clickTransId,
-        serviceId,
-        secretKey,
-        merchantTransId,
-        merchantPrepareIdParam,
-        amount,
-        action,
-        signTime
-      );
-      if (signString.toLowerCase() !== expectedSign.toLowerCase()) {
-        return NextResponse.json({
-          error: -1,
-          error_note: "SIGN CHECK FAILED",
-        });
-      }
-    }
-
-    if (error && Number(error) < 0) {
-      return NextResponse.json({
-        error: -1,
-        error_note: "Tranzaksiya xatolik bilan yakunlandi",
-      });
-    }
-
-    const numClickTransId = Number(clickTransId) || 0;
-    const storeKey = `click:${clickTransId}`;
-
-    // Action 0: Prepare phase
-    if (action === "0") {
-      const existing = clickStore.get(storeKey);
-      if (existing) {
-        return NextResponse.json({
-          click_trans_id: existing.clickTransId,
-          merchant_trans_id: existing.merchantTransId,
-          merchant_prepare_id: existing.merchantPrepareId,
-          error: 0,
-          error_note: "Success",
-        });
-      }
-
-      const prepareId = Math.floor(Date.now() / 1000) + Math.floor(Math.random() * 1000);
-      const record: ClickTransactionRecord = {
-        clickTransId: numClickTransId,
-        merchantTransId,
-        merchantPrepareId: prepareId,
-        amount: Number(amount) || 0,
-        status: "prepared",
-        createdAt: Date.now(),
-      };
-      clickStore.set(storeKey, record);
-
-      return NextResponse.json({
-        click_trans_id: numClickTransId,
-        merchant_trans_id: merchantTransId,
-        merchant_prepare_id: prepareId,
-        error: 0,
-        error_note: "Success",
-      });
-    }
-
-    // Action 1: Complete phase
-    if (action === "1") {
-      const existing = clickStore.get(storeKey);
-
-      if (existing && existing.status === "completed") {
-        // Idempotent replay for already completed transaction
-        return NextResponse.json({
-          click_trans_id: existing.clickTransId,
-          merchant_trans_id: existing.merchantTransId,
-          merchant_confirm_id: existing.merchantConfirmId || existing.merchantPrepareId,
-          error: 0,
-          error_note: "Success",
-        });
-      }
-
-      const prepareId = existing?.merchantPrepareId || Number(merchantPrepareIdParam) || Math.floor(Date.now() / 1000);
-      const confirmId = prepareId + 1;
-
-      const record: ClickTransactionRecord = {
-        clickTransId: numClickTransId,
-        merchantTransId,
-        merchantPrepareId: prepareId,
-        merchantConfirmId: confirmId,
-        amount: Number(amount) || 0,
-        status: "completed",
-        createdAt: existing?.createdAt || Date.now(),
-      };
-      clickStore.set(storeKey, record);
-
-      return NextResponse.json({
-        click_trans_id: numClickTransId,
-        merchant_trans_id: merchantTransId,
-        merchant_confirm_id: confirmId,
-        error: 0,
-        error_note: "Success",
-      });
-    }
-
-    return NextResponse.json({ error: -3, error_note: "Action not found" });
-  } catch (err) {
-    return NextResponse.json({ error: -1, error_note: "Server error" });
-  }
+function objectMeta(value: unknown): Record<string, unknown> {
+  return value !== null && typeof value === "object" && !Array.isArray(value) ? { ...value } : {};
 }
 
+function providerClickId(payment: PaymentRow): number | null {
+  const value = objectMeta(payment.meta).clickTransId;
+  return typeof value === "number" && Number.isInteger(value) ? value : null;
+}
+
+function protocolError(note: string, status = 400) {
+  return NextResponse.json({ error: -1, error_note: note }, { status });
+}
+
+async function findPayment(data: ClickWebhookInput, executor: PaymentDatabase = db) {
+  if (!z.string().uuid().safeParse(data.merchant_trans_id).success) return null;
+  const [payment] = await executor.select().from(payments)
+    .where(and(eq(payments.id, data.merchant_trans_id), eq(payments.provider, "click")))
+    .limit(1);
+  return payment ?? null;
+}
+
+export async function POST(req: NextRequest) {
+  const secretKey = process.env.CLICK_SECRET_KEY?.trim();
+  const serviceId = process.env.CLICK_SERVICE_ID?.trim();
+  if (!secretKey || !serviceId) return protocolError("Payment provider is not configured", 503);
+
+  const formData = await req.formData().catch(() => null);
+  if (!formData) return protocolError("Invalid form payload");
+  const raw: Record<string, unknown> = {};
+  for (const [key, value] of formData.entries()) raw[key] = typeof value === "string" ? value : undefined;
+
+  const parsed = clickWebhookSchema.safeParse(raw);
+  if (!parsed.success) return protocolError("Missing or invalid signed fields");
+  const data = parsed.data;
+  if (data.service_id !== serviceId) return protocolError("Unexpected service id", 401);
+
+  const expectedSign = computeClickSign(
+    data.click_trans_id, data.service_id, secretKey, data.merchant_trans_id,
+    data.merchant_prepare_id, data.amount, data.action, data.sign_time
+  );
+  if (!verifyClickSign(data.sign_string, expectedSign)) return protocolError("SIGN CHECK FAILED", 401);
+
+  const payment = await findPayment(data);
+  if (!payment) return protocolError("Payment not found", 404);
+  if (!clickAmountMatches(payment.amountSum, data.amount)) return protocolError("Amount mismatch", 400);
+
+  const clickTransId = Number(data.click_trans_id);
+  if (!Number.isSafeInteger(clickTransId) || clickTransId <= 0) return protocolError("Invalid Click transaction id");
+
+  if (Number(data.error ?? 0) < 0) {
+    await withTransactionLock(`click:${data.click_trans_id}`, async (transaction: unknown) => {
+      if (!transaction) throw new Error("Payment database transaction is unavailable");
+      const tx = transaction as PaymentDatabase;
+      const current = await findPayment(data, tx);
+      if (current && current.status === "pending") {
+        await tx.update(payments).set({ providerTxnId: data.click_trans_id, status: "failed", meta: { ...objectMeta(current.meta), clickTransId, providerError: data.error } })
+          .where(eq(payments.id, current.id));
+      }
+    });
+    return protocolError("Tranzaksiya xatolik bilan yakunlandi");
+  }
+
+  if (data.action === "0") {
+    const prepared = await withTransactionLock(`click:${data.click_trans_id}`, async (transaction: unknown) => {
+      if (!transaction) throw new Error("Payment database transaction is unavailable");
+      const tx = transaction as PaymentDatabase;
+      const current = await findPayment(data, tx);
+      if (!current) return null;
+      const existingProviderId = providerClickId(current);
+      if (existingProviderId !== null && existingProviderId !== clickTransId) return "mismatch" as const;
+      if (current.status !== "pending") return "terminal" as const;
+      const merchantPrepareId = createMerchantPrepareId();
+      await tx.update(payments).set({ providerTxnId: data.click_trans_id, meta: { ...objectMeta(current.meta), clickTransId, merchantPrepareId, clickState: "prepared" } })
+        .where(eq(payments.id, current.id));
+      return merchantPrepareId;
+    });
+    if (prepared === "mismatch" || prepared === "terminal") return protocolError("Invalid transaction state");
+    if (!prepared) return protocolError("Payment not found", 404);
+    return NextResponse.json({ click_trans_id: clickTransId, merchant_trans_id: data.merchant_trans_id, merchant_prepare_id: prepared, error: 0, error_note: "Success" });
+  }
+
+  const completed = await withTransactionLock(`click:${data.click_trans_id}`, async (transaction: unknown) => {
+    if (!transaction) throw new Error("Payment database transaction is unavailable");
+    const tx = transaction as PaymentDatabase;
+    const current = await findPayment(data, tx);
+    if (!current) return null;
+    const existingProviderId = providerClickId(current);
+    if (existingProviderId !== null && existingProviderId !== clickTransId) return "mismatch" as const;
+    const storedPrepareId = Number(objectMeta(current.meta).merchantPrepareId);
+    const merchantPrepareId = Number(data.merchant_prepare_id);
+    if (!Number.isSafeInteger(merchantPrepareId) || merchantPrepareId <= 0 || merchantPrepareId !== storedPrepareId) {
+      return "prepare" as const;
+    }
+    if (current.status === "paid") {
+      return { merchantConfirmId: Number(objectMeta(current.meta).merchantConfirmId) || merchantPrepareId + 1, replay: true };
+    }
+    if (current.status !== "pending") return "terminal" as const;
+    const merchantConfirmId = merchantPrepareId + 1;
+    const paidAt = new Date();
+    await tx.update(payments).set({ providerTxnId: data.click_trans_id, status: "paid", paidAt, meta: { ...objectMeta(current.meta), clickTransId, merchantPrepareId, merchantConfirmId, clickState: "completed" } })
+      .where(eq(payments.id, current.id));
+    if (current.enrollmentId) await tx.update(enrollments).set({ status: "active" }).where(eq(enrollments.id, current.enrollmentId));
+    return { merchantConfirmId, replay: false };
+  });
+  if (completed === "mismatch" || completed === "prepare" || completed === "terminal") return protocolError("Invalid transaction state");
+  if (!completed) return protocolError("Payment not found", 404);
+  return NextResponse.json({ click_trans_id: clickTransId, merchant_trans_id: data.merchant_trans_id, merchant_confirm_id: completed.merchantConfirmId, error: 0, error_note: "Success" });
+}

@@ -29,7 +29,7 @@ export async function middleware(request: NextRequest) {
     token = undefined;
   }
 
-  const session = token ? verifySessionToken(token) : null;
+  const session = token ? await verifySessionToken(token) : null;
 
   // Allow public access to /admin/login
   if (pathname.startsWith("/admin/login")) {
@@ -52,7 +52,8 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(adminLoginUrl);
     }
     const loginUrl = new URL("/", request.url);
-    loginUrl.searchParams.set("redirect", pathname);
+    loginUrl.searchParams.set("auth", "1");
+    loginUrl.searchParams.set("redirect", `${pathname}${request.nextUrl.search}`);
     return NextResponse.redirect(loginUrl);
   }
 

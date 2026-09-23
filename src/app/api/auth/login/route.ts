@@ -78,7 +78,7 @@ export async function POST(request: Request) {
       .where(eq(users.id, user.id));
 
     // Generate token and set HTTP-only cookie
-    const token = createSessionToken({
+    const token = await createSessionToken({
       sessionId: session ? session.id : user.id,
       userId: user.id,
       role: user.role,

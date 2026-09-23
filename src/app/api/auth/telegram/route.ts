@@ -94,7 +94,7 @@ export async function POST(request: Request) {
       .values({ userId: user.id, expiresAt, userAgent, ip })
       .returning();
 
-    const token = createSessionToken({
+    const token = await createSessionToken({
       sessionId: session ? session.id : user.id,
       userId: user.id,
       role: user.role,

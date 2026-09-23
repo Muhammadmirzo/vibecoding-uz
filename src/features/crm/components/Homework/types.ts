@@ -1,0 +1,6 @@
+import type { CriterionResult, HomeworkSubmission } from "../../types";
+export type HomeworkStatus = "submitted" | "approved" | "rejected" | "all";
+export interface ReviewDraft { criteria: CriterionResult[]; feedbackMd: string; }
+export const DEFAULT_RUBRIC: CriterionResult[] = [{ criterion: "AI Prompt samaradorligi", score: 8, maxScore: 10 }, { criterion: "Kod arxitekturasi va ishlashi", score: 8, maxScore: 10 }, { criterion: "Topshiriq talablariga mosligi", score: 9, maxScore: 10 }, { criterion: "UI/UX sifati", score: 8, maxScore: 10 }];
+export const FEEDBACK_TEMPLATES = [{ label: "✨ A'lo (Ajoyib ish)", text: "Ajoyib ish! Kod arxitekturasi va AI promptlaridan foydalanish ko'nikmalari a'lo darajada namoyon etilgan. Barcha mezonlar va talablar to'liq bajarildi." }, { label: "⚠️ Yaxshi (Tavsiyalar bilan)", text: "Yaxshi natija! Mahsulot ishlaydi, lekin AI promptlariga ko'proq kontekst berish va kod strukturasini modullarga ajratish tavsiya etiladi." }, { label: "❌ Qayta topshirish talab etiladi", text: "Topshiriq mezonlariga yetarlicha mos emas. Iltimos, Github repozitoriyasidagi xatoliklarni tuzatib va promptlar jurnalini to'ldirib qayta topshiring." }];
+export type { CriterionResult, HomeworkSubmission };

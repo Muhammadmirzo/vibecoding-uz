@@ -4,10 +4,6 @@
 
 @layer base {
   :root {
-    --font-onest: "Onest", system-ui, sans-serif;
-    --font-instrument-serif: "Instrument Serif", Georgia, serif;
-    --font-geist-mono: "Geist Mono", monospace;
-
     --color-cream: #F9F8F6;
     --color-cream-warm: #F3F0EC;
     --color-cream-deep: #EBE7E0;

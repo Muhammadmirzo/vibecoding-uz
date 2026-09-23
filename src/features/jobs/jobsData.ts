@@ -95,7 +95,7 @@ export const STATIC_JOB_OPENINGS: JobOpeningItem[] = [
     type: "To'liq stavka",
     salary: "8,000,000 - 14,000,000 UZS + KPI bonuslar",
     experience: "1+ yil Telegram kanallar yoki hamjamiyat boshqaruvi",
-    descriptionMd: "Mirzo Academy'ning 15,000+ kishilik Telegram jamoasini faol ushlab turish, vebinarlar tashkillashtirish va yangi talabalar oqimini jalb qilish.",
+    descriptionMd: "Mirzo Academy Telegram jamoasini faol ushlab turish, vebinarlar tashkillashtirish va yangi talabalar oqimini jalb qilish. Murojaat Telegram orqali qabul qilinadi.",
     responsibilities: [
       "Telegram kanali va yopiq talabalar guruhlarida faollikni oshirish, savollarga zudlik bilan javob berish;",
       "Haftalik bepul jonli darslar va 'Build in Public' meetlarini rejalashtirish va olib borish;",

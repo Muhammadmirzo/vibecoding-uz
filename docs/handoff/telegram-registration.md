@@ -111,3 +111,40 @@ Restore branch tayyor bo'lgach, PR orqali `main` ga qaytariladi — to'g'ridan-t
 - Deploy: ~3 daqiqada live (curl: 550k=1, ClashNexus=1, eski narx=0, 9savol=0, diagnostika "5 savol"=✅, admin/login=200, bepul-dars=200).
 - DB: bizning slice'larda schema o'zgarishi YO'Q (migrate shart emas). Upstream schema+20 (portfolio jadvallari) drizzle/ migrationsiz kelgan — /api/portfolio prod DB'da jadval bo'lmasa 500 berishi mumkin; local .env pooler "tenant not found" (ishchi env'da db:push/migrate kerak).
 - Rollback: pre-release-20260923-2202 tag + merge commit df0a46c ni revert qilish mumkin.
+
+---
+
+# PRODUCTION HARDENING — 6 WAVES (2026-09-24)
+
+Branch: `fix/production-hardening-wave1`. Tagger: `pre-wave1-*`. Barcha o'zgarishlar localda, deploy qilinmagan.
+
+## Majburiy harakat deploy'dan OLDIN
+1. Vercel → master-2 → Environment Variables: **`SESSION_SECRET`** qo'shing (`openssl rand -base64 48`).
+   Production'da yo'q bo'lsa app **ishga tushmaydi** (fail closed — bu atayin).
+2. `npm run db:migrate` — `drizzle/0001_daily_tarot.sql` (leads.telegram qo'shish + phone NULL bo'lishi).
+3. Payme/Click kalitlari: `PAYME_KEY`, `PAYME_MERCHANT_ID`, `CLICK_SECRET_KEY`, `CLICK_SERVICE_ID`, `CLICK_MERCHANT_ID`.
+4. Telegram Login: `NEXT_PUBLIC_TELEGRAM_BOT_NAME` (bot username, @ siz) + BotFather `/setdomain` → domen.
+5. DB parolini Supabase'da ROTATE qiling (git tarixida eski parol bor).
+
+## Nima tuzatildi (6 wave)
+- **W1**: portfolio dubl Header/Footer, soxta IdeaSimulator kalkulyator, soxta to'lov invoice + `alert()`, "hammasi haqiqiy" testimonials, 15 000+ jobs claim, kafolat 14→7 kun, bot.ts 416→7 modul, admin login a11y.
+- **W2**: to'lov server-side narx (client ishonilmasdi), Payme `test_key` bypass va Click "secret yo'q = verify yo'q" olib tashlandi, webhook in-memory→DB (idempotent), Header 570→8 modul + Radix drawer, Quiz 338→6 modul + a11y, next/font + sitemap/robots + metadata, `/xizmatlar` monetization sahifasi, SettingsManager 945→10 modul.
+- **W3**: CRM 5 yirik komponent → modullar, kabinet sozlamalar/referral split, blog detail server+JSON-LD, seed 661→8 seeder, kurs CTA endi auth-aware (Telegram emas), bepul-dars halol matn, pul-qaytarish siteConfig'dan.
+- **W4**: qolgan spaghetti (PortfolioManager 641, VideoPlayer 390, db/schema 351 → domain modullari, session 297, drip 299, cron/search/SearchModal), testlar split, DB-test endi SKIP.
+- **W5 (P0)**: session token `Math.imul` → HMAC-SHA256 WebCrypto, `SESSION_SECRET` fail-closed, `expiresAt` verify ichida, constant-time compare. Leads: `@username` endi `phone`ga emas `telegram` ustuniga.
+- **W6**: `any` tozalandi (db/index, auth/password), kabinet real `/api/me` + `/api/me/payments`, dars sahifasi real API + drip gate, uy vazifa halol "Tez orada", seed FAQ/narx mos.
+
+## Verifikatsiya
+- `npx tsc --noEmit` → 0 xato
+- `npx vitest run` → **221 passed, 1 skipped** (DB-ga bog'liq `withTransactionLock` — Supabase DNS bu muhitda yo'q), 0 failed
+- `npm run build` → 0 (SESSION_SECRET bilan)
+- Fayl qoidasi: **0 ta fayl 250+ qator** (eng kattasi 238)
+
+## Rollback
+`git checkout -b restore/pre-wave1-<date> pre-wave1-<date>` — barcha o'zgarishlardan oldingi holat.
+
+## Qolgan xavflar
+- Lead orchestrator: `/xizmatlar` narxlari boshlang'ich interval; db settings orqali boshqariladi.
+- DB migration `0001` hali production'da ishga tushirilmagan.
+- Payments: receipt PDF hali generatsiya qilinmaydi (faqat provider txn id saqlanadi).
+- `.vercel` env hali to'ldirilmagan (yuqoragi 1-4-bandlar).

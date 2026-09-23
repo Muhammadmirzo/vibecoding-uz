@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Onest, Instrument_Serif, JetBrains_Mono } from "next/font/google";
 import { cookies } from "next/headers";
 import "./globals.css";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
@@ -9,14 +10,42 @@ import { PwaRegister } from "@/components/layout/PwaRegister";
 import { ClientModals } from "@/components/layout/ClientModals";
 import { userSchema, User } from "@/lib/validations/auth";
 
-const onest = { variable: "font-sans" };
-const instrumentSerif = { variable: "font-serif" };
-const geistMono = { variable: "font-mono" };
+const onest = Onest({
+  subsets: ["latin"],
+  variable: "--font-onest",
+  display: "swap",
+});
+
+const instrumentSerif = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  style: ["normal", "italic"],
+  variable: "--font-instrument-serif",
+  display: "swap",
+});
+
+const jetBrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-geist-mono",
+  display: "swap",
+});
+
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://academy.mirzo.uz";
+const title = "AI bilan mahsulot qurishni o'rganing";
+const description =
+  "Mirzo Academy'da AI va vibe coding yordamida g'oyadan jonli web ilova, bot va MVP yaratishni amaliy mentorlik bilan o'rganing.";
 
 export const metadata: Metadata = {
-  title: "Mirzo Academy — AI bilan mahsulot qurishni jonli mentordan o'rganing | academy.mirzo.uz",
-  description: "EduBaza (27 000+ o'qituvchi), Chatla (500+ biznes) — AI bilan qurilgan jonli mahsulotlar. Dasturlashsiz, g'oyadan jonli MVPgacha 8 haftada yetib boring.",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: title,
+    template: "%s | Mirzo Academy",
+  },
+  description,
   keywords: ["Mirzo Academy", "vibecoding kursi", "vibe coding O'zbekiston", "Claude Code kursi", "AI bilan dasturlash"],
+  alternates: {
+    canonical: "/",
+  },
   manifest: "/manifest.json",
   icons: {
     icon: "/favicon.ico",
@@ -28,12 +57,26 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
   },
   openGraph: {
-    title: "Mirzo Academy — academy.mirzo.uz",
-    description: "EduBaza va Chatla loyihalarini 100% AI bilan qurgan mentordan o'rganing.",
-    url: "https://academy.mirzo.uz",
+    title,
+    description,
+    url: "/",
     siteName: "Mirzo Academy",
     locale: "uz_UZ",
     type: "website",
+    images: [
+      {
+        url: "/images/hero-banner.jpg",
+        width: 1376,
+        height: 768,
+        alt: "Mirzo Academy — AI bilan mahsulot yaratish kurslari",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+    images: ["/images/hero-banner.jpg"],
   },
 };
 
@@ -62,7 +105,7 @@ export default async function RootLayout({
   const initialUser = await getInitialUser();
 
   return (
-    <html lang="uz" suppressHydrationWarning className={`${onest.variable} ${instrumentSerif.variable} ${geistMono.variable}`}>
+    <html lang="uz" suppressHydrationWarning className={`${onest.variable} ${instrumentSerif.variable} ${jetBrainsMono.variable}`}>
       <body className="antialiased selection:bg-[var(--color-accent-soft)] selection:text-[var(--color-accent)]">
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} themes={["light", "dark", "likely"]}>
           <AuthProvider initialUser={initialUser}>
