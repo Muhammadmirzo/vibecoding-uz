@@ -52,7 +52,8 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(adminLoginUrl);
     }
     const loginUrl = new URL("/", request.url);
-    loginUrl.searchParams.set("redirect", pathname);
+    loginUrl.searchParams.set("auth", "1");
+    loginUrl.searchParams.set("redirect", `${pathname}${request.nextUrl.search}`);
     return NextResponse.redirect(loginUrl);
   }
 

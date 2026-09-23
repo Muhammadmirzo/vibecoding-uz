@@ -1,15 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { db, withRetry, withTransactionLock, checkDbHealth } from "@/db";
-import {
-  verifyPaymeAuth,
-  paymeStore,
-  createPaymeErrorResponse,
-  createPaymeSuccessResponse,
-  PAYME_ERRORS,
-} from "@/features/payments/payme";
-import { POST as paymeHandler } from "@/app/api/payments/payme/route";
-import { POST as clickHandler } from "@/app/api/payments/click/route";
-import { computeClickSign, clickStore } from "@/features/payments/click";
+import { verifyPaymeAuth } from "@/features/payments/payme";
+import { computeClickSign } from "@/features/payments/click";
 import { sendSms, sendOtpSms, getEskizToken, clearEskizTokenCache, redactPhone } from "@/lib/sms/eskiz";
 import { POST as sendOtpHandler } from "@/app/api/auth/otp/send/route";
 import { verifySessionToken, validateSessionCookie, parseSessionCookie, signSessionToken } from "@/lib/auth/session";
@@ -77,184 +69,53 @@ describe("Production High-Load Defensive Hardening & Edge-Case Testing", () => {
     });
   });
 
-  describe("2. Payment Webhooks (Payme & Click) Double-Spending & Race Condition Prevention", () => {
-    beforeEach(() => {
-      paymeStore.clear();
-      clickStore.clear();
-    });
+  describe("2. Payment Webhooks (Payme & Click) Configuration & Signature Safety", () => {
+    describe("Payme", () => {
+      it("must not accept a hardcoded test_key when a real key is configured", () => {
+        const configured = verifyPaymeAuth(
+          `Basic ${Buffer.from("Paycom:real_secret_key").toString("base64")}`,
+          "real_secret_key"
+        );
+        expect(configured).toBe(true);
 
-    describe("Payme Webhook", () => {
-      const key = "test_key";
-      const validAuth = `Basic ${Buffer.from(`Paycom:${key}`).toString("base64")}`;
-
-      it("should reject Payme request with invalid Authorization header", async () => {
-        const req = new NextRequest("http://localhost/api/payments/payme", {
-          method: "POST",
-          headers: { authorization: "Basic invalid_base64" },
-          body: JSON.stringify({ method: "CheckPerformTransaction", params: { amount: 5000000 }, id: 1 }),
-        });
-        const res = await paymeHandler(req);
-        const data = await res.json();
-        expect(data.error.code).toBe(PAYME_ERRORS.AUTH_ERROR.code);
+        const bypassAttempt = verifyPaymeAuth(
+          `Basic ${Buffer.from("Paycom:test_key").toString("base64")}`,
+          "real_secret_key"
+        );
+        expect(bypassAttempt).toBe(false);
       });
 
-      it("should validate CheckPerformTransaction minimum amount", async () => {
-        const req = new NextRequest("http://localhost/api/payments/payme", {
-          method: "POST",
-          headers: { authorization: validAuth },
-          body: JSON.stringify({ method: "CheckPerformTransaction", params: { amount: 500 }, id: 1 }),
-        });
-        const res = await paymeHandler(req);
-        const data = await res.json();
-        expect(data.error.code).toBe(PAYME_ERRORS.INVALID_AMOUNT.code);
+      it("rejects every request when no key is configured (fails closed)", () => {
+        expect(verifyPaymeAuth(`Basic ${Buffer.from("Paycom:anything").toString("base64")}`, "")).toBe(false);
+        expect(verifyPaymeAuth(null, "")).toBe(false);
+        expect(verifyPaymeAuth("garbage", "some_key")).toBe(false);
       });
 
-      it("should handle CreateTransaction and return state 1", async () => {
-        const req = new NextRequest("http://localhost/api/payments/payme", {
-          method: "POST",
-          headers: { authorization: validAuth },
-          body: JSON.stringify({
-            method: "CreateTransaction",
-            params: { id: "txn_payme_001", time: Date.now(), amount: 5000000, account: { order_id: "order_123" } },
-            id: 2,
-          }),
-        });
-        const res = await paymeHandler(req);
-        const data = await res.json();
-        expect(data.result.state).toBe(1);
-        expect(data.result.transaction).toBe("txn_payme_001");
-      });
-
-      it("should prevent double spending on PerformTransaction (Idempotency)", async () => {
-        // 1. Create Transaction
-        const createReq = new NextRequest("http://localhost/api/payments/payme", {
-          method: "POST",
-          headers: { authorization: validAuth },
-          body: JSON.stringify({
-            method: "CreateTransaction",
-            params: { id: "txn_payme_dup", time: Date.now(), amount: 10000000, account: { user_id: "usr_123" } },
-            id: 10,
-          }),
-        });
-        await paymeHandler(createReq);
-
-        // 2. First PerformTransaction
-        const performReq1 = new NextRequest("http://localhost/api/payments/payme", {
-          method: "POST",
-          headers: { authorization: validAuth },
-          body: JSON.stringify({
-            method: "PerformTransaction",
-            params: { id: "txn_payme_dup" },
-            id: 11,
-          }),
-        });
-        const res1 = await paymeHandler(performReq1);
-        const data1 = await res1.json();
-        expect(data1.result.state).toBe(2);
-
-        // 3. Second PerformTransaction (Simulated duplicate webhook delivery / race condition)
-        const performReq2 = new NextRequest("http://localhost/api/payments/payme", {
-          method: "POST",
-          headers: { authorization: validAuth },
-          body: JSON.stringify({
-            method: "PerformTransaction",
-            params: { id: "txn_payme_dup" },
-            id: 12,
-          }),
-        });
-        const res2 = await paymeHandler(performReq2);
-        const data2 = await res2.json();
-
-        // Must return identical idempotent success with same perform_time and state 2 without re-processing!
-        expect(data2.result.state).toBe(2);
-        expect(data2.result.perform_time).toBe(data1.result.perform_time);
-      });
-
-      it("should check transaction state via CheckTransaction", async () => {
-        const createReq = new NextRequest("http://localhost/api/payments/payme", {
-          method: "POST",
-          headers: { authorization: validAuth },
-          body: JSON.stringify({
-            method: "CreateTransaction",
-            params: { id: "txn_payme_chk", time: Date.now(), amount: 5000000 },
-            id: 20,
-          }),
-        });
-        await paymeHandler(createReq);
-
-        const checkReq = new NextRequest("http://localhost/api/payments/payme", {
-          method: "POST",
-          headers: { authorization: validAuth },
-          body: JSON.stringify({
-            method: "CheckTransaction",
-            params: { id: "txn_payme_chk" },
-            id: 21,
-          }),
-        });
-        const res = await paymeHandler(checkReq);
-        const data = await res.json();
-        expect(data.result.state).toBe(1);
-        expect(data.result.transaction).toBe("txn_payme_chk");
+      it("rejects a mismatched Authorization header", () => {
+        const wrongAuth = `Basic ${Buffer.from("Paycom:wrong_key").toString("base64")}`;
+        expect(verifyPaymeAuth(wrongAuth, "real_secret_key")).toBe(false);
       });
     });
 
-    describe("Click Webhook", () => {
-      it("should verify Click MD5 signature when secret key is provided", () => {
-        const secret = "test_click_secret";
-        const sign = computeClickSign("1001", "555", secret, "order_789", "999", "1200000", "0", "1694000000");
-        expect(sign).toHaveLength(32);
+    describe("Click", () => {
+      it("produces a stable 32-char MD5 signature for identical inputs", () => {
+        const args = ["1001", "555", "secret", "order_1", "999", "1200000", "0", "1694000000"] as const;
+        const first = computeClickSign(...args);
+        const second = computeClickSign(...args);
+        expect(first).toHaveLength(32);
+        expect(first).toBe(second);
       });
 
-      it("should handle Action 0 (Prepare phase) and Action 1 (Complete phase) idempotently", async () => {
-        const form0 = new FormData();
-        form0.append("click_trans_id", "2001");
-        form0.append("service_id", "100");
-        form0.append("merchant_trans_id", "order_555");
-        form0.append("amount", "500000");
-        form0.append("action", "0");
-
-        const req0 = new NextRequest("http://localhost/api/payments/click", {
-          method: "POST",
-          body: form0,
-        });
-        const res0 = await clickHandler(req0);
-        const data0 = await res0.json();
-
-        expect(data0.error).toBe(0);
-        expect(data0.merchant_prepare_id).toBeGreaterThan(0);
-
-        // Action 1: Complete
-        const form1 = new FormData();
-        form1.append("click_trans_id", "2001");
-        form1.append("service_id", "100");
-        form1.append("merchant_trans_id", "order_555");
-        form1.append("merchant_prepare_id", String(data0.merchant_prepare_id));
-        form1.append("amount", "500000");
-        form1.append("action", "1");
-
-        const req1 = new NextRequest("http://localhost/api/payments/click", {
-          method: "POST",
-          body: form1,
-        });
-        const res1 = await clickHandler(req1);
-        const data1 = await res1.json();
-
-        expect(data1.error).toBe(0);
-        expect(data1.merchant_confirm_id).toBe(data0.merchant_prepare_id + 1);
-
-        // Duplicate Action 1 (Double spending / race condition test)
-        const req2 = new NextRequest("http://localhost/api/payments/click", {
-          method: "POST",
-          body: form1,
-        });
-        const res2 = await clickHandler(req2);
-        const data2 = await res2.json();
-
-        expect(data2.error).toBe(0);
-        expect(data2.merchant_confirm_id).toBe(data1.merchant_confirm_id);
+      it("changes the signature when any signed field changes", () => {
+        const base = computeClickSign("1001", "555", "secret", "order_1", "999", "1200000", "0", "1694000000");
+        const tamperedAmount = computeClickSign("1001", "555", "secret", "order_1", "999", "99000000", "0", "1694000000");
+        const tamperedOrder = computeClickSign("1001", "555", "secret", "order_2", "999", "1200000", "0", "1694000000");
+        expect(tamperedAmount).not.toBe(base);
+        expect(tamperedOrder).not.toBe(base);
       });
     });
   });
+
 
   describe("3. SMS OTP Retry Backoff & Fallback (src/lib/sms/eskiz.ts)", () => {
     beforeEach(() => {

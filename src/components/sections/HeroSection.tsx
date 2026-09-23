@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { BadgeCheck, ArrowRight, CirclePlay, Quote } from "lucide-react";
 
@@ -67,7 +68,15 @@ export const HeroSection = React.memo(function HeroSection() {
           <div className="relative mx-auto w-full max-w-[440px] lg:max-w-[480px]">
             <div className="rounded-[var(--radius-xl)] border border-[var(--color-border-strong)] bg-[var(--color-cream)] overflow-hidden shadow-[var(--shadow-lg)]">
               <div className="relative aspect-[16/9] bg-[var(--color-cream-deep)] flex items-center justify-center overflow-hidden">
-                <img src="/images/hero-banner.jpg" alt="Mirzo Academy Vibe Coding Hero" className="w-full h-full object-cover" />
+                <Image
+                  src="/images/hero-banner.jpg"
+                  alt="Mirzo Academy mentorligida AI bilan yaratilayotgan Clash Nexus loyihasi"
+                  width={1376}
+                  height={768}
+                  sizes="(max-width: 1024px) calc(100vw - 40px), 480px"
+                  priority
+                  className="h-full w-full object-cover"
+                />
                 <div className="absolute top-3 right-3 z-20 px-3 py-1 rounded-full bg-ink/85 backdrop-blur text-white text-xs font-mono font-medium flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-success"></span>
                   <a
