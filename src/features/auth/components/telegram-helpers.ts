@@ -54,6 +54,8 @@ export function mapTelegramData(raw: unknown): TelegramAuthData | null {
 export function getTelegramErrorMessage(status: number): string {
   if (status === 400) return "Telegram ma'lumotlari noto'g'ri. Qaytadan urinib ko'ring.";
   if (status === 401) return "Telegram imzosi tasdiqlanmadi. Qaytadan urinib ko'ring.";
+  if (status === 422)
+    return "Bu Telegram hisobi hali ulanmagan. Avval telefon raqamingiz bilan kiring (SMS kod), keyin botda /start ni bosing — hisob ulanadi.";
   if (status === 410) return "Kirish muddati o'tgan. Telegram orqali qaytadan kiring.";
   if (status === 429) return "Juda ko'p urinish. Birozdan keyin qaytadan urinib ko'ring.";
   if (status >= 500) return "Server xatosi. Birozdan keyin qaytadan urinib ko'ring.";
