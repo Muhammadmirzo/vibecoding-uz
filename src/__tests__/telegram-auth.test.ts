@@ -49,6 +49,7 @@ describe("getTelegramErrorMessage", () => {
     expect(getTelegramErrorMessage(401)).toContain("imzosi");
     expect(getTelegramErrorMessage(410)).toContain("muddati");
     expect(getTelegramErrorMessage(429)).toContain("ko'p urinish");
+    expect(getTelegramErrorMessage(422)).toContain("hali ulanmagan");
   });
 
   it("maps server errors and unknown statuses to fallback messages", () => {

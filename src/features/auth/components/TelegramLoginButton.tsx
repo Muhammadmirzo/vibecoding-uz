@@ -57,7 +57,16 @@ export function TelegramLoginButton({ onSuccess, onError }: TelegramLoginButtonP
           body: JSON.stringify(data),
         });
         if (!res.ok) {
-          fail(getTelegramErrorMessage(res.status));
+          let serverMsg: string | null = null;
+          try {
+            const errJson = (await res.json()) as { error?: unknown };
+            if (typeof errJson.error === "string" && errJson.error.length > 0) {
+              serverMsg = errJson.error;
+            }
+          } catch {
+            serverMsg = null;
+          }
+          fail(serverMsg ?? getTelegramErrorMessage(res.status));
           return;
         }
         const json = (await res.json()) as {
