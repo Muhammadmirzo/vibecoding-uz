@@ -77,15 +77,19 @@ function AdminLoginForm() {
       {/* Login Form */}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-xs font-bold text-[var(--color-ink)] uppercase tracking-wider mb-1.5">
+          <label htmlFor="admin-login" className="block text-xs font-bold text-[var(--color-ink)] uppercase tracking-wider mb-1.5">
             Login (Email yoki Telefon)
           </label>
           <div className="relative">
             <Mail className="w-4 h-4 absolute left-3.5 top-3.5 text-[var(--color-ink-muted)]" />
             <input
+              id="admin-login"
               type="text"
               required
+              autoComplete="username"
               value={loginInput}
+              aria-invalid={Boolean(error)}
+              aria-describedby={error ? "admin-login-error" : undefined}
               onChange={(e) => setLoginInput(e.target.value)}
               placeholder="admin@mirzo.uz yoki +998901234567"
               className="w-full h-11 pl-10 pr-4 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-cream-warm)] text-sm text-[var(--color-ink)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
@@ -94,15 +98,19 @@ function AdminLoginForm() {
         </div>
 
         <div>
-          <label className="block text-xs font-bold text-[var(--color-ink)] uppercase tracking-wider mb-1.5">
+          <label htmlFor="admin-password" className="block text-xs font-bold text-[var(--color-ink)] uppercase tracking-wider mb-1.5">
             Parol
           </label>
           <div className="relative">
             <Lock className="w-4 h-4 absolute left-3.5 top-3.5 text-[var(--color-ink-muted)]" />
             <input
+              id="admin-password"
               type="password"
               required
+              autoComplete="current-password"
               value={password}
+              aria-invalid={Boolean(error)}
+              aria-describedby={error ? "admin-login-error" : undefined}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••••••"
               className="w-full h-11 pl-10 pr-4 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-cream-warm)] text-sm text-[var(--color-ink)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
@@ -111,7 +119,7 @@ function AdminLoginForm() {
         </div>
 
         {error && (
-          <div className="flex items-start gap-2 p-3 rounded-[var(--radius-md)] bg-red-500/10 border border-red-500/20 text-red-600 text-xs font-medium">
+          <div id="admin-login-error" role="alert" className="flex items-start gap-2 p-3 rounded-[var(--radius-md)] bg-red-500/10 border border-red-500/20 text-red-600 text-xs font-medium">
             <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
             <span>{error}</span>
           </div>

@@ -8,6 +8,10 @@ export interface PortfolioItem {
   description: string;
   imageUrl: string;
   userCount?: string | null;
+  /** Public URL for the userCount figure shown on the project website. */
+  source?: string;
+  /** Context for interpreting the public figure; it is not an independent audit. */
+  note?: string;
   badgeText: string;
   isFeatured: boolean;
   sortOrder: number;
@@ -21,6 +25,19 @@ export interface PortfolioItem {
  */
 export const PORTFOLIO_DATA: PortfolioItem[] = [
   {
+    id: "clash-nexus",
+    slug: "clash-nexus",
+    title: "Clash Nexus",
+    url: "https://clash-nexus.vercel.app/",
+    domain: "clash-nexus.vercel.app",
+    category: "Startup MVP",
+    description: "Clash of Clans muxlislari uchun klan qidiruv, reyting va o'zbek tilidagi jamoa vositalari.",
+    imageUrl: "",
+    badgeText: "Tekshirilgan jonli loyiha",
+    isFeatured: true,
+    sortOrder: 0,
+  },
+  {
     id: "edubaza",
     slug: "edubaza",
     title: "EduBaza",
@@ -30,6 +47,8 @@ export const PORTFOLIO_DATA: PortfolioItem[] = [
     description: "O'qituvchilar uchun interaktiv ta'lim resurslari va dars ishlanmalari platformasi.",
     imageUrl: "",
     userCount: "27 000+ o'qituvchi foydalanadi",
+    source: "https://edubaza.uz",
+    note: "Bu raqam loyihaning o'z saytidagi ochiq raqam; mustaqil audit qilinmagan.",
     badgeText: "Shu metod bilan qurilgan",
     isFeatured: true,
     sortOrder: 1,
@@ -44,6 +63,8 @@ export const PORTFOLIO_DATA: PortfolioItem[] = [
     description: "Instagram va Telegram bizneslari uchun mijozlar savollariga avtomatik javob beruvchi sun'iy intellekt xizmati.",
     imageUrl: "",
     userCount: "500+ biznes foydalanadi",
+    source: "https://chatla.uz",
+    note: "Bu raqam loyihaning o'z saytidagi ochiq raqam; mustaqil audit qilinmagan.",
     badgeText: "Shu metod bilan qurilgan",
     isFeatured: true,
     sortOrder: 2,
@@ -58,6 +79,8 @@ export const PORTFOLIO_DATA: PortfolioItem[] = [
     description: "Startaplarni investorlar va venchur fondlar bilan bog'laydigan har oylik pitch platformasi.",
     imageUrl: "",
     userCount: "30+ loyiha pitch qildi",
+    source: "https://imkonday.uz",
+    note: "Bu raqam loyihaning o'z saytidagi ochiq raqam; mustaqil audit qilinmagan.",
     badgeText: "Shu metod bilan qurilgan",
     isFeatured: true,
     sortOrder: 3,
@@ -72,6 +95,8 @@ export const PORTFOLIO_DATA: PortfolioItem[] = [
     description: "Pedagoglar uchun tezkor metodik yordamchi va hujjat generatsiyasi boti.",
     imageUrl: "",
     userCount: "15 000+ faol foydalanuvchi",
+    source: "https://t.me/edubazabot",
+    note: "Bu raqam loyihaning o'z kanalidagi ochiq raqam; mustaqil audit qilinmagan.",
     badgeText: "Shu metod bilan qurilgan",
     isFeatured: true,
     sortOrder: 4,
@@ -86,6 +111,8 @@ export const PORTFOLIO_DATA: PortfolioItem[] = [
     description: "Nomzodlar uchun sun'iy intellekt yordamida rezume va portfolio yaratuvchi tezkor platforma.",
     imageUrl: "",
     userCount: "1 200+ rezume yaratildi",
+    source: "https://viberesume.uz",
+    note: "Bu raqam loyihaning o'z saytidagi ochiq raqam; mustaqil audit qilinmagan.",
     badgeText: "Talabalarimiz loyihasi",
     isFeatured: true,
     sortOrder: 5,
@@ -100,6 +127,8 @@ export const PORTFOLIO_DATA: PortfolioItem[] = [
     description: "Telegram bot va saytlar uchun 1 daqiqada aqlli forma generatori.",
     imageUrl: "",
     userCount: "350+ shakl to'ldirildi",
+    source: "https://fastform.uz",
+    note: "Bu raqam loyihaning o'z saytidagi ochiq raqam; mustaqil audit qilinmagan.",
     badgeText: "Talabalarimiz loyihasi",
     isFeatured: true,
     sortOrder: 6,
@@ -114,6 +143,8 @@ export const PORTFOLIO_DATA: PortfolioItem[] = [
     description: "Kichik biznes egalari uchun shartnoma va huquqiy konsultatsiyalar bo'yicha AI yordamchisi.",
     imageUrl: "",
     userCount: "800+ konsultatsiya",
+    source: "https://legalbot.uz",
+    note: "Bu raqam loyihaning o'z saytidagi ochiq raqam; mustaqil audit qilinmagan.",
     badgeText: "Talabalarimiz loyihasi",
     isFeatured: false,
     sortOrder: 7,
@@ -128,6 +159,8 @@ export const PORTFOLIO_DATA: PortfolioItem[] = [
     description: "E-commerce do'konlar uchun mahsulot tavsiflarini avtomatik generatsiya qiluvchi tizim.",
     imageUrl: "",
     userCount: "120+ do'kon ulangan",
+    source: "https://shopspeed.uz",
+    note: "Bu raqam loyihaning o'z saytidagi ochiq raqam; mustaqil audit qilinmagan.",
     badgeText: "Talabalarimiz loyihasi",
     isFeatured: false,
     sortOrder: 8,

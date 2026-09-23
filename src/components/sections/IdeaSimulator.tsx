@@ -1,243 +1,191 @@
 "use client";
 
 import * as React from "react";
-import { Sparkles, ArrowRight, CheckCircle2, Zap, DollarSign, Clock, ShieldAlert } from "lucide-react";
 import Link from "next/link";
-
-interface IdeaPlan {
-  idea: string;
-  category: string;
-  tools: string[];
-  days: number;
-  traditionalCost: string;
-  vibeCost: string;
-  savedAmount: string;
-  roadmap: string[];
-}
-
-const PRESET_IDEAS: IdeaPlan[] = [
-  {
-    idea: "Telegram do'kon va Click/Payme to'lov boti",
-    category: "E-commerce & Bot",
-    tools: ["Cursor IDE", "Next.js", "Telegraf", "Click/Payme API"],
-    days: 4,
-    traditionalCost: "1 500$",
-    vibeCost: "0$ (o'zingiz yozasiz)",
-    savedAmount: "1 500$",
-    roadmap: [
-      "1-kun: Telegram bot token va Webhook arxitekturasini Cursor orqali qurish",
-      "2-kun: Mahsulotlar katalogi va savatcha (Cart) bazasini ulash",
-      "3-kun: Click va Payme to'lov integratsiyasi va MD5 tekshiruvini kiritish",
-      "4-kun: Serverga (Vercel/VPS) bepul deploy qilish va ishga tushirish",
-    ],
-  },
-  {
-    idea: "O'quv markaz yoki klinika uchun CRM va mijozlar navbati",
-    category: "SaaS & Web App",
-    tools: ["Claude Code", "Next.js 15", "Supabase", "Tailwind CSS"],
-    days: 7,
-    traditionalCost: "3 000$",
-    vibeCost: "0$ (o'zingiz yozasiz)",
-    savedAmount: "3 000$",
-    roadmap: [
-      "1-2 kun: Baza sxemasi va Drizzle ORM munosabatlarini generatsiya qilish",
-      "3-4 kun: Admin paneli, mijozlar jadvali va statuslar kanbanini qurish",
-      "5-kun: SMS eslatmalar (Eskiz.uz) va Telegram bildirishnomalarni ulash",
-      "6-7 kun: Rollar (Admin, Menajer) va mobil versiya moslashuvini tugallash",
-    ],
-  },
-  {
-    idea: "AI asosidagi kontent va ijtimoiy tarmoqlar avtomatizatsiyasi",
-    category: "AI Agent & Tool",
-    tools: ["Cursor IDE", "Gemini API", "Python / Node.js", "Telegram API"],
-    days: 3,
-    traditionalCost: "1 200$",
-    vibeCost: "0$ (o'zingiz yozasiz)",
-    savedAmount: "1 200$",
-    roadmap: [
-      "1-kun: Gemini yoki Claude API ga prompt shablonlarini kiritish",
-      "2-kun: Telegram va Instagramga avto-post qiluvchi bot logikasini yozish",
-      "3-kun: Jadval bo'yicha (Cron) ishga tushirish va monitoring o'rnatish",
-    ],
-  },
-];
+import {
+  ArrowRight,
+  Calculator,
+  CheckCircle2,
+  Clock3,
+  Coins,
+  Info,
+} from "lucide-react";
+import {
+  estimateCustomIdea,
+  estimatePreset,
+  formatUzsRange,
+} from "@/features/ideaSimulator/estimateIdea";
+import {
+  estimationRules,
+  ideaPresets,
+} from "@/features/ideaSimulator/ideaPresets";
 
 export function IdeaSimulator() {
-  const [selectedIdx, setSelectedIdx] = React.useState<number>(0);
+  const [selectedId, setSelectedId] = React.useState(ideaPresets[0].id);
   const [customIdea, setCustomIdea] = React.useState("");
-  const [isAnalyzing, setIsAnalyzing] = React.useState(false);
-  const [activePlan, setActivePlan] = React.useState<IdeaPlan>(PRESET_IDEAS[0]);
+  const [submittedIdea, setSubmittedIdea] = React.useState<string | null>(null);
+  const estimate =
+    submittedIdea === null
+      ? estimatePreset(selectedId)
+      : estimateCustomIdea(submittedIdea);
 
-  const handleSelectPreset = (idx: number) => {
-    setSelectedIdx(idx);
-    setActivePlan(PRESET_IDEAS[idx]);
-    setCustomIdea("");
+  const selectPreset = (id: string) => {
+    setSelectedId(id);
+    setSubmittedIdea(null);
   };
 
-  const handleCustomSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!customIdea.trim()) return;
-
-    setIsAnalyzing(true);
-    setTimeout(() => {
-      setActivePlan({
-        idea: customIdea,
-        category: "Maxsus Loyiha",
-        tools: ["Claude Code", "Cursor IDE", "Next.js", "Supabase"],
-        days: 5,
-        traditionalCost: "2 000$ - 3 500$",
-        vibeCost: "0$ (Kursda o'rganib o'zingiz qurasiz)",
-        savedAmount: "2 500$+",
-        roadmap: [
-          "1-kun: Loyiha arxitekturasi va AI uchun AGENTS.md qoidalarini tuzish",
-          "2-kun: Ma'lumotlar bazasi va asosiy API yo'nalishlarini generatsiya qilish",
-          "3-kun: Frontend interfeysini Tailwind tokenlari bilan yaratish",
-          "4-kun: Tashqi xizmatlar (to'lov, SMS yoki bot) integratsiyasini ulash",
-          "5-kun: Jonli domen va serverga deploy qilish",
-        ],
-      });
-      setIsAnalyzing(false);
-    }, 600);
+  const submitIdea = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (customIdea.trim()) setSubmittedIdea(customIdea);
   };
 
   return (
-    <section className="w-full py-14 md:py-20 bg-cream-warm border-b border-border">
-      <div className="mx-auto w-full max-w-[1360px] px-5 md:px-8 lg:px-10">
-        <div className="text-center max-w-3xl mx-auto mb-10">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-accent-soft text-accent border border-accent-line mb-3">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Interaktiv Kalkulyator</span>
+    <section className="w-full border-b border-border bg-cream-warm py-14 md:py-20">
+      <div className="mx-auto w-full max-w-5xl px-5 md:px-8">
+        <div className="mx-auto mb-9 max-w-3xl text-center">
+          <span className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-accent-line bg-accent-soft px-3 py-1 font-mono text-xs font-semibold text-accent">
+            <Calculator className="h-3.5 w-3.5" aria-hidden="true" />
+            Ochiq hisob-kitob
           </span>
-          <h2 className="text-2xl md:text-4xl font-extrabold text-ink tracking-tight mb-4">
-            G'oyangizni kiritib ko'ring: Vibe Coding bilan{" "}
-            <span className="accent-serif">qancha pul va vaqt</span> tejaladi?
+          <h2 className="mb-4 text-2xl font-extrabold tracking-tight text-ink md:text-4xl">
+            G'oyangiz uchun taxminiy muddat va byudjet
           </h2>
-          <p className="text-sm md:text-base text-ink-muted leading-relaxed">
-            Dasturchilarga oylab navbat kutish va minglab dollar sarflash shart emas.
-            Haqiqiy loyihalar misolida qanday natijaga erishishingizni ko'ring.
+          <p className="text-sm leading-relaxed text-ink-muted md:text-base">
+            Kategoriya bo'yicha ochiq qoidalar asosida MVP g'oyasini tahmin qiling.
+            Natijada qanday hisoblanishi ham ko'rsatiladi.
           </p>
         </div>
 
-        {/* Input & Preset Buttons */}
-        <div className="max-w-3xl mx-auto mb-8">
-          <form onSubmit={handleCustomSubmit} className="flex flex-col sm:flex-row gap-2.5 mb-4">
+        <form onSubmit={submitIdea} className="mb-5 flex flex-col gap-2 sm:flex-row">
+          <div className="flex-1">
+            <label htmlFor="custom-idea" className="sr-only">
+              Biznes g'oyangiz
+            </label>
             <input
+              id="custom-idea"
+              name="idea"
               type="text"
               value={customIdea}
-              onChange={(e) => setCustomIdea(e.target.value)}
-              placeholder="O'z biznes g'oyangizni yozing (masalan: Mebel do'koni uchun katalog sayt)..."
-              className="flex-1 px-4 py-3.5 text-sm bg-cream border border-border-strong rounded-xl focus:outline-none focus:ring-2 focus:ring-accent text-ink placeholder:text-ink-subtle"
+              onChange={(event) => setCustomIdea(event.target.value)}
+              aria-describedby="idea-hint"
+              placeholder="Masalan: salonga mijozlar uchun Telegram bot"
+              className="w-full rounded-xl border border-border-strong bg-cream px-4 py-3.5 text-sm text-ink placeholder:text-ink-subtle focus:outline-none focus:ring-2 focus:ring-accent"
             />
-            <button
-              type="submit"
-              disabled={isAnalyzing}
-              className="px-6 py-3.5 rounded-xl bg-accent text-white font-semibold text-sm hover:bg-accent-hover transition-colors shrink-0 shadow-sm flex items-center justify-center gap-2"
-            >
-              {isAnalyzing ? "Hisoblanmoqda..." : "Hisoblash"}
-              <Zap className="w-4 h-4" />
-            </button>
-          </form>
-
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-            <span className="text-xs font-mono text-ink-subtle shrink-0">Tayyor misollar:</span>
-            {PRESET_IDEAS.map((p, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => handleSelectPreset(i)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors border ${
-                  selectedIdx === i && !customIdea
-                    ? "bg-ink text-white border-ink"
-                    : "bg-cream text-ink-muted border-border hover:border-accent-line"
-                }`}
-              >
-                {p.category}
-              </button>
-            ))}
+            <p id="idea-hint" className="mt-1.5 text-xs text-ink-muted">
+              Bot, CRM, salon, kontent yoki do'kon so'zlaridan birini yozing.
+            </p>
           </div>
+          <button
+            type="submit"
+            disabled={!customIdea.trim()}
+            className="shrink-0 rounded-xl bg-accent px-6 py-3.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Taxmin qilish
+          </button>
+        </form>
+
+        <div className="mb-7 flex flex-wrap items-center gap-2">
+          <span className="text-xs text-ink-subtle">Tayyor shablonlar:</span>
+          {ideaPresets.map((preset) => (
+            <button
+              key={preset.id}
+              type="button"
+              aria-pressed={submittedIdea === null && selectedId === preset.id}
+              onClick={() => selectPreset(preset.id)}
+              className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
+                submittedIdea === null && selectedId === preset.id
+                  ? "border-ink bg-ink text-white"
+                  : "border-border bg-cream text-ink-muted hover:border-accent-line"
+              }`}
+            >
+              {preset.label}
+            </button>
+          ))}
         </div>
 
-        {/* Result Card */}
-        <div className="max-w-4xl mx-auto bg-cream border border-border-strong rounded-2xl p-6 md:p-8 shadow-sm">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pb-6 border-b border-border">
-            <div className="flex items-start gap-3.5">
-              <div className="p-2.5 rounded-xl bg-accent-soft text-accent shrink-0">
-                <Clock className="w-5 h-5" />
-              </div>
+        <div className="rounded-2xl border border-border-strong bg-cream p-5 shadow-sm md:p-8">
+          <div className="mb-6 grid gap-4 border-b border-border pb-6 md:grid-cols-3">
+            <div className="flex items-start gap-3">
+              <Clock3 className="mt-1 h-5 w-5 shrink-0 text-accent" aria-hidden="true" />
               <div>
-                <span className="text-xs font-mono text-ink-subtle block">Ishlab chiqish muddati</span>
-                <span className="text-xl md:text-2xl font-bold text-ink">
-                  {activePlan.days} kunda tayyor
-                </span>
-                <span className="text-xs text-ink-muted block mt-0.5">An'anaviy yo'l bilan: 2-3 oy</span>
+                <span className="text-xs text-ink-subtle">Taxminiy muddat</span>
+                <strong className="block text-xl text-ink">
+                  {estimate.dayRange.min}–{estimate.dayRange.max} kun
+                </strong>
               </div>
             </div>
-
-            <div className="flex items-start gap-3.5">
-              <div className="p-2.5 rounded-xl bg-error-soft text-error shrink-0">
-                <ShieldAlert className="w-5 h-5" />
-              </div>
+            <div className="flex items-start gap-3">
+              <Coins className="mt-1 h-5 w-5 shrink-0 text-accent" aria-hidden="true" />
               <div>
-                <span className="text-xs font-mono text-ink-subtle block">Dasturchilar so'raydigan narx</span>
-                <span className="text-xl md:text-2xl font-bold text-error line-through">
-                  {activePlan.traditionalCost}
-                </span>
-                <span className="text-xs text-ink-muted block mt-0.5">Doimiy xarajat va qaramlik</span>
+                <span className="text-xs text-ink-subtle">Taxminiy ish byudjeti</span>
+                <strong className="block text-xl text-ink">
+                  {formatUzsRange(estimate.costRange)}
+                </strong>
               </div>
             </div>
-
-            <div className="flex items-start gap-3.5">
-              <div className="p-2.5 rounded-xl bg-success-soft text-success shrink-0">
-                <DollarSign className="w-5 h-5" />
-              </div>
-              <div>
-                <span className="text-xs font-mono text-ink-subtle block">Siz tejaydigan summa</span>
-                <span className="text-xl md:text-2xl font-extrabold text-success">
-                  {activePlan.savedAmount}
-                </span>
-                <span className="text-xs text-success block font-semibold mt-0.5">Faqat kurs narxi evaziga</span>
-              </div>
+            <div>
+              <span className="text-xs text-ink-subtle">Murakkablik</span>
+              <strong className="block text-xl capitalize text-ink">{estimate.complexity}</strong>
             </div>
           </div>
 
-          {/* Roadmap Steps */}
-          <div className="pt-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
-              <span className="text-xs font-mono uppercase tracking-wider text-ink-subtle font-semibold">
-                Vibe Coding bilan bosqichma-bosqich yo'l:
-              </span>
-              <div className="flex items-center gap-1.5 flex-wrap">
-                {activePlan.tools.map((t, idx) => (
-                  <span
-                    key={idx}
-                    className="px-2 py-0.5 rounded text-[11px] font-mono bg-cream-warm text-ink-muted border border-border"
-                  >
-                    {t}
-                  </span>
+          <p className="mb-5 flex items-start gap-2 rounded-xl border border-accent-line bg-accent-soft p-3 text-sm font-semibold text-ink">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
+            Bu taxminy baho, aniq narx emas.
+          </p>
+
+          <div className="grid gap-7 lg:grid-cols-[1fr_0.8fr]">
+            <div>
+              <h3 className="mb-2 text-sm font-bold text-ink">Ish bosqichlari</h3>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {estimate.roadmap.map((step) => (
+                  <p key={step} className="flex gap-2 rounded-xl border border-border bg-cream-warm p-3 text-xs leading-relaxed text-ink">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success" aria-hidden="true" />
+                    <span>{step}</span>
+                  </p>
                 ))}
               </div>
             </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
-              {activePlan.roadmap.map((step, idx) => (
-                <div key={idx} className="flex items-start gap-2.5 p-3 rounded-xl bg-cream-warm border border-border/70 text-xs md:text-sm text-ink leading-relaxed">
-                  <CheckCircle2 className="w-4 h-4 text-success shrink-0 mt-0.5" />
-                  <span>{step}</span>
-                </div>
-              ))}
+            <div className="space-y-4 text-sm">
+              <div>
+                <h3 className="font-bold text-ink">Tanlangan qoida</h3>
+                <p className="mt-1 leading-relaxed text-ink-muted">{estimate.rule}</p>
+              </div>
+              <div>
+                <h3 className="font-bold text-ink">Taxminlar</h3>
+                <ul className="mt-1 list-disc space-y-1 pl-5 text-ink-muted">
+                  {estimate.assumptions.map((assumption) => <li key={assumption}>{assumption}</li>)}
+                </ul>
+              </div>
+              <div>
+                <h3 className="font-bold text-ink">Bahoga kirmagan xarajatlar</h3>
+                <ul className="mt-1 list-disc space-y-1 pl-5 text-ink-muted">
+                  {estimate.excludedCosts.map((cost) => <li key={cost}>{cost}</li>)}
+                </ul>
+              </div>
             </div>
+          </div>
 
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-border">
-              <p className="text-xs text-ink-muted text-center sm:text-left">
-                Aynan shunday loyihalarni 8 haftalik amaliy mentorlikda birga quramiz.
-              </p>
-              <Link href="/diagnostika" className="w-full sm:w-auto">
-                <button className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-accent text-white font-semibold text-sm hover:bg-accent-hover transition-colors shadow-sm">
-                  <span>Menga mos yo'lni aniqlash</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              </Link>
-            </div>
+          <details className="mt-6 rounded-xl border border-border bg-cream-warm p-3 text-sm">
+            <summary className="cursor-pointer font-semibold text-ink">Qanday hisoblanadi?</summary>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-ink-muted">
+              {estimationRules.map((rule) => <li key={rule}>{rule}</li>)}
+            </ul>
+          </details>
+
+          <div className="mt-6 flex flex-col gap-3 border-t border-border pt-5 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-xs leading-relaxed text-ink-muted">
+              {estimate.matched
+                ? "Aniqlikni oshirish uchun funksiyalar ro'yxatini diagnostikada ko'rib chiqing."
+                : "G'oyani aniqlashtirish uchun funksiyalar va majburiy integratsiyalarni yozib qoldiring."}
+            </p>
+            <Link
+              href="/diagnostika"
+              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-accent-hover"
+            >
+              {estimate.matched ? "G'oyani aniqlashtirish" : "Aniqlashtirish uchun yozish"}
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
           </div>
         </div>
       </div>
