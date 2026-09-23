@@ -188,7 +188,7 @@ export default async function CourseDetailPage({ params }: Props) {
 
             <div className="space-y-3 pt-2">
               <a href="https://t.me/m/ODAfK_QIMjky" target="_blank" rel="noreferrer" className="block">
-                <button className="btn-primary h-13 px-6 rounded-[var(--radius-md)] text-sm font-semibold inline-flex items-center justify-center gap-2 w-full">
+                <button className="btn-primary h-12 min-h-[48px] px-6 rounded-[var(--radius-md)] text-sm font-semibold inline-flex items-center justify-center gap-2 w-full whitespace-nowrap active:scale-[0.98] transition-transform">
                   Joyni band qilish (Telegram)
                   <ArrowRight className="w-4 h-4" />
                 </button>

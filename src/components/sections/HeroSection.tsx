@@ -6,6 +6,8 @@ import { BadgeCheck, ArrowRight, CirclePlay, Quote } from "lucide-react";
 import { siteConfig } from "@/lib/siteConfig";
 
 export const HeroSection = React.memo(function HeroSection() {
+  // quizData.ts dagi savollar soni
+  const QUIZ_QUESTION_COUNT = 5;
   return (
     <section className="relative w-full pt-28 pb-16 md:pt-36 md:pb-24 bg-[var(--color-cream-warm)] border-b border-[var(--color-border)]">
       <div className="mx-auto w-full max-w-[1360px] px-5 md:px-8 lg:px-10">
@@ -49,7 +51,7 @@ export const HeroSection = React.memo(function HeroSection() {
                 </Link>
               </div>
               <span className="text-xs font-mono text-[var(--color-ink-subtle)] mt-1">
-                2 daqiqalik diagnostika · 9 savol · bepul
+                2 daqiqalik diagnostika · {QUIZ_QUESTION_COUNT} savol · bepul
               </span>
             </div>
           </div>

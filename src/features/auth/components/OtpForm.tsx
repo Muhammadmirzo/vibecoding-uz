@@ -110,9 +110,9 @@ export function OtpForm() {
         <div className="p-3 rounded-[var(--radius-md)] bg-[var(--color-cream-warm)] border border-[var(--color-border)] mb-4 text-xs text-[var(--color-ink-muted)] flex items-center justify-between">
           <span>Yuborildi: <strong className="font-mono text-[var(--color-ink)]">{pendingPhone}</strong></span>
           {devCode ? (
-            <span className="text-[var(--color-accent)] font-semibold">(Dev kod: {devCode})</span>
+            <span className="text-[var(--color-accent)] font-semibold">(Test kod: {devCode})</span>
           ) : (
-            <span className="text-[var(--color-accent)] font-semibold">(Demo kod: 123456)</span>
+            <span>Kod kelmasa — spam/junk qutini tekshiring yoki qayta yuboring</span>
           )}
         </div>
 
@@ -131,7 +131,7 @@ export function OtpForm() {
               value={digit}
               onChange={(e) => handleInputChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
-              className="w-11 h-13 text-center rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-cream-warm)] text-[var(--color-ink)] font-mono text-xl font-bold focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent transition-all disabled:opacity-50"
+              className="w-11 sm:w-12 h-12 min-h-[48px] text-center rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-cream-warm)] text-[var(--color-ink)] font-mono text-xl font-bold focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent transition-all disabled:opacity-50"
               aria-label={`Digit ${index + 1}`}
             />
           ))}
