@@ -108,10 +108,11 @@ export function FreeLessonForm() {
 
   return (
     <div className="bg-[var(--color-cream-warm)] border border-[var(--color-border-strong)] rounded-[var(--radius-xl)] p-8 shadow-[var(--shadow-lg)] space-y-6">
+      <h2 className="sr-only">Bepul darsga ro&apos;yxatdan o&apos;tish</h2>
       <div className="p-5 rounded-[var(--radius-lg)] bg-[var(--color-cream)] border border-[var(--color-border-strong)] space-y-3">
-        <h2 className="text-sm font-bold font-mono text-[var(--color-ink)] uppercase tracking-wide flex items-center gap-2">
+        <h3 className="text-sm font-bold font-mono text-[var(--color-ink)] uppercase tracking-wide flex items-center gap-2">
           <BookOpen className="w-4 h-4 text-[var(--color-accent)]" /> Bu darsda nima bor?
-        </h2>
+        </h3>
         <ul className="space-y-2 text-xs text-[var(--color-ink-muted)]">
           {["AI agentlari yordamida 30 daqiqada MVP yaratish", "Claude Code va Cursor yordamida dasturchilarsiz ishlash", "Telegram bot va to'lov tizimlarini integratsiya qilish"].map((item) => (
             <li key={item} className="flex items-start gap-2">
@@ -124,17 +125,17 @@ export function FreeLessonForm() {
       {submitted ? (
         <div className="text-center py-4 space-y-4">
           <div className="w-12 h-12 rounded-full bg-success-soft text-success mx-auto flex items-center justify-center"><CheckCircle2 className="w-8 h-8" /></div>
-          <h2 className="text-lg font-bold text-[var(--color-ink)]">Darsga kirish muvaffaqiyatli tashkil etildi!</h2>
-          <p className="text-xs text-[var(--color-ink-muted)]">Rahmat, <strong>{name}</strong>! Dars havolasi Telegram botda — quyidagi tugma orqali oching.</p>
+          <h2 className="text-lg font-bold text-[var(--color-ink)]">24 soat ichida Telegram orqali dars havolasi yuboriladi</h2>
+          <p className="text-xs text-[var(--color-ink-muted)]">Rahmat, <strong>{name}</strong>! So&apos;rovingiz qabul qilindi. Dars havolasi qo&apos;lda Telegram orqali yuboriladi — quyidagi tugma orqali Telegram&apos;ga o&apos;ting.</p>
           <a href="https://t.me/m/ODAfK_QIMjky" target="_blank" rel="noopener noreferrer" className="btn-primary h-12 px-6 rounded-[var(--radius-md)] text-sm font-semibold inline-flex items-center justify-center gap-2 w-full mt-2">
-            <Send className="w-4 h-4" /> Darsni Telegram botda olish
+            <Send className="w-4 h-4" /> Telegram&apos;ga o&apos;tish
           </a>
         </div>
       ) : (
         <>
           <div className="space-y-2">
-            <h2 className="text-xl font-bold text-[var(--color-ink)]">Bepul darsni hoziroq ko&apos;ring</h2>
-            <p className="text-xs text-[var(--color-ink-muted)]">Telegram yoki telefon raqamingizni kiriting, darsga kirish havolasi ochiladi.</p>
+            <h2 className="text-xl font-bold text-[var(--color-ink)]">Bepul darsni ko&apos;rish uchun so&apos;rov qoldiring</h2>
+            <p className="text-xs text-[var(--color-ink-muted)]">Telegram yoki telefon raqamingizni kiriting. 24 soat ichida dars havolasi Telegram orqali qo&apos;lda yuboriladi.</p>
           </div>
           {errorMsg && <div role="alert" className="p-3 rounded-[var(--radius-md)] bg-red-500/10 border border-red-500/30 text-xs font-semibold text-red-600 dark:text-red-400">{errorMsg}</div>}
           <form onSubmit={handleSubmit} className="space-y-4" aria-label="Bepul dars uchun ro'yxatdan o'tish shakli" noValidate>
