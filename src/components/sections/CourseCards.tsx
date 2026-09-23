@@ -3,6 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { Check, ArrowRight, CirclePlay } from "lucide-react";
+import { siteConfig } from "@/lib/siteConfig";
 
 export const CourseCards = React.memo(function CourseCards() {
   return (
@@ -58,7 +59,7 @@ export const CourseCards = React.memo(function CourseCards() {
             </ul>
 
             <div className="text-sm font-semibold text-[var(--color-ink-muted)] mb-5">
-              2 990 000 so'mdan · 3 oyga bo'lib to'lash bor
+              {siteConfig.courses["vibe-coding-express"].price} · {siteConfig.courses["vibe-coding-express"].installment}
             </div>
 
             <div className="space-y-3">
@@ -106,7 +107,7 @@ export const CourseCards = React.memo(function CourseCards() {
             </ul>
 
             <div className="text-sm font-semibold text-[var(--color-ink-muted)] mb-5">
-              990 000 so'mdan · bir martalik to'lov
+              {siteConfig.courses["ai-asoslari"].price} · {siteConfig.courses["ai-asoslari"].installment}
             </div>
 
             <div className="space-y-3">

@@ -38,16 +38,17 @@ export const siteConfig: SiteConfig = siteConfigSchema.parse({
     liveStartupsCount: "1",
     projectsCount: "1",
   },
+  // NARXLAR — egasi shu yerdan o'zgartiradi: price (asosiy), oldPrice (price bilan teng bo'lsa chegirma ko'rinmaydi; katta yozilsa usti chizilgan eski narx chiqadi), installment (bo'lib to'lash matni). O'zgartirgach: npm run build && git push.
   courses: {
     "vibe-coding-express": {
-      price: "2 990 000 so'm",
-      oldPrice: "3 990 000 so'm",
-      installment: "996 000 so'm / oyiga (3 oy)",
+      price: "550 000 so'm",
+      oldPrice: "550 000 so'm",
+      installment: "183 334 so'm / oyiga (3 oy)",
     },
     "ai-asoslari": {
-      price: "990 000 so'm",
-      oldPrice: "1 490 000 so'm",
-      installment: "495 000 so'm / oyiga (2 oy)",
+      price: "550 000 so'm",
+      oldPrice: "550 000 so'm",
+      installment: "275 000 so'm / oyiga (2 oy)",
     },
   },
 });

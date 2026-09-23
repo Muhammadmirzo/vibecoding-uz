@@ -154,9 +154,11 @@ export default async function CourseDetailPage({ params }: Props) {
           {/* Pricing & Checkout Card */}
           <div className="sticky top-24 bg-[var(--color-cream-warm)] border-2 border-[var(--color-accent)] rounded-[var(--radius-xl)] p-7 space-y-6 shadow-[var(--shadow-lg)]">
             <div className="space-y-1">
-              <div className="text-xs font-mono font-bold text-[var(--color-ink-subtle)] line-through">
-                {course.oldPrice}
-              </div>
+              {course.oldPrice !== course.price && (
+                <div className="text-xs font-mono font-bold text-[var(--color-ink-subtle)] line-through">
+                  {course.oldPrice}
+                </div>
+              )}
               <div className="text-3xl font-extrabold text-[var(--color-ink)]">
                 {course.price}
               </div>
