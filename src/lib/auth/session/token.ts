@@ -1,109 +1,103 @@
-import { DEFAULT_SECRET } from "./constants";
-import type { SessionPayload } from "./types";
+import { getSessionSecret } from "./constants";
+import { DEFAULT_SESSION_TTL_HOURS, type SessionPayload } from "./types";
 
-/** Base64URL helper. */
-function base64urlEncode(str: string): string {
-  const bytes = new TextEncoder().encode(str);
+type SessionTokenInput = string | Partial<SessionPayload>;
+
+function base64urlEncode(value: string): string {
+  const bytes = new TextEncoder().encode(value);
   let binary = "";
-  for (let i = 0; i < bytes.byteLength; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
+  for (const byte of bytes) binary += String.fromCharCode(byte);
   return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 
-function base64urlDecode(str: string): string {
-  if (!str || typeof str !== "string") return "";
+function base64urlDecode(value: string): string {
   try {
-    let base64 = str.replace(/-/g, "+").replace(/_/g, "/");
-    while (base64.length % 4) {
-      base64 += "=";
-    }
-    return atob(base64);
+    const base64 = value.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = base64.padEnd(Math.ceil(base64.length / 4) * 4, "=");
+    const binary = atob(padded);
+    const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
+    return new TextDecoder().decode(bytes);
   } catch {
     return "";
   }
 }
 
-/** Edge-compatible HMAC signature helper using Web Crypto. */
-async function computeSignatureHex(payload: string, secret: string): Promise<string> {
-  const enc = new TextEncoder();
+async function hmacSha256(payload: string, secret: string): Promise<Uint8Array> {
+  if (!secret) throw new Error("Session signing secret cannot be empty");
+  const encoder = new TextEncoder();
   const key = await crypto.subtle.importKey(
     "raw",
-    enc.encode(secret),
+    encoder.encode(secret),
     { name: "HMAC", hash: "SHA-256" },
     false,
     ["sign"]
   );
-  const signatureBuffer = await crypto.subtle.sign("HMAC", key, enc.encode(payload));
-  const hashArray = Array.from(new Uint8Array(signatureBuffer));
-  return hashArray.map((byte) => byte.toString(16).padStart(2, "0")).join("");
+  return new Uint8Array(await crypto.subtle.sign("HMAC", key, encoder.encode(payload)));
 }
 
-function signPayload(payload: string, safeSecret: string): string {
-  let hash = 0;
-  const full = payload + safeSecret;
-  for (let i = 0; i < full.length; i++) {
-    hash = (Math.imul(31, hash) + full.charCodeAt(i)) | 0;
+function constantTimeEqual(expected: Uint8Array, suppliedHex: string): boolean {
+  if (!/^[a-f0-9]{64}$/i.test(suppliedHex)) return false;
+  let difference = 0;
+  for (let index = 0; index < expected.length; index += 1) {
+    const supplied = Number.parseInt(suppliedHex.slice(index * 2, index * 2 + 2), 16);
+    difference |= expected[index] ^ supplied;
   }
-  return Math.abs(hash).toString(16).padStart(16, "0");
+  return difference === 0;
 }
 
-/** Edge-compatible session token signing. */
-export function signSessionToken(
-  payloadInput: string | { userId?: string; role?: string; sessionId?: string; expiresAt?: number },
-  secret: string = DEFAULT_SECRET
-): string {
-  const safeSecret = secret || DEFAULT_SECRET;
-  const payloadObj = typeof payloadInput === "string"
-    ? { sessionId: payloadInput, userId: payloadInput, role: "student" }
-    : (payloadInput || { role: "student" });
-  const payload = base64urlEncode(JSON.stringify(payloadObj));
-  return `${payload}.${signPayload(payload, safeSecret)}`;
+function normalizePayload(input: SessionTokenInput): SessionPayload {
+  const source = typeof input === "string"
+    ? { sessionId: input, userId: input, role: "student" }
+    : input;
+  const userId = source.userId || source.sessionId;
+  if (!userId) throw new Error("Session token requires a userId or sessionId");
+  return {
+    userId,
+    role: source.role || "student",
+    sessionId: source.sessionId || userId,
+    expiresAt: source.expiresAt ?? Date.now() + DEFAULT_SESSION_TTL_HOURS * 3_600_000,
+  };
+}
+
+export async function signSessionToken(
+  payloadInput: SessionTokenInput,
+  secret: string = getSessionSecret()
+): Promise<string> {
+  const payload = base64urlEncode(JSON.stringify(normalizePayload(payloadInput)));
+  const signature = await hmacSha256(payload, secret);
+  const signatureHex = Array.from(signature, (byte) => byte.toString(16).padStart(2, "0")).join("");
+  return `${payload}.${signatureHex}`;
 }
 
 export const createSessionToken = signSessionToken;
 
-/** Edge-compatible session token verification. */
-export function verifySessionToken(
+export async function verifySessionToken(
   token: string | null | undefined,
-  secret = DEFAULT_SECRET
-): SessionPayload | null {
-  if (!token || typeof token !== "string") return null;
-
-  const safeSecret = secret || DEFAULT_SECRET;
+  secret: string = getSessionSecret()
+): Promise<SessionPayload | null> {
+  if (!token) return null;
   const parts = token.split(".");
   if (parts.length !== 2) return null;
-
   const [payload, signature] = parts;
   if (!payload || !signature) return null;
-  if (signature !== signPayload(payload, safeSecret)) return null;
 
   try {
-    const decodedStr = base64urlDecode(payload);
-    if (!decodedStr) return null;
-
-    const decoded: unknown = JSON.parse(decodedStr);
-    if (
-      decoded
-      && typeof decoded === "object"
-      && ("userId" in decoded || "sessionId" in decoded)
-    ) {
-      const value = decoded as Record<string, unknown>;
-      if (value.userId || value.sessionId) {
-        const id = String(value.userId || value.sessionId);
-        return {
-          userId: id,
-          role: typeof value.role === "string" ? value.role : "student",
-          sessionId: value.sessionId ? String(value.sessionId) : id,
-          expiresAt: typeof value.expiresAt === "number" ? value.expiresAt : undefined,
-        };
-      }
-    }
+    const expected = await hmacSha256(payload, secret);
+    if (!constantTimeEqual(expected, signature)) return null;
+    const decoded: unknown = JSON.parse(base64urlDecode(payload));
+    if (!decoded || typeof decoded !== "object") return null;
+    const value = decoded as Record<string, unknown>;
+    const userId = value.userId || value.sessionId;
+    if (typeof userId !== "string" || !userId) return null;
+    if (typeof value.expiresAt !== "number" || !Number.isFinite(value.expiresAt)) return null;
+    if (Date.now() > value.expiresAt) return null;
+    return {
+      userId,
+      role: typeof value.role === "string" ? value.role : "student",
+      sessionId: typeof value.sessionId === "string" ? value.sessionId : userId,
+      expiresAt: value.expiresAt,
+    };
   } catch {
     return null;
   }
-
-  return null;
 }
-
-void computeSignatureHex;

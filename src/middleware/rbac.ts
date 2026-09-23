@@ -93,16 +93,21 @@ export interface MiddlewareResponse {
   redirectUrl?: string;
 }
 
-export function rbacMiddleware(
+export async function rbacMiddleware(
   req: MiddlewareRequest,
   options: {
     secret: string;
     sessionLookup: (sessionId: string) => SessionRecord | null | undefined;
     now?: Date;
   }
-): MiddlewareResponse {
+): Promise<MiddlewareResponse> {
   const cookieHeader = req.headers["cookie"] || req.headers["Cookie"];
-  const validation = validateSessionCookie(cookieHeader, options.secret, options.sessionLookup, options.now);
+  const validation = await validateSessionCookie(
+    cookieHeader,
+    options.secret,
+    options.sessionLookup,
+    options.now
+  );
 
   const activeRole = validation.valid && validation.session ? validation.session.role : null;
   const authCheck = authorizeRoute(req.pathname, activeRole);

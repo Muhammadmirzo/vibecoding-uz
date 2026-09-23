@@ -69,16 +69,16 @@ describe("Production High-Load Defensive Hardening - SMS and Edge Runtime", () =
   });
 
   describe("Edge Runtime Null Check Resilience", () => {
-    it("should handle null or invalid session tokens without throwing exceptions", () => {
-      expect(verifySessionToken(null)).toBeNull();
-      expect(verifySessionToken(undefined)).toBeNull();
-      expect(verifySessionToken("")).toBeNull();
-      expect(verifySessionToken("invalid.token.structure")).toBeNull();
-      expect(verifySessionToken("malformed_base64!.signature")).toBeNull();
+    it("should handle null or invalid session tokens without throwing exceptions", async () => {
+      await expect(verifySessionToken(null)).resolves.toBeNull();
+      await expect(verifySessionToken(undefined)).resolves.toBeNull();
+      await expect(verifySessionToken("")).resolves.toBeNull();
+      await expect(verifySessionToken("invalid.token.structure")).resolves.toBeNull();
+      await expect(verifySessionToken("malformed_base64!.signature")).resolves.toBeNull();
     });
-    it("should sign and verify valid session tokens cleanly", () => {
-      const token = signSessionToken({ userId: "usr_abc", role: "admin" }, "my_test_secret");
-      const verified = verifySessionToken(token, "my_test_secret");
+    it("should sign and verify valid session tokens cleanly", async () => {
+      const token = await signSessionToken({ userId: "usr_abc", role: "admin" }, "my_test_secret");
+      const verified = await verifySessionToken(token, "my_test_secret");
       expect(verified).not.toBeNull();
       expect(verified?.userId).toBe("usr_abc");
       expect(verified?.role).toBe("admin");
@@ -89,8 +89,8 @@ describe("Production High-Load Defensive Hardening - SMS and Edge Runtime", () =
       expect(parseSessionCookie("")).toBeNull();
       expect(parseSessionCookie("session_token=abc123xyz")).toBe("abc123xyz");
     });
-    it("should validate session cookie with null check resilience", () => {
-      const result = validateSessionCookie(null, "secret", () => null);
+    it("should validate session cookie with null check resilience", async () => {
+      const result = await validateSessionCookie(null, "secret", () => null);
       expect(result.valid).toBe(false);
       expect(result.error).toBe("MISSING_TOKEN");
     });

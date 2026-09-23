@@ -1,14 +1,8 @@
 import { describe, it, expect } from "vitest";
 
 /**
- * MIRROR of the pure helpers exported from src/app/api/quiz/route.ts
- * (normalizeLeadName, normalizeLeadPhone, validateLeadName, validateLeadContact).
- *
- * The route module itself is not imported here on purpose: importing it would
- * pull in `@/db` (which throws without DATABASE_URL) and the rate-limit
- * module. These pure helpers have no dependencies, so they are duplicated
- * verbatim for side-effect-free unit testing. If the route helpers change,
- * update this mirror to match.
+ * Legacy helper mirror retained for normalization and contact-format coverage.
+ * The route now delegates final validation to dedicated Zod schemas in CRM.
  */
 
 const TELEGRAM_USERNAME_REGEX = /^@[A-Za-z0-9_]{3,}$/;

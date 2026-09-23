@@ -29,7 +29,7 @@ export async function middleware(request: NextRequest) {
     token = undefined;
   }
 
-  const session = token ? verifySessionToken(token) : null;
+  const session = token ? await verifySessionToken(token) : null;
 
   // Allow public access to /admin/login
   if (pathname.startsWith("/admin/login")) {

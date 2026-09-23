@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { parseSessionCookie } from "./cookie";
-import { DEFAULT_SECRET } from "./constants";
+import { getSessionSecret } from "./constants";
 import { verifySessionToken } from "./token";
 import {
   DEFAULT_SESSION_COOKIE_NAME,
@@ -9,34 +9,27 @@ import {
   type SessionValidationResult,
 } from "./types";
 
-/**
- * Validates session cookie against storage lookup safely.
- */
-export function validateSessionCookie(
+/** Validates the signed cookie and then checks the backing session record. */
+export async function validateSessionCookie(
   cookieHeader: string | null | undefined,
-  secret: string = DEFAULT_SECRET,
+  secret: string = getSessionSecret(),
   sessionLookup: (sessionId: string) => SessionRecord | null | undefined,
   now?: Date,
   cookieName = DEFAULT_SESSION_COOKIE_NAME
-): SessionValidationResult {
+): Promise<SessionValidationResult> {
   try {
     const token = parseSessionCookie(cookieHeader, cookieName);
-    if (!token) {
-      return { valid: false, error: "MISSING_TOKEN" };
-    }
+    if (!token) return { valid: false, error: "MISSING_TOKEN" };
 
-    const verifiedPayload = verifySessionToken(token, secret);
-    if (!verifiedPayload) {
-      return { valid: false, error: "INVALID_SIGNATURE" };
-    }
+    const verifiedPayload = await verifySessionToken(token, secret);
+    if (!verifiedPayload) return { valid: false, error: "INVALID_SIGNATURE" };
 
-    let session: SessionRecord | null | undefined = null;
+    let session: SessionRecord | null | undefined;
     try {
       session = sessionLookup(verifiedPayload.sessionId || verifiedPayload.userId);
     } catch {
       return { valid: false, error: "SESSION_NOT_FOUND" };
     }
-
     if (!session || !session.expiresAt) {
       return { valid: false, error: "SESSION_NOT_FOUND" };
     }
@@ -55,9 +48,7 @@ export function validateSessionCookie(
   }
 }
 
-/**
- * Helper to retrieve auth session token from headers or next/headers cookies.
- */
+/** Retrieves and verifies a session token from cookies or a cookie header. */
 export async function getAuthSession(cookieHeader?: string | null) {
   let token: string | null = null;
 

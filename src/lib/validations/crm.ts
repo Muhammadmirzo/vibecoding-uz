@@ -33,6 +33,33 @@ export const createLeadSchema = z.object({
   nextContactAt: z.string().optional().nullable(),
 });
 
+const telegramUsernameSchema = z.string().regex(/^@[A-Za-z0-9_]{3,}$/, {
+  message: "Telegram username @ bilan, min 4 belgi bo'lishi kerak",
+});
+
+export const quizLeadSchema = createLeadSchema.extend({
+  phone: z.string().regex(uzbekPhoneRegex, {
+    message: "Quiz uchun +998 telefon raqami kiritilishi shart",
+  }),
+  source: z.literal("quiz"),
+});
+
+export const freeLessonLeadSchema = createLeadSchema
+  .omit({ phone: true, source: true })
+  .extend({
+    phone: z.string().regex(uzbekPhoneRegex).optional().nullable(),
+    telegram: telegramUsernameSchema.optional().nullable(),
+    source: z.literal("free_lesson"),
+  })
+  .superRefine((value, context) => {
+    if (!value.phone && !value.telegram) {
+      context.addIssue({ code: z.ZodIssueCode.custom, path: ["phone"], message: "Telefon yoki Telegram username kiritish shart" });
+    }
+    if (value.phone && value.telegram) {
+      context.addIssue({ code: z.ZodIssueCode.custom, path: ["telegram"], message: "Faqat bitta aloqa usulini kiriting" });
+    }
+  });
+
 export const updateLeadStatusSchema = z.object({
   status: leadStatusSchema,
 });

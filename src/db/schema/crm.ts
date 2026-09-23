@@ -6,7 +6,8 @@ import { courses } from "./courses";
 export const leads = pgTable("leads", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
-  phone: varchar("phone", { length: 20 }).notNull(),
+  phone: varchar("phone", { length: 20 }),
+  telegram: varchar("telegram", { length: 64 }),
   source: leadSourceEnum("source").default("form").notNull(),
   quizAnswers: jsonb("quiz_answers"),
   recommendedCourseId: uuid("recommended_course_id").references(() => courses.id),

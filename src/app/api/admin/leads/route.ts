@@ -42,7 +42,7 @@ export async function GET(request: Request) {
       allLeads = allLeads.filter(
         (lead) =>
           lead.name.toLowerCase().includes(q) ||
-          lead.phone.toLowerCase().includes(q)
+          (lead.phone ?? "").toLowerCase().includes(q)
       );
     }
 
