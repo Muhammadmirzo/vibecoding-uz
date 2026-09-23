@@ -86,3 +86,8 @@ Restore branch tayyor bo'lgach, PR orqali `main` ga qaytariladi — to'g'ridan-t
 - kurs/[slug]: h-13 → h-12 min-h-48.
 - Test: tsc 0, grep (h-13/9 savol/demo) clean, vitest 17/17, build 0.
 - Rollback tag: pre-honest-slice1-20260923.
+
+## 2026-09-23 — Trust Slice 2: Clash Nexus showcase
+- ProofStats/Hero/page/siteConfig: soxta raqamlar o'chirildi, Clash Nexus (https://clash-nexus.vercel.app/) jonli isbot.
+- Test: tsc 0, grep clean, vitest 17/17, build 0.
+- Qoldiq: narx/kafolat/sana qiymatlari egasi tasdig'ini kutmoqda (TODO olib tashlangan, qiymatlar o'zgarmagan).
