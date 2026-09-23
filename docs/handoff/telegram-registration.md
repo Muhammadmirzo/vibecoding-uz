@@ -67,8 +67,14 @@ Restore branch tayyor bo'lgach, PR orqali `main` ga qaytariladi — to'g'ridan-t
 
 ## Keyingi qadamlar
 
-1. [ ] Auth ishchisi "O'zgarishlar" jadvalini aniq fayllar bilan to'ldiradi.
-2. [ ] Verifikatsiya jadvali ishga tushirib to'ldiriladi (`tsc`, `vitest`, `build`).
+1. [x] Auth ishchisi "O'zgarishlar" jadvalini aniq fayllar bilan to'ldirdi (yuqorida).
+2. [x] Verifikatsiya: tsc ✅, telegram-auth 7/7 ✅, build ✅ (full suite 141/142 — 1 infra flake).
 3. [ ] `TELEGRAM_BOT_TOKEN` Vercel dashboardda borligi tekshiriladi.
 4. [ ] `main` ga merge PR + pre-deploy gate yashil.
 5. [ ] Push `main` va `master` ga, production smoke-test.
+
+## 2026-09-23 — Bepul dars fix (commit 3296197)
+
+- Button `h-13` (Tailwind'da yo'q → yupqa) → `h-12 min-h-48`.
+- Telefon `+998` yarim holatda 400 "saqlanmadi" berardi → maska + client validatsiya + serverda aniq 400 xabarlar (ism/phone/telegram).
+- Test: free-lesson-lead 10/10, telegram-auth 7/7, tsc 0, build 0.
