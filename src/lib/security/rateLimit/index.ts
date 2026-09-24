@@ -24,25 +24,34 @@ export async function checkRateLimit(
   const windowMs = windowSeconds * 1000;
   const key = `ratelimit:${prefix}:${safeIdentifier}`;
 
+  if (process.env.NODE_ENV === "production" &&
+      (!process.env.UPSTASH_REDIS_REST_URL?.trim() || !process.env.UPSTASH_REDIS_REST_TOKEN?.trim())) {
+    throw new Error("Rate limit service is not configured");
+  }
   const redisResult = await checkRedisRateLimit(key, limit, windowSeconds, now);
+  if (process.env.NODE_ENV === "production" && !redisResult) {
+    throw new Error("Rate limit service is temporarily unavailable");
+  }
   return redisResult || checkMemoryRateLimit(key, limit, windowMs, now);
 }
 
-/** Extracts a client IP address from request headers safely. */
+const IPV4 = /^(?:\d{1,3}\.){3}\d{1,3}$/;
+const IPV6 = /^[0-9a-f:]+$/i;
+function validIp(value: string): string | null {
+  const candidate = value.trim();
+  const valid = IPV4.test(candidate)
+    ? candidate.split(".").every((part) => Number(part) <= 255)
+    : IPV6.test(candidate) && candidate.includes(":");
+  return valid ? candidate : null;
+}
+
+/** Extracts a platform-normalized client IP; raw XFF is only trusted in development. */
 export function getClientIp(request?: Request | null): string {
-  if (!request || !request.headers) return "127.0.0.1";
-  try {
-    const forwardedFor = request.headers.get("x-forwarded-for");
-    if (forwardedFor && typeof forwardedFor === "string") {
-      const firstIp = forwardedFor.split(",")[0]?.trim();
-      if (firstIp) return firstIp;
-    }
-    const realIp = request.headers.get("x-real-ip");
-    if (realIp && typeof realIp === "string" && realIp.trim()) return realIp.trim();
-  } catch {
-    // Edge runtime fallback
-  }
-  return "127.0.0.1";
+  if (!request?.headers) return "127.0.0.1";
+  const platform = request.headers.get("x-vercel-forwarded-for") ||
+    (process.env.NODE_ENV !== "production" ? request.headers.get("x-forwarded-for") : null);
+  const first = platform?.split(",")[0];
+  return (first && validIp(first)) || validIp(request.headers.get("x-real-ip") || "") || "127.0.0.1";
 }
 
 /** Creates a standard HTTP 429 response with rate-limit headers. */

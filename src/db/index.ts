@@ -2,13 +2,18 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import * as schema from "./schema";
 
-const connectionString = process.env.DATABASE_URL || "postgres://postgres:postgres@localhost:5432/vibecoding_db";
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString && process.env.NODE_ENV === "production") {
+  throw new Error("DATABASE_URL production uchun majburiy");
+}
+// Local/test convenience only. Production fails closed above.
+const effectiveConnectionString = connectionString ?? "postgres://postgres:postgres@localhost:5432/vibecoding_db";
 
 const maxConnections = process.env.DATABASE_MAX_CONNECTIONS
   ? parseInt(process.env.DATABASE_MAX_CONNECTIONS, 10) || 10
   : 10;
 
-const client = postgres(connectionString, {
+const client = postgres(effectiveConnectionString, {
   max: Math.max(1, Math.min(maxConnections, 100)),
   idle_timeout: 30,
   connect_timeout: 10,
@@ -115,15 +120,8 @@ export async function withTransactionLock<T>(
           return await fn(tx);
         });
       } catch (err: unknown) {
-        // If DB connection is refused/offline (e.g. unit test environment), run with local in-memory lock
-        const { code, message } = getErrorDetails(err);
-        if (
-          code === "ECONNREFUSED" ||
-          code === "ENOTFOUND" ||
-          message.includes("ECONNREFUSED")
-        ) {
-          return await fn(null);
-        }
+        // A local mutex cannot replace a database transaction. Fail closed so
+        // callers return a retryable 503 instead of performing partial writes.
         throw err;
       }
     });

@@ -51,6 +51,24 @@ function codeOf(error: object): string {
   return typeof candidate.code === "string" && candidate.code.length > 0 ? candidate.code : "internal_error";
 }
 
+const DATABASE_ERROR_CODES = new Set([
+  "ECONNREFUSED", "ECONNRESET", "ENOTFOUND", "ETIMEDOUT", "EAI_AGAIN",
+  "08000", "08001", "08003", "08004", "08006", "08007", "08P01", "53300", "57P01",
+]);
+
+/** Recognises PostgreSQL/connectivity failures so public pages never expose a generic 500. */
+export function isDatabaseUnavailable(error: unknown): boolean {
+  if (!error || typeof error !== "object") return false;
+  const candidate = error as { code?: unknown; message?: unknown; name?: unknown };
+  if (typeof candidate.code === "string" && DATABASE_ERROR_CODES.has(candidate.code)) return true;
+  const message = typeof candidate.message === "string" ? candidate.message.toLowerCase() : "";
+  return message.includes("connection terminated") || message.includes("connection refused") ||
+    message.includes("connection lost") || message.includes("connect timeout") ||
+    message.includes("the database system is") || message.includes("timeout exceeded");
+}
+
+const RECOVERY_MESSAGE = "Texnik xizmat vaqtincha ishlamayapti. Ma'lumotlaringiz saqlangan; qisqa vaqt ichida qayta urinib ko'ring.";
+
 /**
  * Converts any thrown error into a JSON error response.
  * Zod validation failures → 400, known domain codes → mapped status,
@@ -66,16 +84,19 @@ export function errorResponse(error: unknown): NextResponse {
     );
   }
   if (typeof error === "object" && error !== null) {
-    const status = statusOf(error);
-    const code = codeOf(error);
-    const message = error instanceof Error ? error.message : code;
+    const databaseUnavailable = isDatabaseUnavailable(error);
+    const rateLimitUnavailable = error instanceof Error && /rate limit service/i.test(error.message);
+    const status = databaseUnavailable || rateLimitUnavailable ? 503 : statusOf(error);
+    const code = databaseUnavailable ? "database_unavailable" : rateLimitUnavailable ? "rate_limit_unavailable" : codeOf(error);
+    const message = databaseUnavailable || rateLimitUnavailable ? RECOVERY_MESSAGE : error instanceof Error ? error.message : code;
+    const retryable = status === 503 || status === 429 || status === 408;
     if (status >= 500) {
       console.error(`[api] ${code}:`, error);
     }
-    return NextResponse.json({ error: code, message }, { status });
+    return NextResponse.json({ error: code, message, retryable }, { status });
   }
   console.error("[api] non-error thrown:", error);
-  return NextResponse.json({ error: "internal_error" }, { status: 500 });
+  return NextResponse.json({ error: "internal_error", message: RECOVERY_MESSAGE, retryable: false }, { status: 500 });
 }
 
 /** Success envelope helper (keeps list routes consistent). */

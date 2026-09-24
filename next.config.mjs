@@ -22,42 +22,7 @@ const nextConfig = {
       bodySizeLimit: '2mb',
     },
   },
-  async headers() {
-    const securityHeaders = [
-      {
-        key: 'Strict-Transport-Security',
-        value: 'max-age=63072000; includeSubDomains; preload',
-      },
-      { key: 'X-Frame-Options', value: 'DENY' },
-      { key: 'X-Content-Type-Options', value: 'nosniff' },
-      { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-      {
-        key: 'Permissions-Policy',
-        value: 'camera=(), microphone=(), geolocation=(), payment=()',
-      },
-      {
-        key: 'Content-Security-Policy',
-        value: [
-          "default-src 'self'",
-          "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://telegram.org https://oauth.telegram.org",
-          "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-          "font-src 'self' https://fonts.gstatic.com data:",
-          "img-src 'self' data: blob: https:",
-          "connect-src 'self' https://api.telegram.org",
-          "frame-src https://oauth.telegram.org https://telegram.org",
-          "object-src 'none'",
-          "base-uri 'self'",
-          "form-action 'self'",
-        ].join('; '),
-      },
-    ];
-    return [
-      {
-        source: '/:path*',
-        headers: securityHeaders,
-      },
-    ];
-  },
+  // Security headers (Content-Security-Policy, X-Frame-Options, Strict-Transport-Security) and nonce-based CSP are applied centrally in middleware.
 };
 
 export default nextConfig;
