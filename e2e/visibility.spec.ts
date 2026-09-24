@@ -8,7 +8,26 @@ import { expect, test } from "@playwright/test";
  * block that reached the viewport is actually visible, and that headings never
  * fall back to a serif (Times) font.
  */
-const PAGES = ["/", "/kurs/vibe-coding-express", "/bepul-dars", "/xizmatlar", "/blog"];
+const PAGES = [
+  "/",
+  "/kurs/vibe-coding-express",
+  "/kurs/ai-asoslari",
+  "/bepul-dars",
+  "/diagnostika",
+  "/xizmatlar",
+  "/portfolio",
+  "/blog",
+  "/blog/vibe-coding-nima-va-u-qanday-ishlaydi",
+  "/resurslar",
+  "/atamalar",
+  "/ekspertlar",
+  "/meetlar",
+  "/pul-qaytarish",
+  "/maxfiylik",
+  "/offerta",
+  "/shahodatnoma/DEMO2026",
+  "/kabinet",
+];
 const WIDTHS = [390, 1440];
 
 for (const path of PAGES) {

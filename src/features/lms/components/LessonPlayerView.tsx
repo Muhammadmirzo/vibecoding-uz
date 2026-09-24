@@ -61,9 +61,16 @@ export default function LessonPlayerView({ courseId, lessonId }: { courseId: str
         {tab === "homework" ? <HomeworkPanel assignment={section.title} /> : null}
          </div>
       </div>
-      <aside className="rounded-xl border border-border bg-bg-elevated p-5"><h2 className="font-display text-base font-semibold text-ink">Kurs darslari</h2><div className="mt-4 space-y-2">{lessons.map((item) => <Link key={item.id} href={`/kabinet/kurs/${courseId}/dars/${item.id}`} className={`block rounded-lg border p-3 text-sm ${item.id === lesson.id ? "border-accent bg-accent-soft font-semibold text-ink" : "border-border text-ink-muted hover:border-brand"}`}><span className="block">{item.title}</span><span className="font-mono text-xs">{Math.round(item.durationSec / 60)} daq</span></Link>)}</div></aside>
+      <aside className="rounded-xl border border-border bg-bg-elevated p-5"><h2 className="font-display text-base font-semibold text-ink">Kurs darslari</h2><div className="mt-4 space-y-2">{lessons.map((item) => <Link key={item.id} href={`/kabinet/kurs/${courseId}/dars/${item.id}`} aria-current={item.id === lesson.id ? "page" : undefined} className={`block min-h-11 rounded-lg border p-3 text-sm ${item.id === lesson.id ? "border-accent bg-accent-soft font-semibold text-ink" : "border-border text-ink-muted hover:border-brand"}`}><span className="block">{item.title}</span><span className="font-mono text-xs">{Math.round(item.durationSec / 60)} daq</span></Link>)}</div><NextLessonButton lessons={lessons} currentId={lesson.id} courseId={courseId} /></aside>
     </div>
   </main></div>;
+}
+
+function NextLessonButton({ lessons, currentId, courseId }: { lessons: LessonRow[]; currentId: string; courseId: string }) {
+  const ordered = [...lessons].sort((a, b) => a.sortOrder - b.sortOrder);
+  const next = ordered[ordered.findIndex((item) => item.id === currentId) + 1];
+  if (!next) return <p className="mt-4 rounded-lg bg-success-soft px-4 py-3 text-center text-sm font-semibold text-success">Bu bo&apos;limning oxirgi darsi</p>;
+  return <Button href={`/kabinet/kurs/${courseId}/dars/${next.id}`} className="mt-4 w-full">Keyingi dars: {next.title}</Button>;
 }
 
 function PromptList({ prompts, copied, onCopy }: { prompts: Array<{ title: string; content: string }>; copied: boolean; onCopy: (text: string) => void }) {

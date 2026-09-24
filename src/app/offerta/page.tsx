@@ -1,8 +1,30 @@
 import type { Metadata } from "next";
-import { Container, Heading, Eyebrow } from "@/components/ui";
-import { Card } from "@/components/ui/Surfaces";
 import { NextStepCTA } from "@/components/ui/NextStepCTA";
+import { LegalLayout } from "@/components/pages/PageBits";
 
 export const metadata: Metadata = { title: "Ommaviy oferta", description: "Naqsh ta’lim xizmatlari bo‘yicha ommaviy oferta shartnomasi." };
-const sections = [["1. Shartnoma mavzusi", "Naqsh platformasi va ta’lim oluvchi o‘rtasidagi rasmiy shartnoma. Ijrochi qo‘llanma, video darslar va maslahat xizmatlarini taqdim etadi."], ["2. Xizmatlar", "Kurs dasturi va uning doirasidagi materiallar platformada joylashtiriladi. Materiallarni tashqariga ko‘chirish yoki qayta tarqatish taqiqlanadi."], ["3. To‘lov tartibi", "To‘lov Payme, Click yoki operator orqali amalga oshiriladi. To‘lov miqdori va muddati ariza yoki sahifadagi shartlarda ko‘rsatiladi."], ["4. Bekor qilish va qaytarish", "Bekor qilish va pul qaytarish shartlari alohida kafolat siyosatida ko‘rsatilgan."], ["5. Aloqa", "Shartnoma bo‘yicha savollar uchun sayt orqali yoki Telegram orqali bog‘lanish mumkin."]];
-export default function Page() { return <div className="bg-bg text-ink"><Container className="py-20 sm:py-28"><Eyebrow>Huquqiy hujjat</Eyebrow><Heading as="h1" className="mt-3">Ommaviy oferta shartnomasi</Heading><Card className="mt-10 max-w-3xl divide-y divide-border text-[17px] leading-relaxed text-ink-muted"><p className="pb-7">Ushbu hujjat Naqsh platformasi va ta’lim oluvchi o‘rtasidagi rasmiy shartnoma hisoblanadi.</p>{sections.map(([title, text]) => <section key={title} className="py-7"><Heading as="h2" className="text-2xl">{title}</Heading><p className="mt-3">{text}</p></section>)}</Card></Container><NextStepCTA /></div>; }
+
+const sections = [
+  { id: "mavzu", title: "1. Shartnoma mavzusi", text: "Naqsh platformasi va ta’lim oluvchi o‘rtasidagi rasmiy shartnoma. Ijrochi qo‘llanma, video darslar va maslahat xizmatlarini taqdim etadi." },
+  { id: "xizmatlar", title: "2. Xizmatlar", text: "Kurs dasturi va uning doirasidagi materiallar platformada joylashtiriladi. Materiallarni tashqariga ko‘chirish yoki qayta tarqatish taqiqlanadi." },
+  { id: "tolov", title: "3. To‘lov tartibi", text: "To‘lov Payme, Click yoki operator orqali amalga oshiriladi. To‘lov miqdori va muddati ariza yoki sahifadagi shartlarda ko‘rsatiladi." },
+  { id: "bekor", title: "4. Bekor qilish va qaytarish", text: "Bekor qilish va pul qaytarish shartlari alohida kafolat siyosatida ko‘rsatilgan." },
+  { id: "aloqa", title: "5. Aloqa", text: "Shartnoma bo‘yicha savollar uchun sayt orqali yoki Telegram orqali bog‘lanish mumkin." },
+];
+
+export default function Page() {
+  return (
+    <div className="bg-bg">
+      <LegalLayout eyebrow="Huquqiy hujjat" title="Ommaviy oferta shartnomasi" toc={sections.map(({ id, title }) => ({ id, label: title }))}>
+        <p>Ushbu hujjat Naqsh platformasi va ta’lim oluvchi o‘rtasidagi rasmiy shartnoma hisoblanadi.</p>
+        {sections.map((section) => (
+          <section key={section.id} id={section.id} className="scroll-mt-24">
+            <h2>{section.title}</h2>
+            <p>{section.text}</p>
+          </section>
+        ))}
+      </LegalLayout>
+      <NextStepCTA />
+    </div>
+  );
+}
