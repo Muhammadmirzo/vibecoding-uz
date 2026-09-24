@@ -82,6 +82,7 @@ export function RevealRoot() {
 
     let disposed = false;
     let mutations: MutationObserver | null = null;
+    let safetyTimer = 0;
 
     const arm = () => {
       if (disposed) return;
@@ -93,7 +94,7 @@ export function RevealRoot() {
             if (entry.isIntersecting) revealOne(entry.target);
           }
         },
-        { threshold: 0.12, rootMargin: "0px 0px -8% 0px" },
+        { threshold: 0, rootMargin: "0px 0px -5% 0px" },
       );
 
       marqueeObserver = new IntersectionObserver(
@@ -109,6 +110,13 @@ export function RevealRoot() {
       armMarquees(document);
       sweepReveals();
       window.addEventListener("scroll", onScrollSweep, { passive: true });
+      window.addEventListener("resize", onScrollSweep, { passive: true });
+      // Safety net: whatever blocks an observer callback (throttled webviews,
+      // momentum scroll, bfcache), content that reached the viewport is shown.
+      safetyTimer = window.setInterval(() => {
+        if (pendingReveals.size === 0) window.clearInterval(safetyTimer);
+        else sweepReveals();
+      }, 1200);
 
       // Client-side navigations inject new nodes — watch for them.
       mutations = new MutationObserver((records) => {
@@ -145,6 +153,8 @@ export function RevealRoot() {
       mutations?.disconnect();
       document.removeEventListener("visibilitychange", syncHidden);
       window.removeEventListener("scroll", onScrollSweep);
+      window.removeEventListener("resize", onScrollSweep);
+      window.clearInterval(safetyTimer);
       revealObserver?.disconnect();
       marqueeObserver?.disconnect();
       revealObserver = null;
