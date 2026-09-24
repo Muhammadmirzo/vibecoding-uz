@@ -37,6 +37,7 @@ export const chatMessages = pgTable("chat_messages", {
 }, (table) => [
   uniqueIndex("chat_messages_client_idx").on(table.conversationId, table.clientId),
   index("chat_messages_conversation_idx").on(table.conversationId, table.createdAt),
+  index("chat_messages_telegram_idx").on(table.telegramMessageId),
 ]);
 
 export type ChatConversation = typeof chatConversations.$inferSelect;
