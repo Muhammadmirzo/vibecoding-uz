@@ -65,7 +65,9 @@ export default async function CourseDetailPage({ params }: Props) {
         actions={<><Button href="/diagnostika" size="lg">Mosligini tekshirish</Button><Button href="/bepul-dars" size="lg" variant="outline">Avval bepul dars</Button></>}
         aside={
           <div className="w6c-load lg:sticky lg:top-24" style={{ "--i": 3 } as React.CSSProperties}>
-            <CohortCountdown date={siteConfig.nextCohortDate} className="mb-3" />
+            <div className="mb-3 min-h-[46px]">
+              <CohortCountdown date={siteConfig.nextCohortDate} />
+            </div>
             <CourseCheckoutCard
               price={pricing.price}
               oldPrice={pricing.oldPrice}
