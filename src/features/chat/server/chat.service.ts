@@ -176,6 +176,7 @@ export async function postReply(
   body: string,
   clientId = crypto.randomUUID(),
   ip?: string,
+  sender: "admin" | "ai" = "admin",
 ): Promise<ChatMessageDto> {
   await requireConversation(conversationId);
   const existing = (await db.select().from(chatMessages).where(and(
@@ -184,7 +185,7 @@ export async function postReply(
   if (existing) return messageDto(existing);
   const [message] = await db.transaction(async (tx) => {
     const inserted = await tx.insert(chatMessages).values({
-      conversationId, clientId, sender: "admin", authorUserId: actorId, body: body.trim(),
+      conversationId, clientId, sender, authorUserId: actorId, body: body.trim(),
     }).returning();
     await tx.update(chatConversations).set({
       status: "open",
@@ -193,7 +194,7 @@ export async function postReply(
     }).where(eq(chatConversations.id, conversationId));
     await tx.insert(auditLogs).values({
       userId: actorId, action: "chat.reply.send", entityType: "chat_conversation",
-      entityId: conversationId, details: { messageId: inserted[0].id }, ipAddress: ip || null,
+      entityId: conversationId, details: { messageId: inserted[0].id, sender }, ipAddress: ip || null,
     });
     return inserted;
   });

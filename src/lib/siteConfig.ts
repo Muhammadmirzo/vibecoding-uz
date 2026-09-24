@@ -3,6 +3,7 @@ import { servicesPageCopySchema } from "@/features/services/serviceSchemas";
 import { servicesCatalog } from "@/features/services/servicesCatalog";
 
 export const siteConfigSchema = z.object({
+  siteUrl: z.string().url(),
   nextCohortDate: z.string(),
   nextCohortShortDate: z.string(),
   guaranteeDays: z.number(),
@@ -30,6 +31,7 @@ export const siteConfigSchema = z.object({
 export type SiteConfig = z.infer<typeof siteConfigSchema>;
 
 export const siteConfig: SiteConfig = siteConfigSchema.parse({
+  siteUrl: "https://master-2-jade.vercel.app",
   nextCohortDate: "15-Oktyabr, 2026",
   nextCohortShortDate: "15-Oktyabr",
   guaranteeDays: 7,
