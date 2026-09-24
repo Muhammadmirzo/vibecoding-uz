@@ -43,6 +43,13 @@
       "when": 1790238440515,
       "tag": "0005_normal_stephen_strange",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1790249718512,
+      "tag": "0006_familiar_naoko",
+      "breakpoints": true
     }
   ]
 }

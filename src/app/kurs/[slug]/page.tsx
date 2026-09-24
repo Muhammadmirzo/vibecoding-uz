@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Surfaces";
 import { Container, Eyebrow, Heading, Section } from "@/components/ui/Layout";
 import { NextStepCTA } from "@/components/ui/NextStepCTA";
-import { PORTFOLIO_DATA } from "@/features/portfolio/portfolioData";
+import { getPublicPortfolios } from "@/features/portfolio/server/portfolio.service";
 import { siteConfig } from "@/lib/siteConfig";
 import { courseJsonLd, routeMetadata, serializeJsonLd } from "@/lib/seo";
 import { COMPARISON_ROWS, COURSES, COURSE_SLUGS, getCoursePricing } from "@/features/courses/content";
@@ -35,7 +35,7 @@ export default async function CourseDetailPage({ params }: Props) {
   const course = COURSES[slug];
   if (!course) notFound();
   const pricing = getCoursePricing(slug);
-  const projects = PORTFOLIO_DATA.filter((item) => item.isFeatured).slice(0, 3);
+  const projects = (await getPublicPortfolios()).portfolios.slice(0, 3);
 
   const jsonLd = courseJsonLd({ name: course.title, description: course.description, price: pricing.price, path: `/kurs/${slug}`, startDate: siteConfig.nextCohortDate });
 
