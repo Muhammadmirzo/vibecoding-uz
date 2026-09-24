@@ -35,7 +35,7 @@ export function CourseCheckoutCard({ price, oldPrice, installment, sessionFormat
         </ul>
       </div>
       <div className="space-y-3 pt-2">
-        <CourseCheckoutButton />
+        <span data-track="course_buy"><CourseCheckoutButton /></span>
         <p className="text-sm leading-relaxed text-ink-muted">
           To&apos;lov oynasi `Kabinet → To&apos;lovlar` bo&apos;limida ochiladi — avval hisobingizga kiring.
         </p>
@@ -43,7 +43,7 @@ export function CourseCheckoutCard({ price, oldPrice, installment, sessionFormat
           <Send className="size-4 text-accent" aria-hidden="true" /> Telegram orqali maslahat
         </Button>
         <Link href="/bepul-dars" prefetch className="block">
-          <Button variant="outline" className="w-full">
+          <Button variant="outline" data-track="course_free_lesson" className="w-full">
             <CirclePlay className="size-4 text-accent" aria-hidden="true" /> Bepul darsni ko&apos;rish
           </Button>
         </Link>

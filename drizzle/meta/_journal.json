@@ -57,6 +57,13 @@
       "when": 1790253579555,
       "tag": "0007_free_odin",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1790255343443,
+      "tag": "0008_flat_king_bedlam",
+      "breakpoints": true
     }
   ]
 }
