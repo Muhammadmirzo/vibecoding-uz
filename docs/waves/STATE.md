@@ -21,7 +21,23 @@
 | W4B Audit fixes | space-bunny-free | ✅ | wave/w4b-fixes (auto-resumed by opencode service after reboot) | reports/W4B-FIXES.md | orchestrator rejected fail-closed rate limit (no Upstash on Vercel) + added theme-script nonce |
 | W5 Final QA + deploy | space-bunny-free + orchestrator | ✅ DEPLOYED 2026-09-24 | main = master | reports/W5-FINAL.md | live smoke: all key routes 200, CSP nonce OK, 0 console errors (light/dark, 390/1440); /api/auth/telegram/start → 503 Uzbek message while DB is down |
 
-⚠️ **Machine has 7.6 GB RAM: run ONE agent at a time** (two agents + builds got killed by memory pressure on 2026-09-24).
+## Phase 2 (started 2026-09-24) — design overhaul, portfolio, chat, MCP, mobile-ready
+
+Parallel agents allowed (max 2) — heavy commands serialized with `scripts/waves/locked.sh` (flock). Owner rule: every source file ≤ 250 lines.
+
+| Wave | Model | Status | Branch | Report | Notes |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| W6A Design + motion: HOME | muse-spark-1.3 | 🏃 | wave/w6a-design-home | reports/W6A-DESIGN-HOME.md | scroll-driven storytelling, bento, micro-interactions; port 3301 |
+| W6B Portfolio management | space-bunny-free | 🏃 | wave/w6b-portfolio | reports/W6B-PORTFOLIO.md | featured rank, ownership, admin CRUD; new migration (orchestrator applies); port 3302 |
+| W6C Design rollout: all pages | muse-spark-1.3 | ⏳ after W6A approved | — | reports/W6C-DESIGN-PAGES.md | reuse W6A primitives |
+| W7 Chat centre (visitor ↔ admin ↔ AI agent) | space-bunny | ⏳ owner approval | — | reports/W7-CHAT.md | |
+| W8 First-party analytics + world-class MCP | — | ⏳ owner approval | — | reports/W8-MCP.md | tracking first, then MCP (OAuth, analytics tools, charts) |
+| W9 Mobile-ready API (/api/v1, OpenAPI, token auth) | — | ⏳ owner approval | — | reports/W9-MOBILE-API.md | |
+
+Waiting on the owner: which portfolio projects are really theirs · approve waves W7–W9 · approve cuts (/ekspertlar, /testimoniyalar, /ish, SpinWheel, unbuilt feature flags) · admin password reset (say "parolni yangila").
+Done outside waves 2026-09-24: DB restored + migrations 0000–0005 recorded/applied; reveal-blur/Times-font fix + e2e/visibility.spec.ts (0366972).
+
+⚠️ **Machine has 7.6 GB RAM: run heavy commands one at a time** — Phase 2 runs 2 agents but every build/playwright/lighthouse goes through `scripts/waves/locked.sh`.
 ⚠️ Stop dev servers by PID from `ss -ltnp | grep :<port>` — `lsof -t -i:<port>` misses next-server.
 ⚠️ After a reboot the `opencode serve --service` daemon auto-resumes old agent sessions in parallel — run `opencode service restart` first, then dispatch one wave.
 
