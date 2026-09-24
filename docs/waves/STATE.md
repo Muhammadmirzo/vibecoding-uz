@@ -16,8 +16,8 @@
 | W1B Brand | muse-spark-1.3-contributor-free | ✅ | wave/w1b-brand (f8f8052) | reports/W1B-BRAND.md | logo redrawn by orchestrator; geometry in src/components/brand/logoGeometry.ts; migration 0004 = blog author default |
 | W2 Telegram | space-bunny-free | ✅ | wave/w2-telegram (3 rounds: 0458ca2 rejected → 53ba867 → aebcd4b) | reports/W2-TELEGRAM.md | migration 0005 = telegram_login_requests; bot confirm step (anti-phishing) |
 | W3A Motion | muse-spark-1.3 → space-bunny | ✅ | wave/w3a-motion (ccfa473) | reports/W3A-MOTION.md | +2 kB home JS; `/` dynamic because root layout reads cookies() → W4A |
-| W3B Motion admin | space-bunny-free | 🏃 | wave/w3b-motion-admin | reports/W3B-MOTION-ADMIN.md | |
-| W4A Perf | space-bunny | ⏳ | — | reports/W4A-PERF.md | |
+| W3B Motion admin | space-bunny-free | ✅ | wave/w3b-motion-admin (c97a880) | reports/W3B-MOTION-ADMIN.md | site_settings key "motion", cached 300s, fail-safe defaults; admin tab "Animatsiyalar" |
+| W4A Perf | space-bunny-free | 🏃 | wave/w4a-perf | reports/W4A-PERF.md | |
 | W4B Audit fixes | space-bunny-free | ✅ | wave/w4b-fixes (auto-resumed by opencode service after reboot) | reports/W4B-FIXES.md | orchestrator rejected fail-closed rate limit (no Upstash on Vercel) + added theme-script nonce |
 | W5 Final QA + deploy | space-bunny + orchestrator | ⏳ | main | reports/W5-FINAL.md | |
 
