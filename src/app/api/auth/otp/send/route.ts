@@ -1,12 +1,15 @@
 import { NextResponse } from "next/server";
 import { randomInt } from "crypto";
-import { db } from "@/db";
-import { otpCodes } from "@/db/schema";
 import { otpSendSchema } from "@/lib/validations";
-import { normalizePhone, hashOtpCode } from "@/lib/auth/password";
 import { checkRateLimit, getClientIp, createRateLimitResponse, PRESETS } from "@/lib/security/rateLimit";
 import { sendOtpSms, redactPhone } from "@/lib/sms/eskiz";
+import { errorResponse } from "@/lib/http/errors";
+import { drizzleOtpRepository } from "@/features/auth/server/otp.repository";
+import { requestOtp } from "@/features/auth/server/otp.service";
 
+// NOTE(W5-ARCH): `randomInt` (CSPRNG) intentionally stays in this route file —
+// the W1-SEC hardening test asserts the route source uses the crypto-based
+// generator. The DB insert + SMS send live in `requestOtp`.
 export async function POST(request: Request) {
   try {
     const ip = getClientIp(request);
@@ -15,79 +18,44 @@ export async function POST(request: Request) {
       return createRateLimitResponse(ipRlResult);
     }
 
-    const body = await request.json();
-    const parseResult = otpSendSchema.safeParse(body);
-
-    if (!parseResult.success) {
-      return NextResponse.json(
-        {
-          error: "Ma'lumotlar noto'g'ri kiritildi",
-          details: parseResult.error.flatten(),
-        },
-        { status: 400 }
-      );
-    }
-
-    const phone = parseResult.data.phone;
-    const purpose = parseResult.data.purpose || "login";
-    const normalizedPhone = normalizePhone(phone);
+    const parsed = otpSendSchema.parse(await request.json());
+    const purpose = parsed.purpose || "login";
 
     // Enforce strict rate limit per phone number: max 3 OTP requests per 5 minutes
-    const phoneRlResult = await checkRateLimit(`phone:${normalizedPhone}`, PRESETS.OTP);
+    const phoneRlResult = await checkRateLimit(`phone:${parsed.phone}`, PRESETS.OTP);
     if (!phoneRlResult.success) {
       return createRateLimitResponse(phoneRlResult);
     }
 
     // Generate random 6-digit OTP code via CSPRNG
     const code = randomInt(100000, 1000000).toString();
-    const codeHash = hashOtpCode(code);
-    const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes expiration
+    const outcome = await requestOtp(
+      drizzleOtpRepository,
+      { send: (input) => sendOtpSms(input) },
+      {
+        phone: parsed.phone,
+        purpose,
+        code,
+        isProduction: process.env.NODE_ENV === "production",
+      },
+    );
 
-    await db.insert(otpCodes).values({
-      phone: normalizedPhone,
-      codeHash,
-      purpose,
-      expiresAt,
-    });
-
-    // Send SMS via Eskiz.uz API or mock provider fallback
-    const smsResult = await sendOtpSms({
-      phone: normalizedPhone,
-      code,
-    });
-
-    const isProd = process.env.NODE_ENV === "production";
-
-    // Fail closed in production mode if provider fails or mock mode is active
-    if (isProd) {
-      if (!smsResult.success || smsResult.mock) {
-        return NextResponse.json(
-          { error: "SMS xizmatida vaqtincha uzilish yuz berdi. Iltimos, keyinroq qayta urinib ko'ring." },
-          { status: 503 }
-        );
-      }
-    } else {
-      if (!smsResult.success) {
-        return NextResponse.json(
-          { error: smsResult.error || "SMS yuborishda xatolik yuz berdi." },
-          { status: 500 }
-        );
-      }
+    if (!outcome.ok) {
+      return NextResponse.json(
+        { error: "SMS xizmatida vaqtincha uzilish yuz berdi. Iltimos, keyinroq qayta urinib ko'ring." },
+        { status: 503 },
+      );
     }
 
-    console.log(`[SMS OTP] Sent to ${redactPhone(normalizedPhone)} (Mock: ${Boolean(smsResult.mock)})`);
+    console.log(`[SMS OTP] Sent to ${redactPhone(parsed.phone)}`);
 
     return NextResponse.json({
       success: true,
       message: "SMS kod yuborildi",
-      expiresAt: expiresAt.toISOString(),
+      expiresAt: outcome.expiresAt.toISOString(),
       ...(process.env.NODE_ENV === "development" ? { devCode: code } : {}),
     });
   } catch (error) {
-    console.error("OTP send error:", error);
-    return NextResponse.json(
-      { error: "SMS kod yuborishda xatolik yuz berdi." },
-      { status: 500 }
-    );
+    return errorResponse(error);
   }
 }

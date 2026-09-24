@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { db } from "@/db";
-import { portfolios } from "@/db/schema";
 import { portfolioUpdateSchema } from "@/lib/validations/portfolio";
 import { requireAdmin } from "@/lib/auth/require-auth";
-import { eq } from "drizzle-orm";
+import { errorResponse } from "@/lib/http/errors";
+import { drizzlePortfolioRepository } from "@/features/portfolio/server/portfolio.repository";
+import { deletePortfolio, updatePortfolio } from "@/features/portfolio/server/portfolio.service";
 
 const paramsSchema = z.object({ id: z.string().uuid() });
 
@@ -16,44 +16,12 @@ export async function PATCH(
     const auth = await requireAdmin(request);
     if (!auth.ok) return auth.response;
 
-    const parsedParams = paramsSchema.safeParse(await params);
-    if (!parsedParams.success) {
-      return NextResponse.json({ error: "Loyiha IDsi noto'g'ri" }, { status: 400 });
-    }
-    const { id } = parsedParams.data;
-    const body = await request.json();
-    const parseResult = portfolioUpdateSchema.safeParse(body);
-
-    if (!parseResult.success) {
-      return NextResponse.json(
-        { error: "Kiritilgan ma'lumotlar noto'g'ri", details: parseResult.error.flatten() },
-        { status: 400 }
-      );
-    }
-
-    const updated = await db
-      .update(portfolios)
-      .set(parseResult.data)
-      .where(eq(portfolios.id, id))
-      .returning();
-
-    if (updated.length === 0) {
-      return NextResponse.json(
-        { error: "Loyiha topilmadi" },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json({
-      success: true,
-      portfolio: updated[0],
-    });
+    const { id } = paramsSchema.parse(await params);
+    const patch = portfolioUpdateSchema.parse(await request.json());
+    const portfolio = await updatePortfolio(drizzlePortfolioRepository, id, patch);
+    return NextResponse.json({ success: true, portfolio });
   } catch (error) {
-    console.error("PATCH /api/portfolio/[id] error:", error);
-    return NextResponse.json(
-      { error: "Portfolioni yangilashda xatolik" },
-      { status: 500 }
-    );
+    return errorResponse(error);
   }
 }
 
@@ -65,32 +33,13 @@ export async function DELETE(
     const auth = await requireAdmin(request);
     if (!auth.ok) return auth.response;
 
-    const parsedParams = paramsSchema.safeParse(await params);
-    if (!parsedParams.success) {
-      return NextResponse.json({ error: "Loyiha IDsi noto'g'ri" }, { status: 400 });
-    }
-    const { id } = parsedParams.data;
-    const deleted = await db
-      .delete(portfolios)
-      .where(eq(portfolios.id, id))
-      .returning();
-
-    if (deleted.length === 0) {
-      return NextResponse.json(
-        { error: "Loyiha topilmadi" },
-        { status: 404 }
-      );
-    }
-
+    const { id } = paramsSchema.parse(await params);
+    await deletePortfolio(drizzlePortfolioRepository, id);
     return NextResponse.json({
       success: true,
       message: "Portfolio muvaffaqiyatli o'chirildi",
     });
   } catch (error) {
-    console.error("DELETE /api/portfolio/[id] error:", error);
-    return NextResponse.json(
-      { error: "Portfolioni o'chirishda xatolik" },
-      { status: 500 }
-    );
+    return errorResponse(error);
   }
 }

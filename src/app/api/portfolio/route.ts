@@ -1,11 +1,10 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { db } from "@/db";
-import { portfolios } from "@/db/schema";
 import { portfolioSchema } from "@/lib/validations/portfolio";
-import { PORTFOLIO_DATA } from "@/features/portfolio/portfolioData";
-import { eq, asc } from "drizzle-orm";
 import { requireAdmin } from "@/lib/auth/require-auth";
+import { errorResponse } from "@/lib/http/errors";
+import { drizzlePortfolioRepository } from "@/features/portfolio/server/portfolio.repository";
+import { createPortfolio, listPortfolios } from "@/features/portfolio/server/portfolio.service";
 
 const portfolioQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).optional(),
@@ -19,39 +18,13 @@ export async function GET(request: Request) {
       limit: searchParams.get("limit") ?? undefined,
       category: searchParams.get("category") ?? undefined,
     });
-    const limit = parsed.success ? parsed.data.limit : undefined;
-    const category = parsed.success ? parsed.data.category : undefined;
-
-    let items = await db
-      .select()
-      .from(portfolios)
-      .orderBy(asc(portfolios.sortOrder), asc(portfolios.createdAt))
-      .limit(limit ?? 100);
-
-    // Fallback to static seed data if DB is currently empty
-    if (items.length === 0) {
-      return NextResponse.json({
-        success: true,
-        portfolios: PORTFOLIO_DATA.slice(0, limit),
-        total: PORTFOLIO_DATA.length,
-      });
-    }
-
-    if (category && category !== "Barchasi") {
-      items = items.filter((i) => i.category === category);
-    }
-
-    return NextResponse.json({
-      success: true,
-      portfolios: items,
-      total: items.length,
+    const result = await listPortfolios(drizzlePortfolioRepository, {
+      limit: parsed.success ? parsed.data.limit : undefined,
+      category: parsed.success ? parsed.data.category : undefined,
     });
+    return NextResponse.json({ success: true, portfolios: result.portfolios, total: result.total });
   } catch (error) {
-    console.error("GET /api/portfolio error:", error);
-    return NextResponse.json(
-      { success: true, portfolios: PORTFOLIO_DATA },
-      { status: 200 }
-    );
+    return errorResponse(error);
   }
 }
 
@@ -60,30 +33,10 @@ export async function POST(request: Request) {
     const auth = await requireAdmin(request);
     if (!auth.ok) return auth.response;
 
-    const body = await request.json();
-    const parseResult = portfolioSchema.safeParse(body);
-
-    if (!parseResult.success) {
-      return NextResponse.json(
-        { error: "Kiritilgan ma'lumotlar noto'g'ri", details: parseResult.error.flatten() },
-        { status: 400 }
-      );
-    }
-
-    const newPortfolio = await db
-      .insert(portfolios)
-      .values(parseResult.data)
-      .returning();
-
-    return NextResponse.json({
-      success: true,
-      portfolio: newPortfolio[0],
-    });
+    const input = portfolioSchema.parse(await request.json());
+    const portfolio = await createPortfolio(drizzlePortfolioRepository, input);
+    return NextResponse.json({ success: true, portfolio });
   } catch (error) {
-    console.error("POST /api/portfolio error:", error);
-    return NextResponse.json(
-      { error: "Portfolioni saqlashda xatolik yuz berdi" },
-      { status: 500 }
-    );
+    return errorResponse(error);
   }
 }
