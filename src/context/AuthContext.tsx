@@ -23,6 +23,7 @@ interface AuthContextType {
   clearToast: () => void;
   setAuthStep: (step: "login" | "otp") => void;
   setPendingPhone: (phone: string) => void;
+  setAuthenticatedUser: (user: User) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -173,7 +174,7 @@ export function AuthProvider({ children, initialUser = null }: { children: React
   return <AuthContext.Provider value={{ user, isLoading, error, toastMessage, toastType, devCode,
     isAuthModalOpen, authStep, pendingPhone, login, verifyOtp, logout, openAuthModal, closeAuthModal,
     clearError: () => setError(null), clearToast: () => { setToastMessage(null); setToastType(null); },
-    setAuthStep, setPendingPhone }}>
+    setAuthStep, setPendingPhone, setAuthenticatedUser: (nextUser) => { setUser(nextUser); setIsAuthModalOpen(false); setIsLoading(false); } }}>
     {children}
   </AuthContext.Provider>;
 }

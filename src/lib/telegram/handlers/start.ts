@@ -1,5 +1,7 @@
 import { Markup, Telegraf } from "telegraf";
-import { QUIZ_QUESTIONS } from "@/features/quiz/quizData";
+import { BRAND } from "@/config/brand";
+import { approveAlreadyLinkedTelegramLogin, rememberTelegramLoginContact } from "@/features/auth/server/telegram-login.service";
+import { ServiceError } from "@/lib/http/errors";
 import { linkTelegramAccount } from "../linkAccount";
 
 const mainKeyboard = Markup.keyboard([
@@ -13,10 +15,21 @@ export function registerStartHandler(bot: Telegraf) {
     const payload = ctx.payload;
     const tgUserId = ctx.from.id.toString();
 
+    if (payload && /^login_[A-Za-z0-9_-]{1,58}$/.test(payload)) {
+      const token = payload.slice("login_".length);
+      rememberTelegramLoginContact(tgUserId, token);
+      try {
+        const user = await approveAlreadyLinkedTelegramLogin(token, tgUserId);
+        return ctx.reply(`✅ Tayyor! ${BRAND.name} saytida hisobingizga kirdingiz.\n\nSaytga qaytib, davom etishingiz mumkin.`, { parse_mode: "HTML", ...Markup.inlineKeyboard([[Markup.button.url("Saytga qaytish", BRAND.url)]]) });
+      } catch (error) {
+        if (error instanceof ServiceError && error.code === "NOT_FOUND") {
+          return ctx.reply(`${BRAND.name} saytida kirish uchun avval o'zingizning telefon raqamingizni ulashing.`, { parse_mode: "HTML", ...Markup.keyboard([[Markup.button.contactRequest("📱 Raqamni ulashish")]]).resize() });
+        }
+        return ctx.reply("Bu kirish havolasi eskirgan yoki allaqachon ishlatilgan. Iltimos, saytdagi Telegram tugmasini qayta bosing.", { parse_mode: "HTML" });
+      }
+    }
+
     if (payload) {
-      // Only short-lived signed single-use link tokens are accepted here
-      // (see lib/telegram/linkToken.ts). Anything else falls through to the
-      // generic welcome message instead of linking an account.
       const result = await linkTelegramAccount({
         tgUserId,
         tgUsername: ctx.from.username,

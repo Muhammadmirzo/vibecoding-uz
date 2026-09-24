@@ -1,4 +1,6 @@
 import { Markup, Telegraf } from "telegraf";
+import { BRAND } from "@/config/brand";
+import { approveTelegramLogin, takeTelegramLoginContact } from "@/features/auth/server/telegram-login.service";
 import { linkTelegramAccount } from "../linkAccount";
 import { handleOperatorHandoff } from "../handoff";
 
@@ -46,6 +48,15 @@ export function registerAccountHandlers(bot: Telegraf) {  bot.hears("📱 Hisobn
     }
 
     const phone = contact.phone_number;
+    const loginToken = takeTelegramLoginContact(ctx.from.id.toString());
+    if (loginToken) {
+      try {
+        const result = await approveTelegramLogin({ token: loginToken, tgUserId: ctx.from.id.toString(), tgUsername: ctx.from.username, fullName: [ctx.from.first_name, ctx.from.last_name].filter(Boolean).join(" "), phone });
+        return ctx.reply(`✅ Tayyor! ${result.user.fullName}, ${BRAND.name} saytida hisobingizga kirdingiz.`, { parse_mode: "HTML", ...Markup.inlineKeyboard([[Markup.button.url("Saytga qaytish", BRAND.url)]]) });
+      } catch {
+        return ctx.reply("Bu kirish havolasi eskirgan yoki allaqachon ishlatilgan. Iltimos, saytdagi Telegram tugmasini qayta bosing.");
+      }
+    }
     const result = await linkTelegramAccount({
       tgUserId: ctx.from.id.toString(),
       tgUsername: ctx.from.username,

@@ -5,6 +5,7 @@ import { CheckCircle2, CircleAlert, Sparkles, X } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { LoginForm } from "./LoginForm";
 import { OtpForm } from "./OtpForm";
+import { TelegramAuthFlow } from "./TelegramAuthFlow";
 import { TelegramLoginButton } from "./TelegramLoginButton";
 
 export function AuthModal() {
@@ -28,7 +29,7 @@ export function AuthModal() {
                 <span>Vibecoding platformasi</span>
               </div>
               <Dialog.Title className="font-display text-2xl font-bold tracking-tight text-ink sm:text-3xl">
-                {isOtpStep ? "Kodni tasdiqlash" : "Tizimga kirish"}
+                {isOtpStep ? "Kodni tasdiqlash" : "Kirish yoki ro'yxatdan o'tish"}
               </Dialog.Title>
               <Dialog.Description className="mt-1 text-sm leading-6 text-ink-muted">
                 {isOtpStep
@@ -65,19 +66,13 @@ export function AuthModal() {
               </div>
             )}
 
-            {isOtpStep ? <OtpForm /> : <LoginForm />}
+            {isOtpStep ? <OtpForm /> : <>
+              <TelegramAuthFlow />
+              <div className="my-5 flex items-center gap-3" aria-hidden="true"><span className="h-px flex-1 bg-border" /><span className="text-xs font-medium text-ink-subtle">yoki telefon bilan</span><span className="h-px flex-1 bg-border" /></div>
+              <LoginForm />
+            </>}
 
-            <div className="mt-5" aria-label="Muqobil kirish usuli">
-              <div className="flex items-center gap-3" aria-hidden="true">
-                <span className="h-px flex-1 bg-border" />
-                <span className="text-xs font-medium text-ink-subtle">yoki</span>
-                <span className="h-px flex-1 bg-border" />
-              </div>
-              <div className="mt-3">
-                <TelegramLoginButton />
-              </div>
-            </div>
-
+            {process.env.NEXT_PUBLIC_TELEGRAM_WIDGET === "1" && <div className="mt-5" aria-label="Telegram kirish widgeti"><TelegramLoginButton /></div>}
             <div className="mt-4 border-t border-border pt-4 text-center">
               <a
                 href="/admin/login"
