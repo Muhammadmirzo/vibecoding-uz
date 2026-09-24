@@ -48,6 +48,12 @@ describe("Telegram chat bridge security", () => {
     expect(mocks.updates[0]?.values).toEqual({ telegramMessageId: "88" });
   });
 
+  it("reads the sender from message.from (real Telegram update shape)", async () => {
+    mocks.selectResults.push([{ conversationId: conversation.id }]);
+    const handled = await handleTelegramChatReply({ message: { message_id: 89, from: { id: 123 }, reply_to_message: { message_id: 77 }, text: "Albatta" } });
+    expect(handled).toBe(true);
+  });
+
   it("rejects a non-allowlisted Telegram user", async () => {
     const handled = await handleTelegramChatReply({ from: { id: 999 }, message: { message_id: 88, reply_to_message: { message_id: 77 }, text: "Albatta" } });
     expect(handled).toBe(false);

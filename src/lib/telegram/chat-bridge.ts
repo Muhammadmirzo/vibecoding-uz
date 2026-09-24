@@ -74,12 +74,14 @@ export async function handleTelegramChatReply(update: {
   from?: { id?: number };
   message?: {
     message_id?: number;
+    from?: { id?: number };
     reply_to_message?: { message_id?: number };
     text?: string;
   };
 }): Promise<boolean> {
   const message = update.message;
-  const userId = update.from?.id;
+  // Real Telegram updates carry the sender inside `message.from`.
+  const userId = message?.from?.id ?? update.from?.id;
   const parentId = message?.reply_to_message?.message_id;
   if (!message || !userId || !parentId || !message.text || !telegramAdminAllowed(String(userId))) return false;
   const [parent] = await db.select({ conversationId: chatMessages.conversationId })
