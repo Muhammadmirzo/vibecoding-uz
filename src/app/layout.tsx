@@ -103,7 +103,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const initialUser = await getInitialUser();
-  const motionSettings = getMotionSettings();
+  const motionSettings = await getMotionSettings();
   // Per-request CSP nonce set by middleware; inline scripts need it to run.
   const nonce = (await headers()).get("x-nonce") ?? undefined;
 
