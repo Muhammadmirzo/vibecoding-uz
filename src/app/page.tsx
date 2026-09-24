@@ -17,7 +17,8 @@ const siteUrl = BRAND.url;
 const title = "G'oyangizni AI bilan ishlaydigan ilovaga aylantiring";
 const description = "Kod yozishni bilmasangiz ham, AI va Claude Code yordamida 8 haftada g'oyangizni ishlaydigan ilovaga aylantiring.";
 
-export const metadata: Metadata = { title, description, alternates: { canonical: "/" }, openGraph: { title, description, url: "/", siteName: BRAND.name, locale: BRAND.locale, type: "website" } };
+// Root-segment page: the layout title template does not apply here, so brand it explicitly.
+export const metadata: Metadata = { title: { absolute: `${title} — ${BRAND.name}` }, description, alternates: { canonical: "/" }, openGraph: { title, description, url: "/", siteName: BRAND.name, locale: BRAND.locale, type: "website" } };
 
 const organization = { "@context": "https://schema.org", "@type": "Organization", name: BRAND.name, url: siteUrl, description };
 const courseList = { "@context": "https://schema.org", "@type": "ItemList", itemListElement: Object.keys(siteConfig.courses).map((slug, index) => ({ "@type": "ListItem", position: index + 1, item: { "@type": "Course", name: slug === "ai-asoslari" ? "AI Asoslari" : "Vibe Coding Express", description: slug === "ai-asoslari" ? "AI vositalarini amaliy qo'llash kursi" : "AI bilan ishlaydigan ilova qurish kursi", url: `${siteUrl}/kurs/${slug}`, provider: { "@id": `${siteUrl}/#organization` } } })) };
