@@ -1,7 +1,8 @@
 import type * as React from "react";
 import Link from "next/link";
 import { ArrowLeft, Compass } from "lucide-react";
-import { Button, Container } from "@/components/ui";
+import { Button } from "@/components/ui/Button";
+import { Container } from "@/components/ui/Layout";
 import { NextStepCTA } from "@/components/ui/NextStepCTA";
 import "@/components/pages/w6c.css";
 

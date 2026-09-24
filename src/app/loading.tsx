@@ -1,4 +1,4 @@
-import { Container } from "@/components/ui";
+import { Container } from "@/components/ui/Layout";
 import { PageSkeleton } from "@/components/pages/PageBits";
 
 // Full viewport height on purpose: a shorter skeleton let the footer paint

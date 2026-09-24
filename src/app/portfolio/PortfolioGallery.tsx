@@ -3,7 +3,8 @@
 import { useMemo, useState } from "react";
 import { Filter } from "lucide-react";
 import { PortfolioCard } from "@/components/portfolio/PortfolioCard";
-import { Button, Container } from "@/components/ui";
+import { Button } from "@/components/ui/Button";
+import { Container } from "@/components/ui/Layout";
 import { EmptyState } from "@/components/pages/PageBits";
 import { NextStepCTA } from "@/components/ui/NextStepCTA";
 import "@/components/pages/w6c.css";

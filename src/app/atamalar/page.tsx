@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { BookOpen, Search } from "lucide-react";
 import { Input } from "@/components/ui/Form";
-import { Container } from "@/components/ui";
+import { Container } from "@/components/ui/Layout";
 import { Card } from "@/components/ui/Surfaces";
 import { NextStepCTA } from "@/components/ui/NextStepCTA";
 import { PageHero } from "@/components/pages/PageHero";

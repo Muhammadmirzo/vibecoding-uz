@@ -81,18 +81,17 @@ Shared by all: **103 kB → 103 kB (±0)**.
 | `/maxfiylik` | 124 kB | 107 kB | −17 ✓ |
 | `/offerta` | 124 kB | 107 kB | −17 ✓ |
 | `/pul-qaytarish` | 124 kB | 107 kB | −17 ✓ |
-| `/shahodatnoma/[code]` | 106 kB | TBD (anchor pass) | budget ≤ +3 |
+| `/shahodatnoma/[code]` | 106 kB | TBD (zero-JS pass) | budget ≤ +3 |
 | `/kabinet` | 141 kB | 142 kB | +1 ✓ |
 | `/_not-found` | 103 kB | 103 kB | 0 ✓ |
 
 Two diet fixes after the first after-build: `CohortCountdown` no longer
 imports `siteConfig` client-side (date passed as prop — the services
 catalog was leaking into the kurs bundle: 126→124 kB). The certificate
-share button is self-contained AND dynamically imported (`ssr: false`
-with a same-size loading placeholder, so no CLS and no JS-off gap —
-the verification code itself stays visible): a static island was
-reshaping webpack chunk-splitting and attributing +19 kB of UI-kit
-chunks to the route. Also fixed dead `var()`-opacity Tailwind classes
+share control is a zero-JS Telegram share link (server-rendered anchor):
+a client island was reshaping webpack chunk-splitting and attributing
++19 kB of UI-kit chunks to the route, and `ssr: false` dynamic is banned
+in Server Components. Also fixed dead `var()`-opacity Tailwind classes
 found in scope (`bg-ink/40`, `bg-bg/90`, `text-bg/75`, …) with
 `color-mix()` equivalents — Tailwind 3.4 silently drops opacity
 modifiers on `var()` colors (verified in built CSS).

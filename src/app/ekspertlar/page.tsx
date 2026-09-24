@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { BadgeCheck, Wrench } from "lucide-react";
-import { Container } from "@/components/ui";
+import { Container } from "@/components/ui/Layout";
 import { Card } from "@/components/ui/Surfaces";
 import { NextStepCTA } from "@/components/ui/NextStepCTA";
 import { PageHero } from "@/components/pages/PageHero";

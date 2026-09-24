@@ -1,7 +1,8 @@
 "use client";
 
 import { TriangleAlert } from "lucide-react";
-import { Button, Container, Heading } from "@/components/ui";
+import { Button } from "@/components/ui/Button";
+import { Container, Heading } from "@/components/ui/Layout";
 
 export default function Error({ reset }: { error: Error & { digest?: string }; reset: () => void }) {
   return (

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Calendar } from "lucide-react";
 import { LeadCaptureForm } from "@/features/leads/ui/LeadCaptureForm";
-import { Container } from "@/components/ui";
+import { Container } from "@/components/ui/Layout";
 import { Card } from "@/components/ui/Surfaces";
 import { NextStepCTA } from "@/components/ui/NextStepCTA";
 import { PageHero } from "@/components/pages/PageHero";

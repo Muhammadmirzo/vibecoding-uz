@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import type * as React from "react";
 import Link from "next/link";
 import { Send, ShieldCheck } from "lucide-react";
-import { Container } from "@/components/ui";
+import { Container } from "@/components/ui/Layout";
 import { NextStepCTA } from "@/components/ui/NextStepCTA";
 import { Seal } from "@/components/pages/PageBits";
 import "@/components/pages/w6c.css";

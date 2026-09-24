@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { BookOpen, CirclePlay, CreditCard, Gift, Settings } from "lucide-react";
-import { Button } from "@/components/ui";
+import { Button } from "@/components/ui/Button";
 import { KabinetNav } from "@/features/lms/components/KabinetNav";
 import { KabinetPageHeader, KabinetSkeleton, KabinetState } from "@/features/lms/components/KabinetPage";
 import { fetchWithTimeout } from "@/lib/http/fetch";
