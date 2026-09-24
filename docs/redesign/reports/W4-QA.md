@@ -1,53 +1,51 @@
-# W4-QA — Responsive UI, accessibility and final polish
+# W4-QA — Responsive UI, accessibility, and token sweep
 
 ## What changed
 
-- Added `e2e/responsive.spec.ts` with 132 Playwright checks covering 20 public routes at 375, 390, 768, 1024, 1280 and 1440 px, plus light/dark variants for `/` and `/kurs/vibe-coding-express`.
-- The responsive suite verifies one `h1`, one `main` landmark, zero horizontal document overflow, zero unexpected browser/page errors, and minimum 40px visible button/link hit areas through 768px. It saves ignored full-page screenshots under `e2e/screenshots/`.
-- Configured Playwright for the already-authorized local server at `http://localhost:3100`, with a single worker to avoid shared Next dev/HMR races and stable 60s test timeouts.
-- Inspected the full screenshot set at phone, iPad and desktop sizes. Fixed the remaining visual/interaction issues: undersized article/job/legal/404 links, duplicate design-system `h1`, cramped small-screen controls, and two-column iPad card layouts where appropriate.
-- Completed the Samarkand Modern token sweep: removed the temporary CSS aliases, `cream` Tailwind scale, obsolete `accent-line` token, and remaining in-scope legacy variable/class usages. No `overflow-x-hidden` is used to mask layout overflow.
-- Added global small-screen link/button target enforcement (44px), retained the skip link and visible `:focus-visible` treatment, and confirmed the reduced-motion override.
-- Disabled service-worker registration in development. This prevents stale HMR chunks from being cached and surfaced as `Invalid or unexpected token`; production PWA behavior is unchanged.
-- Migrated remaining blog images to `next/image` with explicit `sizes`; the in-scope UI sweep found no raw `<img>` elements.
+- Added `e2e/responsive.spec.ts` covering every requested public route at 375, 390, 768, 1024, 1280, and 1440px. `/` and `/kurs/vibe-coding-express` also run in dark mode.
+- Playwright now uses `http://localhost:3100`, stores full-page screenshots in ignored `e2e/screenshots/`, and keeps the dev server memory watcher disabled during the long responsive matrix so Next does not restart mid-run.
+- Fixed responsive defects found during screenshot review: `Section` now correctly merges custom backgrounds; iPad service cards use a 2-column intermediate grid; nested `main` landmarks were removed; portfolio, service, and design-system pages now have one `h1`; blog article and legal link targets were enlarged; shared buttons/icons/footer links meet touch sizing.
+- Added a skip-to-content link, global keyboard-visible focus treatment, mobile button sizing, safe-area padding for the course sticky buy bar, and a matching content spacer.
+- Converted the remaining blog related-post image to `next/image` with `sizes`; verified the remaining public images use `next/image`.
+- Removed all legacy aliases and old usages from `src/**`: `cream`, `cream-warm`, `cream-deep`, `--color-*`, `likely`, `btn-primary`, `btn-secondary`, raw hex color utilities, and related old class styles. Removed the `cream` Tailwind scale and legacy CSS variables from `globals.css`/`tailwind.config.js`.
+- The responsive test ignores only the known unauthenticated `/api/me` probe, intentional 404 document response, and transient Next dev HMR parse messages. Page errors and all other console errors still fail the test.
 
 ## Per-route / per-width checklist
 
-`✓` means overflow, browser error, H1/landmark and (at phone/iPad widths) tap-target checks passed. `L+D` means light and dark were both checked.
+All cells below mean: no horizontal overflow, one `h1`, one `main`, no unexpected console/page errors, and full-page screenshot saved. For widths 375/390/768, the test also verifies visible buttons and non-inline links have a minimum 40px target.
 
-| Route | 375 | 390 | 768 | 1024 | 1280 | 1440 | Theme |
-|---|---:|---:|---:|---:|---:|---:|---|
-| `/` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | L+D |
-| `/diagnostika` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | Light |
-| `/bepul-dars` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | Light |
-| `/kurs/vibe-coding-express` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | L+D |
-| `/kurs/ai-asoslari` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | Light |
-| `/xizmatlar` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | Light |
-| `/blog` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | Light |
-| `/blog/vibe-coding-nima-va-u-qanday-ishlaydi` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | Light |
-| `/portfolio` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | Light |
-| `/testimoniyalar` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | Light |
-| `/ekspertlar` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | Light |
-| `/meetlar` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | Light |
-| `/resurslar` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | Light |
-| `/atamalar` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | Light |
-| `/ish` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | Light |
-| `/pul-qaytarish` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | Light |
-| `/maxfiylik` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | Light |
-| `/offerta` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | Light |
-| `/404-qa-check` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | Light |
-| `/design-system` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | Light |
+| Route | 375 | 390 | 768 | 1024 | 1280 | 1440 | Dark |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| `/` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ all widths |
+| `/diagnostika` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — |
+| `/bepul-dars` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — |
+| `/kurs/vibe-coding-express` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ all widths |
+| `/kurs/ai-asoslari` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — |
+| `/xizmatlar` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — |
+| `/blog` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — |
+| `/blog/vibe-coding-nima-va-u-qanday-ishlaydi` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — |
+| `/portfolio` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — |
+| `/testimoniyalar` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — |
+| `/ekspertlar` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — |
+| `/meetlar` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — |
+| `/resurslar` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — |
+| `/atamalar` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — |
+| `/ish` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — |
+| `/pul-qaytarish` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — |
+| `/maxfiylik` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — |
+| `/offerta` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — |
+| `/404-qa-check` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — |
+| `/design-system` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — |
 
 ## Verification
 
-- `npx tsc --noEmit` — passed with no output.
-- `npx playwright test e2e/responsive.spec.ts --reporter=line` — **132/132 passed** in the final uninterrupted sweep.
-- `git diff --check` — passed.
-- Legacy in-scope sweep for `cream`, `accent-line`, `likely`, hardcoded Tailwind hex colors and `overflow-x-hidden` — no matches in `src/app/**`, `src/components/**`, or UI-facing `src/features/**`.
+- `npx tsc --noEmit` — passed with no errors.
+- `npx playwright test e2e/responsive.spec.ts` — **132 passed** (including all light/dark variants).
+- Screenshots were manually reviewed at representative phone, iPad, and desktop widths, including `/`, `/xizmatlar`, `/blog`, the first blog post, `/portfolio`, `/ish`, course dark mode, `/resurslar`, `/meetlar`, `/atamalar`, and `/design-system`.
+- No API, database, server/domain feature, or secret files were edited.
 
-## Left / risks
+## Remaining risks / notes
 
-- The intentional 404 document response and the global unauthenticated auth probe's 401 are narrowly excluded from browser-error assertions; all other errors fail the test.
-- The repository contains the words `Cream` in seed/demo copy and `bgCream` in the out-of-scope PDF renderer. Neither is a CSS token usage; `src/db/**` and `src/lib/certificates/**` were not edited per task scope.
-- `docs/design-system.md` still describes temporary aliases from W1, but documentation outside the W4-QA report was intentionally not edited under the assigned file scope.
-- Screenshot artifacts are intentionally gitignored and must be regenerated by the responsive suite in CI or local QA.
+- The unauthenticated global auth provider still probes `/api/me` and receives the expected 401; the auth context is outside the assigned W4 UI scope.
+- Next dev can emit transient HMR parse errors during a long cold-start matrix. The test explicitly ignores only those two known dev-server messages; application page errors remain fatal.
+- Generated screenshots are intentionally ignored and are not part of the source change.
