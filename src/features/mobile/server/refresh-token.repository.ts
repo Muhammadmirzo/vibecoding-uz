@@ -9,6 +9,8 @@ export interface RefreshTokenRepository {
   findByHash(tokenHash: string): Promise<RefreshTokenRow | null>;
   touchLastUsed(id: string): Promise<void>;
   revoke(id: string, rotatedTo?: string): Promise<void>;
+  /** Atomically revokes an active row; false when another request already did. */
+  claim(id: string): Promise<boolean>;
   revokeFamily(userId: string, deviceId: string): Promise<number>;
   revokeAllForUser(userId: string): Promise<number>;
   listActiveForUser(userId: string): Promise<RefreshTokenRow[]>;
@@ -36,6 +38,12 @@ export const drizzleRefreshTokenRepository: RefreshTokenRepository = {
   async revoke(id) {
     await db.update(apiRefreshTokens).set({ revokedAt: new Date() }).where(eq(apiRefreshTokens.id, id));
   },
+  async claim(id) {
+    const rows = await db.update(apiRefreshTokens).set({ revokedAt: new Date() })
+      .where(and(eq(apiRefreshTokens.id, id), isNull(apiRefreshTokens.revokedAt)))
+      .returning({ id: apiRefreshTokens.id });
+    return rows.length > 0;
+  },
   async revokeFamily(userId, deviceId) {
     const rows = await db.update(apiRefreshTokens).set({ revokedAt: new Date() })
       .where(and(eq(apiRefreshTokens.userId, userId), eq(apiRefreshTokens.deviceId, deviceId), isNull(apiRefreshTokens.revokedAt)))
@@ -58,7 +66,6 @@ export const drizzleRefreshTokenRepository: RefreshTokenRepository = {
     return row ?? null;
   },
   async markRotated(oldId, newId) {
-    await db.update(apiRefreshTokens).set({ revokedAt: new Date(), rotatedFrom: oldId }).where(eq(apiRefreshTokens.id, oldId));
     await db.update(apiRefreshTokens).set({ rotatedFrom: oldId }).where(eq(apiRefreshTokens.id, newId));
   },
 };

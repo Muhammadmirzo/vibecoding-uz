@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
-import { users } from "@/db/schema";
+import { sessions, users } from "@/db/schema";
 import { ok } from "@/lib/api/v1/respond";
 import { v1Public } from "@/lib/api/v1/with-v1";
 import { registerV1Route } from "@/lib/api/v1/registry";
@@ -30,7 +30,13 @@ export async function POST(request: Request) {
     const input = refreshRequestSchema.parse(await request.json());
     const outcome = await rotateRefreshToken(
       drizzleRefreshTokenRepository,
-      { findRole: async (userId) => (await db.select({ role: users.role }).from(users).where(eq(users.id, userId)).limit(1))[0]?.role ?? null },
+      {
+        findRole: async (userId) => (await db.select({ role: users.role }).from(users).where(eq(users.id, userId)).limit(1))[0]?.role ?? null,
+        sessionAlive: async (sessionId) => {
+          const [row] = await db.select({ expiresAt: sessions.expiresAt }).from(sessions).where(eq(sessions.id, sessionId)).limit(1);
+          return !!row && row.expiresAt.getTime() > Date.now();
+        },
+      },
       input.refreshToken,
     );
     const user = await drizzleAuthUserRepository.findById(outcome.userId);

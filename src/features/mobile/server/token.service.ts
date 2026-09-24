@@ -64,13 +64,23 @@ export async function issueTokenPair(
 
 export type RotateOutcome = { pair: TokenPair; userId: string; role: string; sessionId: string };
 
+/** A just-rotated token replayed within this window is a client retry / parallel refresh, not theft. */
+export const REUSE_GRACE_MS = 30_000;
+
+export interface RotateDeps {
+  findRole(userId: string): Promise<string | null>;
+  /** The backing `sessions` row must still exist — access tokens die without it. */
+  sessionAlive?(sessionId: string): Promise<boolean>;
+}
+
 /**
- * Rotates a refresh token. Reuse of an already-rotated token means theft:
- * the whole device family is revoked (all sessions on that device die).
+ * Rotates a refresh token. Reuse of an already-rotated token (outside the
+ * grace window) means theft: the whole device family is revoked. The old row
+ * is claimed atomically, so two parallel refreshes cannot both win.
  */
 export async function rotateRefreshToken(
   repo: RefreshTokenRepository,
-  roles: { findRole(userId: string): Promise<string | null> },
+  deps: RotateDeps,
   presented: string,
 ): Promise<RotateOutcome> {
   const row = await repo.findByHash(hashRefreshToken(presented));
@@ -79,6 +89,9 @@ export async function rotateRefreshToken(
     throw new ServiceError("INVALID_TOKEN", "Yangilash tokeni yaroqsiz", 401);
   }
   if (row.revokedAt) {
+    if (Date.now() - row.revokedAt.getTime() < REUSE_GRACE_MS) {
+      throw new ServiceError("INVALID_TOKEN", "Token allaqachon yangilangan. Eng so'nggi tokendan foydalaning.", 401);
+    }
     await repo.revokeFamily(row.userId, row.deviceId);
     console.warn("[mobile-auth] refresh reuse detected", { tokenId: row.id, userId: row.userId, deviceId: row.deviceId });
     throw new ServiceError("TOKEN_REUSED", "Token qayta ishlatildi. Xavfsizlik uchun barcha sessiyalar yopildi.", 401);
@@ -86,10 +99,14 @@ export async function rotateRefreshToken(
   if (!active(row)) {
     throw new ServiceError("TOKEN_EXPIRED", "Yangilash tokeni muddati tugagan. Qayta kiring.", 401);
   }
-  const role = await roles.findRole(row.userId);
-  if (!role || !row.sessionId) {
+  const role = await deps.findRole(row.userId);
+  const alive = row.sessionId && (deps.sessionAlive ? await deps.sessionAlive(row.sessionId) : true);
+  if (!role || !row.sessionId || !alive) {
     await repo.revoke(row.id);
     throw new ServiceError("INVALID_TOKEN", "Sessiya topilmadi. Qayta kiring.", 401);
+  }
+  if (!(await repo.claim(row.id))) {
+    throw new ServiceError("INVALID_TOKEN", "Token allaqachon yangilangan. Eng so'nggi tokendan foydalaning.", 401);
   }
   const pair = await issueTokenPair(repo, {
     userId: row.userId, role, sessionId: row.sessionId,
@@ -99,8 +116,6 @@ export async function rotateRefreshToken(
     },
   });
   const fresh = await repo.findByHash(hashRefreshToken(pair.refreshToken));
-  if (fresh) await repo.markRotated(row.id, fresh.id);
-  else await repo.revoke(row.id);
-  if (fresh) await repo.touchLastUsed(fresh.id).catch(() => undefined);
+  if (fresh) await repo.markRotated(row.id, fresh.id).catch(() => undefined);
   return { pair, userId: row.userId, role, sessionId: row.sessionId };
 }

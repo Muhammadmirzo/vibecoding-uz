@@ -5,6 +5,7 @@ import {
   newRefreshToken,
   rotateRefreshToken,
   REFRESH_TOKEN_TTL_MS,
+  REUSE_GRACE_MS,
 } from "@/features/mobile/server/token.service";
 import type { RefreshTokenRepository, RefreshTokenRow } from "@/features/mobile/server/refresh-token.repository";
 
@@ -65,10 +66,14 @@ function memoryRepo(): RefreshTokenRepository & { rows: Map<string, RefreshToken
       const row = rows.get(id);
       return row && row.userId === userId ? { ...row } : null;
     },
+    async claim(id) {
+      const row = rows.get(id);
+      if (!row || row.revokedAt) return false;
+      row.revokedAt = new Date();
+      return true;
+    },
     async markRotated(oldId, newId) {
-      const old = rows.get(oldId);
       const fresh = rows.get(newId);
-      if (old) { old.revokedAt = new Date(); old.rotatedFrom = oldId; }
       if (fresh) fresh.rotatedFrom = oldId;
     },
   };
@@ -104,6 +109,9 @@ describe("refresh rotation + reuse detection", () => {
   it("reuse of a rotated token revokes the whole device family", async () => {
     const first = await issueTokenPair(repo, { userId: "u1", role: "student", sessionId: "s1", device });
     const rotated = await rotateRefreshToken(repo, roles, first.refreshToken);
+    // Replay arrives after the grace window.
+    const old = (await repo.findByHash(hashRefreshToken(first.refreshToken))) as RefreshTokenRow;
+    repo.rows.get(old.id)!.revokedAt = new Date(Date.now() - REUSE_GRACE_MS - 1000);
     // Attacker replays the stolen (already rotated) token.
     await expect(rotateRefreshToken(repo, roles, first.refreshToken)).rejects.toMatchObject({ status: 401 });
     // Family is dead: even the legitimate newest token is revoked.
@@ -119,5 +127,23 @@ describe("refresh rotation + reuse detection", () => {
     repo.rows.get(row.id)!.expiresAt = new Date(Date.now() - 1000);
     await expect(rotateRefreshToken(repo, roles, pair.refreshToken)).rejects.toMatchObject({ status: 401 });
     expect(REFRESH_TOKEN_TTL_MS).toBe(30 * 24 * 60 * 60 * 1000);
+  });
+
+  it("parallel refresh with the same token: one wins, the other is rejected without killing the family", async () => {
+    const first = await issueTokenPair(repo, { userId: "u1", role: "student", sessionId: "s1", device });
+    const results = await Promise.allSettled([
+      rotateRefreshToken(repo, roles, first.refreshToken),
+      rotateRefreshToken(repo, roles, first.refreshToken),
+    ]);
+    const won = results.filter((r) => r.status === "fulfilled");
+    expect(won).toHaveLength(1);
+    const winner = (won[0] as PromiseFulfilledResult<Awaited<ReturnType<typeof rotateRefreshToken>>>).value;
+    await expect(rotateRefreshToken(repo, roles, winner.pair.refreshToken)).resolves.toMatchObject({ userId: "u1" });
+  });
+
+  it("dead web session → refresh refused", async () => {
+    const pair = await issueTokenPair(repo, { userId: "u1", role: "student", sessionId: "s1", device });
+    const deps = { ...roles, sessionAlive: async () => false };
+    await expect(rotateRefreshToken(repo, deps, pair.refreshToken)).rejects.toMatchObject({ status: 401 });
   });
 });
