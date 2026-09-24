@@ -4,6 +4,9 @@ import { ok, fail } from "@/lib/api/v1/respond";
 import { getClientIp } from "@/lib/security/rateLimit";
 import { draftApprovalSchema } from "@/features/chat/contracts";
 import { approveDraft } from "@/features/chat/server/chat.service";
+import { registerV1Route } from "@/lib/api/v1/registry";
+
+registerV1Route({ method: "post", path: "/api/v1/admin/chat/drafts", security: [{ bearerAuth: [], cookieAuth: [] }], tags: ["admin-chat"], summary: "AI qoralamasini tasdiqlash yoki rad etish", request: { body: { content: { "application/json": { schema: draftApprovalSchema } } } }, responses: { 200: { description: "OK" } } });
 
 export async function POST(request: NextRequest) {
   const auth = await requireAdmin(request);

@@ -3,6 +3,16 @@ import type { ChatAgentContext, ChatAgentProvider, ChatAgentResult } from "./ind
 
 const PERSON_REQUEST = /\b(odam|inson|admin|operator|mentor|human|person)\b/i;
 
+/** Last 20 non-empty messages; the API needs the conversation to start with a user turn. */
+function toApiMessages(history: ChatAgentContext["history"]) {
+  const mapped = history.slice(-20).filter((message) => message.body.trim()).map((message) => ({
+    role: message.sender === "admin" || message.sender === "ai" ? "assistant" as const : "user" as const,
+    content: message.body,
+  }));
+  const firstUser = mapped.findIndex((message) => message.role === "user");
+  return firstUser === -1 ? [] : mapped.slice(firstUser);
+}
+
 export class AnthropicChatAgent implements ChatAgentProvider {
   readonly id = "anthropic";
   constructor(private readonly apiKey: string | undefined, private readonly model: string) {}
@@ -26,10 +36,7 @@ export class AnthropicChatAgent implements ChatAgentProvider {
           `Persona: ${ctx.persona}`,
           `SITE FACTS:\n${ctx.siteFacts}`,
         ].join("\n"),
-        messages: ctx.history.slice(-20).map((message) => ({
-          role: message.sender === "admin" || message.sender === "ai" ? "assistant" as const : "user" as const,
-          content: message.body,
-        })),
+        messages: toApiMessages(ctx.history),
       });
       const text = response.content.find((part) => part.type === "text")?.text?.trim() || "";
       if (!text || text === "[HANDOFF]") return { text: "", handoff: true };

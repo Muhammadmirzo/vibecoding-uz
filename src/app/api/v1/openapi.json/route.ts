@@ -27,6 +27,14 @@ import "@/app/api/v1/push-devices/[id]/route";
 import "@/app/api/v1/app/config/route";
 import "@/app/api/v1/events/route";
 import "@/app/api/v1/admin/analytics/[report]/route";
+import "@/app/api/v1/chat/route";
+import "@/app/api/v1/chat/read/route";
+import "@/app/api/v1/chat/messages/route";
+import "@/app/api/v1/chat/open/route";
+import "@/app/api/v1/admin/chat/read/route";
+import "@/app/api/v1/admin/chat/messages/route";
+import "@/app/api/v1/admin/chat/conversations/route";
+import "@/app/api/v1/admin/chat/drafts/route";
 import "@/app/api/v1/docs/route";
 
 registerV1Route({

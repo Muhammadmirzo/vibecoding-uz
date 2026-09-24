@@ -4,6 +4,9 @@ import { ok, fail } from "@/lib/api/v1/respond";
 import { getClientIp } from "@/lib/security/rateLimit";
 import { adminReplySchema } from "@/features/chat/contracts";
 import { postReply } from "@/features/chat/server/chat.service";
+import { registerV1Route } from "@/lib/api/v1/registry";
+
+registerV1Route({ method: "post", path: "/api/v1/admin/chat/messages", security: [{ bearerAuth: [], cookieAuth: [] }], tags: ["admin-chat"], summary: "Admin javobi", request: { body: { content: { "application/json": { schema: adminReplySchema } } } }, responses: { 200: { description: "OK" } } });
 
 export async function POST(request: NextRequest) {
   const auth = await requireAdmin(request);

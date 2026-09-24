@@ -10,6 +10,10 @@ import { getVisitorConversation, listMessages, markConversationRead, sendVisitor
 import { getChatSettings } from "@/features/chat/server/settings.service";
 import { getOrCreateVisitorToken, visitorTokenFromRequest } from "@/features/chat/server/visitor-token";
 import { notifyVisitorMessage } from "@/lib/telegram/chat-bridge";
+import { registerV1Route } from "@/lib/api/v1/registry";
+
+registerV1Route({ method: "get", path: "/api/v1/chat/messages", tags: ["chat"], summary: "Suhbat xabarlari (polling)", responses: { 200: { description: "OK" } } });
+registerV1Route({ method: "post", path: "/api/v1/chat/messages", tags: ["chat"], summary: "Tashrifchi xabar yuboradi", request: { body: { content: { "application/json": { schema: sendMessageSchema } } } }, responses: { 200: { description: "OK" } } });
 
 async function visitorIdentity(request: NextRequest) {
   return visitorTokenFromRequest(request) || (await getOrCreateVisitorToken()).token;
@@ -68,7 +72,7 @@ export async function POST(request: NextRequest) {
         settings.telegramNotify ? notifyVisitorMessage(conversation, message) : Promise.resolve({ sent: false }),
       ]);
     });
-    void trackServerEvent({ type: "chat_message", path: parsed.data.sourcePath, props: { sender: "visitor" } });
+    void trackServerEvent({ type: "chat_message", path: parsed.data.sourcePath, props: { conversationId: conversation.id, messageLength: parsed.data.body.length } });
     return created({ message, conversation, settings });
   } catch (error) {
     if (error && typeof error === "object" && "code" in error && error.code === "42P01") {
