@@ -2,16 +2,19 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { ArrowRight, Award, BookOpen, CirclePlay, FileCheck, MessageCircle } from "lucide-react";
+import { BookOpen, CirclePlay, CreditCard, Gift, Settings } from "lucide-react";
+import { Button } from "@/components/ui";
 import { KabinetNav } from "@/features/lms/components/KabinetNav";
+import { KabinetPageHeader, KabinetSkeleton, KabinetState } from "@/features/lms/components/KabinetPage";
 
 type DashboardUser = { fullName: string | null };
 type Payment = { enrollmentId: string | null; status: string };
 type State = { loading: boolean; error: string | null; payments: Payment[]; user: DashboardUser | null };
 
+const initialState: State = { loading: true, error: null, payments: [], user: null };
+
 export default function KabinetDashboardPage() {
-  const [state, setState] = useState<State>({ loading: true, error: null, payments: [], user: null });
-  const hasEnrollment = state.payments.some((p) => p.status === "paid" && p.enrollmentId);
+  const [state, setState] = useState<State>(initialState);
 
   useEffect(() => {
     let active = true;
@@ -36,45 +39,70 @@ export default function KabinetDashboardPage() {
     return () => { active = false; };
   }, []);
 
+  const hasEnrollment = state.payments.some((payment) => payment.status === "paid" && payment.enrollmentId);
+
   return (
-    <div className="min-h-screen bg-cream px-5 pb-16 pt-24 md:px-8">
+    <div className="min-h-screen bg-bg text-ink">
       <KabinetNav />
-      <main className="mx-auto w-full max-w-[1100px] space-y-8">
-        <header className="rounded-2xl border border-border-strong bg-cream-warm p-6 shadow-sm md:p-8">
-          <h1 className="text-2xl font-extrabold text-ink md:text-4xl">Xush kelibsiz{state.user?.fullName ? `, ${state.user.fullName}` : ""}!</h1>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink-muted">Kabinetingizdagi faol a'zolarik va darslar shu yerdan ko'rsatiladi.</p>
-        </header>
-        {state.loading && <p className="rounded-xl border border-border bg-cream-warm p-6 text-sm text-ink-muted">A'zolarik ma'lumotlari yuklanmoqda...</p>}
-        {state.error && <div role="alert" className="rounded-xl border border-danger-line bg-danger-soft p-6 text-sm text-danger">A'zolarikni yuklashda xatolik: {state.error}</div>}
-        {!state.loading && !state.error && !hasEnrollment && <EmptyEnrollment />}
-        {!state.loading && !state.error && hasEnrollment && <EnrollmentCard />}
-        {!state.loading && !state.error && <SupportCard />}
+      <main className="mx-auto w-full max-w-6xl space-y-8 px-5 pb-28 pt-24 md:px-8 md:pt-28 lg:pl-80 lg:pr-8">
+        <KabinetPageHeader
+          title={state.user?.fullName ? `Xush kelibsiz, ${state.user.fullName}` : "Xush kelibsiz"}
+          description="Faol a&apos;zolarik, to&apos;lovlar va kurs bo&apos;limlariga shu yerdan o&apos;ting."
+        />
+
+        {state.loading ? <KabinetSkeleton label="Kabinet ma&apos;lumotlari yuklanmoqda" /> : null}
+        {!state.loading && state.error ? <KabinetState tone="error" title="Kabinetni yuklab bo&apos;lmadi" description={state.error} /> : null}
+        {!state.loading && !state.error && !hasEnrollment ? (
+          <KabinetState
+            title="Faol kurs a&apos;zoligingiz yo&apos;q"
+            description="Kursga a&apos;zolik va to&apos;lov tasdiqlanganida, darslar shu sahifada ochiladi."
+            action={{ label: "Kurslarni ko&apos;rish", href: "/#kurs-tanlash" }}
+          />
+        ) : null}
+        {!state.loading && !state.error && hasEnrollment ? <ActiveCourse /> : null}
+        {!state.loading && !state.error ? <QuickLinks /> : null}
       </main>
     </div>
   );
 }
 
-function EmptyEnrollment() {
-  return <section className="rounded-2xl border border-border-strong bg-cream-warm p-8 text-center shadow-sm">
-    <BookOpen className="mx-auto mb-4 h-8 w-8 text-accent" />
-    <h2 className="text-xl font-bold text-ink">Hali faol kursga a'zo emasiz</h2>
-    <p className="mx-auto mt-2 max-w-md text-sm text-ink-muted">Kursga a'zolik va to'lov tasdiqlanganida, darslar shu sahifada ochiladi.</p>
-    <Link href="/#kurs-tanlash" className="btn-primary mt-6 inline-flex h-11 items-center gap-2 rounded-lg px-5 text-sm font-semibold">Kurslarni ko'rish <ArrowRight className="h-4 w-4" /></Link>
-  </section>;
+function ActiveCourse() {
+  return (
+    <section className="overflow-hidden rounded-2xl border border-border bg-bg-elevated shadow-sm">
+      <div className="grid gap-6 p-6 md:grid-cols-[1fr_auto] md:items-center md:p-8">
+        <div>
+          <p className="text-sm font-semibold text-success">Faol a&apos;zolik</p>
+          <h2 className="mt-2 font-display text-xl font-semibold text-ink">Vibe Coding Express</h2>
+          <p className="mt-2 max-w-xl text-base leading-relaxed text-ink-muted">Kursga kirishda keyingi dars va topshiriqlar tizimdagi haqiqiy ma&apos;lumotlar asosida ko&apos;rsatiladi.</p>
+        </div>
+        <Button href="/kabinet/kurs/vibe-coding-express" className="w-full md:w-auto">
+          <CirclePlay className="h-5 w-5" aria-hidden="true" /> Kursga o&apos;tish
+        </Button>
+      </div>
+    </section>
+  );
 }
 
-function EnrollmentCard() {
-  return <section className="rounded-2xl border border-border-strong bg-cream-warm p-6 shadow-sm">
-    <div className="flex items-center gap-3"><BookOpen className="h-5 w-5 text-accent" /><div><p className="text-xs font-mono text-accent">FAOL A'ZOLIK</p><h2 className="text-lg font-bold text-ink">Kursingiz</h2></div></div>
-    <p className="mt-3 text-sm text-ink-muted">A'zolarik to'lov tasdiqlangan. Darslar ro'yxati va progressi API'dan olinadi.</p>
-    <Link href="/kabinet/kurs/vibe-coding-express" className="btn-secondary mt-5 inline-flex h-10 items-center gap-2 rounded-lg px-4 text-xs font-semibold">Kursga o'tish <CirclePlay className="h-4 w-4" /></Link>
-  </section>;
-}
-
-function SupportCard() {
-  return <section className="grid gap-6 md:grid-cols-3">
-    <div className="rounded-xl border border-border-strong bg-cream-warm p-6"><FileCheck className="mb-3 h-5 w-5 text-accent" /><h3 className="font-bold text-ink">Amaliy vazifalar</h3><p className="mt-2 text-xs leading-relaxed text-ink-muted">Topshiriqlar faol kurs ichida ko'rsatiladi.</p></div>
-    <div className="rounded-xl border border-border-strong bg-cream-warm p-6"><MessageCircle className="mb-3 h-5 w-5 text-telegram" /><h3 className="font-bold text-ink">Mentor bilan bog'lanish</h3><p className="mt-2 text-xs leading-relaxed text-ink-muted">Savollaringiz uchun Telegram orqali murojaat qiling.</p></div>
-    <div className="rounded-xl border border-border-strong bg-cream-warm p-6"><Award className="mb-3 h-5 w-5 text-accent" /><h3 className="font-bold text-ink">Sertifikat</h3><p className="mt-2 text-xs leading-relaxed text-ink-muted">Sertifikat holati topshiriqlar yakunlangach ochiladi.</p></div>
-  </section>;
+function QuickLinks() {
+  const links = [
+    { href: "/kabinet/to-lovlar", label: "To&apos;lovlar", text: "To&apos;lov tarixi va cheklar", icon: CreditCard },
+    { href: "/kabinet/referral", label: "Bonus", text: "Taklif havolangizni ulashing", icon: Gift },
+    { href: "/kabinet/sozlamalar", label: "Profil", text: "Ma&apos;lumotlarni boshqaring", icon: Settings },
+  ];
+  return (
+    <section aria-labelledby="cabinet-links-title">
+      <h2 id="cabinet-links-title" className="font-display text-lg font-semibold text-ink">Kabinet bo&apos;limlari</h2>
+      <div className="mt-4 grid gap-3 md:grid-cols-3">
+        {links.map((item) => {
+          const Icon = item.icon;
+          return (
+            <Link key={item.href} href={item.href} className="flex min-h-28 items-center gap-4 rounded-xl border border-border bg-bg-elevated p-5 transition-colors hover:border-brand">
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-brand-soft text-brand"><Icon className="h-5 w-5" aria-hidden="true" /></span>
+              <span><span className="block font-semibold text-ink">{item.label}</span><span className="mt-1 block text-sm text-ink-muted">{item.text}</span></span>
+            </Link>
+          );
+        })}
+      </div>
+    </section>
+  );
 }

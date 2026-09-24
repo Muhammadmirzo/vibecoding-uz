@@ -11,19 +11,13 @@ import type { SettingsTab } from "./settingsTypes";
 export function useSettingsProfile() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = React.useState<SettingsTab>("profile");
-  const [fullName, setFullName] = React.useState(
-    user?.fullName || "Jamshid Alimov",
-  );
-  const [email, setEmail] = React.useState(user?.email || "jamshid@example.uz");
-  const [phone, setPhone] = React.useState(user?.phone || "+998901234567");
-  const [city, setCity] = React.useState("Toshkent");
-  const [profession, setProfession] = React.useState("Startap asoschisi");
-  const [goal, setGoal] = React.useState(
-    "AI vositalari orqali 1 oyda SaaS mahsulotimni yaratish",
-  );
-  const [bio, setBio] = React.useState(
-    "Vibe coding bilan qiziqaman, mahsulotlarni tezroq bozorga chiqarishni xohlayman.",
-  );
+  const [fullName, setFullName] = React.useState(user?.fullName || "");
+  const [email, setEmail] = React.useState(user?.email || "");
+  const [phone, setPhone] = React.useState(user?.phone || "");
+  const [city, setCity] = React.useState("");
+  const [profession, setProfession] = React.useState("");
+  const [goal, setGoal] = React.useState("");
+  const [bio, setBio] = React.useState("");
   const [avatarUrl, setAvatarUrl] = React.useState(user?.avatarUrl || "");
   const [currentPassword, setCurrentPassword] = React.useState("");
   const [newPassword, setNewPassword] = React.useState("");

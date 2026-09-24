@@ -4,7 +4,7 @@ import type { JobOpeningItem } from "@/features/jobs/jobsData";
 export function JobRequirements({ job }: { job: JobOpeningItem }) {
   return (
     <>
-      <section className="bg-cream-warm border border-border-strong rounded-2xl p-6 md:p-8 space-y-4 shadow-sm">
+      <section className="bg-bg-elevated border border-border-strong rounded-2xl p-6 md:p-8 space-y-4 shadow-sm">
         <h2 className="text-xl font-bold text-ink">Nomzodga qo'yiladigan talablar</h2>
         <ul className="space-y-3">
           {job.requirements.map((req, i) => (
@@ -15,7 +15,7 @@ export function JobRequirements({ job }: { job: JobOpeningItem }) {
           ))}
         </ul>
       </section>
-      <section className="bg-cream-warm border border-border-strong rounded-2xl p-6 md:p-8 space-y-4 shadow-sm">
+      <section className="bg-bg-elevated border border-border-strong rounded-2xl p-6 md:p-8 space-y-4 shadow-sm">
         <h2 className="text-xl font-bold text-ink flex items-center gap-2">
           <Sparkles className="w-5 h-5 text-accent" /> Biz taklif qilamiz
         </h2>

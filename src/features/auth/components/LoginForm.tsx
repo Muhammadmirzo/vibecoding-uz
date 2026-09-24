@@ -1,116 +1,92 @@
 "use client";
 
-import React, { useState } from "react";
+import { ArrowRight, CircleAlert, Loader2, Phone } from "lucide-react";
+import { useState } from "react";
+import { Button } from "@/components/ui";
+import { FieldError, Input, Label } from "@/components/ui";
 import { useAuth } from "@/context/AuthContext";
-import { Phone, ArrowRight, Loader2, AlertCircle } from "lucide-react";
+
+const PHONE_DIGITS = 9;
+
+function formatPhoneNumber(value: string): string {
+  const digits = value.replace(/\D/g, "");
+  const localDigits = digits.startsWith("998") ? digits.slice(3) : digits;
+  const limited = localDigits.slice(0, PHONE_DIGITS);
+  const groups = [limited.slice(0, 2), limited.slice(2, 5), limited.slice(5, 7), limited.slice(7, 9)];
+  return groups.filter(Boolean).reduce((formatted, group, index) => {
+    if (index === 0) return group;
+    return `${formatted}${index === 1 ? " " : "-"}${group}`;
+  }, "");
+}
 
 export function LoginForm() {
   const { login, isLoading, error, clearError } = useAuth();
-  const [phoneInput, setPhoneInput] = useState<string>("");
+  const [phoneInput, setPhoneInput] = useState("");
+  const digits = phoneInput.replace(/\D/g, "");
+  const isPhoneValid = digits.length === PHONE_DIGITS;
 
-  const formatPhoneNumber = (value: string) => {
-    // Strip all non-numeric characters
-    const digits = value.replace(/\D/g, "");
-    
-    // If starts with 998, keep or strip
-    let localDigits = digits;
-    if (digits.startsWith("998")) {
-      localDigits = digits.slice(3);
-    }
-    
-    // Format up to 9 digits: XX XXX-XX-XX
-    const limited = localDigits.slice(0, 9);
-    let formatted = "";
-    
-    if (limited.length > 0) {
-      formatted += limited.slice(0, 2);
-    }
-    if (limited.length > 2) {
-      formatted += " " + limited.slice(2, 5);
-    }
-    if (limited.length > 5) {
-      formatted += "-" + limited.slice(5, 7);
-    }
-    if (limited.length > 7) {
-      formatted += "-" + limited.slice(7, 9);
-    }
-    
-    return formatted;
-  };
-
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  function handlePhoneChange(value: string) {
     if (error) clearError();
-    const formatted = formatPhoneNumber(e.target.value);
-    setPhoneInput(formatted);
-  };
+    setPhoneInput(formatPhoneNumber(value));
+  }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!phoneInput || isLoading) return;
-    
-    // Normalize to full phone
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!isPhoneValid || isLoading) return;
     const cleanDigits = phoneInput.replace(/\D/g, "");
     const fullPhone = cleanDigits.startsWith("998") ? `+${cleanDigits}` : `+998${cleanDigits}`;
     await login(fullPhone);
-  };
+  }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5" aria-label="Tizimga kirish shakli">
+    <form onSubmit={handleSubmit} className="space-y-4" aria-label="Tizimga kirish shakli" noValidate>
       <div>
-        <label htmlFor="phone-input" className="block text-sm font-semibold text-[var(--color-ink)] mb-2">
-          Telefon raqamingiz
-        </label>
+        <Label htmlFor="phone-input">Telefon raqamingiz</Label>
         <div className="relative flex items-center">
-          <div className="absolute left-3.5 flex items-center pointer-events-none text-[var(--color-ink-muted)] text-sm font-medium">
-            <Phone className="w-4 h-4 mr-1.5 text-[var(--color-accent)]" />
+          <div className="pointer-events-none absolute left-4 flex items-center gap-1.5 text-sm font-medium text-ink-muted">
+            <Phone className="h-4 w-4 text-accent" aria-hidden="true" />
             <span>+998</span>
           </div>
-          <input
+          <Input
             id="phone-input"
+            name="phone"
             type="tel"
+            autoComplete="tel-national"
+            inputMode="tel"
             required
-            autoFocus
             disabled={isLoading}
             value={phoneInput}
-            onChange={handlePhoneChange}
+            onChange={(event) => handlePhoneChange(event.target.value)}
             placeholder="90 123-45-67"
-            className="w-full h-12 pl-20 pr-4 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-cream-warm)] text-[var(--color-ink)] font-mono text-base placeholder-[var(--color-ink-subtle)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent transition-all disabled:opacity-50"
-            aria-describedby={error ? "login-error" : undefined}
+            className="h-11 pl-20 font-mono text-base"
+            aria-invalid={Boolean(error)}
+            aria-describedby={error ? "login-error login-hint" : "login-hint"}
           />
         </div>
-        <p className="mt-1.5 text-xs text-[var(--color-ink-muted)]">
-          SMS orqali bir marta ishlatiladigan tasdiqlash kodi yuboriladi
+        <p id="login-hint" className="mt-1.5 text-xs text-ink-muted">
+          SMS orqali bir marta ishlatiladigan tasdiqlash kodi yuboriladi.
         </p>
+        {error && (
+          <FieldError id="login-error" role="alert" className="flex items-start gap-2">
+            <CircleAlert className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+            <span>{error}</span>
+          </FieldError>
+        )}
       </div>
 
-      {error && (
-        <div
-          id="login-error"
-          role="alert"
-          className="flex items-start gap-2 p-3 rounded-[var(--radius-md)] bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-sm font-medium animate-fadeIn"
-        >
-          <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
-          <span>{error}</span>
-        </div>
-      )}
-
-      <button
-        type="submit"
-        disabled={isLoading || phoneInput.replace(/\D/g, "").length < 9}
-        className="w-full h-12 rounded-[var(--radius-md)] btn-primary font-semibold text-base flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)]"
-      >
+      <Button type="submit" size="lg" className="w-full" disabled={isLoading || !isPhoneValid}>
         {isLoading ? (
           <>
-            <Loader2 className="w-5 h-5 animate-spin" />
+            <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
             <span>SMS yuborilmoqda...</span>
           </>
         ) : (
           <>
             <span>Kodni olish</span>
-            <ArrowRight className="w-5 h-5" />
+            <ArrowRight className="h-5 w-5" aria-hidden="true" />
           </>
         )}
-      </button>
+      </Button>
     </form>
   );
 }

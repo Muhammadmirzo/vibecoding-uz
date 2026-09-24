@@ -1,5 +1,6 @@
-import * as React from "react";
 import { Share2, Copy, Check, Send, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Form";
 import type { ReferralLead, ReferralStats } from "./referralTypes";
 
 interface ReferralLinkCardProps {
@@ -14,36 +15,39 @@ export function ReferralLinkCard({
   copied,
 }: ReferralLinkCardProps) {
   return (
-    <div className="bg-cream-warm border-2 border-accent-line rounded-2xl p-6 md:p-8 space-y-5 shadow-md">
+    <div className="rounded-2xl border border-border bg-bg-elevated p-6 md:p-8">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="space-y-1">
           <h2 className="text-lg font-bold text-ink flex items-center gap-2">
             <Share2 className="w-5 h-5 text-accent" /> Shaxsiy Taklif Havolangiz
           </h2>
-          <p className="text-xs text-ink-muted">
+          <p className="text-sm text-ink-muted sm:text-base">
             Ushbu havolani do'stlaringiz, ijtimoiy tarmoqlar yoki Telegram
             kanalingizda ulashing.
           </p>
         </div>
-        <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-accent bg-accent-soft px-3 py-1 rounded-full">
-          <Sparkles className="w-3.5 h-3.5" /> 15% Keshbek Bonusi
+        <div className="flex items-center gap-1.5 rounded-full bg-accent-soft px-3 py-1 text-xs font-semibold text-accent">
+          <Sparkles className="h-3.5 w-3.5" /> Bonus dasturi
         </div>
       </div>
 
       {/* Copy Box */}
       <div className="flex flex-col sm:flex-row items-stretch gap-3">
         <div className="flex-1 relative">
-          <input
+          <Input
             type="text"
             readOnly
             value={referralUrl}
-            className="w-full h-12 px-4 rounded-xl border border-border-strong bg-cream text-ink font-mono text-xs font-semibold select-all focus:outline-none focus:ring-2 focus:ring-accent"
+            aria-label="Shaxsiy taklif havolasi"
+            className="rounded-xl font-mono text-sm font-semibold sm:text-base"
           />
         </div>
 
-        <button
+        <Button
+          type="button"
           onClick={handleCopy}
-          className="btn-primary h-12 px-6 rounded-xl text-xs font-semibold inline-flex items-center justify-center gap-2 shrink-0 shadow-sm"
+          size="lg"
+          className="w-full shrink-0 text-base sm:w-auto"
         >
           {copied ? (
             <>
@@ -56,22 +60,23 @@ export function ReferralLinkCard({
               <span>Havolani nusxalash</span>
             </>
           )}
-        </button>
+        </Button>
 
-        <a
+        <Button asChild variant="telegram" size="lg" className="w-full shrink-0 text-base sm:w-auto">
+          <a
           href={`https://t.me/share/url?url=${encodeURIComponent(
             referralUrl,
           )}&text=${encodeURIComponent(
-            "Mirzo Academy (academy.mirzo.uz) da AI va Vibe Coding bo'yicha 8 haftalik intensiv kursga qo'shiling va 10% chegirmaga ega bo'ling!",
+            "Mirzo Academy kursiga qo'shiling va o'rganishni davom ettiring!",
           )}`}
           target="_blank"
           rel="noreferrer"
-          className="btn-secondary h-12 px-5 rounded-xl text-xs font-semibold inline-flex items-center justify-center gap-2 text-telegram shrink-0"
           title="Telegram'da yuborish"
         >
-          <Send className="w-4 h-4" />
+          <Send className="w-4 h-4" aria-hidden="true" />
           <span>Telegram'da ulashish</span>
         </a>
+        </Button>
       </div>
     </div>
   );

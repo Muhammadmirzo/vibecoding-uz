@@ -27,7 +27,7 @@ export function JobBenefits() {
   return (
     <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
       {BENEFITS.map(({ icon: Icon, title, description }) => (
-        <div key={title} className="space-y-2 rounded-xl border border-border-strong bg-cream-warm p-5">
+        <div key={title} className="space-y-2 rounded-xl border border-border-strong bg-bg-elevated p-5">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent-soft text-accent">
             <Icon className="h-5 w-5" />
           </div>

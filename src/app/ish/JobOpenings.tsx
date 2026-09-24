@@ -32,7 +32,7 @@ export function JobOpenings({
               className={`whitespace-nowrap rounded-lg px-4 py-2 text-xs font-semibold transition-all md:text-sm ${
                 isSelected
                   ? "bg-accent text-white shadow-sm"
-                  : "border border-border bg-cream-warm text-ink-muted hover:bg-cream-deep hover:text-ink"
+                  : "border border-border bg-bg-elevated text-ink-muted hover:bg-bg-sunken hover:text-ink"
               }`}
             >
               {department}
@@ -47,7 +47,7 @@ export function JobOpenings({
       </div>
 
       {filteredJobs.length === 0 ? (
-        <div className="rounded-2xl border border-border bg-cream-warm px-6 py-14 text-center">
+        <div className="rounded-2xl border border-border bg-bg-elevated px-6 py-14 text-center">
           <h3 className="text-lg font-bold text-ink">Bu bo&apos;limda vakansiya yo&apos;q</h3>
           <p className="mt-2 text-sm text-ink-muted">Boshqa bo&apos;limlardagi ochiq imkoniyatlarni ko&apos;ring.</p>
           <button type="button" onClick={() => onDepartmentChange("Barchasi")} className="btn-secondary mt-5 h-11 rounded-lg px-6 text-sm font-semibold">
@@ -57,12 +57,12 @@ export function JobOpenings({
       ) : (
         <div className="grid gap-5">
           {filteredJobs.map((job) => (
-            <article key={job.id} className="group flex flex-col justify-between gap-6 rounded-2xl border border-border-strong bg-cream-warm p-6 transition-all hover:border-accent-line hover:shadow-md md:p-8 lg:flex-row lg:items-center">
+            <article key={job.id} className="group flex flex-col justify-between gap-6 rounded-2xl border border-border-strong bg-bg-elevated p-6 transition-all hover:border-border hover:shadow-md md:p-8 lg:flex-row lg:items-center">
               <div className="max-w-2xl space-y-3">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="rounded-full border border-border bg-cream px-3 py-1 font-mono text-[11px] font-bold text-accent">{job.department}</span>
-                  <span className="flex items-center gap-1 rounded-full border border-border bg-cream px-2.5 py-0.5 font-mono text-[11px] text-ink-subtle"><Clock className="h-3 w-3 text-accent" />{job.type}</span>
-                  <span className="flex items-center gap-1 rounded-full border border-border bg-cream px-2.5 py-0.5 font-mono text-[11px] text-ink-subtle"><MapPin className="h-3 w-3 text-accent" />{job.location}</span>
+                  <span className="rounded-full border border-border bg-bg px-3 py-1 font-mono text-[11px] font-bold text-accent">{job.department}</span>
+                  <span className="flex items-center gap-1 rounded-full border border-border bg-bg px-2.5 py-0.5 font-mono text-[11px] text-ink-subtle"><Clock className="h-3 w-3 text-accent" />{job.type}</span>
+                  <span className="flex items-center gap-1 rounded-full border border-border bg-bg px-2.5 py-0.5 font-mono text-[11px] text-ink-subtle"><MapPin className="h-3 w-3 text-accent" />{job.location}</span>
                 </div>
                 <Link href={`/ish/${job.slug}`} className="block transition-colors group-hover:text-accent">
                   <h3 className="text-xl font-bold text-ink md:text-2xl">{job.title}</h3>

@@ -1,126 +1,20 @@
-import * as React from "react";
-import {
-  Share2,
-  Users,
-  CheckCircle2,
-  DollarSign,
-  ArrowRight,
-  HelpCircle,
-} from "lucide-react";
-import type { ReferralLead, ReferralStats } from "./referralTypes";
+import { ArrowRight, CheckCircle2, HelpCircle, Share2, Users } from "lucide-react";
+import type { ReferralStats } from "./referralTypes";
 
-interface ReferralStatsProps {
-  stats: ReferralStats;
-  onPayout: () => void;
+export function ReferralStats({ stats, onPayout }: { stats: ReferralStats; onPayout: () => void }) {
+  const cards = [
+    { label: "Havolaga o'tishlar", value: stats.clicks, detail: "Tizimdagi tashriflar", icon: Share2 },
+    { label: "Ro'yxatdan o'tganlar", value: stats.registered, detail: "Taklif havolasi orqali", icon: Users },
+    { label: "To'lov qilganlar", value: stats.paid, detail: "Muvaffaqiyatli xaridlar", icon: CheckCircle2 },
+  ];
+  return <>
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{cards.map((card) => { const Icon = card.icon; return <div key={card.label} className="rounded-xl border border-border bg-bg-elevated p-5"><div className="flex items-center gap-2 text-sm text-ink-muted"><Icon className="h-4 w-4 text-accent" aria-hidden="true" />{card.label}</div><p className="mt-2 font-mono text-2xl font-bold text-ink">{card.value}</p><p className="mt-1 text-sm text-ink-subtle">{card.detail}</p></div>; })}
+      <div className="rounded-xl border border-gold bg-bg-elevated p-5"><p className="text-sm font-semibold text-ink">Yechib olinadigan bonus</p><p className="mt-2 font-mono text-2xl font-bold text-ink">{stats.balance.toLocaleString("uz-UZ")} UZS</p><button type="button" onClick={onPayout} disabled={stats.balance <= 0} className="mt-2 inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-brand disabled:cursor-not-allowed disabled:text-ink-subtle">Bonusni yechish <ArrowRight className="h-4 w-4" aria-hidden="true" /></button></div>
+    </div>
+    <section className="rounded-2xl border border-border bg-bg-elevated p-6 md:p-8"><div className="flex items-start gap-3"><HelpCircle className="h-6 w-6 shrink-0 text-accent" aria-hidden="true" /><div><h2 className="font-display text-lg font-semibold text-ink">Taklif dasturi qanday ishlaydi?</h2><p className="mt-2 max-w-2xl text-base leading-relaxed text-ink-muted">Havolani ulashing. Do&apos;stingiz ro&apos;yxatdan o&apos;tganidan keyin uning faollik holati va bonus hisobi tizimda qayd etiladi.</p></div></div><div className="mt-6 grid gap-4 md:grid-cols-3"><ProcessStep number="1" title="Havolani ulashing" text="Shaxsiy taklif havolangizni tanlangan kanalda ulashing." /><ProcessStep number="2" title="Do'stingiz ro'yxatdan o'tadi" text="U havoladan foydalanib ro'yxatdan o'tganda aktivlik yoziladi." /><ProcessStep number="3" title="Holat kuzatiladi" text="To'lov va bonus holati faqat tizim ma'lumotlari mavjud bo'lganda ko'rsatiladi." /></div></section>
+  </>;
 }
 
-export function ReferralStats({ stats, onPayout }: ReferralStatsProps) {
-  return (
-    <>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-cream-warm border border-border-strong rounded-xl p-5 space-y-1 shadow-sm">
-          <div className="text-xs font-mono text-ink-muted flex items-center gap-1.5">
-            <Share2 className="w-3.5 h-3.5 text-accent" /> Havolaga o'tishlar
-          </div>
-          <div className="text-2xl font-mono font-bold text-ink">
-            {stats.clicks}
-          </div>
-          <div className="text-[10px] text-ink-subtle">Unikal tashriflar</div>
-        </div>
-
-        <div className="bg-cream-warm border border-border-strong rounded-xl p-5 space-y-1 shadow-sm">
-          <div className="text-xs font-mono text-ink-muted flex items-center gap-1.5">
-            <Users className="w-3.5 h-3.5 text-accent" /> Ro'yxatdan o'tganlar
-          </div>
-          <div className="text-2xl font-mono font-bold text-ink">
-            {stats.registered} ta
-          </div>
-          <div className="text-[10px] text-ink-subtle">
-            Kvizi yechgan leadlar
-          </div>
-        </div>
-
-        <div className="bg-cream-warm border border-border-strong rounded-xl p-5 space-y-1 shadow-sm">
-          <div className="text-xs font-mono text-ink-muted flex items-center gap-1.5">
-            <CheckCircle2 className="w-3.5 h-3.5 text-success" /> To'lov
-            qilganlar
-          </div>
-          <div className="text-2xl font-mono font-bold text-success">
-            {stats.paid} nafar
-          </div>
-          <div className="text-[10px] text-ink-subtle">
-            Muvaffaqiyatli xaridlar
-          </div>
-        </div>
-
-        <div className="bg-cream-warm border border-accent-line rounded-xl p-5 space-y-1 shadow-sm relative overflow-hidden">
-          <div className="text-xs font-mono font-bold text-accent flex items-center gap-1.5">
-            <DollarSign className="w-3.5 h-3.5" /> Yechib olinadigan bonus
-          </div>
-          <div className="text-2xl font-mono font-bold text-accent">
-            {stats.balance.toLocaleString("uz-UZ")} UZS
-          </div>
-          <button
-            onClick={onPayout}
-            className="text-[11px] font-semibold text-accent hover:underline flex items-center gap-1 pt-1"
-          >
-            <span>Bonusni yechish</span>
-            <ArrowRight className="w-3 h-3" />
-          </button>
-        </div>
-      </div>
-
-      {/* How Referral Works: 3 Steps */}
-      <div className="bg-cream-warm border border-border-strong rounded-2xl p-6 md:p-8 space-y-6 shadow-sm">
-        <div className="space-y-1">
-          <h3 className="text-lg font-bold text-ink flex items-center gap-2">
-            <HelpCircle className="w-5 h-5 text-accent" /> Referral Dasturi
-            Qanday Ishlaydi?
-          </h3>
-          <p className="text-xs text-ink-muted">
-            Oddiy 3 qadam orqali qo'shimcha daromadga ega bo'ling.
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-6">
-          <div className="p-5 rounded-xl bg-cream border border-border space-y-2 relative">
-            <div className="w-8 h-8 rounded-full bg-accent text-white font-mono font-bold text-sm flex items-center justify-center">
-              1
-            </div>
-            <h4 className="text-sm font-bold text-ink">Havolani ulashing</h4>
-            <p className="text-xs text-ink-muted leading-relaxed">
-              Shaxsiy taklif havolangizni do'stlaringizga, IT guruhlarga yoki
-              blogingizga joylang.
-            </p>
-          </div>
-
-          <div className="p-5 rounded-xl bg-cream border border-border space-y-2 relative">
-            <div className="w-8 h-8 rounded-full bg-accent text-white font-mono font-bold text-sm flex items-center justify-center">
-              2
-            </div>
-            <h4 className="text-sm font-bold text-ink">
-              Do'stingiz 10% chegirma oladi
-            </h4>
-            <p className="text-xs text-ink-muted leading-relaxed">
-              Sizning havolangiz orqali kelgan har bir talaba kurs xaridida
-              avtomatik 10% arzonroq to'laydi.
-            </p>
-          </div>
-
-          <div className="p-5 rounded-xl bg-cream border border-border space-y-2 relative">
-            <div className="w-8 h-8 rounded-full bg-accent text-white font-mono font-bold text-sm flex items-center justify-center">
-              3
-            </div>
-            <h4 className="text-sm font-bold text-ink">
-              Sizga 15% keshbek tushadi
-            </h4>
-            <p className="text-xs text-ink-muted leading-relaxed">
-              Har bir muvaffaqiyatli to'lovdan 450,000 UZS gacha shaxsiy
-              hisobingizga yoki kartangizga yechib oling.
-            </p>
-          </div>
-        </div>
-      </div>
-    </>
-  );
+function ProcessStep({ number, title, text }: { number: string; title: string; text: string }) {
+  return <div className="rounded-lg border border-border bg-bg-sunken p-4"><span className="grid h-8 w-8 place-items-center rounded-full bg-brand-soft font-mono text-sm font-bold text-brand">{number}</span><h3 className="mt-3 font-semibold text-ink">{title}</h3><p className="mt-2 text-sm leading-relaxed text-ink-muted">{text}</p></div>;
 }

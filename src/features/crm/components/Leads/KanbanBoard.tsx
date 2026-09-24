@@ -1,9 +1,34 @@
 "use client";
 
-import { Filter, HelpCircle, Plus, Search, UserCheck, PhoneCall, DollarSign, AlertCircle, CheckCircle2, MoveRight, Pencil, Trash2, Clock } from "lucide-react";
+import { DollarSign, HelpCircle, PhoneCall, UserCheck } from "lucide-react";
 import { LeadColumn, type PipelineStage } from "./LeadColumn";
 import type { Lead, LeadStatus } from "./types";
 
-export const PIPELINE_STAGES: PipelineStage[] = [{ id: "new", title: "Yangi (New)", badgeBg: "bg-blue-500/10 border-blue-500/30", badgeText: "text-blue-600 dark:text-blue-400", icon: HelpCircle }, { id: "contacted", title: "Bog'lanildi (Contacted)", badgeBg: "bg-amber-500/10 border-amber-500/30", badgeText: "text-amber-600 dark:text-amber-400", icon: PhoneCall }, { id: "consultation", title: "Konsultatsiya (Consultation)", badgeBg: "bg-purple-500/10 border-purple-500/30", badgeText: "text-purple-600 dark:text-purple-400", icon: UserCheck }, { id: "paid", title: "To'langan (Paid)", badgeBg: "bg-emerald-500/10 border-emerald-500/30", badgeText: "text-emerald-600 dark:text-emerald-400", icon: DollarSign }];
-type Props = { leads: Lead[]; draggedLeadId: string | null; onDragStart: (event: React.DragEvent, id: string) => void; onDragOver: (event: React.DragEvent) => void; onDrop: (event: React.DragEvent, status: LeadStatus) => void; onEdit: (lead: Lead) => void; onDelete: (id: string) => void; onMove: (id: string, status: LeadStatus) => void; onQuiz: (lead: Lead) => void };
-export function KanbanBoard({ leads, draggedLeadId, onDragStart, onDragOver, onDrop, onEdit, onDelete, onMove, onQuiz }: Props) { return <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">{PIPELINE_STAGES.map((stage) => <LeadColumn key={stage.id} stage={stage} leads={leads.filter((lead) => lead.status === stage.id)} draggedLeadId={draggedLeadId} onDragStart={onDragStart} onDragOver={onDragOver} onDrop={onDrop} onEdit={onEdit} onDelete={onDelete} onMove={onMove} onQuiz={onQuiz} />)}</div>; }
+export const PIPELINE_STAGES: PipelineStage[] = [
+  { id: "new", title: "Yangi", badgeBg: "bg-brand-soft border-brand/20", badgeText: "text-brand", icon: HelpCircle },
+  { id: "contacted", title: "Bog&apos;lanildi", badgeBg: "bg-gold-soft border-gold/20", badgeText: "text-gold", icon: PhoneCall },
+  { id: "consultation", title: "Konsultatsiya", badgeBg: "bg-accent-soft border-accent/20", badgeText: "text-accent", icon: UserCheck },
+  { id: "paid", title: "To&apos;langan", badgeBg: "bg-success-soft border-success/20", badgeText: "text-success", icon: DollarSign },
+];
+
+type Props = {
+  leads: Lead[];
+  draggedLeadId: string | null;
+  onDragStart: (event: React.DragEvent, id: string) => void;
+  onDragOver: (event: React.DragEvent) => void;
+  onDrop: (event: React.DragEvent, status: LeadStatus) => void;
+  onEdit: (lead: Lead) => void;
+  onDelete: (id: string) => void;
+  onMove: (id: string, status: LeadStatus) => void;
+  onQuiz: (lead: Lead) => void;
+};
+
+export function KanbanBoard(props: Props) {
+  return (
+    <div className="grid min-w-0 grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+      {PIPELINE_STAGES.map((stage) => (
+        <LeadColumn key={stage.id} stage={stage} leads={props.leads.filter((lead) => lead.status === stage.id)} draggedLeadId={props.draggedLeadId} onDragStart={props.onDragStart} onDragOver={props.onDragOver} onDrop={props.onDrop} onEdit={props.onEdit} onDelete={props.onDelete} onMove={props.onMove} onQuiz={props.onQuiz} />
+      ))}
+    </div>
+  );
+}

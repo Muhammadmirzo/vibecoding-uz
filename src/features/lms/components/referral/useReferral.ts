@@ -11,7 +11,7 @@ export function useReferral() {
   const { user } = useAuth();
   const [copied, setCopied] = React.useState(false);
   const referralCode = React.useMemo(
-    () => (user?.id ? user.id.slice(0, 8).toUpperCase() : "JAMSHID-77"),
+    () => (user?.id ? user.id.slice(0, 8).toUpperCase() : "KODNI KIRITING"),
     [user],
   );
   const referralUrl =
@@ -23,46 +23,8 @@ export function useReferral() {
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
   };
-  const stats: ReferralStats = {
-    clicks: 42,
-    registered: 9,
-    paid: 3,
-    balance: 1350000,
-  };
-  const referralList: ReferralLead[] = [
-    {
-      id: "ref-01",
-      name: "Sardor Karimov",
-      date: "02.09.2026",
-      course: "Vibe Coding Express",
-      status: "paid",
-      bonusAmount: "+450,000 UZS",
-    },
-    {
-      id: "ref-02",
-      name: "Dilshod Matrasulov",
-      date: "04.09.2026",
-      course: "Vibe Coding Express",
-      status: "paid",
-      bonusAmount: "+450,000 UZS",
-    },
-    {
-      id: "ref-03",
-      name: "Anvar Temirov",
-      date: "05.09.2026",
-      course: "Vibe Coding Express",
-      status: "paid",
-      bonusAmount: "+450,000 UZS",
-    },
-    {
-      id: "ref-04",
-      name: "Farrux Zokirov",
-      date: "06.09.2026",
-      course: "AI Asoslari",
-      status: "registered",
-      bonusAmount: "Kutilmoqda",
-    },
-  ];
+  const stats: ReferralStats = { clicks: 0, registered: 0, paid: 0, balance: 0 };
+  const referralList: ReferralLead[] = [];
   const [payoutModalOpen, setPayoutModalOpen] = React.useState(false);
   const [payoutMethod, setPayoutMethod] =
     React.useState<PayoutMethod>("uzcard_humo");

@@ -1,186 +1,157 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import { ArrowLeft, CircleAlert, Loader2, RefreshCw, ShieldCheck } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Button } from "@/components/ui";
+import { FieldError } from "@/components/ui";
 import { useAuth } from "@/context/AuthContext";
-import { ShieldCheck, ArrowLeft, Loader2, AlertCircle, RefreshCw } from "lucide-react";
+
+const OTP_LENGTH = 6;
+const RESEND_SECONDS = 60;
 
 export function OtpForm() {
   const { verifyOtp, login, pendingPhone, devCode, setAuthStep, isLoading, error, clearError } = useAuth();
-  const [code, setCode] = useState<string[]>(["", "", "", "", "", ""]);
-  const [timer, setTimer] = useState<number>(60);
+  const [code, setCode] = useState<string[]>(Array(OTP_LENGTH).fill(""));
+  const [timer, setTimer] = useState(RESEND_SECONDS);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const verifyInFlight = useRef(false);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (timer > 0) {
-      interval = setInterval(() => {
-        setTimer((prev) => prev - 1);
-      }, 1000);
-    }
-    return () => {
-      if (interval) clearInterval(interval);
-    };
+    if (timer <= 0) return;
+    const interval = window.setInterval(() => setTimer((value) => Math.max(0, value - 1)), 1000);
+    return () => window.clearInterval(interval);
   }, [timer]);
 
-  // Focus initial input
-  useEffect(() => {
-    inputRefs.current[0]?.focus();
-  }, []);
+  async function submitCode(value: string) {
+    if (value.length !== OTP_LENGTH || isLoading || verifyInFlight.current) return;
+    verifyInFlight.current = true;
+    try {
+      await verifyOtp(value);
+    } finally {
+      verifyInFlight.current = false;
+    }
+  }
 
-  const handleInputChange = (index: number, value: string) => {
+  function handleInputChange(index: number, value: string) {
     if (error) clearError();
     const digitsOnly = value.replace(/\D/g, "");
-    
-    if (!digitsOnly) {
-      const newCode = [...code];
-      newCode[index] = "";
-      setCode(newCode);
-      return;
-    }
+    const nextCode = [...code];
 
-    // Handle paste of full 6 digits
     if (digitsOnly.length > 1) {
-      const pasted = digitsOnly.slice(0, 6).split("");
-      const newCode = [...code];
-      pasted.forEach((char, i) => {
-        if (i < 6) newCode[i] = char;
+      const pasted = digitsOnly.slice(0, OTP_LENGTH).split("");
+      pasted.forEach((digit, pasteIndex) => {
+        nextCode[pasteIndex] = digit;
       });
-      setCode(newCode);
-      const nextIndex = Math.min(pasted.length, 5);
-      inputRefs.current[nextIndex]?.focus();
+      setCode(nextCode);
+      inputRefs.current[Math.min(pasted.length, OTP_LENGTH - 1)]?.focus();
+      if (nextCode.join("").length === OTP_LENGTH) void submitCode(nextCode.join(""));
       return;
     }
 
-    const newCode = [...code];
-    newCode[index] = digitsOnly;
-    setCode(newCode);
+    nextCode[index] = digitsOnly;
+    setCode(nextCode);
+    if (digitsOnly && index < OTP_LENGTH - 1) inputRefs.current[index + 1]?.focus();
+    if (nextCode.join("").length === OTP_LENGTH) void submitCode(nextCode.join(""));
+  }
 
-    // Auto-advance
-    if (digitsOnly && index < 5) {
-      inputRefs.current[index + 1]?.focus();
-    }
+  function handleKeyDown(index: number, event: React.KeyboardEvent<HTMLInputElement>) {
+    if (event.key === "Backspace" && !code[index] && index > 0) inputRefs.current[index - 1]?.focus();
+    if (event.key === "ArrowLeft" && index > 0) inputRefs.current[index - 1]?.focus();
+    if (event.key === "ArrowRight" && index < OTP_LENGTH - 1) inputRefs.current[index + 1]?.focus();
+  }
 
-    // Auto submit when complete 6 digits
-    const updatedFullCode = newCode.join("");
-    if (updatedFullCode.length === 6) {
-      verifyOtp(updatedFullCode);
-    }
-  };
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    await submitCode(code.join(""));
+  }
 
-  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Backspace" && !code[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus();
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const fullCode = code.join("");
-    if (fullCode.length !== 6 || isLoading) return;
-    await verifyOtp(fullCode);
-  };
-
-  const handleResend = async () => {
+  async function handleResend() {
     if (timer > 0 || isLoading) return;
     const success = await login(pendingPhone);
     if (success) {
-      setTimer(60);
-      setCode(["", "", "", "", "", ""]);
+      setTimer(RESEND_SECONDS);
+      setCode(Array(OTP_LENGTH).fill(""));
       inputRefs.current[0]?.focus();
     }
-  };
+  }
+
+  const fullCode = code.join("");
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5" aria-label="OTP tasdiqlash shakli">
-      <div>
-        <div className="flex items-center justify-between mb-2">
-          <label className="block text-sm font-semibold text-[var(--color-ink)]">
-            SMS orqali kelgan 6 xonali kod
-          </label>
+    <form onSubmit={handleSubmit} className="space-y-4" aria-label="Tasdiqlash kodi shakli" noValidate>
+      <fieldset className="min-w-0 border-0 p-0">
+        <div className="mb-2 flex items-center justify-between gap-2">
+          <legend className="text-sm font-semibold text-ink">SMS orqali kelgan 6 xonali kod</legend>
           <button
             type="button"
             onClick={() => setAuthStep("login")}
-            className="text-xs font-semibold text-[var(--color-accent)] hover:underline inline-flex items-center gap-1"
+            className="inline-flex min-h-11 items-center gap-1 rounded-md px-1 text-xs font-semibold text-brand hover:underline"
           >
-            <ArrowLeft className="w-3 h-3" />
-            O'zgartirish
+            <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+            O&apos;zgartirish
           </button>
         </div>
 
-        <div className="p-3 rounded-[var(--radius-md)] bg-[var(--color-cream-warm)] border border-[var(--color-border)] mb-4 text-xs text-[var(--color-ink-muted)] flex items-center justify-between">
-          <span>Yuborildi: <strong className="font-mono text-[var(--color-ink)]">{pendingPhone}</strong></span>
+        <div className="mb-4 rounded-md border border-border bg-bg-sunken p-3 text-xs leading-5 text-ink-muted">
+          <span>Yuborildi: <strong className="font-mono text-ink">{pendingPhone}</strong></span>
           {devCode ? (
-            <span className="text-[var(--color-accent)] font-semibold">(Test kod: {devCode})</span>
+            <span className="mt-1 block font-semibold text-accent">Test kod: {devCode}</span>
           ) : (
-            <span>Kod kelmasa — spam/junk qutini tekshiring yoki qayta yuboring</span>
+            <span className="mt-1 block">Kod kelmasa — spam/junk qutini tekshiring yoki qayta yuboring.</span>
           )}
         </div>
 
-        {/* 6 Digit PIN Inputs */}
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center justify-between gap-2" aria-describedby="otp-hint">
           {code.map((digit, index) => (
             <input
               key={index}
-              ref={(el) => {
-                inputRefs.current[index] = el;
-              }}
+              ref={(element) => { inputRefs.current[index] = element; }}
               type="text"
               inputMode="numeric"
-              maxLength={6}
+              autoComplete="one-time-code"
+              maxLength={OTP_LENGTH}
               disabled={isLoading}
               value={digit}
-              onChange={(e) => handleInputChange(index, e.target.value)}
-              onKeyDown={(e) => handleKeyDown(index, e)}
-              className="w-11 sm:w-12 h-12 min-h-[48px] text-center rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-cream-warm)] text-[var(--color-ink)] font-mono text-xl font-bold focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent transition-all disabled:opacity-50"
-              aria-label={`Digit ${index + 1}`}
+              onChange={(event) => handleInputChange(index, event.target.value)}
+              onKeyDown={(event) => handleKeyDown(index, event)}
+              className="h-12 min-w-0 flex-1 rounded-md border border-border-strong bg-bg-elevated text-center font-mono text-xl font-bold text-ink outline-none transition-colors focus:border-brand focus:ring-2 focus:ring-gold/30 disabled:opacity-50"
+              aria-label={`Kodning ${index + 1}-raqamli maydoni`}
+              aria-invalid={Boolean(error)}
+              aria-describedby={error ? "otp-error otp-hint" : "otp-hint"}
             />
           ))}
         </div>
-      </div>
+        <p id="otp-hint" className="mt-1.5 text-xs text-ink-muted">Kodni kiritishingiz mumkin yoki SMS'dan nusxa olishingiz mumkin.</p>
+      </fieldset>
 
       {error && (
-        <div
-          role="alert"
-          className="flex items-start gap-2 p-3 rounded-[var(--radius-md)] bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-sm font-medium animate-fadeIn"
-        >
-          <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+        <FieldError id="otp-error" role="alert" className="flex items-start gap-2">
+          <CircleAlert className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
           <span>{error}</span>
-        </div>
+        </FieldError>
       )}
 
-      <button
-        type="submit"
-        disabled={isLoading || code.join("").length !== 6}
-        className="w-full h-12 rounded-[var(--radius-md)] btn-primary font-semibold text-base flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)]"
-      >
+      <Button type="submit" size="lg" className="w-full" disabled={isLoading || fullCode.length !== OTP_LENGTH}>
         {isLoading ? (
           <>
-            <Loader2 className="w-5 h-5 animate-spin" />
-            <span>Kodni tekshirilmoqda...</span>
+            <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
+            <span>Kod tekshirilmoqda...</span>
           </>
         ) : (
           <>
-            <ShieldCheck className="w-5 h-5" />
-            <span>Tasdiqlash va Kirish</span>
+            <ShieldCheck className="h-5 w-5" aria-hidden="true" />
+            <span>Tasdiqlash va kirish</span>
           </>
         )}
-      </button>
+      </Button>
 
-      {/* Resend timer */}
-      <div className="text-center pt-1">
+      <div className="pt-1 text-center">
         {timer > 0 ? (
-          <p className="text-xs text-[var(--color-ink-muted)] font-mono">
-            Kodni qayta yuborish: <span className="font-bold text-[var(--color-ink)]">{timer}s</span>
-          </p>
+          <p className="font-mono text-xs text-ink-muted">Kodni qayta yuborish: <span className="font-bold text-ink">{timer}s</span></p>
         ) : (
-          <button
-            type="button"
-            onClick={handleResend}
-            disabled={isLoading}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--color-accent)] hover:underline disabled:opacity-50"
-          >
-            <RefreshCw className="w-3.5 h-3.5" />
-            <span>Kodni qayta yuborish</span>
+          <button type="button" onClick={handleResend} disabled={isLoading} className="inline-flex min-h-11 items-center gap-1.5 rounded-md px-2 text-xs font-semibold text-brand hover:underline disabled:opacity-50">
+            <RefreshCw className="h-4 w-4" aria-hidden="true" />
+            Kodni qayta yuborish
           </button>
         )}
       </div>

@@ -3,6 +3,8 @@
 import React, { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ShieldCheck, Lock, Mail, ArrowRight, Loader2, AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import { Input, Label } from "@/components/ui/Form";
 
 function AdminLoginForm() {
   const router = useRouter();
@@ -59,17 +61,17 @@ function AdminLoginForm() {
   };
 
   return (
-    <div className="w-full max-w-md bg-[var(--color-cream)] border border-[var(--color-border-strong)] rounded-[var(--radius-xl)] p-6 sm:p-8 shadow-[var(--shadow-lg)] space-y-6">
+    <div className="w-full max-w-md bg-bg-elevated border border-border-strong rounded-xl p-6 sm:p-8 shadow-lg space-y-6">
       {/* Header Badge */}
       <div className="text-center space-y-2">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--color-cream-warm)] border border-[var(--color-accent-line)] text-xs font-mono font-bold text-[var(--color-accent)] uppercase">
-          <ShieldCheck className="w-4 h-4 text-[var(--color-accent)]" />
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-bg-sunken border border-border text-xs font-mono font-bold text-accent uppercase">
+          <ShieldCheck className="w-4 h-4 text-accent" />
           <span>Mirzo Academy Admin Portal</span>
         </div>
-        <h1 className="text-2xl font-extrabold text-[var(--color-ink)] tracking-tight">
+        <h1 className="text-2xl font-extrabold text-ink tracking-tight">
           Admin Panelga Kirish
         </h1>
-        <p className="text-xs text-[var(--color-ink-muted)] max-w-xs mx-auto">
+        <p className="text-xs text-ink-muted max-w-xs mx-auto">
           Boshqaruv tizimiga kirish uchun elektron pochta yoki telefon raqamingiz hamda parolingizni kiriting.
         </p>
       </div>
@@ -77,12 +79,12 @@ function AdminLoginForm() {
       {/* Login Form */}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="admin-login" className="block text-xs font-bold text-[var(--color-ink)] uppercase tracking-wider mb-1.5">
+          <Label htmlFor="admin-login" className="mb-1.5 text-xs uppercase tracking-wider">
             Login (Email yoki Telefon)
-          </label>
+          </Label>
           <div className="relative">
-            <Mail className="w-4 h-4 absolute left-3.5 top-3.5 text-[var(--color-ink-muted)]" />
-            <input
+            <Mail className="w-4 h-4 absolute left-3.5 top-4 text-ink-muted" aria-hidden="true" />
+            <Input
               id="admin-login"
               type="text"
               required
@@ -92,18 +94,18 @@ function AdminLoginForm() {
               aria-describedby={error ? "admin-login-error" : undefined}
               onChange={(e) => setLoginInput(e.target.value)}
               placeholder="admin@mirzo.uz yoki +998901234567"
-              className="w-full h-11 pl-10 pr-4 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-cream-warm)] text-sm text-[var(--color-ink)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+              className="pl-10 text-base sm:text-sm"
             />
           </div>
         </div>
 
         <div>
-          <label htmlFor="admin-password" className="block text-xs font-bold text-[var(--color-ink)] uppercase tracking-wider mb-1.5">
+          <Label htmlFor="admin-password" className="mb-1.5 text-xs uppercase tracking-wider">
             Parol
-          </label>
+          </Label>
           <div className="relative">
-            <Lock className="w-4 h-4 absolute left-3.5 top-3.5 text-[var(--color-ink-muted)]" />
-            <input
+            <Lock className="w-4 h-4 absolute left-3.5 top-4 text-ink-muted" aria-hidden="true" />
+            <Input
               id="admin-password"
               type="password"
               required
@@ -113,22 +115,22 @@ function AdminLoginForm() {
               aria-describedby={error ? "admin-login-error" : undefined}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••••••"
-              className="w-full h-11 pl-10 pr-4 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-cream-warm)] text-sm text-[var(--color-ink)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+              className="pl-10 text-base sm:text-sm"
             />
           </div>
         </div>
 
         {error && (
-          <div id="admin-login-error" role="alert" className="flex items-start gap-2 p-3 rounded-[var(--radius-md)] bg-red-500/10 border border-red-500/20 text-red-600 text-xs font-medium">
+          <div id="admin-login-error" role="alert" className="flex items-start gap-2 p-3 rounded-lg bg-danger/10 border border-danger/20 text-danger text-xs font-medium">
             <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
             <span>{error}</span>
           </div>
         )}
 
-        <button
+        <Button
           type="submit"
           disabled={isLoading || !loginInput || !password}
-          className="w-full h-12 rounded-[var(--radius-md)] btn-primary font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-50 transition-all shadow-sm"
+          className="w-full text-sm"
         >
           {isLoading ? (
             <>
@@ -141,7 +143,7 @@ function AdminLoginForm() {
               <ArrowRight className="w-4 h-4" />
             </>
           )}
-        </button>
+        </Button>
       </form>
     </div>
   );
@@ -149,10 +151,10 @@ function AdminLoginForm() {
 
 export default function AdminLoginPage() {
   return (
-    <div className="min-h-screen bg-[var(--color-cream-warm)] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[60] flex min-h-[100dvh] items-center justify-center overflow-y-auto bg-bg-sunken p-4">
       <Suspense
         fallback={
-          <div className="w-full max-w-md bg-[var(--color-cream)] border border-[var(--color-border-strong)] rounded-[var(--radius-xl)] p-8 text-center text-sm font-mono text-[var(--color-ink-muted)]">
+          <div className="w-full max-w-md bg-bg-elevated border border-border-strong rounded-xl p-8 text-center text-sm font-mono text-ink-muted">
             Yuklanmoqda...
           </div>
         }

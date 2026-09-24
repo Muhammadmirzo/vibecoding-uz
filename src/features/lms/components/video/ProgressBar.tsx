@@ -20,7 +20,7 @@ export function ProgressBar({ controller }: ProgressBarProps) {
         step={0.1}
         value={controller.currentTime}
         onChange={controller.handleSeek}
-        className="w-full h-1.5 bg-cream/30 rounded-lg appearance-none cursor-pointer accent-accent focus:outline-none"
+        className="w-full h-1.5 bg-ink/30 rounded-lg appearance-none cursor-pointer accent-accent focus:outline-none"
       />
       <div
         className="absolute left-0 top-0 h-1.5 bg-accent rounded-lg pointer-events-none"

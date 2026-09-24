@@ -29,21 +29,16 @@ export default function ReferralPage() {
   } = referral;
 
   return (
-    <div className="pt-24 pb-16 min-h-screen bg-cream">
+    <div className="min-h-screen bg-bg text-ink">
       <KabinetNav />
-      <div className="mx-auto w-full max-w-[1100px] px-5 md:px-8 space-y-8">
-        <div className="space-y-2">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent-soft text-accent text-xs font-mono font-bold">
-            <Gift className="w-3.5 h-3.5" /> Hamkorlik va Bonus Dasturi
+      <main className="mx-auto w-full max-w-6xl space-y-8 px-5 pb-28 pt-24 md:px-8 md:pt-28 lg:pl-80 lg:pr-8">
+        <header className="max-w-3xl">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-accent-soft px-3 py-1 text-xs font-semibold text-accent">
+            <Gift className="w-3.5 h-3.5" aria-hidden="true" /> Hamkorlik dasturi
           </span>
-          <h1 className="text-2xl md:text-3xl font-extrabold text-ink">
-            Do'stlaringizni Taklif Qiling va Daromad Oling
-          </h1>
-          <p className="text-xs text-ink-muted">
-            Do'stingiz kurs to'lovidan 10% chegirma oladi, siz esa har bir
-            to'lovdan 15% (o'rtacha 450,000 UZS) bonus ishlab olasiz.
-          </p>
-        </div>
+          <h1 className="mt-4 font-display text-2xl font-semibold text-ink md:text-3xl">Do&apos;stingizni taklif qiling</h1>
+          <p className="mt-3 text-base leading-relaxed text-ink-muted">Shaxsiy havolangizni ulashing. Bonus va takliflar haqidagi ma&apos;lumotlar tizimda qayd etilgan holda ko&apos;rinadi.</p>
+        </header>
         <ReferralLinkCard {...referral} />
         <ReferralStats
           stats={stats}
@@ -53,8 +48,8 @@ export default function ReferralPage() {
           }}
         />
         <ReferralHistoryTable referralList={referralList} />
-      </div>
-      {payoutModalOpen && <PayoutModal {...referral} />}
+      </main>
+      {payoutModalOpen ? <PayoutModal {...referral} /> : null}
     </div>
   );
 }

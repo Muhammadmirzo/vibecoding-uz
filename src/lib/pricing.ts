@@ -143,3 +143,14 @@ export function calculateInstallmentPlan(totalSum: number, monthsCount: number):
     totalAmount: monthlyAmount * months,
   };
 }
+
+// Tiyin-integer money (1 sum = 100 tiyin). Provider protocols and the
+// payments domain work in tiyin; the canonical implementation lives in
+// src/features/payments/domain/money.ts and is re-exported here.
+export {
+  TIYIN_PER_SUM,
+  sumToTiyin,
+  tiyinToSumString,
+  formatTiyinUz,
+  sumMatchesTiyin,
+} from "@/features/payments/domain/money";

@@ -1,4 +1,5 @@
 import { CheckCircle2, Receipt } from "lucide-react";
+import { Button } from "@/components/ui/Button";
 import {
   formatDate,
   formatUzs,
@@ -18,7 +19,7 @@ const providerLabels = {
 
 export function ReceiptsTable({ payments }: ReceiptsTableProps) {
   return (
-    <section className="rounded-2xl border border-border-strong bg-cream-warm p-6 shadow-sm md:p-8">
+    <section className="rounded-2xl border border-border bg-bg-elevated p-6 md:p-8">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-border pb-4">
         <div>
           <h2 className="flex items-center gap-2 text-lg font-bold text-ink">
@@ -31,7 +32,7 @@ export function ReceiptsTable({ payments }: ReceiptsTableProps) {
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full text-left text-xs">
+        <table className="w-full text-left text-sm">
           <caption className="sr-only">Hisobingizdagi to'lovlar ro'yxati</caption>
           <thead>
             <tr className="border-b border-border font-mono text-[11px] uppercase text-ink-subtle">
@@ -45,7 +46,7 @@ export function ReceiptsTable({ payments }: ReceiptsTableProps) {
           </thead>
           <tbody className="divide-y divide-border">
             {payments.map((payment) => (
-              <tr key={payment.id} className="hover:bg-cream">
+              <tr key={payment.id} className="hover:bg-bg-sunken">
                 <th scope="row" className="max-w-44 truncate py-4 pr-4 font-mono font-bold text-ink" title={payment.providerTxnId ?? payment.id}>
                   {payment.providerTxnId ?? payment.id.slice(0, 8)}
                 </th>
@@ -66,11 +67,13 @@ export function ReceiptsTable({ payments }: ReceiptsTableProps) {
                 </td>
                 <td className="whitespace-nowrap py-4 pl-4 text-right">
                   {payment.receiptUrl ? (
-                    <a href={payment.receiptUrl} target="_blank" rel="noreferrer" className="btn-secondary inline-flex h-8 items-center rounded-md px-3 text-[11px] font-semibold">
-                      Chekni ochish
-                    </a>
+                    <Button asChild variant="outline" size="md" className="text-sm">
+                      <a href={payment.receiptUrl} target="_blank" rel="noreferrer">
+                        Chekni ochish
+                      </a>
+                    </Button>
                   ) : (
-                    <span className="inline-flex cursor-not-allowed items-center rounded-md bg-cream-deep px-3 py-2 text-[11px] text-ink-subtle" title="Chek tez orada" aria-disabled="true">
+                    <span className="inline-flex cursor-not-allowed items-center rounded-md bg-bg-sunken-deep px-3 py-2 text-[11px] text-ink-subtle" title="Chek tez orada" aria-disabled="true">
                       Chek tez orada
                     </span>
                   )}

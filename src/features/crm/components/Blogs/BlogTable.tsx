@@ -1,102 +1,18 @@
 "use client";
+
 import { Edit, FileText, Loader2, Trash2 } from "lucide-react";
 import type { BlogPost } from "./types";
+
 interface Props { posts: BlogPost[]; loading: boolean; onEdit: (post: BlogPost) => void; onDelete: (id: string) => void; }
-export function BlogTable({ posts, loading, onEdit, onDelete }: Props) { return (<>
-      {/* Articles Table / Grid */}
-      {loading ? (
-        <div className="flex items-center justify-center py-16">
-          <Loader2 className="w-8 h-8 animate-spin text-accent" />
-        </div>
-      ) : posts.length === 0 ? (
-        <div className="text-center py-16 bg-cream-warm rounded-xl border border-border">
-          <FileText className="w-12 h-12 text-ink-muted mx-auto mb-3 opacity-50" />
-          <h3 className="text-base font-semibold text-ink">Hali hech qanday maqola mavjud emas</h3>
-          <p className="text-xs text-ink-muted mt-1">Yangi maqola yaratish uchun tugmani bosing.</p>
-        </div>
-      ) : (
-        <div className="bg-cream-warm rounded-xl border border-border overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-cream-deep border-b border-border text-xs uppercase text-ink-muted font-semibold tracking-wider">
-                <tr>
-                  <th className="px-4 py-3.5">Maqola</th>
-                  <th className="px-4 py-3.5">Kategoriya</th>
-                  <th className="px-4 py-3.5">Muallif</th>
-                  <th className="px-4 py-3.5">Holat</th>
-                  <th className="px-4 py-3.5">Sana</th>
-                  <th className="px-4 py-3.5 text-right">Amallar</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {posts.map((post) => {
-                  const statusColors: Record<string, string> = {
-                    published: "bg-emerald-100 text-emerald-800 border-emerald-200",
-                    scheduled: "bg-blue-100 text-blue-800 border-blue-200",
-                    draft: "bg-amber-100 text-amber-800 border-amber-200",
-                    archived: "bg-gray-100 text-gray-800 border-gray-200",
-                  };
+const STATUS: Record<string, { label: string; className: string }> = {
+  published: { label: "Chop etilgan", className: "bg-success-soft text-success border-success/20" },
+  scheduled: { label: "Rejalashtirilgan", className: "bg-telegram-soft text-telegram border-telegram/20" },
+  draft: { label: "Qoralama", className: "bg-gold-soft text-gold border-gold/20" },
+  archived: { label: "Arxiv", className: "bg-bg-sunken text-ink-muted border-border" },
+};
 
-                  const statusLabels: Record<string, string> = {
-                    published: "Chop etilgan",
-                    scheduled: "Rejalashtirilgan",
-                    draft: "Qoralama",
-                    archived: "Arxiv",
-                  };
-
-                  return (
-                    <tr key={post.id} className="hover:bg-cream/60 transition-colors">
-                      <td className="px-4 py-3.5 max-w-xs">
-                        <div className="font-semibold text-ink truncate">{post.title}</div>
-                        <div className="text-xs text-ink-muted truncate font-mono mt-0.5">/{post.slug}</div>
-                      </td>
-                      <td className="px-4 py-3.5">
-                        <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-cream border border-border text-ink">
-                          {post.category}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3.5 text-ink-muted text-xs font-medium">{post.authorName}</td>
-                      <td className="px-4 py-3.5">
-                        <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
-                            statusColors[post.status] || "bg-gray-100 text-gray-800"
-                          }`}
-                        >
-                          {statusLabels[post.status] || post.status}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3.5 text-xs text-ink-muted whitespace-nowrap">
-                        {new Date(post.publishedAt).toLocaleDateString("uz-UZ", {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </td>
-                      <td className="px-4 py-3.5 text-right space-x-2 whitespace-nowrap">
-                        <button
-                          onClick={() => onEdit(post)}
-                          className="p-1.5 rounded-md hover:bg-cream border border-transparent hover:border-border text-ink-muted hover:text-ink transition-all"
-                          title="Tahrirlash"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => onDelete(post.id)}
-                          className="p-1.5 rounded-md hover:bg-red-50 border border-transparent hover:border-red-200 text-ink-muted hover:text-red-600 transition-all"
-                          title="O'chirish"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-</>
-); }
+export function BlogTable({ posts, loading, onEdit, onDelete }: Props) {
+  if (loading) return <div role="status" className="grid min-h-64 place-items-center rounded-2xl border border-border bg-bg-elevated"><div className="text-center"><Loader2 className="mx-auto h-7 w-7 animate-spin text-brand" /><p className="mt-3 text-sm text-ink-muted">Maqolalar yuklanmoqda...</p></div></div>;
+  if (!posts.length) return <div className="rounded-2xl border border-dashed border-border bg-bg-elevated p-12 text-center"><FileText className="mx-auto h-9 w-9 text-ink-subtle" /><h3 className="mt-3 font-semibold text-ink">Maqola topilmadi</h3><p className="mt-1 text-sm text-ink-muted">Yangi maqola yarating yoki filtrni o&apos;zgartiring.</p></div>;
+  return <div className="rounded-2xl border border-border bg-bg-elevated shadow-sm"><div className="space-y-3 p-3 md:hidden">{posts.map((post) => { const status = STATUS[post.status] ?? STATUS.draft; return <article key={post.id} className="rounded-xl border border-border p-4"><div className="flex items-start justify-between gap-3"><h3 className="font-semibold text-ink">{post.title}</h3><span className={`shrink-0 rounded-full border px-2 py-1 text-xs ${status.className}`}>{status.label}</span></div><p className="mt-1 font-mono text-xs text-ink-subtle">/{post.slug}</p><p className="mt-3 text-sm text-ink-muted">{post.category} · {post.authorName}</p><div className="mt-4 flex items-center gap-2 border-t border-border pt-3"><button type="button" onClick={() => onEdit(post)} className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-lg bg-brand-soft text-sm font-semibold text-brand"><Edit className="h-4 w-4" />Tahrirlash</button><button type="button" onClick={() => onDelete(post.id)} className="grid h-11 w-11 place-items-center rounded-lg border border-border text-danger" aria-label={`${post.title}ni o&apos;chirish`}><Trash2 className="h-4 w-4" /></button></div></article>; })}</div><div className="hidden overflow-x-auto md:block"><table className="w-full text-left text-sm"><thead className="border-b border-border bg-bg-sunken text-xs uppercase text-ink-muted"><tr><th className="px-4 py-3.5">Maqola</th><th className="px-4 py-3.5">Kategoriya</th><th className="px-4 py-3.5">Muallif</th><th className="px-4 py-3.5">Holat</th><th className="px-4 py-3.5">Sana</th><th className="px-4 py-3.5 text-right">Amallar</th></tr></thead><tbody className="divide-y divide-border">{posts.map((post) => { const status = STATUS[post.status] ?? STATUS.draft; return <tr key={post.id} className="hover:bg-bg-sunken"><td className="max-w-xs px-4 py-3.5"><div className="truncate font-semibold text-ink">{post.title}</div><div className="mt-0.5 truncate font-mono text-xs text-ink-muted">/{post.slug}</div></td><td className="px-4 py-3.5"><span className="rounded-md border border-border bg-bg-sunken px-2.5 py-1 text-xs text-ink">{post.category}</span></td><td className="px-4 py-3.5 text-xs text-ink-muted">{post.authorName}</td><td className="px-4 py-3.5"><span className={`rounded-full border px-2.5 py-1 text-xs font-medium ${status.className}`}>{status.label}</span></td><td className="whitespace-nowrap px-4 py-3.5 text-xs text-ink-muted">{new Date(post.publishedAt).toLocaleDateString("uz-UZ", { year: "numeric", month: "short", day: "numeric" })}</td><td className="px-4 py-3.5"><div className="flex justify-end gap-1"><button type="button" onClick={() => onEdit(post)} className="grid h-11 w-11 place-items-center rounded-lg text-ink-muted hover:bg-bg-sunken hover:text-ink" aria-label={`${post.title}ni tahrirlash`}><Edit className="h-4 w-4" /></button><button type="button" onClick={() => onDelete(post.id)} className="grid h-11 w-11 place-items-center rounded-lg text-ink-muted hover:bg-danger-soft hover:text-danger" aria-label={`${post.title}ni o&apos;chirish`}><Trash2 className="h-4 w-4" /></button></div></td></tr>; })}</tbody></table></div></div>;
+}

@@ -17,16 +17,16 @@ export function JobDetailHeader({ job }: { job: JobOpeningItem }) {
           <ArrowLeft className="w-4 h-4" /> Barcha vakansiyalarga qaytish
         </Link>
       </div>
-      <div className="bg-cream-warm border border-border-strong rounded-2xl p-6 md:p-10 space-y-6 shadow-sm">
+      <div className="bg-bg-elevated border border-border-strong rounded-2xl p-6 md:p-10 space-y-6 shadow-sm">
         <div className="flex flex-wrap items-center gap-3">
-          <span className="px-3.5 py-1 rounded-full text-xs font-mono font-bold bg-accent-soft text-accent border border-accent-line">{job.department}</span>
-          <span className="px-3 py-1 rounded-full text-xs font-mono text-ink-subtle bg-cream border border-border flex items-center gap-1.5">
+          <span className="px-3.5 py-1 rounded-full text-xs font-mono font-bold bg-accent-soft text-accent border border-border">{job.department}</span>
+          <span className="px-3 py-1 rounded-full text-xs font-mono text-ink-subtle bg-bg border border-border flex items-center gap-1.5">
             <Clock className="w-3.5 h-3.5 text-accent" /> {job.type}
           </span>
-          <span className="px-3 py-1 rounded-full text-xs font-mono text-ink-subtle bg-cream border border-border flex items-center gap-1.5">
+          <span className="px-3 py-1 rounded-full text-xs font-mono text-ink-subtle bg-bg border border-border flex items-center gap-1.5">
             <MapPin className="w-3.5 h-3.5 text-accent" /> {job.location}
           </span>
-          <span className="px-3 py-1 rounded-full text-xs font-mono text-ink-subtle bg-cream border border-border flex items-center gap-1.5">
+          <span className="px-3 py-1 rounded-full text-xs font-mono text-ink-subtle bg-bg border border-border flex items-center gap-1.5">
             <Calendar className="w-3.5 h-3.5 text-accent" /> E'lon qilindi: {job.postedDate}
           </span>
         </div>

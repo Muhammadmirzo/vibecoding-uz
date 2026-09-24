@@ -4,12 +4,43 @@ import { Clock, HelpCircle, Pencil, Phone, Trash2 } from "lucide-react";
 import type { Lead, LeadStatus } from "./types";
 
 type Props = { lead: Lead; dragged: boolean; onDragStart: (event: React.DragEvent, id: string) => void; onEdit: (lead: Lead) => void; onDelete: (id: string) => void; onMove: (id: string, status: LeadStatus) => void; onQuiz: (lead: Lead) => void; sourceClass: string };
+
+const statusOptions: Array<{ value: LeadStatus; label: string }> = [
+  { value: "new", label: "Yangi" },
+  { value: "contacted", label: "Bog&apos;lanildi" },
+  { value: "consultation", label: "Konsultatsiya" },
+  { value: "paid", label: "To&apos;langan" },
+  { value: "rejected", label: "Rad etildi" },
+  { value: "cancelled", label: "Bekor qilindi" },
+];
+
 export function LeadCard({ lead, dragged, onDragStart, onEdit, onDelete, onMove, onQuiz, sourceClass }: Props) {
-  return <div draggable onDragStart={(e) => onDragStart(e, lead.id)} className={`bg-cream border border-border rounded-lg p-3.5 shadow-sm hover:shadow-md transition-all cursor-grab active:cursor-grabbing space-y-3 ${dragged ? "opacity-50 border-accent" : ""}`}>
-    <div className="flex items-start justify-between"><div><h5 className="font-semibold text-sm text-ink leading-tight">{lead.name}</h5><a href={`tel:${lead.phone}`} className="inline-flex items-center text-xs text-accent hover:underline mt-1"><Phone className="w-3 h-3 mr-1" />{lead.phone}</a></div><span className={`text-[10px] px-2 py-0.5 rounded-full font-medium border ${sourceClass}`}>{lead.source}</span></div>
-    {lead.recommendedCourseTitle && <div className="text-xs px-2.5 py-1 bg-cream-warm border border-border rounded-md text-ink-muted">🎯 {lead.recommendedCourseTitle}</div>}
-    {lead.quizAnswers && <button onClick={() => onQuiz(lead)} className="text-[11px] text-purple-600 dark:text-purple-400 hover:underline flex items-center"><HelpCircle className="w-3 h-3 mr-1" />Quiz javoblarini ko'rish</button>}
-    <div className="pt-2 border-t border-border flex items-center justify-between text-xs text-ink-subtle"><span className="flex items-center text-[10px]"><Clock className="w-3 h-3 mr-1 text-ink-subtle" />{new Date(lead.createdAt).toLocaleDateString("uz-UZ", { month: "short", day: "numeric" })}</span><div className="flex items-center space-x-1"><select value={lead.status} onChange={(e) => onMove(lead.id, e.target.value as LeadStatus)} className="text-[11px] bg-cream-warm border border-border rounded px-1.5 py-0.5 text-ink focus:outline-none" title="Bosqichni o'zgartirish"><option value="new">Yangi</option><option value="contacted">Bog'lanildi</option><option value="consultation">Konsultatsiya</option><option value="paid">To'langan</option><option value="rejected">Rad etildi</option></select><button onClick={() => onEdit(lead)} className="p-1 hover:text-ink text-ink-muted rounded transition-colors" title="Tahrirlash"><Pencil className="w-3.5 h-3.5" /></button><button onClick={() => onDelete(lead.id)} className="p-1 hover:text-red-500 text-ink-muted rounded transition-colors" title="O'chirish"><Trash2 className="w-3.5 h-3.5" /></button></div></div>
-  </div>;
+  return (
+    <article draggable onDragStart={(event) => onDragStart(event, lead.id)} className={`cursor-grab space-y-3 rounded-xl border border-border bg-bg p-4 shadow-sm transition active:cursor-grabbing ${dragged ? "border-accent opacity-50" : "hover:border-brand/30 hover:shadow-md"}`}>
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0"><h4 className="truncate text-sm font-semibold text-ink">{lead.name}</h4><a href={`tel:${lead.phone}`} className="mt-1 inline-flex min-h-8 items-center text-xs font-medium text-brand hover:underline"><Phone className="mr-1 h-3.5 w-3.5" />{lead.phone}</a></div>
+        <span className={`shrink-0 rounded-full border px-2 py-1 text-[10px] font-medium ${sourceClass}`}>{lead.source}</span>
+      </div>
+      {lead.recommendedCourseTitle && <div className="rounded-lg bg-bg-sunken px-3 py-2 text-xs leading-5 text-ink-muted">Tavsiya: {lead.recommendedCourseTitle}</div>}
+      {lead.quizAnswers && <button type="button" onClick={() => onQuiz(lead)} className="flex min-h-11 items-center text-xs font-medium text-brand hover:underline"><HelpCircle className="mr-1.5 h-4 w-4" />Quiz javoblarini ko&apos;rish</button>}
+      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border pt-2">
+        <span className="flex items-center text-xs text-ink-subtle"><Clock className="mr-1.5 h-3.5 w-3.5" />{new Date(lead.createdAt).toLocaleDateString("uz-UZ", { month: "short", day: "numeric" })}</span>
+        <div className="flex items-center gap-1">
+          <label className="sr-only" htmlFor={`lead-status-${lead.id}`}>Holatni o&apos;zgartirish</label>
+          <select id={`lead-status-${lead.id}`} value={lead.status} onChange={(event) => onMove(lead.id, event.target.value as LeadStatus)} className="min-h-11 max-w-36 rounded-lg border border-border bg-bg-sunken px-2 text-xs text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent" title="Touch uchun holatni o&apos;zgartiring">
+            {statusOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+          </select>
+          <button type="button" onClick={() => onEdit(lead)} className="grid h-11 w-11 place-items-center rounded-lg text-ink-muted hover:bg-bg-sunken hover:text-ink" title="Tahrirlash" aria-label={`${lead.name}ni tahrirlash`}><Pencil className="h-4 w-4" /></button>
+          <button type="button" onClick={() => onDelete(lead.id)} className="grid h-11 w-11 place-items-center rounded-lg text-ink-muted hover:bg-danger-soft hover:text-danger" title="O&apos;chirish" aria-label={`${lead.name}ni o&apos;chirish`}><Trash2 className="h-4 w-4" /></button>
+        </div>
+      </div>
+    </article>
+  );
 }
-export function sourceBadge(source: string) { switch (source) { case "quiz": return "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20"; case "free_lesson": return "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20"; case "telegram": return "bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20"; case "form": return "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"; default: return "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"; } }
+
+export function sourceBadge(source: string) {
+  if (source === "quiz") return "bg-brand-soft text-brand border-brand/20";
+  if (source === "telegram") return "bg-telegram-soft text-telegram border-telegram/20";
+  if (source === "form" || source === "free_lesson") return "bg-success-soft text-success border-success/20";
+  return "bg-gold-soft text-gold border-gold/20";
+}

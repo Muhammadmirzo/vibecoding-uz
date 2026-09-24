@@ -11,7 +11,7 @@ function ListBlock({ block }: { block: Extract<MarkdownBlock, { type: "list" }> 
   if (block.ordered) {
     return (
       <div className="flex items-start gap-3 my-2 text-sm text-ink-muted leading-relaxed">
-        <span className="w-6 h-6 rounded-full bg-cream-deep text-accent font-mono text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+        <span className="w-6 h-6 rounded-full bg-bg-sunken text-accent font-mono text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
           {block.marker}
         </span>
         <span>{boldText(block.text)}</span>

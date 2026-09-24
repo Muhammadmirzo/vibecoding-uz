@@ -54,7 +54,7 @@ export function useSettings() {
   async function save() {
     setSaving(true);
     try {
-      const response = await fetch("/api/admin/settings", { method: "POST", headers: { "Contents-Type": "application/json" }, body: JSON.stringify(settings) });
+      const response = await fetch("/api/admin/settings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(settings) });
       const payload: unknown = await response.json();
       if (isRecord(payload) && payload.success) { setSaved(true); window.setTimeout(() => setSaved(false), 4000); }
       else window.alert(isRecord(payload) ? String(payload.error ?? "Sozlamalarni saqlashda xatolik") : "Sozlamalarni saqlashda xatolik");

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, ReceiptText } from "lucide-react";
+import { Button } from "@/components/ui/Button";
 import type { PaymentRecord } from "@/features/payments/format";
 import { ReceiptsTable } from "./ReceiptsTable";
 
@@ -10,15 +11,18 @@ interface PaymentHistorySectionProps {
 export function PaymentHistorySection({ payments }: PaymentHistorySectionProps) {
   if (payments.length === 0) {
     return (
-      <section className="rounded-2xl border border-dashed border-border-strong bg-cream-warm px-6 py-12 text-center shadow-sm">
+      <section className="rounded-2xl border border-dashed border-border-strong bg-bg-elevated px-6 py-12 text-center">
         <ReceiptText className="mx-auto h-10 w-10 text-ink-subtle" aria-hidden="true" />
         <h2 className="mt-4 text-lg font-bold text-ink">Hali to'lov topilmadi</h2>
         <p className="mx-auto mt-2 max-w-md text-sm text-ink-muted">
           Bu yerda tizimda qayd etilgan to'lovlar va haqiqiy cheklar ko'rinadi.
         </p>
-        <Link href="/kurs/vibe-coding-express" className="btn-primary mt-6 inline-flex h-11 items-center gap-2 rounded-xl px-5 text-sm font-semibold">
-          Kurslarni ko'rish <ArrowRight className="h-4 w-4" aria-hidden="true" />
-        </Link>
+        <Button asChild size="md" className="mt-6">
+          <Link href="/kurs/vibe-coding-express">
+
+            Kurslarni ko'rish <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </Link>
+        </Button>
       </section>
     );
   }

@@ -23,7 +23,7 @@ export function PricingTab({ settings, setSettings }: Props) {
 export function GuaranteeTab({ settings, setSettings }: Props) {
   return <div className="space-y-4">
     <Heading icon={<ShieldCheck />} title="7 kunlik pul qaytarish kafolati matni" />
-    <label className="block text-xs font-medium text-ink">Saytda ko‘rinadigan kafolat matni<textarea rows={7} value={settings.guaranteeTextUz} onChange={(event) => setSettings((current) => ({ ...current, guaranteeTextUz: event.target.value }))} className="mt-1 w-full rounded-lg border border-border bg-cream px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent" /></label>
+    <label className="block text-xs font-medium text-ink">Saytda ko‘rinadigan kafolat matni<textarea rows={7} value={settings.guaranteeTextUz} onChange={(event) => setSettings((current) => ({ ...current, guaranteeTextUz: event.target.value }))} className="mt-1 w-full rounded-lg border border-border bg-bg-elevated px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent" /></label>
   </div>;
 }
 

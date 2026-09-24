@@ -1,173 +1,95 @@
 "use client";
 
+import * as Dialog from "@radix-ui/react-dialog";
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Kanban,
-  Users,
-  GraduationCap,
-  CheckSquare,
-  BarChart3,
   ArrowLeft,
-  ShieldCheck,
-  LayoutDashboard,
+  BarChart3,
+  Briefcase,
+  CheckSquare,
   FileText,
+  GraduationCap,
+  LayoutDashboard,
+  Menu,
   Send,
   Settings,
-  Briefcase,
+  ShieldCheck,
+  Users,
+  X,
+  type LucideIcon,
 } from "lucide-react";
+
+type NavItem = { href: string; label: string; icon: LucideIcon; exact?: boolean };
+
+const navItems: NavItem[] = [
+  { href: "/admin", label: "Boshqaruv paneli", icon: LayoutDashboard, exact: true },
+  { href: "/admin/leads", label: "Leadlar", icon: BarChart3 },
+  { href: "/admin/cohorts", label: "Guruhlar", icon: GraduationCap },
+  { href: "/admin/homework", label: "Uy vazifalari", icon: CheckSquare },
+  { href: "/admin/blog", label: "Maqolalar", icon: FileText },
+  { href: "/admin/portfolio", label: "Portfoliolar", icon: Briefcase },
+  { href: "/admin/notifications", label: "Xabarnomalar", icon: Send },
+  { href: "/admin/students", label: "Talabalar", icon: Users },
+  { href: "/admin/users", label: "Foydalanuvchilar", icon: Users },
+  { href: "/admin/analytics", label: "Analitika", icon: BarChart3 },
+  { href: "/admin/settings", label: "Sozlamalar", icon: Settings },
+];
+
+function Brand() {
+  return (
+    <Link href="/admin" className="flex min-h-11 items-center gap-3 rounded-lg px-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
+      <span className="grid h-10 w-10 place-items-center rounded-xl bg-brand-soft text-brand"><ShieldCheck className="h-5 w-5" /></span>
+      <span><span className="block font-display text-sm font-semibold text-ink">Mirzo Academy</span><span className="block text-xs text-ink-muted">Boshqaruv markazi</span></span>
+    </Link>
+  );
+}
+
+function Navigation({ pathname, onNavigate }: { pathname: string; onNavigate?: () => void }) {
+  return (
+    <nav aria-label="Admin bo'limlari" className="space-y-1">
+      {navItems.map((item) => {
+        const active = item.exact ? pathname === item.href : pathname.startsWith(item.href);
+        const Icon = item.icon;
+        return (
+          <Link key={item.href} href={item.href} onClick={onNavigate} aria-current={active ? "page" : undefined} className={`flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${active ? "bg-brand-soft text-brand" : "text-ink-muted hover:bg-bg-sunken hover:text-ink"}`}>
+            <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
+            <span>{item.label}</span>
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
 
 export function AdminNav() {
   const pathname = usePathname();
-
-  const navItems = [
-    {
-      href: "/admin",
-      label: "Boshqaruv",
-      icon: LayoutDashboard,
-      exact: true,
-    },
-    {
-      href: "/admin/leads",
-      label: "Leads Kanban",
-      icon: Kanban,
-      exact: false,
-    },
-    {
-      href: "/admin/cohorts",
-      label: "Guruhlar",
-      icon: GraduationCap,
-      exact: false,
-    },
-    {
-      href: "/admin/homework",
-      label: "Uy Vazifalari",
-      icon: CheckSquare,
-      exact: false,
-    },
-    {
-      href: "/admin/blog",
-      label: "Blog CMS",
-      icon: FileText,
-      exact: false,
-    },
-    {
-      href: "/admin/portfolio",
-      label: "Portfoliolar",
-      icon: Briefcase,
-      exact: false,
-    },
-    {
-      href: "/admin/notifications",
-      label: "Xabarnomalar",
-      icon: Send,
-      exact: false,
-    },
-    {
-      href: "/admin/students",
-      label: "Talabalar Faolligi",
-      icon: Users,
-      exact: false,
-    },
-    {
-      href: "/admin/users",
-      label: "Foydalanuvchilar",
-      icon: Users,
-      exact: false,
-    },
-    {
-      href: "/admin/settings",
-      label: "Sozlamalar",
-      icon: Settings,
-      exact: false,
-    },
-    {
-      href: "/admin/analytics",
-      label: "Analitika",
-      icon: BarChart3,
-      exact: false,
-    },
-  ];
-
+  const [drawerOpen, setDrawerOpen] = useState(false);
   return (
-    <header className="bg-cream-warm border-b border-border sticky top-0 z-50 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 gap-4">
-          {/* Brand & Badge */}
-          <div className="flex items-center space-x-3 shrink-0">
-            <Link
-              href="/"
-              className="flex items-center text-xs text-ink-muted hover:text-ink transition-colors"
-              title="Platformaga qaytish"
-            >
-              <ArrowLeft className="w-4 h-4 mr-1" />
-              <span>Saytga qaytish</span>
-            </Link>
-            <div className="h-4 w-px bg-border hidden sm:block" />
-            <Link href="/admin" className="flex items-center space-x-2">
-              <span className="font-bold text-base md:text-lg tracking-tight text-ink whitespace-nowrap">
-                Mirzo Academy <span className="accent-serif font-normal">CRM</span>
-              </span>
-              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-accent-soft text-accent border border-accent-line">
-                <ShieldCheck className="w-3 h-3 mr-1" />
-                Admin
-              </span>
-            </Link>
-          </div>
+    <>
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-72 flex-col border-r border-border bg-bg-elevated px-4 py-5 lg:flex">
+        <Brand />
+        <div className="my-5 border-t border-border" />
+        <div className="flex-1 overflow-y-auto"><Navigation pathname={pathname} /></div>
+        <Link href="/" className="mt-4 flex min-h-11 items-center gap-2 rounded-xl border border-border px-3 text-sm font-medium text-ink-muted transition-colors hover:bg-bg-sunken hover:text-ink"><ArrowLeft className="h-4 w-4" />Saytga qaytish</Link>
+      </aside>
 
-          {/* Navigation Links */}
-          <nav className="hidden lg:flex items-center justify-end space-x-1 overflow-x-auto no-scrollbar py-1 min-w-0 flex-1">
-            {navItems.map((item) => {
-              const isActive = item.exact
-                ? pathname === item.href
-                : pathname.startsWith(item.href);
-
-              const Icon = item.icon;
-
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`flex items-center space-x-2 px-3.5 py-2 rounded-md text-sm font-medium transition-all ${
-                    isActive
-                      ? "bg-accent text-white shadow-sm"
-                      : "text-ink-muted hover:text-ink hover:bg-cream-deep"
-                  }`}
-                >
-                  <Icon className="w-4 h-4" />
-                  <span>{item.label}</span>
-                </Link>
-              );
-            })}
-          </nav>
-        </div>
-
-        {/* Mobile Navigation Row */}
-        <div className="lg:hidden flex space-x-1.5 overflow-x-auto pb-3 pt-1 no-scrollbar w-full">
-          {navItems.map((item) => {
-            const isActive = item.exact
-              ? pathname === item.href
-              : pathname.startsWith(item.href);
-
-            const Icon = item.icon;
-
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-md text-xs font-medium whitespace-nowrap transition-all ${
-                  isActive
-                    ? "bg-accent text-white shadow-sm"
-                    : "text-ink-muted hover:text-ink bg-cream"
-                }`}
-              >
-                <Icon className="w-3.5 h-3.5" />
-                <span>{item.label}</span>
-              </Link>
-            );
-          })}
-        </div>
-      </div>
-    </header>
+      <Dialog.Root open={drawerOpen} onOpenChange={setDrawerOpen}>
+        <Dialog.Trigger asChild>
+          <button type="button" className="fixed inset-x-3 top-3 z-40 flex min-h-12 items-center justify-between rounded-xl border border-border bg-bg-elevated px-4 shadow-lg lg:hidden" aria-label="Menyuni ochish"><span className="font-display text-sm font-semibold text-ink">CRM boshqaruv</span><span className="grid h-8 w-8 place-items-center rounded-lg bg-brand-soft text-brand"><Menu className="h-5 w-5" /></span></button>
+        </Dialog.Trigger>
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 z-50 bg-ink/60 backdrop-blur-sm lg:hidden" />
+          <Dialog.Content className="fixed inset-y-0 left-0 z-50 flex w-[min(88vw,20rem)] flex-col bg-bg-elevated p-4 shadow-2xl lg:hidden">
+            <Dialog.Title className="sr-only">Navigatsiya</Dialog.Title>
+            <div className="flex items-center justify-between"><Brand /><Dialog.Close className="grid h-11 w-11 place-items-center rounded-xl text-ink-muted hover:bg-bg-sunken" aria-label="Menyuni yopish"><X className="h-5 w-5" /></Dialog.Close></div>
+            <div className="my-4 border-t border-border" />
+            <div className="flex-1 overflow-y-auto"><Navigation pathname={pathname} onNavigate={() => setDrawerOpen(false)} /></div>
+            <Dialog.Close asChild><Link href="/" className="mt-4 flex min-h-11 items-center gap-2 rounded-xl border border-border px-3 text-sm font-medium text-ink-muted"><ArrowLeft className="h-4 w-4" />Saytga qaytish</Link></Dialog.Close>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
+    </>
   );
 }

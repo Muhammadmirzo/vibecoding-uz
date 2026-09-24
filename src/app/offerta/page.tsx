@@ -1,23 +1,8 @@
 import type { Metadata } from "next";
+import { Container, Heading, Eyebrow } from "@/components/ui";
+import { Card } from "@/components/ui/Surfaces";
+import { NextStepCTA } from "@/components/ui/NextStepCTA";
 
-export const metadata: Metadata = {
-  title: "Ommaviy Oferta | Mirzo Academy",
-  description: "academy.mirzo.uz ta'lim xizmatlarini ko'rsatish bo'yicha ommaviy oferta shartnomasi.",
-};
-
-export default function OffertaPage() {
-  return (
-    <div className="pt-28 pb-20 min-h-screen bg-[var(--color-cream)]">
-      <div className="mx-auto w-full max-w-[800px] px-5 md:px-8 space-y-8">
-        <h1 className="text-3xl font-extrabold text-[var(--color-ink)]">Ommaviy Oferta Shartnomasi</h1>
-        <div className="bg-[var(--color-cream-warm)] border border-[var(--color-border-strong)] rounded-[var(--radius-xl)] p-8 text-sm text-[var(--color-ink-muted)] leading-relaxed space-y-4">
-          <p>Ushbu hujjat Mirzo Academy (academy.mirzo.uz) platformasi va ta'lim oluvchi o'rtasidagi rasmiy shartnoma hisoblanadi.</p>
-          <h2 className="text-base font-bold text-[var(--color-ink)]">1. Shartnoma mavzusi</h2>
-          <p>Ijrochi Buyurtmachiga sun'iy intellekt va Vibe Coding bo'yicha masofaviy ta'lim xizmatlarini taqdim etadi.</p>
-          <h2 className="text-base font-bold text-[var(--color-ink)]">2. To'lov tartibi</h2>
-          <p>Xizmatlar uchun to'lov Payme, Click yoki operator orqali 100% oldindan to'lov yoki kelishilgan 2 ga bo'lib to'lash sharti bilan amalga oshiriladi.</p>
-        </div>
-      </div>
-    </div>
-  );
-}
+export const metadata: Metadata = { title: "Ommaviy oferta", description: "Mirzo Academy ta’lim xizmatlari bo‘yicha ommaviy oferta shartnomasi." };
+const sections = [["1. Shartnoma mavzusi", "Mirzo Academy platformasi va ta’lim oluvchi o‘rtasidagi rasmiy shartnoma. Ijrochi qo‘llanma, video darslar va maslahat xizmatlarini taqdim etadi."], ["2. Xizmatlar", "Kurs dasturi va uning doirasidagi materiallar platformada joylashtiriladi. Materiallarni tashqariga ko‘chirish yoki qayta tarqatish taqiqlanadi."], ["3. To‘lov tartibi", "To‘lov Payme, Click yoki operator orqali amalga oshiriladi. To‘lov miqdori va muddati ariza yoki sahifadagi shartlarda ko‘rsatiladi."], ["4. Bekor qilish va qaytarish", "Bekor qilish va pul qaytarish shartlari alohida kafolat siyosatida ko‘rsatilgan."], ["5. Aloqa", "Shartnoma bo‘yicha savollar uchun sayt orqali yoki Telegram orqali bog‘lanish mumkin."]];
+export default function Page() { return <div className="bg-bg text-ink"><Container className="py-20 sm:py-28"><Eyebrow>Huquqiy hujjat</Eyebrow><Heading as="h1" className="mt-3">Ommaviy oferta shartnomasi</Heading><Card className="mt-10 max-w-3xl divide-y divide-border text-[17px] leading-relaxed text-ink-muted"><p className="pb-7">Ushbu hujjat Mirzo Academy platformasi va ta’lim oluvchi o‘rtasidagi rasmiy shartnoma hisoblanadi.</p>{sections.map(([title, text]) => <section key={title} className="py-7"><Heading as="h2" className="text-2xl">{title}</Heading><p className="mt-3">{text}</p></section>)}</Card></Container><NextStepCTA /></div>; }

@@ -10,6 +10,8 @@ import {
   Star,
 } from "lucide-react";
 import { STATIC_TESTIMONIALS } from "@/features/testimonials/testimonialsData";
+import { NextStepCTA } from "@/components/ui/NextStepCTA";
+import { Button } from "@/components/ui";
 
 type RatingFilter = "all" | "5" | "4";
 
@@ -41,10 +43,10 @@ export function TestimonialsExplorer() {
   };
 
   return (
-    <main className="min-h-screen bg-cream px-5 pb-20 pt-28 md:px-8 lg:px-10">
+    <main className="min-h-screen bg-bg px-5 pb-20 pt-28 md:px-8 lg:px-10">
       <div className="mx-auto w-full max-w-[1360px] space-y-12">
         <header className="mx-auto max-w-[800px] space-y-4 text-center">
-          <span className="inline-flex items-center gap-2 rounded-md border border-accent-line bg-cream-warm px-3.5 py-1.5 font-mono text-xs font-bold uppercase tracking-wider text-accent">
+          <span className="inline-flex items-center gap-2 rounded-md border border-border bg-bg-elevated px-3.5 py-1.5 font-mono text-xs font-bold uppercase tracking-wider text-accent">
             <Star className="h-4 w-4 fill-current" /> Namunaviy fikrlar
           </span>
           <h1 className="text-3xl font-extrabold tracking-tight text-ink md:text-5xl">
@@ -57,7 +59,7 @@ export function TestimonialsExplorer() {
         </header>
 
         <aside
-          className="mx-auto flex max-w-4xl gap-3 rounded-xl border border-accent-line bg-accent-soft p-4 text-sm leading-relaxed text-ink sm:p-5"
+          className="mx-auto flex max-w-4xl gap-3 rounded-xl border border-border bg-accent-soft p-4 text-sm leading-relaxed text-ink sm:p-5"
           aria-label="Fikrlar holati haqida"
         >
           <Info className="mt-0.5 h-5 w-5 flex-shrink-0 text-accent" aria-hidden="true" />
@@ -70,7 +72,7 @@ export function TestimonialsExplorer() {
         </aside>
 
         <section
-          className="space-y-4 rounded-2xl border border-border-strong bg-cream-warm p-4 shadow-sm md:p-6"
+          className="space-y-4 rounded-2xl border border-border-strong bg-bg-elevated p-4 shadow-sm md:p-6"
           aria-label="Fikrlarni filtrlash"
         >
           <div className="flex flex-wrap items-center justify-between gap-4">
@@ -88,8 +90,8 @@ export function TestimonialsExplorer() {
                     onClick={() => setSelectedRating(option.value)}
                     className={`inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
                       isActive
-                        ? "bg-accent text-cream"
-                        : "border border-border bg-cream text-ink hover:bg-cream-deep"
+                        ? "bg-accent text-white"
+                        : "border border-border bg-bg text-ink hover:bg-bg-deep"
                     }`}
                   >
                     {option.value !== "all" ? <Star className="h-3.5 w-3.5 fill-current" aria-hidden="true" /> : null}
@@ -110,7 +112,7 @@ export function TestimonialsExplorer() {
                 id="testimonial-course"
                 value={selectedCourse}
                 onChange={(event) => setSelectedCourse(event.target.value)}
-                className="h-9 rounded-lg border border-border-strong bg-cream px-3 text-xs text-ink focus:outline-none focus:ring-2 focus:ring-accent"
+                className="h-9 rounded-lg border border-border-strong bg-bg px-3 text-xs text-ink focus:outline-none focus:ring-2 focus:ring-accent"
               >
                 <option value="all">Barcha kurslar</option>
                 {courseOptions.map((course) => <option key={course} value={course}>{course}</option>)}
@@ -131,7 +133,7 @@ export function TestimonialsExplorer() {
             {filteredReviews.map((item) => {
               const initials = item.fullName.split(" ").map((name) => name[0]).join("").slice(0, 2);
               return (
-                <article key={item.id} className="flex flex-col justify-between overflow-hidden rounded-2xl border border-border-strong bg-cream-warm transition-all duration-200 hover:border-accent-line hover:shadow-lg">
+                <article key={item.id} className="flex flex-col justify-between overflow-hidden rounded-2xl border border-border-strong bg-bg-elevated transition-all duration-200 hover:border-border hover:shadow-lg">
                   <div className="flex flex-1 flex-col justify-between space-y-4 p-6">
                     <div className="space-y-3">
                       <div className="flex items-center justify-between gap-3">
@@ -141,7 +143,7 @@ export function TestimonialsExplorer() {
                           ))}
                         </div>
                         {item.isExample ? (
-                          <span className="rounded-full border border-accent-line bg-accent-soft px-2.5 py-0.5 font-mono text-[11px] font-bold text-accent">Namuna</span>
+                          <span className="rounded-full border border-border bg-accent-soft px-2.5 py-0.5 font-mono text-[11px] font-bold text-accent">Namuna</span>
                         ) : null}
                       </div>
                       <p className="text-xs italic leading-relaxed text-ink-muted md:text-sm">“{item.body}”</p>
@@ -162,25 +164,26 @@ export function TestimonialsExplorer() {
             })}
           </div>
         ) : (
-          <section className="rounded-2xl border border-border-strong bg-cream-warm px-6 py-12 text-center" aria-live="polite">
+          <section className="rounded-2xl border border-border-strong bg-bg-elevated px-6 py-12 text-center" aria-live="polite">
             <Star className="mx-auto mb-4 h-8 w-8 text-border" aria-hidden="true" />
             <h2 className="text-lg font-bold text-ink">Bu filtrda fikr topilmadi</h2>
             <p className="mt-2 text-sm text-ink-muted">Boshqa reyting yoki kursni tanlab ko‘ring.</p>
-            <button type="button" onClick={resetFilters} className="btn-secondary mt-5 h-11 rounded-lg px-6 text-xs font-semibold">Barchasini ko‘rish</button>
+            <Button type="button" onClick={resetFilters} variant="outline">Barchasini ko‘rish</Button>
           </section>
         )}
 
-        <section className="mx-auto max-w-3xl space-y-6 rounded-2xl border border-accent-line bg-cream-warm p-8 text-center shadow-sm md:p-12">
+        <section className="mx-auto max-w-3xl space-y-6 rounded-2xl border border-border bg-bg-elevated p-8 text-center shadow-sm md:p-12">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-accent-soft text-accent"><Sparkles className="h-6 w-6" aria-hidden="true" /></div>
           <div className="space-y-2">
             <h2 className="text-2xl font-extrabold text-ink md:text-3xl">Yo‘nalishni aniqlashdan boshlang</h2>
             <p className="mx-auto max-w-lg text-xs text-ink-muted md:text-sm">Diagnostika kvizi orqali o‘rganish yo‘nalishingizni aniqlang.</p>
           </div>
           <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link href="/diagnostika" className="btn-primary inline-flex h-12 w-full items-center justify-center gap-2 rounded-lg px-8 text-xs font-semibold sm:w-auto">Diagnostika Kvizi <ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>
-            <Link href="/kurs/vibe-coding-express" className="btn-secondary flex h-12 w-full items-center justify-center rounded-lg px-8 text-xs font-semibold sm:w-auto">Kurs dasturi</Link>
+            <Button href="/diagnostika" size="lg" className="w-full sm:w-auto">Diagnostika kvizi <ArrowRight className="h-4 w-4" aria-hidden="true" /></Button>
+            <Button href="/kurs/vibe-coding-express" size="lg" variant="outline" className="w-full sm:w-auto">Kurs dasturi</Button>
           </div>
         </section>
+        <NextStepCTA />
       </div>
     </main>
   );

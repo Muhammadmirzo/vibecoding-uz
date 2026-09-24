@@ -1,90 +1,92 @@
 "use client";
 
-import React from "react";
 import * as Dialog from "@radix-ui/react-dialog";
+import { CheckCircle2, CircleAlert, Sparkles, X } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { LoginForm } from "./LoginForm";
 import { OtpForm } from "./OtpForm";
-import { X, Sparkles, CheckCircle2, AlertCircle } from "lucide-react";
 import { TelegramLoginButton } from "./TelegramLoginButton";
 
 export function AuthModal() {
   const { isAuthModalOpen, closeAuthModal, authStep, toastMessage, toastType } = useAuth();
+  const isOtpStep = authStep === "otp";
 
   return (
-    <Dialog.Root open={isAuthModalOpen} onOpenChange={(open) => !open && closeAuthModal()}>
+    <Dialog.Root
+      open={isAuthModalOpen}
+      onOpenChange={(open) => {
+        if (!open) closeAuthModal();
+      }}
+    >
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 transition-opacity" />
-        
-        <Dialog.Content className="fixed left-[50%] top-[50%] z-50 w-full max-w-md translate-x-[-50%] translate-y-[-50%] p-6 sm:p-8 bg-[var(--color-cream)] border border-[var(--color-border)] shadow-[var(--shadow-lg)] rounded-[var(--radius-lg)] duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] focus:outline-none">
-          {/* Header */}
-          <div className="flex items-start justify-between mb-6">
-            <div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[var(--color-accent-soft)] text-[var(--color-accent)] text-xs font-semibold mb-2">
-                <Sparkles className="w-3.5 h-3.5" />
+        <Dialog.Overlay className="fixed inset-0 z-50 bg-ink/60 backdrop-blur-sm data-[state=open]:animate-fade-up data-[state=closed]:opacity-0" />
+        <Dialog.Content className="fixed inset-x-4 top-1/2 z-50 flex max-h-[calc(100dvh-2rem)] w-auto -translate-y-1/2 flex-col overflow-hidden rounded-xl border border-border bg-bg-elevated p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-[max(1.25rem,env(safe-area-inset-top))] shadow-lg outline-none sm:inset-x-auto sm:left-1/2 sm:w-[calc(100%-3rem)] sm:max-w-md sm:p-7 sm:pb-[max(1.75rem,env(safe-area-inset-bottom))] sm:pt-[max(1.75rem,env(safe-area-inset-top))]">
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-gold-soft px-2.5 py-1 text-xs font-semibold text-gold-hover">
+                <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
                 <span>Vibecoding platformasi</span>
               </div>
-              <Dialog.Title className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--color-ink)] font-serif italic">
-                {authStep === "login" ? "Tizimga kirish" : "Kodni tasdiqlash"}
+              <Dialog.Title className="font-display text-2xl font-bold tracking-tight text-ink sm:text-3xl">
+                {isOtpStep ? "Kodni tasdiqlash" : "Tizimga kirish"}
               </Dialog.Title>
-              <Dialog.Description className="mt-1 text-sm text-[var(--color-ink-muted)]">
-                {authStep === "login"
-                  ? "Platformaga kirish va bilimlarni o'zlashtirish uchun telefon raqamingizni kiriting"
-                  : "Sizning telefon raqamingizga yuborilgan tasdiqlash kodini kiriting"}
+              <Dialog.Description className="mt-1 text-sm leading-6 text-ink-muted">
+                {isOtpStep
+                  ? "Telefoningizga yuborilgan tasdiqlash kodini kiriting."
+                  : "Platformaga kirish uchun telefon raqamingizni kiriting."}
               </Dialog.Description>
             </div>
-
             <Dialog.Close
               onClick={closeAuthModal}
-              className="rounded-[var(--radius-md)] p-1.5 text-[var(--color-ink-subtle)] hover:text-[var(--color-ink)] hover:bg-[var(--color-cream-warm)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-ink-subtle transition-colors hover:bg-bg-sunken hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
               aria-label="Yopish"
             >
-              <X className="w-5 h-5" />
+              <X className="h-5 w-5" aria-hidden="true" />
             </Dialog.Close>
           </div>
 
-          {/* Toast Notification Banner */}
-          {toastMessage && (
-            <div
-              role="status"
-              className={`mb-4 flex items-start gap-2 p-3 rounded-[var(--radius-md)] text-sm font-medium animate-fadeIn ${
-                toastType === "success"
-                  ? "bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400"
-                  : "bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400"
-              }`}
-            >
-              {toastType === "success" ? (
-                <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
-              ) : (
-                <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
-              )}
-              <span>{toastMessage}</span>
-            </div>
-          )}
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pt-5">
+            {toastMessage && (
+              <div
+                role="status"
+                aria-live="polite"
+                className={`mb-4 flex items-start gap-2 rounded-md border p-3 text-sm font-medium ${
+                  toastType === "success"
+                    ? "border-success-line bg-success-soft text-success"
+                    : "border-danger/30 bg-danger-soft text-danger"
+                }`}
+              >
+                {toastType === "success" ? (
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                ) : (
+                  <CircleAlert className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                )}
+                <span>{toastMessage}</span>
+              </div>
+            )}
 
-          {/* Form Content */}
-          {authStep === "login" ? <LoginForm /> : <OtpForm />}
+            {isOtpStep ? <OtpForm /> : <LoginForm />}
 
-          {/* Telegram alternative */}
-          <div className="mt-5" aria-label="Muqobil kirish usuli">
-            <div className="flex items-center gap-3" aria-hidden="true">
-              <span className="h-px flex-1 bg-border" />
-              <span className="text-xs font-medium text-ink-subtle">yoki</span>
-              <span className="h-px flex-1 bg-border" />
+            <div className="mt-5" aria-label="Muqobil kirish usuli">
+              <div className="flex items-center gap-3" aria-hidden="true">
+                <span className="h-px flex-1 bg-border" />
+                <span className="text-xs font-medium text-ink-subtle">yoki</span>
+                <span className="h-px flex-1 bg-border" />
+              </div>
+              <div className="mt-3">
+                <TelegramLoginButton />
+              </div>
             </div>
-            <div className="mt-3">
-              <TelegramLoginButton />
-            </div>
-          </div>
 
-          <div className="mt-4 pt-4 border-t border-[var(--color-border)] text-center">
-            <a
-              href="/admin/login"
-              onClick={closeAuthModal}
-              className="text-xs font-mono text-[var(--color-accent)] hover:underline"
-            >
-              Admin yoki Xodimlar uchun kirish &rarr;
-            </a>
+            <div className="mt-4 border-t border-border pt-4 text-center">
+              <a
+                href="/admin/login"
+                onClick={closeAuthModal}
+                className="inline-flex min-h-11 items-center rounded-md px-2 font-mono text-xs text-brand hover:underline"
+              >
+                Admin yoki xodimlar uchun kirish &rarr;
+              </a>
+            </div>
           </div>
         </Dialog.Content>
       </Dialog.Portal>

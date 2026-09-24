@@ -1,198 +1,61 @@
-import * as React from "react";
-import {
-  User,
-  Lock,
-  Bell,
-  Send,
-  Save,
-  CheckCircle2,
-  AlertCircle,
-  Loader2,
-  Shield,
-  Smartphone,
-  Mail,
-  MapPin,
-  Briefcase,
-  Target,
-  Sparkles,
-} from "lucide-react";
+import type { ReactNode } from "react";
+import { AlertCircle, CheckCircle2, Loader2, Save } from "lucide-react";
+import { Button, Input, Label, Textarea } from "@/components/ui";
 import type { SettingsProfileState } from "./settingsTypes";
 
-export function ProfileSettingsForm({
-  fullName,
-  email,
-  phone,
-  city,
-  profession,
-  goal,
-  bio,
-  avatarUrl,
-  profileLoading,
-  profileSuccess,
-  profileError,
-  setFullName,
-  setEmail,
-  setCity,
-  setProfession,
-  setGoal,
-  setBio,
-  setAvatarUrl,
-  handleProfileSubmit,
-}: SettingsProfileState) {
+type FieldProps = {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  type?: string;
+  required?: boolean;
+  disabled?: boolean;
+};
+
+function Field({ label, value, onChange, type = "text", required, disabled }: FieldProps) {
+  return <div><Label htmlFor={label}>{label}</Label><Input id={label} type={type} value={value} onChange={(event) => onChange(event.target.value)} required={required} disabled={disabled} /></div>;
+}
+
+export function ProfileSettingsForm(props: SettingsProfileState) {
+  const {
+    fullName, email, phone, city, profession, goal, bio, avatarUrl,
+    profileLoading, profileSuccess, profileError,
+    setFullName, setEmail, setCity, setProfession, setGoal, setBio, setAvatarUrl,
+    handleProfileSubmit,
+  } = props;
+
   return (
-    <div className="bg-cream-warm border border-border-strong rounded-2xl p-6 md:p-8 shadow-sm space-y-6">
-      <div className="border-b border-border pb-3">
-        <h2 className="text-lg font-bold text-ink">
-          Shaxsiy Profil Ma'lumotlari
-        </h2>
-        <p className="text-xs text-ink-muted">
-          Sizning sertifikatingiz va mentorlar bilan muloqotda ko'rinadigan
-          ma'lumotlar.
-        </p>
+    <section className="rounded-2xl border border-border bg-bg-elevated p-6 md:p-8">
+      <div className="border-b border-border pb-5">
+        <h2 className="font-display text-xl font-semibold text-ink">Shaxsiy profil</h2>
+        <p className="mt-2 text-base leading-relaxed text-ink-muted">Kurs, mentorlik va sertifikat jarayonida ko&apos;rinadigan ma&apos;lumotlarni yangilang.</p>
       </div>
 
-      {profileSuccess && (
-        <div className="p-3.5 rounded-lg bg-success-soft border border-success-line text-success text-xs font-semibold flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4" />
-          <span>Profilingiz muvaffaqiyatli saqlandi!</span>
+      {profileSuccess ? <StatusMessage tone="success"><CheckCircle2 className="h-5 w-5" />Profil saqlandi.</StatusMessage> : null}
+      {profileError ? <StatusMessage tone="error"><AlertCircle className="h-5 w-5" />{profileError}</StatusMessage> : null}
+
+      <form onSubmit={handleProfileSubmit} className="mt-6 space-y-5">
+        <div className="grid gap-5 md:grid-cols-2">
+          <Field label="F.I.SH." value={fullName} onChange={setFullName} required />
+          <Field label="Telefon" value={phone} onChange={() => undefined} disabled />
+          <Field label="Email" value={email} onChange={setEmail} type="email" />
+          <Field label="Yashash shahri" value={city} onChange={setCity} />
+          <Field label="Kasbi yoki soha" value={profession} onChange={setProfession} />
+          <Field label="Avatar havolasi" value={avatarUrl} onChange={setAvatarUrl} type="url" />
         </div>
-      )}
-
-      {profileError && (
-        <div className="p-3.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-xs flex items-center gap-2">
-          <AlertCircle className="w-4 h-4" />
-          <span>{profileError}</span>
-        </div>
-      )}
-
-      <form onSubmit={handleProfileSubmit} className="space-y-4">
-        <div className="grid md:grid-cols-2 gap-4">
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-ink flex items-center gap-1.5">
-              <User className="w-3.5 h-3.5 text-accent" /> F.I.SH. (Sertifikat
-              uchun) *
-            </label>
-            <input
-              type="text"
-              required
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              className="w-full h-11 px-3.5 rounded-lg border border-border-strong bg-cream text-ink text-xs focus:outline-none focus:ring-2 focus:ring-accent"
-            />
-          </div>
-
-          {/* Phone */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-ink flex items-center gap-1.5">
-              <Smartphone className="w-3.5 h-3.5 text-accent" /> Telefon raqam
-            </label>
-            <input
-              type="text"
-              disabled
-              value={phone}
-              className="w-full h-11 px-3.5 rounded-lg border border-border bg-cream-deep text-ink-subtle text-xs font-mono cursor-not-allowed"
-              title="Telefon raqamini o'zgartirish uchun ma'muriyat bilan bog'laning"
-            />
-            <p className="text-[10px] text-ink-subtle">
-              Asosiy login identifikatori hisoblanadi.
-            </p>
-          </div>
-
-          {/* Email */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-ink flex items-center gap-1.5">
-              <Mail className="w-3.5 h-3.5 text-accent" /> Email manzil
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full h-11 px-3.5 rounded-lg border border-border-strong bg-cream text-ink text-xs focus:outline-none focus:ring-2 focus:ring-accent"
-            />
-          </div>
-
-          {/* City */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-ink flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5 text-accent" /> Yashash shahri
-            </label>
-            <input
-              type="text"
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-              className="w-full h-11 px-3.5 rounded-lg border border-border-strong bg-cream text-ink text-xs focus:outline-none focus:ring-2 focus:ring-accent"
-            />
-          </div>
-
-          {/* Profession */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-ink flex items-center gap-1.5">
-              <Briefcase className="w-3.5 h-3.5 text-accent" /> Kasbi yoki Soha
-            </label>
-            <input
-              type="text"
-              value={profession}
-              onChange={(e) => setProfession(e.target.value)}
-              className="w-full h-11 px-3.5 rounded-lg border border-border-strong bg-cream text-ink text-xs focus:outline-none focus:ring-2 focus:ring-accent"
-            />
-          </div>
-
-          {/* Avatar URL */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-ink">
-              Avatar / Rasm havolasi
-            </label>
-            <input
-              type="url"
-              placeholder="https://..."
-              value={avatarUrl}
-              onChange={(e) => setAvatarUrl(e.target.value)}
-              className="w-full h-11 px-3.5 rounded-lg border border-border-strong bg-cream text-ink text-xs focus:outline-none focus:ring-2 focus:ring-accent"
-            />
-          </div>
-        </div>
-
-        {/* Goal */}
-        <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-ink flex items-center gap-1.5">
-            <Target className="w-3.5 h-3.5 text-accent" /> Kursdan asosiy maqsad
-          </label>
-          <input
-            type="text"
-            value={goal}
-            onChange={(e) => setGoal(e.target.value)}
-            className="w-full h-11 px-3.5 rounded-lg border border-border-strong bg-cream text-ink text-xs focus:outline-none focus:ring-2 focus:ring-accent"
-          />
-        </div>
-
-        {/* Bio */}
-        <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-ink">
-            O'zingiz haqingizda qisqacha bio
-          </label>
-          <textarea
-            rows={3}
-            value={bio}
-            onChange={(e) => setBio(e.target.value)}
-            className="w-full p-3 rounded-lg border border-border-strong bg-cream text-ink text-xs focus:outline-none focus:ring-2 focus:ring-accent resize-none"
-          />
-        </div>
-
-        <div className="pt-2 flex justify-end">
-          <button
-            type="submit"
-            disabled={profileLoading}
-            className="btn-primary h-11 px-6 rounded-lg text-xs font-semibold inline-flex items-center gap-2"
-          >
-            {profileLoading ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <Save className="w-4 h-4" />
-            )}
-            <span>O'zgarishlarni saqlash</span>
-          </button>
+        <div><Label htmlFor="profile-goal">Kursdan asosiy maqsad</Label><Input id="profile-goal" value={goal} onChange={(event) => setGoal(event.target.value)} /></div>
+        <div><Label htmlFor="profile-bio">Qisqacha bio</Label><Textarea id="profile-bio" value={bio} onChange={(event) => setBio(event.target.value)} rows={4} /></div>
+        <div className="flex justify-end border-t border-border pt-5">
+          <Button type="submit" disabled={profileLoading}>
+            {profileLoading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Save className="h-4 w-4" aria-hidden="true" />}
+            O&apos;zgarishlarni saqlash
+          </Button>
         </div>
       </form>
-    </div>
+    </section>
   );
+}
+
+function StatusMessage({ tone, children }: { tone: "success" | "error"; children: ReactNode }) {
+  return <div role="status" className={`mt-5 flex items-center gap-2 rounded-lg border p-3 text-sm font-semibold ${tone === "success" ? "border-success bg-success-soft text-success" : "border-danger bg-bg-sunken text-danger"}`}>{children}</div>;
 }

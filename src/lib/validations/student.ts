@@ -39,10 +39,16 @@ export const referralClaimBonusSchema = z.object({
 });
 
 export const studentPaymentRequestSchema = z.object({
-  enrollmentId: z.string().optional(),
+  enrollmentId: z.string().uuid().optional(),
+  cohortId: z.string().uuid().optional(),
   provider: z.enum(["payme", "click"]),
   installmentMonth: z.number().int().min(1).max(12).optional(),
-  amountSum: z.number().positive("Summa kiritilishi kerak"),
+  // Legacy client hint only: the trusted price always comes from the cohort.
+  amountSum: z.number().positive("Summa kiritilishi kerak").optional(),
+}).superRefine((value, context) => {
+  if (!value.enrollmentId && !value.cohortId) {
+    context.addIssue({ code: z.ZodIssueCode.custom, path: ["enrollmentId"], message: "To'lov uchun guruh tanlanishi shart" });
+  }
 });
 
 export type UpdateStudentProfileInput = z.infer<typeof updateStudentProfileSchema>;

@@ -2,7 +2,9 @@
 
 import * as React from "react";
 import { AlertCircle, CreditCard, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui";
 import { KabinetNav } from "@/features/lms/components/KabinetNav";
+import { KabinetPageHeader, KabinetSkeleton } from "@/features/lms/components/KabinetPage";
 import { siteConfig } from "@/lib/siteConfig";
 import type { PaymentRecord, PaymentsResponse } from "@/features/payments/format";
 import { PaymentSummaryCard } from "./PaymentSummaryCard";
@@ -64,20 +66,13 @@ export default function ToLovlarPage() {
   const enrollmentId = data?.payments.find((payment) => payment.enrollmentId)?.enrollmentId ?? null;
 
   return (
-    <main className="min-h-screen bg-cream pb-16 pt-24">
+    <div className="min-h-screen bg-bg text-ink">
       <KabinetNav />
-      <div className="mx-auto w-full max-w-[1100px] space-y-8 px-5 md:px-8">
-        <header className="space-y-2">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-accent-soft px-3 py-1 font-mono text-xs font-bold text-accent">
-            <CreditCard className="h-3.5 w-3.5" aria-hidden="true" /> Moliya markazi
-          </span>
-          <h1 className="text-2xl font-extrabold text-ink md:text-3xl">To'lovlar va cheklar</h1>
-          <p className="text-xs text-ink-muted">Faqat hisobingizdagi haqiqiy to'lovlar va ularning holati.</p>
-        </header>
-
-        {loading && <LoadingState />}
-        {!loading && error && <ErrorState message={error} onRetry={loadPayments} />}
-        {!loading && !error && data && (
+      <main className="mx-auto w-full max-w-6xl space-y-8 px-5 pb-28 pt-24 md:px-8 md:pt-28 lg:pl-80 lg:pr-8">
+        <KabinetPageHeader title="To&apos;lovlar va cheklar" description="Hisobingizdagi haqiqiy to&apos;lovlar, ularning holati va mavjud cheklar." icon={CreditCard} />
+        {loading ? <KabinetSkeleton label="To&apos;lovlar yuklanmoqda" rows={2} /> : null}
+        {!loading && error ? <ErrorState message={error} onRetry={loadPayments} /> : null}
+        {!loading && !error && data ? (
           <>
             <PaymentSummaryCard
               paidAmount={paidAmount}
@@ -90,30 +85,19 @@ export default function ToLovlarPage() {
             />
             <PaymentHistorySection payments={data.payments} />
           </>
-        )}
-      </div>
-    </main>
-  );
-}
-
-function LoadingState() {
-  return (
-    <div className="space-y-6" aria-live="polite" aria-busy="true" aria-label="To'lovlar yuklanmoqda">
-      <div className="h-72 animate-pulse rounded-2xl bg-cream-warm" />
-      <div className="h-64 animate-pulse rounded-2xl bg-cream-warm" />
+        ) : null}
+      </main>
     </div>
   );
 }
 
 function ErrorState({ message, onRetry }: { message: string; onRetry: () => Promise<void> }) {
   return (
-    <section className="rounded-2xl border border-border-strong bg-cream-warm p-8 text-center" role="alert">
-      <AlertCircle className="mx-auto h-8 w-8 text-accent" aria-hidden="true" />
-      <h2 className="mt-3 font-bold text-ink">Ma'lumotni yuklab bo'lmadi</h2>
-      <p className="mt-2 text-sm text-ink-muted">{message}</p>
-      <button type="button" onClick={() => void onRetry()} className="btn-primary mt-5 inline-flex h-10 items-center gap-2 rounded-xl px-5 text-xs font-semibold">
-        <Loader2 className="h-4 w-4" aria-hidden="true" /> Qayta urinish
-      </button>
+    <section className="rounded-xl border border-danger bg-bg-elevated p-8 text-center" role="alert">
+      <AlertCircle className="mx-auto h-8 w-8 text-danger" aria-hidden="true" />
+      <h2 className="mt-3 font-display text-lg font-semibold text-ink">To&apos;lovlarni yuklab bo&apos;lmadi</h2>
+      <p className="mt-2 text-base text-ink-muted">{message}</p>
+      <Button onClick={() => void onRetry()} className="mt-5"><Loader2 className="h-4 w-4" aria-hidden="true" /> Qayta urinish</Button>
     </section>
   );
 }

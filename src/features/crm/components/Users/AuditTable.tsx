@@ -1,69 +1,12 @@
 "use client";
-import { Eye, Loader2 } from "lucide-react";
+
+import { Eye, Loader2, ScrollText } from "lucide-react";
 import type { AuditLogItem } from "./types";
+
 interface Props { logs: AuditLogItem[]; loading: boolean; onDetails: (log: AuditLogItem) => void; }
-export function AuditTable({ logs, loading, onDetails }: Props) { return (<>
-          {/* Audit Logs Table */}
-          {loading ? (
-            <div className="flex items-center justify-center py-16">
-              <Loader2 className="w-8 h-8 animate-spin text-accent" />
-            </div>
-          ) : logs.length === 0 ? (
-            <div className="text-center py-16 bg-cream-warm rounded-xl border border-border text-ink-muted">
-              Hech qanday audit jurnali topilmadi.
-            </div>
-          ) : (
-            <div className="bg-cream-warm border border-border rounded-xl overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm">
-                  <thead className="bg-cream-deep border-b border-border text-xs uppercase text-ink-muted font-semibold tracking-wider">
-                    <tr>
-                      <th className="px-4 py-3.5">Vaqt</th>
-                      <th className="px-4 py-3.5">Amal kodi</th>
-                      <th className="px-4 py-3.5">Xodim / IP</th>
-                      <th className="px-4 py-3.5">Obyekt</th>
-                      <th className="px-4 py-3.5 text-right">Tafsilotlar</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border">
-                    {logs.map((log) => (
-                      <tr key={log.id} className="hover:bg-cream/60 transition-colors">
-                        <td className="px-4 py-3.5 text-xs text-ink-muted whitespace-nowrap">
-                          {new Date(log.createdAt).toLocaleDateString("uz-UZ", {
-                            month: "short",
-                            day: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                            second: "2-digit",
-                          })}
-                        </td>
-                        <td className="px-4 py-3.5">
-                          <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded bg-accent-soft text-accent border border-accent-line">
-                            {log.action}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3.5">
-                          <div className="font-medium text-ink text-xs">{log.userName || log.userEmail || "Tizim"}</div>
-                          <div className="text-[11px] text-ink-muted font-mono">{log.ipAddress || "127.0.0.1"}</div>
-                        </td>
-                        <td className="px-4 py-3.5 text-xs text-ink-muted font-mono">
-                          {log.entityType || "-"}: {log.entityId ? log.entityId.slice(0, 8) : "-"}
-                        </td>
-                        <td className="px-4 py-3.5 text-right">
-                          <button
-                            onClick={() => onDetails(log)}
-                            className="p-1.5 rounded-lg hover:bg-cream text-ink-muted hover:text-ink transition-colors"
-                            title="Tafsilotlarni ko'rish"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-</>
-); }
+
+export function AuditTable({ logs, loading, onDetails }: Props) {
+  if (loading) return <div role="status" className="grid min-h-64 place-items-center rounded-2xl border border-border bg-bg-elevated"><div className="text-center"><Loader2 className="mx-auto h-7 w-7 animate-spin text-brand" /><p className="mt-3 text-sm text-ink-muted">Audit jurnali yuklanmoqda...</p></div></div>;
+  if (!logs.length) return <div className="rounded-2xl border border-dashed border-border bg-bg-elevated p-12 text-center"><ScrollText className="mx-auto h-8 w-8 text-ink-subtle" /><p className="mt-3 font-semibold text-ink">Audit yozuvlari topilmadi</p></div>;
+  return <div className="rounded-2xl border border-border bg-bg-elevated shadow-sm"><div className="space-y-3 p-3 md:hidden">{logs.map((log) => <article key={log.id} className="rounded-xl border border-border p-4"><div className="flex items-start justify-between gap-3"><span className="rounded-lg bg-accent-soft px-2 py-1 font-mono text-xs font-semibold text-accent">{log.action}</span><span className="text-xs text-ink-subtle">{new Date(log.createdAt).toLocaleString("uz-UZ")}</span></div><p className="mt-3 text-sm font-medium text-ink">{log.userName || log.userEmail || "Tizim"}</p><p className="mt-1 font-mono text-xs text-ink-muted">{log.entityType || "Tizim"} · {log.ipAddress || "127.0.0.1"}</p><button type="button" onClick={() => onDetails(log)} className="mt-4 flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-bg-sunken text-sm font-semibold text-ink"><Eye className="h-4 w-4" />Tafsilotlar</button></article>)}</div><div className="hidden overflow-x-auto md:block"><table className="w-full text-left text-sm"><thead className="border-b border-border bg-bg-sunken text-xs uppercase text-ink-muted"><tr><th className="px-4 py-3.5">Vaqt</th><th className="px-4 py-3.5">Amal kodi</th><th className="px-4 py-3.5">Xodim / IP</th><th className="px-4 py-3.5">Obyekt</th><th className="px-4 py-3.5 text-right">Tafsilotlar</th></tr></thead><tbody className="divide-y divide-border">{logs.map((log) => <tr key={log.id} className="hover:bg-bg-sunken"><td className="whitespace-nowrap px-4 py-3.5 text-xs text-ink-muted">{new Date(log.createdAt).toLocaleString("uz-UZ")}</td><td className="px-4 py-3.5"><span className="rounded-lg border border-border bg-accent-soft px-2 py-1 font-mono text-xs font-semibold text-accent">{log.action}</span></td><td className="px-4 py-3.5"><div className="text-xs font-medium text-ink">{log.userName || log.userEmail || "Tizim"}</div><div className="font-mono text-[11px] text-ink-muted">{log.ipAddress || "127.0.0.1"}</div></td><td className="px-4 py-3.5 font-mono text-xs text-ink-muted">{log.entityType || "-"}: {log.entityId ? log.entityId.slice(0, 8) : "-"}</td><td className="px-4 py-3.5 text-right"><button type="button" onClick={() => onDetails(log)} className="grid h-11 w-11 place-items-center rounded-lg text-ink-muted hover:bg-bg-sunken hover:text-ink" aria-label="Tafsilotlarni ko&apos;rish"><Eye className="h-4 w-4" /></button></td></tr>)}</tbody></table></div></div>;
+}

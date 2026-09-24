@@ -8,6 +8,7 @@ import {
   Loader2,
   ShieldCheck,
 } from "lucide-react";
+import { Button } from "@/components/ui/Button";
 import {
   computeInstallmentProgress,
   formatUzs,
@@ -86,7 +87,7 @@ export function PaymentSummaryCard({
 
   return (
     <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
-      <section className="rounded-2xl border border-border-strong bg-cream-warm p-6 shadow-sm md:p-8">
+      <section className="rounded-2xl border border-border bg-bg-elevated p-6 md:p-8">
         <div className="mb-5 flex flex-wrap items-start justify-between gap-3 border-b border-border pb-4">
           <div>
             <p className="font-mono text-xs font-bold uppercase text-accent">Kurs</p>
@@ -102,7 +103,7 @@ export function PaymentSummaryCard({
             <span>To'langan: <strong className="text-ink">{formatUzs(progress.paidAmount)}</strong></span>
             <span>Jami: <strong className="text-ink">{formatUzs(progress.total)}</strong></span>
           </div>
-          <div className="h-3 overflow-hidden rounded-full bg-cream-deep" role="progressbar"
+          <div className="h-3 overflow-hidden rounded-full bg-bg-sunken" role="progressbar"
             aria-label="To'lov progressi" aria-valuenow={progress.percent} aria-valuemin={0} aria-valuemax={100}>
             <div className="h-full rounded-full bg-accent transition-all" style={{ width: `${progress.percent}%` }} />
           </div>
@@ -118,11 +119,11 @@ export function PaymentSummaryCard({
               return (
                 <button key={option.id} type="button" disabled={!available}
                   aria-pressed={selected} onClick={() => setProvider(option.id)}
-                  className={`rounded-xl border p-3 text-left disabled:cursor-not-allowed disabled:opacity-50 ${
-                    selected ? "border-accent bg-accent-soft text-accent" : "border-border bg-cream text-ink-muted"
+                  className={`min-h-11 rounded-xl border p-3 text-left text-base disabled:cursor-not-allowed disabled:opacity-50 ${
+                    selected ? "border-accent bg-accent-soft text-accent" : "border-border bg-bg-elevated text-ink-muted"
                   }`}>
-                  <strong className="block text-sm">{option.label}</strong>
-                  <span className="text-[10px]">{available ? "Mavjud" : "Hozircha mavjud emas"}</span>
+                  <strong className="block text-base">{option.label}</strong>
+                  <span className="text-sm">{available ? "Mavjud" : "Hozircha mavjud emas"}</span>
                 </button>
               );
             })}
@@ -132,20 +133,25 @@ export function PaymentSummaryCard({
         <div className="mt-4 min-h-5" aria-live="polite" aria-atomic="true">
           {message && <p className="text-xs text-ink">{message}</p>}
         </div>
-        <button type="button" onClick={handlePay} disabled={paying || !anyProviderAvailable || outstanding <= 0}
-          className="btn-primary mt-2 inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl text-xs font-semibold disabled:cursor-not-allowed disabled:opacity-50">
+        <Button
+          type="button"
+          onClick={handlePay}
+          disabled={paying || !anyProviderAvailable || outstanding <= 0}
+          size="lg"
+          className="mt-2 w-full text-base"
+        >
           {paying ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <CreditCard className="h-4 w-4" aria-hidden="true" />}
           {outstanding <= 0 ? "Kurs to'langan" : paying ? "To'lov tizimi ochilmoqda..." : `${formatUzs(outstanding)} to'lash`}
-        </button>
+        </Button>
       </section>
 
-      <aside className="flex flex-col justify-between rounded-2xl border border-border-strong bg-cream-warm p-6 shadow-sm">
+      <aside className="flex flex-col justify-between rounded-2xl border border-border-strong bg-bg-elevated p-6 shadow-sm">
         <div className="space-y-3">
           <ShieldCheck className="h-8 w-8 text-success" aria-hidden="true" />
           <h3 className="font-bold text-ink">Pul qaytarish kafolati</h3>
           <p className="text-xs leading-relaxed text-ink-muted">{guaranteeText}</p>
         </div>
-        <Link href="/pul-qaytarish" className="mt-6 inline-flex items-center gap-1 text-xs font-semibold text-accent hover:underline">
+        <Link href="/pul-qaytarish" className="mt-4 inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-accent hover:underline">
           Kafolat shartlari <ArrowRight className="h-3 w-3" aria-hidden="true" />
         </Link>
       </aside>

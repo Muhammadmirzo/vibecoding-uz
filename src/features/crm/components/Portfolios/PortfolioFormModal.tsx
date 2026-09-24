@@ -1,6 +1,7 @@
 "use client";
 
 import * as Dialog from "@radix-ui/react-dialog";
+import Image from "next/image";
 import { Camera, Loader2, Sparkles, X } from "lucide-react";
 import { PORTFOLIO_CATEGORIES } from "@/lib/validations/portfolio";
 import { fetchOgImage } from "@/features/portfolio/portfolioUtils";
@@ -11,7 +12,7 @@ type Props = { open: boolean; editingItem: PortfolioItem | null; formData: Portf
 export function PortfolioFormModal({ open, editingItem, formData, formErrors, isSubmitting, onOpenChange, onChange, onSubmit, onToast }: Props) {
   const update = (patch: Partial<PortfolioFormData>) => onChange({ ...formData, ...patch });
   return (
-    <Dialog.Root open={open} onOpenChange={onOpenChange}> <Dialog.Portal> <Dialog.Overlay className="fixed inset-0 bg-ink/50 backdrop-blur-xs z-50 animate-fade-in" /> <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-xl max-h-[90vh] overflow-y-auto bg-cream p-6 rounded-2xl border border-border shadow-2xl z-50 space-y-5"> <div className="flex items-center justify-between border-b border-border pb-4"> <Dialog.Title className="text-xl font-bold text-ink flex items-center gap-2"><Sparkles className="w-5 h-5 text-accent" /><span>{editingItem ? "Portfolioni Tahrirlash" : "Yangi Portfolio Qo'shish"}</span></Dialog.Title> <Dialog.Close className="p-1 rounded-lg hover:bg-cream-warm text-ink-muted hover:text-ink"><X className="w-5 h-5" /></Dialog.Close> </div> <form onSubmit={onSubmit} className="space-y-4 text-xs sm:text-sm"> <div className="grid grid-cols-1 sm:grid-cols-2 gap-4"> <div> <label className="block font-semibold text-ink mb-1">Nomi (Title) *</label> <input
+    <Dialog.Root open={open} onOpenChange={onOpenChange}> <Dialog.Portal> <Dialog.Overlay className="fixed inset-0 bg-ink/50 backdrop-blur-xs z-50 animate-fade-in" /> <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-xl max-h-[90vh] overflow-y-auto bg-bg-elevated p-6 rounded-2xl border border-border shadow-2xl z-50 space-y-5"> <div className="flex items-center justify-between border-b border-border pb-4"> <Dialog.Title className="text-xl font-bold text-ink flex items-center gap-2"><Sparkles className="w-5 h-5 text-accent" /><span>{editingItem ? "Portfolioni Tahrirlash" : "Yangi Portfolio Qo'shish"}</span></Dialog.Title> <Dialog.Close className="p-1 rounded-lg hover:bg-bg-sunken text-ink-muted hover:text-ink"><X className="w-5 h-5" /></Dialog.Close> </div> <form onSubmit={onSubmit} className="space-y-4 text-xs sm:text-sm"> <div className="grid grid-cols-1 sm:grid-cols-2 gap-4"> <div> <label className="block font-semibold text-ink mb-1">Nomi (Title) *</label> <input
                     type="text"
                     required
                     value={formData.title}
@@ -29,10 +30,10 @@ export function PortfolioFormModal({ open, editingItem, formData, formErrors, is
                       });
                     }}
                     placeholder="EduBaza"
-                    className="w-full px-3.5 py-2 bg-cream-warm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+                    className="w-full px-3.5 py-2 bg-bg-sunken border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
                   />
                   {formErrors.title && (
-                    <p className="text-xs text-error mt-1">{formErrors.title}</p>
+                    <p className="text-xs text-danger mt-1">{formErrors.title}</p>
                   )}
                 </div>
 
@@ -42,10 +43,10 @@ export function PortfolioFormModal({ open, editingItem, formData, formErrors, is
                     value={formData.slug}
                     onChange={(e) => update({ ...formData, slug: e.target.value })}
                     placeholder="edubaza"
-                    className="w-full px-3.5 py-2 bg-cream-warm border border-border rounded-lg font-mono focus:outline-none focus:ring-2 focus:ring-accent"
+                    className="w-full px-3.5 py-2 bg-bg-sunken border border-border rounded-lg font-mono focus:outline-none focus:ring-2 focus:ring-accent"
                   />
                   {formErrors.slug && (
-                    <p className="text-xs text-error mt-1">{formErrors.slug}</p>
+                    <p className="text-xs text-danger mt-1">{formErrors.slug}</p>
                   )}
                 </div> </div>
 
@@ -67,10 +68,10 @@ export function PortfolioFormModal({ open, editingItem, formData, formErrors, is
                       });
                     }}
                     placeholder="https://edubaza.uz"
-                    className="w-full px-3.5 py-2 bg-cream-warm border border-border rounded-lg font-mono focus:outline-none focus:ring-2 focus:ring-accent"
+                    className="w-full px-3.5 py-2 bg-bg-sunken border border-border rounded-lg font-mono focus:outline-none focus:ring-2 focus:ring-accent"
                   />
                   {formErrors.url && (
-                    <p className="text-xs text-error mt-1">{formErrors.url}</p>
+                    <p className="text-xs text-danger mt-1">{formErrors.url}</p>
                   )}
                 </div>
 
@@ -80,10 +81,10 @@ export function PortfolioFormModal({ open, editingItem, formData, formErrors, is
                     value={formData.domain}
                     onChange={(e) => update({ ...formData, domain: e.target.value })}
                     placeholder="edubaza.uz"
-                    className="w-full px-3.5 py-2 bg-cream-warm border border-border rounded-lg font-mono focus:outline-none focus:ring-2 focus:ring-accent"
+                    className="w-full px-3.5 py-2 bg-bg-sunken border border-border rounded-lg font-mono focus:outline-none focus:ring-2 focus:ring-accent"
                   />
                   {formErrors.domain && (
-                    <p className="text-xs text-error mt-1">{formErrors.domain}</p>
+                    <p className="text-xs text-danger mt-1">{formErrors.domain}</p>
                   )}
                 </div> </div>
 
@@ -95,7 +96,7 @@ export function PortfolioFormModal({ open, editingItem, formData, formErrors, is
                         category: e.target.value as "Startup MVP" | "EdTech" | "AI Bot" | "B2B SaaS",
                       })
                     }
-                    className="w-full px-3.5 py-2 bg-cream-warm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+                    className="w-full px-3.5 py-2 bg-bg-sunken border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
                   >
                     {PORTFOLIO_CATEGORIES.map((cat) => (
                       <option key={cat} value={cat}>
@@ -109,7 +110,7 @@ export function PortfolioFormModal({ open, editingItem, formData, formErrors, is
                     value={formData.userCount}
                     onChange={(e) => update({ ...formData, userCount: e.target.value })}
                     placeholder="27 000+ o'qituvchi foydalanadi"
-                    className="w-full px-3.5 py-2 bg-cream-warm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+                    className="w-full px-3.5 py-2 bg-bg-sunken border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
                   /> </div> </div>
 
               <div> <label className="block font-semibold text-ink mb-1">Tavsif (Description) *</label> <textarea
@@ -118,10 +119,10 @@ export function PortfolioFormModal({ open, editingItem, formData, formErrors, is
                   value={formData.description}
                   onChange={(e) => update({ ...formData, description: e.target.value })}
                   placeholder="O'qituvchilar uchun interaktiv ta'lim resurslari platformasi"
-                  className="w-full px-3.5 py-2 bg-cream-warm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent resize-none"
+                  className="w-full px-3.5 py-2 bg-bg-sunken border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent resize-none"
                 />
                 {formErrors.description && (
-                  <p className="text-xs text-error mt-1">{formErrors.description}</p>
+                  <p className="text-xs text-danger mt-1">{formErrors.description}</p>
                 )}
               </div>
 
@@ -144,13 +145,18 @@ export function PortfolioFormModal({ open, editingItem, formData, formErrors, is
                   value={formData.imageUrl}
                   onChange={(e) => update({ ...formData, imageUrl: e.target.value })}
                   placeholder="Bo'sh qoldirilsa, avtomatik standart dizayn ko'rsatiladi"
-                  className="w-full px-3.5 py-2 bg-cream-warm border border-border rounded-lg font-mono text-xs focus:outline-none focus:ring-2 focus:ring-accent"
+                  className="w-full px-3.5 py-2 bg-bg-sunken border border-border rounded-lg font-mono text-xs focus:outline-none focus:ring-2 focus:ring-accent"
                 />
                 {formData.imageUrl && (
-                  <div className="mt-2.5 rounded-lg border border-border overflow-hidden bg-cream-deep aspect-[16/10] max-h-40"> <img
+                  <div className="mt-2.5 rounded-lg border border-border overflow-hidden bg-bg-sunken aspect-[16/10] max-h-40"> <Image
                       src={formData.imageUrl}
-                      alt="Preview"
-                      className="w-full h-full object-cover object-top"
+                      alt="Yuklanayotgan portfolio rasmi"
+                      width={640}
+                      height={400}
+                      sizes="(max-width: 640px) 100vw, 576px"
+                      className="h-full w-full object-cover object-top"
+                      loader={({ src }) => src}
+                      unoptimized
                       onError={() => {
                         update({ imageUrl: "" });
                       }}
@@ -169,13 +175,13 @@ export function PortfolioFormModal({ open, editingItem, formData, formErrors, is
                     type="number"
                     value={formData.sortOrder}
                     onChange={(e) => update({ ...formData, sortOrder: parseInt(e.target.value, 10) || 0 })}
-                    className="w-16 px-2 py-1 bg-cream-warm border border-border rounded-lg font-mono text-center"
+                    className="w-16 px-2 py-1 bg-bg-sunken border border-border rounded-lg font-mono text-center"
                   /> </div> </div>
 
               <div className="flex items-center justify-end gap-3 pt-4 border-t border-border"> <button
                   type="button"
                   onClick={() => onOpenChange(false)}
-                  className="px-4 py-2 rounded-xl bg-cream-warm text-ink hover:bg-cream-deep font-semibold"
+                  className="px-4 py-2 rounded-xl bg-bg-sunken text-ink hover:bg-bg-sunken font-semibold"
                 >
                   Bekor qilish
                 </button>
@@ -183,7 +189,7 @@ export function PortfolioFormModal({ open, editingItem, formData, formErrors, is
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-6 py-2 rounded-xl bg-accent text-white font-semibold shadow-sm hover:bg-accent-hover disabled:opacity-50 flex items-center gap-2"
+                  className="px-6 py-2 rounded-xl bg-accent text-ink font-semibold shadow-sm hover:bg-accent-hover disabled:opacity-50 flex items-center gap-2"
                 >
                   {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
                   <span>{isSubmitting ? "Saqlanmoqda..." : editingItem ? "Yangilash" : "Qo'shish"}</span> </button> </div> </form> </Dialog.Content> </Dialog.Portal> </Dialog.Root>

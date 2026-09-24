@@ -5,4 +5,5 @@ export * from "./homework";
 export * from "./commercial";
 export * from "./crm";
 export * from "./content";
+export * from "./payouts";
 export * from "./operations";

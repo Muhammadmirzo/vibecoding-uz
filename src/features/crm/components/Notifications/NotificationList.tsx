@@ -1,73 +1,9 @@
 "use client";
-import { Clock, Loader2 } from "lucide-react";
+
+import { Clock, Loader2, Send } from "lucide-react";
 import { audienceLabels } from "./types";
 import type { BroadcastItem } from "./types";
-export function NotificationList({ broadcasts, loading }: { broadcasts: BroadcastItem[]; loading: boolean }) { return (<>
-      {/* History Table */}
-      <div className="space-y-3">
-        <h2 className="text-base font-bold text-ink flex items-center gap-2">
-          <Clock className="w-5 h-5 text-accent" />
-          Yuborilgan Xabarnomalar Tarixi
-        </h2>
 
-        {loading ? (
-          <div className="flex items-center justify-center py-10">
-            <Loader2 className="w-6 h-6 animate-spin text-accent" />
-          </div>
-        ) : broadcasts.length === 0 ? (
-          <div className="text-center py-10 bg-cream-warm rounded-xl border border-border text-xs text-ink-muted">
-            Hali yuborilgan xabarnomalar mavjud emas.
-          </div>
-        ) : (
-          <div className="bg-cream-warm border border-border rounded-xl overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <thead className="bg-cream-deep border-b border-border text-xs uppercase text-ink-muted font-semibold tracking-wider">
-                  <tr>
-                    <th className="px-4 py-3.5">Nomi</th>
-                    <th className="px-4 py-3.5">Kanal</th>
-                    <th className="px-4 py-3.5">Auditoriya</th>
-                    <th className="px-4 py-3.5">Qabul qiluvchilar</th>
-                    <th className="px-4 py-3.5">Holat</th>
-                    <th className="px-4 py-3.5">Sana</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {broadcasts.map((b) => (
-                    <tr key={b.id} className="hover:bg-cream/60 transition-colors">
-                      <td className="px-4 py-3.5 font-semibold text-ink max-w-xs truncate">{b.title}</td>
-                      <td className="px-4 py-3.5 uppercase text-xs font-bold text-accent font-mono">{b.channel}</td>
-                      <td className="px-4 py-3.5 text-xs text-ink-muted">
-                        {audienceLabels[b.targetAudience] || b.targetAudience}
-                      </td>
-                      <td className="px-4 py-3.5 font-medium text-ink">{b.recipientsCount} ta</td>
-                      <td className="px-4 py-3.5">
-                        <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
-                            b.status === "sent"
-                              ? "bg-emerald-100 text-emerald-800 border-emerald-200"
-                              : "bg-amber-100 text-amber-800 border-amber-200"
-                          }`}
-                        >
-                          {b.status === "sent" ? "Yuborilgan" : "Qoralama"}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3.5 text-xs text-ink-muted whitespace-nowrap">
-                        {new Date(b.createdAt).toLocaleDateString("uz-UZ", {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-      </div>
-</>
-); }
+export function NotificationList({ broadcasts, loading }: { broadcasts: BroadcastItem[]; loading: boolean }) {
+  return <section aria-labelledby="history-title" className="space-y-3"><h2 id="history-title" className="flex items-center gap-2 font-semibold text-ink"><Clock className="h-5 w-5 text-accent" />Yuborilgan xabarnomalar tarixi</h2>{loading ? <div role="status" className="grid min-h-52 place-items-center rounded-2xl border border-border bg-bg-elevated"><div className="text-center"><Loader2 className="mx-auto h-6 w-6 animate-spin text-brand" /><p className="mt-2 text-sm text-ink-muted">Tarix yuklanmoqda...</p></div></div> : broadcasts.length === 0 ? <div className="rounded-2xl border border-dashed border-border bg-bg-elevated p-10 text-center"><Send className="mx-auto h-7 w-7 text-ink-subtle" /><p className="mt-3 text-sm text-ink-muted">Hali yuborilgan xabarnoma mavjud emas.</p></div> : <div className="rounded-2xl border border-border bg-bg-elevated shadow-sm"><div className="space-y-3 p-3 md:hidden">{broadcasts.map((item) => <article key={item.id} className="rounded-xl border border-border p-4"><div className="flex items-start justify-between gap-3"><h3 className="font-semibold text-ink">{item.title}</h3><span className={`shrink-0 rounded-full border px-2 py-1 text-xs ${item.status === "sent" ? "bg-success-soft text-success border-success/20" : "bg-gold-soft text-gold border-gold/20"}`}>{item.status === "sent" ? "Yuborilgan" : "Qoralama"}</span></div><dl className="mt-4 grid grid-cols-2 gap-3 text-sm"><div><dt className="text-xs text-ink-subtle">Kanal</dt><dd className="mt-1 uppercase text-ink">{item.channel}</dd></div><div><dt className="text-xs text-ink-subtle">Qabul qiluvchi</dt><dd className="mt-1 text-ink">{item.recipientsCount}</dd></div><div><dt className="text-xs text-ink-subtle">Auditoriya</dt><dd className="mt-1 text-ink">{audienceLabels[item.targetAudience]}</dd></div><div><dt className="text-xs text-ink-subtle">Sana</dt><dd className="mt-1 text-ink">{new Date(item.createdAt).toLocaleDateString("uz-UZ")}</dd></div></dl></article>)}</div><div className="hidden overflow-x-auto md:block"><table className="w-full text-left text-sm"><thead className="border-b border-border bg-bg-sunken text-xs uppercase text-ink-muted"><tr><th className="px-4 py-3.5">Nomi</th><th className="px-4 py-3.5">Kanal</th><th className="px-4 py-3.5">Auditoriya</th><th className="px-4 py-3.5">Qabul qiluvchi</th><th className="px-4 py-3.5">Holat</th><th className="px-4 py-3.5">Sana</th></tr></thead><tbody className="divide-y divide-border">{broadcasts.map((item) => <tr key={item.id} className="hover:bg-bg-sunken"><td className="max-w-xs truncate px-4 py-3.5 font-semibold text-ink">{item.title}</td><td className="px-4 py-3.5 font-mono text-xs font-semibold text-brand">{item.channel}</td><td className="px-4 py-3.5 text-xs text-ink-muted">{audienceLabels[item.targetAudience]}</td><td className="px-4 py-3.5 text-ink">{item.recipientsCount}</td><td className="px-4 py-3.5"><span className={`rounded-full border px-2.5 py-1 text-xs ${item.status === "sent" ? "bg-success-soft text-success border-success/20" : "bg-gold-soft text-gold border-gold/20"}`}>{item.status === "sent" ? "Yuborilgan" : "Qoralama"}</span></td><td className="whitespace-nowrap px-4 py-3.5 text-xs text-ink-muted">{new Date(item.createdAt).toLocaleString("uz-UZ")}</td></tr>)}</tbody></table></div></div>}</section>;
+}

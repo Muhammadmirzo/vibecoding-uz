@@ -31,7 +31,7 @@ export function BlogFilters({
           placeholder="Maqolalarni qidiring..."
           value={query}
           onChange={(event) => onQueryChange(event.target.value)}
-          className="h-12 w-full rounded-xl border border-border-strong bg-cream-warm pl-12 pr-24 text-sm text-ink placeholder:text-ink-subtle focus:outline-none focus:ring-2 focus:ring-accent"
+          className="h-12 w-full rounded-xl border border-border-strong bg-bg-elevated pl-12 pr-24 text-sm text-ink placeholder:text-ink-subtle focus:outline-none focus:ring-2 focus:ring-accent"
         />
         {query && (
           <button type="button" onClick={onClearQuery} className="absolute right-4 top-3.5 font-mono text-xs text-ink-muted hover:text-accent">
@@ -51,7 +51,7 @@ export function BlogFilters({
               className={`whitespace-nowrap rounded-lg px-4 py-2 text-xs font-semibold transition-all md:text-sm ${
                 isSelected
                   ? "bg-accent text-white shadow-sm"
-                  : "border border-border bg-cream-warm text-ink-muted hover:bg-cream-deep hover:text-ink"
+                  : "border border-border bg-bg-elevated text-ink-muted hover:bg-bg-sunken hover:text-ink"
               }`}
             >
               {category}

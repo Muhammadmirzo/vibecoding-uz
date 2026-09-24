@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Lead, LeadSource, LeadStatus } from "./types";
 import { X, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/Button";
 
 interface LeadModalProps {
   isOpen: boolean;
@@ -85,19 +86,19 @@ export function LeadModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/50 backdrop-blur-sm animate-in fade-in"> <div className="bg-cream border border-border rounded-xl shadow-lg max-w-lg w-full overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/50 backdrop-blur-sm animate-in fade-in"> <div className="bg-bg-elevated border border-border rounded-xl shadow-lg max-w-lg w-full overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-cream-warm"> <h3 className="text-lg font-bold text-ink">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-bg-sunken"> <h3 className="text-lg font-bold text-ink">
             {initialData ? "Leadni tahrirlash" : "Yangi lead qo'shish"}
           </h3> <button
             onClick={onClose}
-            className="text-ink-muted hover:text-ink transition-colors p-1 rounded-md"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-md text-ink-muted transition-colors hover:text-ink"
           > <X className="w-5 h-5" /> </button> </div>
 
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {error && (
-            <div className="p-3 bg-red-500/10 border border-red-500/30 text-red-600 rounded-md text-sm">
+            <div className="p-3 bg-danger/10 border border-danger/30 text-danger rounded-md text-sm">
               {error}
             </div>
           )}
@@ -109,7 +110,7 @@ export function LeadModal({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Masalan: Sardor Rahimov"
-              className="w-full px-3 py-2 bg-cream-warm border border-border rounded-md text-sm text-ink focus:outline-none focus:border-accent"
+              className="min-h-11 w-full rounded-md border border-border bg-bg-sunken px-3 text-base text-ink focus:border-accent focus:outline-none"
               required
             /> </div>
 
@@ -120,7 +121,7 @@ export function LeadModal({
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="+998901234567"
-              className="w-full px-3 py-2 bg-cream-warm border border-border rounded-md text-sm text-ink focus:outline-none focus:border-accent"
+              className="min-h-11 w-full rounded-md border border-border bg-bg-sunken px-3 text-base text-ink focus:border-accent focus:outline-none"
               required
             /> </div>
 
@@ -129,7 +130,7 @@ export function LeadModal({
               </label> <select
                 value={source}
                 onChange={(e) => setSource(e.target.value as LeadSource)}
-                className="w-full px-3 py-2 bg-cream-warm border border-border rounded-md text-sm text-ink focus:outline-none focus:border-accent"
+                className="min-h-11 w-full rounded-md border border-border bg-bg-sunken px-3 text-base text-ink focus:border-accent focus:outline-none"
               > <option value="manual">Manual (Qo'lda)</option> <option value="quiz">Diagnostika Quiz</option> <option value="free_lesson">Bepul dars</option> <option value="form">Veb-sayt formasi</option> <option value="telegram">Telegram bot</option> <option value="expert">Ekspert sahifasi</option> <option value="referral">Referral</option> </select> </div>
 
             <div> <label className="block text-sm font-medium text-ink mb-1">
@@ -137,7 +138,7 @@ export function LeadModal({
               </label> <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value as LeadStatus)}
-                className="w-full px-3 py-2 bg-cream-warm border border-border rounded-md text-sm text-ink focus:outline-none focus:border-accent"
+                className="min-h-11 w-full rounded-md border border-border bg-bg-sunken px-3 text-base text-ink focus:border-accent focus:outline-none"
               > <option value="new">Yangi (New)</option> <option value="contacted">Bog'lanildi (Contacted)</option> <option value="consultation">Konsultatsiya (Consultation)</option> <option value="paid">To'langan (Paid)</option> <option value="rejected">Rad etildi (Rejected)</option> <option value="cancelled">Bekor qilindi (Cancelled)</option> </select> </div> </div>
 
           <div> <label className="block text-sm font-medium text-ink mb-1">
@@ -145,7 +146,7 @@ export function LeadModal({
             </label> <select
               value={recommendedCourseId}
               onChange={(e) => setRecommendedCourseId(e.target.value)}
-              className="w-full px-3 py-2 bg-cream-warm border border-border rounded-md text-sm text-ink focus:outline-none focus:border-accent"
+              className="min-h-11 w-full rounded-md border border-border bg-bg-sunken px-3 text-base text-ink focus:border-accent focus:outline-none"
             > <option value="">-- Kursni tanlang --</option>
               {courses.map((course) => (
                 <option key={course.id} value={course.id}>
@@ -160,24 +161,25 @@ export function LeadModal({
               type="datetime-local"
               value={nextContactAt}
               onChange={(e) => setNextContactAt(e.target.value)}
-              className="w-full px-3 py-2 bg-cream-warm border border-border rounded-md text-sm text-ink focus:outline-none focus:border-accent"
+              className="min-h-11 w-full rounded-md border border-border bg-bg-sunken px-3 text-base text-ink focus:border-accent focus:outline-none"
             /> </div>
 
           {/* Footer Buttons */}
-          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2.5 sm:gap-3 pt-4 border-t border-border"> <button
+          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2.5 sm:gap-3 pt-4 border-t border-border"> <Button
               type="button"
+              variant="outline"
               onClick={onClose}
-              className="px-4 py-2 rounded-md text-sm font-medium btn-secondary"
+              className="w-full text-sm sm:w-auto"
               disabled={loading}
             >
               Bekor qilish
-            </button> <button
+            </Button> <Button
               type="submit"
-              className="px-4 py-2 rounded-md text-sm font-medium btn-primary flex items-center justify-center"
+              className="w-full text-sm sm:w-auto"
               disabled={loading}
             >
               {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
               {initialData ? "Saqlash" : "Yaratish"}
-            </button> </div> </form> </div> </div>
+            </Button> </div> </form> </div> </div>
   );
 }

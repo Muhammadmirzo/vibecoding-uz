@@ -1,4 +1,5 @@
 import { ArrowLeft, Calendar, ChevronRight, Clock } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import type { BlogPostItem } from "./types";
 import { HeaderShareActions } from "./ShareActions";
@@ -34,7 +35,7 @@ export function ArticleHeader({ post }: { post: BlogPostItem }) {
       <p className="text-base md:text-lg text-ink-muted leading-relaxed">{post.excerpt}</p>
       <div className="pt-4 border-t border-border flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <img src={post.authorAvatar} alt={post.authorName} className="w-11 h-11 rounded-full object-cover border-2 border-accent" />
+          <Image src={post.authorAvatar} alt={post.authorName} width={44} height={44} className="h-11 w-11 rounded-full object-cover border-2 border-accent" />
           <div><div className="text-sm font-bold text-ink">{post.authorName}</div><div className="text-xs text-ink-muted">{post.authorRole}</div></div>
         </div>
         <HeaderShareActions title={post.title} />

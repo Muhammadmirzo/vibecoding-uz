@@ -10,7 +10,7 @@ const paymentResponseSchema = z.object({
   provider: z.enum(["payme", "click", "manual"]),
   providerTxnId: z.string().nullable(),
   amountSum: z.string(),
-  status: z.enum(["pending", "paid", "failed", "refunded"]),
+  status: z.enum(["pending", "paid", "failed", "refunded", "cancelled"]),
   paidAt: z.string().datetime().nullable(),
   receiptUrl: z.string().url().nullable(),
   createdAt: z.string().datetime(),
@@ -59,9 +59,9 @@ export async function GET() {
         createdAt: row.createdAt.toISOString(),
       })),
       providers: {
-        payme: Boolean(process.env.PAYME_MERCHANT_ID),
+        payme: Boolean(process.env.PAYME_MERCHANT_ID?.trim()) && Boolean(process.env.PAYME_KEY?.trim()),
         click: Boolean(
-          process.env.CLICK_SERVICE_ID && process.env.CLICK_MERCHANT_ID
+          process.env.CLICK_SERVICE_ID?.trim() && process.env.CLICK_MERCHANT_ID?.trim() && process.env.CLICK_SECRET_KEY?.trim()
         ),
       },
     });

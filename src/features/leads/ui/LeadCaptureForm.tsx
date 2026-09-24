@@ -34,7 +34,7 @@ const leadFormSchema = z
     }
   });
 
-export type LeadSource = "quiz" | "free_lesson";
+export type LeadSource = "quiz" | "free_lesson" | "xizmatlar" | "meetlar" | "resurslar";
 
 interface LeadCaptureFormProps {
   source: LeadSource;

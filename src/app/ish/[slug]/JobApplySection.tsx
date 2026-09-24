@@ -10,7 +10,7 @@ export function JobApplySection({ job }: { job: JobOpeningItem }) {
 
   return (
     <div className="lg:col-span-5 lg:sticky lg:top-24">
-      <div className="bg-cream-warm border-2 border-accent-line rounded-2xl p-6 md:p-8 shadow-lg space-y-6">
+      <div className="bg-bg-elevated border-2 border-border rounded-2xl p-6 md:p-8 shadow-lg space-y-6">
         <div className="space-y-1">
           <span className="text-xs font-mono font-bold text-accent uppercase">Tezkor Ariza</span>
           <h3 className="text-2xl font-bold text-ink">Vakansiyaga topshirish</h3>

@@ -1,5 +1,6 @@
 "use client";
 import { Clock, ExternalLink, Github, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/Button";
 import type { HomeworkSubmission } from "./types";
 interface Props { submissions: HomeworkSubmission[]; loading: boolean; onOpen: (s: HomeworkSubmission) => void; }
 export function HomeworkQueueTable({ submissions, loading, onOpen }: Props) { return (<>
@@ -9,7 +10,7 @@ export function HomeworkQueueTable({ submissions, loading, onOpen }: Props) { re
           Topshiriqlar yuklanmoqda...
         </div>
       ) : submissions.length === 0 ? (
-        <div className="bg-cream-warm border border-dashed border-border rounded-xl p-12 text-center text-ink-muted">
+        <div className="bg-bg-sunken border border-dashed border-border rounded-xl p-12 text-center text-ink-muted">
           Ushbu statusda hech qanday topshiriq yo'q.
         </div>
       ) : (
@@ -17,7 +18,7 @@ export function HomeworkQueueTable({ submissions, loading, onOpen }: Props) { re
           {submissions.map((sub) => (
             <div
               key={sub.id}
-              className="bg-cream border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
+              className="bg-bg-elevated border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
             >
               {/* Info Left */}
               <div className="space-y-2 flex-1">
@@ -25,16 +26,16 @@ export function HomeworkQueueTable({ submissions, loading, onOpen }: Props) { re
                   <span className="font-bold text-base text-ink">
                     {sub.studentName}
                   </span>
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-cream-warm border border-border text-ink-muted">
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-bg-sunken border border-border text-ink-muted">
                     Urinish #{sub.attemptNo}
                   </span>
                   <span
                     className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${
                       sub.status === "approved"
-                        ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
+                        ? "bg-success-soft text-success border border-success/20"
                         : sub.status === "rejected"
-                        ? "bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20"
-                        : "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20"
+                        ? "bg-danger-soft text-danger border border-danger/20"
+                        : "bg-gold-soft text-gold border border-gold/20"
                     }`}
                   >
                     {sub.status === "submitted"
@@ -56,7 +57,7 @@ export function HomeworkQueueTable({ submissions, loading, onOpen }: Props) { re
                       href={sub.payload.githubUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center text-accent hover:underline bg-cream-warm px-2.5 py-1 rounded border border-border"
+                      className="inline-flex min-h-11 items-center text-accent hover:underline bg-bg-sunken px-3 rounded-lg border border-border"
                     >
                       <Github className="w-3.5 h-3.5 mr-1" />
                       Github Repozitoriya
@@ -64,7 +65,7 @@ export function HomeworkQueueTable({ submissions, loading, onOpen }: Props) { re
                     </a>
                   )}
                   {sub.payload?.note && (
-                    <span className="italic bg-cream-warm px-2.5 py-1 rounded border border-border max-w-md truncate">
+                    <span className="italic bg-bg-sunken px-2.5 py-1 rounded border border-border max-w-md truncate">
                       "{sub.payload.note}"
                     </span>
                   )}
@@ -86,13 +87,14 @@ export function HomeworkQueueTable({ submissions, loading, onOpen }: Props) { re
                   </div>
                 )}
 
-                <button
+                <Button
+                  type="button"
                   onClick={() => onOpen(sub)}
-                  className="btn-primary px-4 py-2 rounded-lg text-sm font-medium flex items-center space-x-1.5 shadow-sm"
+                  className="w-full text-sm sm:w-auto"
                 >
                   <Sparkles className="w-4 h-4" />
                   <span>{sub.review ? "Bahoni qayta ko'rish" : "Tekshirish va Baholash"}</span>
-                </button>
+                </Button>
               </div>
             </div>
           ))}

@@ -1,117 +1,37 @@
-import * as React from "react";
-import {
-  User,
-  Lock,
-  Bell,
-  Send,
-  Save,
-  CheckCircle2,
-  AlertCircle,
-  Loader2,
-  Shield,
-  Smartphone,
-  Mail,
-  MapPin,
-  Briefcase,
-  Target,
-  Sparkles,
-} from "lucide-react";
+import type { ReactNode } from "react";
+import { AlertCircle, CheckCircle2, Loader2, Lock } from "lucide-react";
+import { Button, Input, Label } from "@/components/ui";
 import type { CredentialsState } from "./settingsTypes";
 
 export function CredentialsSettingsForm({
-  currentPassword,
-  newPassword,
-  confirmPassword,
-  passwordLoading,
-  passwordSuccess,
-  passwordError,
-  setCurrentPassword,
-  setNewPassword,
-  setConfirmPassword,
-  handlePasswordSubmit,
+  currentPassword, newPassword, confirmPassword, passwordLoading, passwordSuccess, passwordError,
+  setCurrentPassword, setNewPassword, setConfirmPassword, handlePasswordSubmit,
 }: CredentialsState) {
   return (
-    <div className="bg-cream-warm border border-border-strong rounded-2xl p-6 md:p-8 shadow-sm space-y-6 max-w-xl">
-      <div className="border-b border-border pb-3">
-        <h2 className="text-lg font-bold text-ink">Parolni O'zgartirish</h2>
-        <p className="text-xs text-ink-muted">
-          Xavfsizlik uchun kamida 8 ta belgidan iborat murakkab paroldan
-          foydalaning.
-        </p>
+    <section className="max-w-2xl rounded-2xl border border-border bg-bg-elevated p-6 md:p-8">
+      <div className="border-b border-border pb-5">
+        <h2 className="font-display text-xl font-semibold text-ink">Parolni o&apos;zgartirish</h2>
+        <p className="mt-2 text-base leading-relaxed text-ink-muted">Xavfsizlik uchun kamida 8 ta belgidan iborat murakkab paroldan foydalaning.</p>
       </div>
-
-      {passwordSuccess && (
-        <div className="p-3.5 rounded-lg bg-success-soft border border-success-line text-success text-xs font-semibold flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4" />
-          <span>Parolingiz muvaffaqiyatli yangilandi!</span>
-        </div>
-      )}
-
-      {passwordError && (
-        <div className="p-3.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-xs flex items-center gap-2">
-          <AlertCircle className="w-4 h-4" />
-          <span>{passwordError}</span>
-        </div>
-      )}
-
-      <form onSubmit={handlePasswordSubmit} className="space-y-4">
-        <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-ink">
-            Joriy parol *
-          </label>
-          <input
-            type="password"
-            required
-            placeholder="••••••••"
-            value={currentPassword}
-            onChange={(e) => setCurrentPassword(e.target.value)}
-            className="w-full h-11 px-3.5 rounded-lg border border-border-strong bg-cream text-ink text-xs focus:outline-none focus:ring-2 focus:ring-accent"
-          />
-        </div>
-
-        <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-ink">
-            Yangi parol (min. 8 ta belgi) *
-          </label>
-          <input
-            type="password"
-            required
-            placeholder="••••••••"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            className="w-full h-11 px-3.5 rounded-lg border border-border-strong bg-cream text-ink text-xs focus:outline-none focus:ring-2 focus:ring-accent"
-          />
-        </div>
-
-        <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-ink">
-            Yangi parolni tasdiqlash *
-          </label>
-          <input
-            type="password"
-            required
-            placeholder="••••••••"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full h-11 px-3.5 rounded-lg border border-border-strong bg-cream text-ink text-xs focus:outline-none focus:ring-2 focus:ring-accent"
-          />
-        </div>
-
-        <div className="pt-2">
-          <button
-            type="submit"
-            disabled={passwordLoading}
-            className="btn-primary h-11 px-6 rounded-lg text-xs font-semibold inline-flex items-center gap-2 w-full justify-center"
-          >
-            {passwordLoading ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <Lock className="w-4 h-4" />
-            )}
-            <span>Parolni yangilash</span>
-          </button>
-        </div>
+      {passwordSuccess ? <Status tone="success"><CheckCircle2 className="h-5 w-5" />Parol yangilandi.</Status> : null}
+      {passwordError ? <Status tone="error"><AlertCircle className="h-5 w-5" />{passwordError}</Status> : null}
+      <form onSubmit={handlePasswordSubmit} className="mt-6 space-y-5">
+        <PasswordField id="current-password" label="Joriy parol" value={currentPassword} onChange={setCurrentPassword} />
+        <PasswordField id="new-password" label="Yangi parol" value={newPassword} onChange={setNewPassword} />
+        <PasswordField id="confirm-password" label="Yangi parolni tasdiqlang" value={confirmPassword} onChange={setConfirmPassword} />
+        <Button type="submit" disabled={passwordLoading} className="w-full">
+          {passwordLoading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Lock className="h-4 w-4" aria-hidden="true" />}
+          Parolni yangilash
+        </Button>
       </form>
-    </div>
+    </section>
   );
+}
+
+function PasswordField({ id, label, value, onChange }: { id: string; label: string; value: string; onChange: (value: string) => void }) {
+  return <div><Label htmlFor={id}>{label}</Label><Input id={id} type="password" value={value} onChange={(event) => onChange(event.target.value)} required /></div>;
+}
+
+function Status({ tone, children }: { tone: "success" | "error"; children: ReactNode }) {
+  return <div role="status" className={`mt-5 flex items-center gap-2 rounded-lg border p-3 text-sm font-semibold ${tone === "success" ? "border-success bg-success-soft text-success" : "border-danger bg-bg-sunken text-danger"}`}>{children}</div>;
 }

@@ -1,23 +1,7 @@
 import type { Metadata } from "next";
+import { Container, Heading, Eyebrow } from "@/components/ui";
+import { Card } from "@/components/ui/Surfaces";
+import { NextStepCTA } from "@/components/ui/NextStepCTA";
 
-export const metadata: Metadata = {
-  title: "Maxfiylik Siyosati | Mirzo Academy",
-  description: "Foydalanuvchilarning shaxsiy ma'lumotlarini himoya qilish siyosati.",
-};
-
-export default function MaxfiylikPage() {
-  return (
-    <div className="pt-28 pb-20 min-h-screen bg-[var(--color-cream)]">
-      <div className="mx-auto w-full max-w-[800px] px-5 md:px-8 space-y-8">
-        <h1 className="text-3xl font-extrabold text-[var(--color-ink)]">Maxfiylik Siyosati (Privacy Policy)</h1>
-        <div className="bg-[var(--color-cream-warm)] border border-[var(--color-border-strong)] rounded-[var(--radius-xl)] p-8 text-sm text-[var(--color-ink-muted)] leading-relaxed space-y-4">
-          <p>Biz sizning shaxsiy ma'lumotlaringiz maxfiyligini qadrlaymiz. Ushbu siyosat qanday ma'lumotlar yig'ilishi va ishlatilishini tushuntiradi.</p>
-          <h2 className="text-base font-bold text-[var(--color-ink)]">1. Yig'iladigan ma'lumotlar</h2>
-          <p>Ismingiz, telefon raqamingiz, Telegram foydalanuvchi nomingiz va kviz javoblaringiz faqat ta'lim xizmatlarini ko'rsatish va aloqa uchun saqlanadi.</p>
-          <h2 className="text-base font-bold text-[var(--color-ink)]">2. Uchinchi shaxslarga berilmaslik</h2>
-          <p>Ma'lumotlaringiz hech qachon uchinchi shaxslarga sotilmaydi yoki topshirilmaydi.</p>
-        </div>
-      </div>
-    </div>
-  );
-}
+export const metadata: Metadata = { title: "Maxfiylik siyosati", description: "Mirzo Academy foydalanuvchilarining ma’lumotlari va ularni qanday qo‘llanishiga oid siyosat." };
+export default function Page() { return <div className="bg-bg text-ink"><Container className="py-20 sm:py-28"><Eyebrow>Maxfiylik</Eyebrow><Heading as="h1" className="mt-3">Maxfiylik siyosati</Heading><Card className="mt-10 max-w-3xl space-y-7 text-[17px] leading-relaxed text-ink-muted"><p>Biz foydalanuvchilar ma’lumotlarini qadrlaymiz. Bu siyosat qanday ma’lumot yig‘ilishi va ishlatilishini tushuntiradi.</p><section><Heading as="h2" className="text-2xl">1. Yig‘iladigan ma’lumotlar</Heading><p className="mt-3">Ism, telefon raqami, Telegram foydalanuvchi nomi va diagnostika javoblari ta’lim xizmatlarini ko‘rsatish hamda aloqa uchun saqlanadi.</p></section><section><Heading as="h2" className="text-2xl">2. Foydalanish va himoya</Heading><p className="mt-3">Ma’lumotlar faqat xizmat sifatini yaxshilash, texnik muammolarni bartaraf etish va qonuniy majburlarni bajarish uchun ishlatiladi. Ular maxfiylikni ta’minlash choralari bilan saqlanadi.</p></section><section><Heading as="h2" className="text-2xl">3. Uchinchi shaxslar</Heading><p className="mt-3">Biz ma’lumotni ruxsatsiz sotmaymiz yoki marketing uchun uchinchi shaxslarga bermaymiz. Qonun hujjatlarida ko‘rsatilgan holatlar bundan mustasno.</p></section><section><Heading as="h2" className="text-2xl">4. Bog‘lanish</Heading><p className="mt-3">Savollaringiz uchun sayt orqali yoki Telegram orqali biz bilan bog‘lanishingiz mumkin.</p></section></Card></Container><NextStepCTA /></div>; }

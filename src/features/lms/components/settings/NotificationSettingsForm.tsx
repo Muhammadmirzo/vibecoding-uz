@@ -1,108 +1,25 @@
-import * as React from "react";
-import {
-  User,
-  Lock,
-  Bell,
-  Send,
-  Save,
-  CheckCircle2,
-  AlertCircle,
-  Loader2,
-  Shield,
-  Smartphone,
-  Mail,
-  MapPin,
-  Briefcase,
-  Target,
-  Sparkles,
-} from "lucide-react";
+import { Send } from "lucide-react";
+import { buttonVariants } from "@/components/ui/Button";
 import type { NotificationState } from "./settingsTypes";
 import { NotificationToggles } from "./NotificationToggles";
 
-export function NotificationSettingsForm({
-  telegramNotify,
-  emailNotify,
-  smsNotify,
-  homeworkDeadlines,
-  mentorReviews,
-  liveMeetReminders,
-  notifSaved,
-  setTelegramNotify,
-  setEmailNotify,
-  setSmsNotify,
-  setHomeworkDeadlines,
-  setMentorReviews,
-  setLiveMeetReminders,
-  handleSaveNotifications,
-}: NotificationState) {
+export function NotificationSettingsForm(props: NotificationState) {
   return (
-    <div className="bg-cream-warm border border-border-strong rounded-2xl p-6 md:p-8 shadow-sm space-y-6">
-      <div className="border-b border-border pb-3">
-        <h2 className="text-lg font-bold text-ink">
-          Bildirishnomalar va Telegram Integratsiyasi
-        </h2>
-        <p className="text-xs text-ink-muted">
-          Darslar, topshiriq muddatlari va mentor javoblarini qanday qabul
-          qilishni sozlang.
-        </p>
+    <section className="rounded-2xl border border-border bg-bg-elevated p-6 md:p-8">
+      <div className="border-b border-border pb-5">
+        <h2 className="font-display text-xl font-semibold text-ink">Bildirishnomalar</h2>
+        <p className="mt-2 text-base leading-relaxed text-ink-muted">Qaysi kanal va mavzular orqali xabar olishni tanlang. sozlamalar hozircha faqat ushbu sahifada saqlanadi.</p>
       </div>
-
-      {notifSaved && (
-        <div className="p-3.5 rounded-lg bg-success-soft border border-success-line text-success text-xs font-semibold flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4" />
-          <span>Bildirishnoma sozlamalari saqlandi!</span>
+      <div className="mt-6 flex flex-col gap-4 rounded-xl border border-border bg-bg-sunken p-5 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h3 className="font-semibold text-ink">Telegram bot</h3>
+          <p className="mt-1 text-sm text-ink-muted">Bot orqali ulanish yoki sozlamalarni yangilash uchun Telegram&apos;da oching.</p>
         </div>
-      )}
-
-      {/* Telegram Bot Card */}
-      <div className="p-5 rounded-xl bg-cream border border-accent-line flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-telegram-soft text-telegram flex items-center justify-center shrink-0">
-            <Send className="w-6 h-6" />
-          </div>
-          <div className="space-y-0.5">
-            <div className="text-sm font-bold text-ink flex items-center gap-2">
-              Telegram Bot Ulanishi
-              <span className="text-[11px] font-mono font-bold text-success bg-success-soft px-2 py-0.5 rounded-full">
-                Faol Ulangan
-              </span>
-            </div>
-            <p className="text-xs text-ink-muted">
-              Uy vazifangiz mentor tomonidan tekshirilganda Telegram orqali
-              bildirishnoma olasiz.
-            </p>
-          </div>
-        </div>
-
-        <a
-          href="https://t.me/m/ODAfK_QIMjky"
-          target="_blank"
-          rel="noreferrer"
-          className="shrink-0"
-        >
-          <button className="btn-secondary h-10 px-4 rounded-lg text-xs font-semibold inline-flex items-center gap-2">
-            <Send className="w-3.5 h-3.5 text-telegram" />
-            <span>Bot sozlamalarini yangilash</span>
-          </button>
+        <a href="https://t.me/m/ODAfK_QIMjky" target="_blank" rel="noreferrer" className={`${buttonVariants({ variant: "telegram" })} shrink-0`}>
+          <Send className="h-4 w-4" aria-hidden="true" /> Telegram&apos;da ochish
         </a>
       </div>
-
-      <NotificationToggles
-        telegramNotify={telegramNotify}
-        emailNotify={emailNotify}
-        smsNotify={smsNotify}
-        homeworkDeadlines={homeworkDeadlines}
-        mentorReviews={mentorReviews}
-        liveMeetReminders={liveMeetReminders}
-        notifSaved={notifSaved}
-        setTelegramNotify={setTelegramNotify}
-        setEmailNotify={setEmailNotify}
-        setSmsNotify={setSmsNotify}
-        setHomeworkDeadlines={setHomeworkDeadlines}
-        setMentorReviews={setMentorReviews}
-        setLiveMeetReminders={setLiveMeetReminders}
-        handleSaveNotifications={handleSaveNotifications}
-      />
-    </div>
+      <NotificationToggles {...props} />
+    </section>
   );
 }

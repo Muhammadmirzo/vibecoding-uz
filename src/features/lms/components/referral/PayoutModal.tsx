@@ -10,6 +10,8 @@ import {
   Gift,
   Loader2,
 } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import { Input, Label } from "@/components/ui/Form";
 import { useReferral } from "./useReferral";
 
 export function PayoutModal({
@@ -29,8 +31,8 @@ export function PayoutModal({
   return (
     <Dialog.Root open={true} onOpenChange={setPayoutModalOpen}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 animate-in fade-in duration-150" />
-        <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-md bg-cream border border-border-strong rounded-2xl p-6 md:p-8 shadow-2xl animate-in zoom-in-95 duration-150 text-ink">
+        <Dialog.Overlay className="fixed inset-0 bg-ink/60 backdrop-blur-sm z-50 animate-in fade-in duration-150" />
+        <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-md bg-bg-elevated border border-border-strong rounded-2xl p-6 md:p-8 shadow-2xl animate-in zoom-in-95 duration-150 text-ink">
           <div className="pb-4 border-b border-border">
             <Dialog.Title className="text-xl font-bold text-ink">
               Referral Bonusini Yechib Olish
@@ -51,41 +53,42 @@ export function PayoutModal({
                 So'rov qabul qilindi!
               </h4>
               <p className="text-xs text-ink-muted leading-relaxed">
-                24 soat ichida ko'rsatilgan kartangizga{" "}
+                So&apos;rov qabul qilindi. Balans tekshirilgandan keyin ko&apos;rsatilgan usulga o&apos;tkaziladi.{" "}
                 <strong>{stats.balance.toLocaleString("uz-UZ")} UZS</strong>{" "}
                 mablag' o'tkazib beriladi.
               </p>
-              <button
+              <Button
+                type="button"
                 onClick={() => setPayoutModalOpen(false)}
-                className="btn-primary h-10 px-6 rounded-lg text-xs font-semibold mt-3"
+                className="mt-3 w-full text-base sm:w-auto"
               >
                 Tushunarli
-              </button>
+              </Button>
             </div>
           ) : (
             <form onSubmit={handlePayoutSubmit} className="space-y-4 pt-4">
               {payoutError && (
-                <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-600 text-xs flex items-center gap-2">
+                <div className="p-3 rounded-lg border border-danger bg-bg-sunken text-danger text-xs flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 shrink-0" />
                   <span>{payoutError}</span>
                 </div>
               )}
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-ink">
+                <Label>
                   Qabul qilish usuli
-                </label>
+                </Label>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() => setPayoutMethod("uzcard_humo")}
-                    className={`p-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition-all ${payoutMethod === "uzcard_humo" ? "border-accent bg-accent-soft text-accent shadow-sm" : "border-border bg-cream-warm text-ink-muted"}`}
+                    className={`min-h-11 rounded-xl border p-3 text-sm flex items-center justify-center gap-1.5 transition-all ${payoutMethod === "uzcard_humo" ? "border-accent bg-accent-soft text-accent shadow-sm" : "border-border bg-bg-elevated text-ink-muted"}`}
                   >
                     <CreditCard className="w-4 h-4" /> Uzcard / Humo
                   </button>
                   <button
                     type="button"
                     onClick={() => setPayoutMethod("course_balance")}
-                    className={`p-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition-all ${payoutMethod === "course_balance" ? "border-accent bg-accent-soft text-accent shadow-sm" : "border-border bg-cream-warm text-ink-muted"}`}
+                    className={`min-h-11 rounded-xl border p-3 text-sm flex items-center justify-center gap-1.5 transition-all ${payoutMethod === "course_balance" ? "border-accent bg-accent-soft text-accent shadow-sm" : "border-border bg-bg-elevated text-ink-muted"}`}
                   >
                     <Gift className="w-4 h-4" /> Kurs to'loviga
                   </button>
@@ -94,11 +97,13 @@ export function PayoutModal({
               {payoutMethod === "uzcard_humo" && (
                 <>
                   <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-ink">
+                    <Label htmlFor="payout-card-number">
                       Karta raqami (16 xonali) *
-                    </label>
-                    <input
+                    </Label>
+                    <Input
+                      id="payout-card-number"
                       type="text"
+                      inputMode="numeric"
                       required
                       placeholder="8600 0000 0000 0000"
                       value={cardNumber}
@@ -107,43 +112,45 @@ export function PayoutModal({
                           e.target.value.replace(/[^0-9]/g, "").slice(0, 16),
                         )
                       }
-                      className="w-full h-11 px-3.5 rounded-lg border border-border-strong bg-cream-warm text-ink text-xs font-mono focus:outline-none focus:ring-2 focus:ring-accent"
+                      className="font-mono text-base"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-ink">
+                    <Label htmlFor="payout-card-holder">
                       Karta egasi ismi (F.I.SH.)
-                    </label>
-                    <input
+                    </Label>
+                    <Input
+                      id="payout-card-holder"
                       type="text"
                       placeholder="JAMSHID ALIMOV"
                       value={cardHolder}
                       onChange={(e) =>
                         setCardHolder(e.target.value.toUpperCase())
                       }
-                      className="w-full h-11 px-3.5 rounded-lg border border-border-strong bg-cream-warm text-ink text-xs focus:outline-none focus:ring-2 focus:ring-accent"
+                      className="text-base"
                     />
                   </div>
                 </>
               )}
-              <div className="p-3 rounded-lg bg-cream-warm border border-border text-xs flex items-center justify-between">
+              <div className="p-3 rounded-lg bg-bg-elevated border border-border text-sm flex items-center justify-between">
                 <span className="text-ink-muted">Yechilayotgan summa:</span>
                 <strong className="text-accent font-mono">
                   {stats.balance.toLocaleString("uz-UZ")} UZS
                 </strong>
               </div>
-              <div className="pt-2 flex items-center justify-end gap-2">
-                <button
+              <div className="pt-2 flex flex-col-reverse items-stretch justify-end gap-2 sm:flex-row">
+                <Button
                   type="button"
+                  variant="outline"
                   onClick={() => setPayoutModalOpen(false)}
-                  className="btn-secondary h-10 px-4 rounded-lg text-xs font-semibold"
+                  className="w-full text-sm sm:w-auto"
                 >
                   Bekor qilish
-                </button>
-                <button
+                </Button>
+                <Button
                   type="submit"
                   disabled={payoutLoading}
-                  className="btn-primary h-10 px-6 rounded-lg text-xs font-semibold inline-flex items-center gap-2"
+                  className="w-full text-sm sm:w-auto"
                 >
                   {payoutLoading ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -151,7 +158,7 @@ export function PayoutModal({
                     <DollarSign className="w-4 h-4" />
                   )}
                   <span>Yechish so'rovini yuborish</span>
-                </button>
+                </Button>
               </div>
             </form>
           )}

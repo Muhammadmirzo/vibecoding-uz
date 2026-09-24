@@ -1,4 +1,5 @@
-import { pgTable, text, timestamp, integer, uuid, decimal, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, integer, uuid, decimal, jsonb, uniqueIndex } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 import { enrollmentStatusEnum, paymentProviderEnum, paymentStatusEnum } from "./enums";
 import { users } from "./users";
 import { courses } from "./courses";
@@ -35,9 +36,15 @@ export const payments = pgTable("payments", {
   provider: paymentProviderEnum("provider").notNull(),
   providerTxnId: text("provider_txn_id"),
   amountSum: decimal("amount_sum", { precision: 12, scale: 2 }).notNull(),
+  amountTiyin: integer("amount_tiyin").default(0).notNull(),
   status: paymentStatusEnum("status").default("pending").notNull(),
   paidAt: timestamp("paid_at"),
   receiptUrl: text("receipt_url"),
   meta: jsonb("meta"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+}, (table) => [
+  // One provider transaction settles at most one payment row (idempotency backstop).
+  uniqueIndex("payments_provider_txn_uidx").on(table.provider, table.providerTxnId),
+  // At most one active pending payment per enrollment (service reuses it instead).
+  uniqueIndex("payments_one_pending_per_enrollment").on(table.enrollmentId).where(sql`"payments"."status" = 'pending'`),
+]);

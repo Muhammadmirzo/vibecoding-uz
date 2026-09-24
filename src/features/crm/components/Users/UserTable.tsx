@@ -1,84 +1,14 @@
 "use client";
-import { Edit, Eye, Loader2, ShieldCheck } from "lucide-react";
+
+import { Edit, Loader2, ShieldCheck, Users } from "lucide-react";
 import type { UserItem } from "./types";
+
 interface Props { users: UserItem[]; loading: boolean; onEdit: (user: UserItem) => void; }
-export function UserTable({ users, loading, onEdit }: Props) { return (<>
-          {/* Users Table */}
-          {loading ? (
-            <div className="flex items-center justify-center py-16">
-              <Loader2 className="w-8 h-8 animate-spin text-accent" />
-            </div>
-          ) : users.length === 0 ? (
-            <div className="text-center py-16 bg-cream-warm rounded-xl border border-border text-ink-muted">
-              Hech qanday foydalanuvchi topilmadi.
-            </div>
-          ) : (
-            <div className="bg-cream-warm border border-border rounded-xl overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm">
-                  <thead className="bg-cream-deep border-b border-border text-xs uppercase text-ink-muted font-semibold tracking-wider">
-                    <tr>
-                      <th className="px-4 py-3.5">Foydalanuvchi</th>
-                      <th className="px-4 py-3.5">Telefon / Telegram</th>
-                      <th className="px-4 py-3.5">Rol</th>
-                      <th className="px-4 py-3.5">Kurslar</th>
-                      <th className="px-4 py-3.5">Ro'yxatdan O'tgan</th>
-                      <th className="px-4 py-3.5 text-right">Boshqaruv</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border">
-                    {users.map((user) => (
-                      <tr key={user.id} className="hover:bg-cream/60 transition-colors">
-                        <td className="px-4 py-3.5">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-accent-soft text-accent font-bold flex items-center justify-center text-xs border border-accent-line">
-                              {user.fullName.slice(0, 1)}
-                            </div>
-                            <div>
-                              <div className="font-semibold text-ink">{user.fullName}</div>
-                              {user.email && <div className="text-xs text-ink-muted">{user.email}</div>}
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3.5">
-                          <div className="font-mono text-xs text-ink">{user.phone}</div>
-                          {user.tgUsername && (
-                            <div className="text-xs text-accent font-mono">@{user.tgUsername}</div>
-                          )}
-                        </td>
-                        <td className="px-4 py-3.5">
-                          <span
-                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
-                              ROLE_COLORS[user.role] || "bg-cream text-ink border-border"
-                            }`}
-                          >
-                            <ShieldCheck className="w-3 h-3 mr-1" />
-                            {ROLE_LABELS[user.role] || user.role}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3.5 text-xs text-ink-muted font-medium">
-                          {user.enrolledCount > 0 ? `${user.enrolledCount} ta guruh` : "Enrolled yo'q"}
-                        </td>
-                        <td className="px-4 py-3.5 text-xs text-ink-muted whitespace-nowrap">
-                          {new Date(user.createdAt).toLocaleDateString("uz-UZ")}
-                        </td>
-                        <td className="px-4 py-3.5 text-right whitespace-nowrap">
-                          <button
-                            onClick={() => onEdit(user)}
-                            className="inline-flex items-center px-3 py-1.5 rounded-lg bg-cream border border-border hover:border-accent text-xs font-medium text-ink hover:text-accent transition-all gap-1.5"
-                          >
-                            <Edit className="w-3.5 h-3.5" />
-                            Rolni O'zgartirish
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-</>
-); }
-const ROLE_COLORS: Record<UserItem["role"], string> = { superadmin: "bg-purple-100 text-purple-800 border-purple-200", admin: "bg-rose-100 text-rose-800 border-rose-200", manager: "bg-blue-100 text-blue-800 border-blue-200", mentor: "bg-amber-100 text-amber-800 border-amber-200", student: "bg-emerald-100 text-emerald-800 border-emerald-200" };
-const ROLE_LABELS: Record<UserItem["role"], string> = { superadmin: "Super Admin", admin: "Administrator", manager: "Menejer", mentor: "Mentor (Kurator)", student: "Talaba" };
+const ROLE_COLORS: Record<UserItem["role"], string> = { superadmin: "bg-brand-soft text-brand border-brand/20", admin: "bg-accent-soft text-accent border-accent/20", manager: "bg-telegram-soft text-telegram border-telegram/20", mentor: "bg-gold-soft text-gold border-gold/20", student: "bg-success-soft text-success border-success/20" };
+const ROLE_LABELS: Record<UserItem["role"], string> = { superadmin: "Super admin", admin: "Administrator", manager: "Menejer", mentor: "Mentor", student: "Talaba" };
+
+export function UserTable({ users, loading, onEdit }: Props) {
+  if (loading) return <div role="status" className="grid min-h-64 place-items-center rounded-2xl border border-border bg-bg-elevated"><div className="text-center"><Loader2 className="mx-auto h-7 w-7 animate-spin text-brand" /><p className="mt-3 text-sm text-ink-muted">Foydalanuvchilar yuklanmoqda...</p></div></div>;
+  if (!users.length) return <div className="rounded-2xl border border-dashed border-border bg-bg-elevated p-12 text-center"><Users className="mx-auto h-8 w-8 text-ink-subtle" /><p className="mt-3 font-semibold text-ink">Foydalanuvchi topilmadi</p><p className="mt-1 text-sm text-ink-muted">Qidiruv yoki rol filtrini o&apos;zgartiring.</p></div>;
+  return <div className="rounded-2xl border border-border bg-bg-elevated shadow-sm"><div className="space-y-3 p-3 md:hidden">{users.map((user) => <article key={user.id} className="rounded-xl border border-border p-4"><div className="flex items-start justify-between gap-3"><div className="min-w-0"><h3 className="truncate font-semibold text-ink">{user.fullName}</h3><p className="mt-1 text-sm text-ink-muted">{user.email || user.phone}</p></div><span className={`shrink-0 rounded-full border px-2 py-1 text-xs font-medium ${ROLE_COLORS[user.role]}`}>{ROLE_LABELS[user.role]}</span></div><dl className="mt-4 grid grid-cols-2 gap-3 text-sm"><div><dt className="text-xs text-ink-subtle">Guruhlar</dt><dd className="mt-1 text-ink">{user.enrolledCount || 0}</dd></div><div><dt className="text-xs text-ink-subtle">Ro&apos;yxatdan o&apos;tgan</dt><dd className="mt-1 text-ink">{new Date(user.createdAt).toLocaleDateString("uz-UZ")}</dd></div></dl><button type="button" onClick={() => onEdit(user)} className="mt-4 flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-brand-soft text-sm font-semibold text-brand"><Edit className="h-4 w-4" />Rolni boshqarish</button></article>)}</div><div className="hidden overflow-x-auto md:block"><table className="w-full text-left text-sm"><thead className="border-b border-border bg-bg-sunken text-xs uppercase text-ink-muted"><tr><th className="px-4 py-3.5">Foydalanuvchi</th><th className="px-4 py-3.5">Telefon / Telegram</th><th className="px-4 py-3.5">Rol</th><th className="px-4 py-3.5">Guruhlar</th><th className="px-4 py-3.5">Ro&apos;yxatdan o&apos;tgan</th><th className="px-4 py-3.5 text-right">Boshqaruv</th></tr></thead><tbody className="divide-y divide-border">{users.map((user) => <tr key={user.id} className="hover:bg-bg-sunken"><td className="px-4 py-3.5"><div className="flex items-center gap-3"><span className="grid h-9 w-9 place-items-center rounded-full bg-accent-soft text-xs font-semibold text-accent">{user.fullName.slice(0, 1)}</span><div><div className="font-semibold text-ink">{user.fullName}</div>{user.email && <div className="text-xs text-ink-muted">{user.email}</div>}</div></div></td><td className="px-4 py-3.5 font-mono text-xs text-ink">{user.phone}{user.tgUsername && <div className="text-brand">@{user.tgUsername}</div>}</td><td className="px-4 py-3.5"><span className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-medium ${ROLE_COLORS[user.role]}`}><ShieldCheck className="h-3.5 w-3.5" />{ROLE_LABELS[user.role]}</span></td><td className="px-4 py-3.5 text-sm text-ink-muted">{user.enrolledCount || 0}</td><td className="px-4 py-3.5 text-xs text-ink-muted">{new Date(user.createdAt).toLocaleDateString("uz-UZ")}</td><td className="px-4 py-3.5 text-right"><button type="button" onClick={() => onEdit(user)} className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-brand-soft px-3 text-xs font-semibold text-brand"><Edit className="h-3.5 w-3.5" />Rolni boshqarish</button></td></tr>)}</tbody></table></div></div>;
+}

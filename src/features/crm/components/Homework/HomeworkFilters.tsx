@@ -5,7 +5,7 @@ interface Props { status: HomeworkStatus; setStatus: (v: HomeworkStatus) => void
 export function HomeworkFilters({ status, setStatus }: Props) { return (
     <div className="space-y-6">
       {/* Header & Filter tabs */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-cream-warm p-5 rounded-xl border border-border">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-bg-sunken p-5 rounded-xl border border-border">
         <div>
           <h2 className="text-xl font-bold text-ink flex items-center">
             <CheckSquare className="w-6 h-6 mr-2 text-accent" />
@@ -17,12 +17,12 @@ export function HomeworkFilters({ status, setStatus }: Props) { return (
         </div>
 
         {/* Status filter tabs */}
-        <div className="flex items-center bg-cream border border-border p-1 rounded-lg self-start sm:self-auto">
+        <div className="flex items-center bg-bg-elevated border border-border p-1 rounded-lg self-start sm:self-auto">
           <button
             onClick={() => setStatus("submitted")}
             className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
               status === "submitted"
-                ? "bg-accent text-white shadow-sm"
+                ? "bg-accent text-ink shadow-sm"
                 : "text-ink-muted hover:text-ink"
             }`}
           >
@@ -32,7 +32,7 @@ export function HomeworkFilters({ status, setStatus }: Props) { return (
             onClick={() => setStatus("approved")}
             className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
               status === "approved"
-                ? "bg-accent text-white shadow-sm"
+                ? "bg-accent text-ink shadow-sm"
                 : "text-ink-muted hover:text-ink"
             }`}
           >
@@ -42,7 +42,7 @@ export function HomeworkFilters({ status, setStatus }: Props) { return (
             onClick={() => setStatus("rejected")}
             className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
               status === "rejected"
-                ? "bg-accent text-white shadow-sm"
+                ? "bg-accent text-ink shadow-sm"
                 : "text-ink-muted hover:text-ink"
             }`}
           >
@@ -52,7 +52,7 @@ export function HomeworkFilters({ status, setStatus }: Props) { return (
             onClick={() => setStatus("all")}
             className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
               status === "all"
-                ? "bg-accent text-white shadow-sm"
+                ? "bg-accent text-ink shadow-sm"
                 : "text-ink-muted hover:text-ink"
             }`}
           >

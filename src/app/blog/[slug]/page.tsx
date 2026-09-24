@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { extractTocFromMarkdown, STATIC_BLOG_POSTS } from "@/features/blog/blogData";
 import { ArticleBreadcrumb, ArticleHeader } from "@/features/blog/ArticleHeader";
@@ -6,6 +7,7 @@ import { ArticleMain } from "@/features/blog/ArticleMain";
 import { BlogSidebar } from "@/features/blog/BlogSidebar";
 import { RelatedPosts } from "@/features/blog/RelatedPosts";
 import { ShareProvider } from "@/features/blog/ShareActions";
+import { NextStepCTA } from "@/components/ui/NextStepCTA";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -61,19 +63,20 @@ export default async function BlogPostDetailPage({ params }: Props) {
 
   return (
     <ShareProvider>
-    <div className="pt-28 pb-20 min-h-screen bg-cream">
+    <div className="pt-28 pb-20 min-h-screen bg-bg text-ink">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       <div className="mx-auto w-full max-w-[1360px] px-5 md:px-8 lg:px-10 space-y-8">
         <ArticleBreadcrumb title={post.title} />
         <ArticleHeader post={post} />
         <div className="w-full h-64 md:h-[420px] rounded-2xl overflow-hidden border border-border-strong relative shadow-md">
-          <img src={post.coverUrl} alt={post.title} className="w-full h-full object-cover" />
+          <Image src={post.coverUrl} alt={post.title} fill sizes="(max-width: 768px) 100vw, 1200px" className="object-cover" priority />
         </div>
         <div className="grid lg:grid-cols-12 gap-10 items-start pt-6">
           <ArticleMain post={post} />
           <BlogSidebar toc={toc} />
         </div>
         <RelatedPosts posts={relatedPosts} />
+        <NextStepCTA />
       </div>
     </div>
     </ShareProvider>

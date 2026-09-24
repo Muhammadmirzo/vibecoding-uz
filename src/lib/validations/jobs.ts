@@ -19,8 +19,8 @@ export const jobOpeningSchema = z.object({
 });
 
 export const applyJobSchema = z.object({
-  jobId: z.string().optional(),
-  jobSlug: z.string().optional(),
+  jobId: z.string().uuid("Vakansiya ID si noto'g'ri").optional(),
+  jobSlug: z.string().min(1).optional(),
   jobTitle: z.string().min(1, "Vakansiya tanlanishi lozim"),
   fullName: z.string().min(2, "F.I.SH. kamida 2 ta belgidan iborat bo'lishi kerak"),
   phone: z.string().regex(uzbekPhoneRegex, {
@@ -29,8 +29,12 @@ export const applyJobSchema = z.object({
   telegramUsername: z.string().optional().or(z.literal("")),
   resumeUrl: z.string().url("Noto'g'ri portfolio/rezyume havolasi formati").optional().or(z.literal("")),
   portfolioUrl: z.string().url("Noto'g'ri GitHub/portfolio havolasi").optional().or(z.literal("")),
-  experience: z.string().optional(),
-  coverLetter: z.string().optional(),
+  experience: z.string().max(2000).optional(),
+  coverLetter: z.string().max(2000).optional(),
+}).superRefine((value, context) => {
+  if (!value.jobId && !value.jobSlug) {
+    context.addIssue({ code: z.ZodIssueCode.custom, path: ["jobId"], message: "Vakansiya tanlanishi lozim" });
+  }
 });
 
 export type JobOpening = z.infer<typeof jobOpeningSchema>;

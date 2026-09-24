@@ -50,7 +50,7 @@ export function VideoPlayer({
 
   if (type === "empty") {
     return (
-      <div className={`relative aspect-video rounded-xl bg-ink text-white flex flex-col items-center justify-center p-6 border border-border shadow-lg ${className}`}>
+      <div className={`relative aspect-video rounded-xl bg-ink text-bg flex flex-col items-center justify-center p-6 border border-border shadow-lg ${className}`}>
         <Video className="w-12 h-12 text-ink-muted mb-3" />
         <p className="text-sm font-medium text-ink-muted">Dars videosi mavjud emas yoki havola berilmadi</p>
       </div>
@@ -60,12 +60,12 @@ export function VideoPlayer({
   if (type === "youtube") {
     return (
       <div className={`relative aspect-video rounded-xl bg-ink overflow-hidden border border-border shadow-lg group ${className}`}>
-        <div className="absolute top-3 right-3 z-10 bg-cream/90 backdrop-blur-md px-2.5 py-1 rounded-md text-[11px] font-mono font-semibold text-ink border border-border flex items-center gap-1.5 shadow-sm">
+        <div className="absolute top-3 right-3 z-10 bg-bg-elevated/90 backdrop-blur-md px-2.5 py-1 rounded-md text-[11px] font-mono font-semibold text-ink border border-border flex items-center gap-1.5 shadow-sm">
           <Youtube className="w-3.5 h-3.5 text-accent" />
           <span>YouTube Player</span>
         </div>
         {title && (
-          <div className="absolute top-3 left-3 z-10 bg-cream/90 backdrop-blur-md px-3 py-1 rounded-md text-xs font-semibold text-ink border border-border max-w-[70%] truncate shadow-sm">
+          <div className="absolute top-3 left-3 z-10 bg-bg-elevated/90 backdrop-blur-md px-3 py-1 rounded-md text-xs font-semibold text-ink border border-border max-w-[70%] truncate shadow-sm">
             {title}
           </div>
         )}
@@ -85,12 +85,12 @@ export function VideoPlayer({
       ref={controller.containerRef}
       className={`relative aspect-video rounded-xl bg-ink overflow-hidden border border-border shadow-lg group select-none ${className}`}
     >
-      <div className="absolute top-3 right-3 z-20 bg-cream/90 backdrop-blur-md px-2.5 py-1 rounded-md text-[11px] font-mono font-semibold text-ink border border-border flex items-center gap-1.5 shadow-sm">
+      <div className="absolute top-3 right-3 z-20 bg-bg-elevated/90 backdrop-blur-md px-2.5 py-1 rounded-md text-[11px] font-mono font-semibold text-ink border border-border flex items-center gap-1.5 shadow-sm">
         <Video className="w-3.5 h-3.5 text-accent" />
         <span>Direct MP4 Stream</span>
       </div>
       {title && (
-        <div className="absolute top-3 left-3 z-20 bg-cream/90 backdrop-blur-md px-3 py-1 rounded-md text-xs font-semibold text-ink border border-border max-w-[70%] truncate shadow-sm">
+        <div className="absolute top-3 left-3 z-20 bg-bg-elevated/90 backdrop-blur-md px-3 py-1 rounded-md text-xs font-semibold text-ink border border-border max-w-[70%] truncate shadow-sm">
           {title}
         </div>
       )}
@@ -111,7 +111,7 @@ export function VideoPlayer({
       />
       {!controller.isPlaying && (
         <div onClick={controller.togglePlay} className="absolute inset-0 z-10 flex items-center justify-center bg-ink/40 backdrop-blur-[2px] cursor-pointer transition-opacity">
-          <div className="w-16 h-16 rounded-full bg-accent text-white flex items-center justify-center shadow-lg transform transition-transform hover:scale-110">
+          <div className="w-16 h-16 rounded-full bg-accent text-bg flex items-center justify-center shadow-lg transform transition-transform hover:scale-110">
             <Play className="w-8 h-8 ml-1 fill-current" />
           </div>
         </div>

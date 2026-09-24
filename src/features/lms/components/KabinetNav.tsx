@@ -1,102 +1,130 @@
 "use client";
 
+import { useState } from "react";
+import * as Dialog from "@radix-ui/react-dialog";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard,
-  BookOpen,
   Award,
+  BookOpen,
   CreditCard,
-  Share2,
+  Gift,
+  LayoutDashboard,
+  Menu,
   Settings,
-  Briefcase,
+  X,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+
+type NavItem = {
+  href: string;
+  label: string;
+  shortLabel: string;
+  icon: LucideIcon;
+  exact?: boolean;
+};
+
+const primaryItems: NavItem[] = [
+  { href: "/kabinet", label: "Bosh sahifa", shortLabel: "Bosh sahifa", icon: LayoutDashboard, exact: true },
+  { href: "/kabinet/kurs/vibe-coding-express", label: "Kurs va darslar", shortLabel: "Kurs", icon: BookOpen },
+  { href: "/kabinet/baholar", label: "Baholar", shortLabel: "Baholar", icon: Award, exact: true },
+  { href: "/kabinet/to-lovlar", label: "To'lovlar", shortLabel: "To'lovlar", icon: CreditCard, exact: true },
+];
+
+const utilityItems: NavItem[] = [
+  { href: "/kabinet/referral", label: "Taklif dasturi", shortLabel: "Bonus", icon: Gift, exact: true },
+  { href: "/kabinet/sozlamalar", label: "Sozlamalar", shortLabel: "Sozlamalar", icon: Settings, exact: true },
+];
+
+function isItemActive(pathname: string, item: NavItem): boolean {
+  return item.exact ? pathname === item.href : pathname.startsWith(item.href);
+}
+
+function NavigationLink({ item, active, compact = false, onNavigate }: { item: NavItem; active: boolean; compact?: boolean; onNavigate?: () => void }) {
+  const Icon = item.icon;
+  return (
+    <Link
+      href={item.href}
+      onClick={onNavigate}
+      aria-current={active ? "page" : undefined}
+      className={`group flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-semibold transition-colors ${
+        active
+          ? "bg-brand-soft text-brand"
+          : "text-ink-muted hover:bg-bg-sunken hover:text-ink"
+      }`}
+    >
+      <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
+      <span className={compact ? "sr-only" : undefined}>{item.label}</span>
+    </Link>
+  );
+}
+
+function SidebarContent({ pathname, onNavigate }: { pathname: string; onNavigate?: () => void }) {
+  return (
+    <div className="flex h-full flex-col">
+      <Link href="/kabinet" onClick={onNavigate} className="mb-8 flex min-h-11 items-center gap-3 px-3">
+        <span className="grid h-10 w-10 place-items-center rounded-lg bg-ink font-display text-sm font-bold text-bg-elevated">VC</span>
+        <span><span className="block font-display text-base font-semibold text-ink">Kabinet</span><span className="block text-xs text-ink-muted">O&apos;quvchi zonasi</span></span>
+      </Link>
+      <nav aria-label="Kabinet navigatsiyasi" className="space-y-1">
+        {primaryItems.map((item) => <NavigationLink key={item.href} item={item} active={isItemActive(pathname, item)} onNavigate={onNavigate} />)}
+      </nav>
+      <div className="my-5 border-t border-border" />
+      <nav aria-label="Kabinet xizmatlari" className="space-y-1">
+        {utilityItems.map((item) => <NavigationLink key={item.href} item={item} active={isItemActive(pathname, item)} onNavigate={onNavigate} />)}
+      </nav>
+      <p className="mt-auto px-3 text-xs leading-relaxed text-ink-subtle">Faol ma&apos;lumot tizimda ko&apos;rsatiladi.</p>
+    </div>
+  );
+}
 
 export function KabinetNav() {
   const pathname = usePathname();
-
-  const navItems = [
-    {
-      href: "/kabinet",
-      label: "Bosh sahifa",
-      icon: LayoutDashboard,
-      exact: true,
-    },
-    {
-      href: "/kabinet/kurs/vibe-coding-express",
-      label: "Darslar & Modullar",
-      icon: BookOpen,
-      exact: false,
-    },
-    {
-      href: "/kabinet/baholar",
-      label: "Baholar & Reyting",
-      icon: Award,
-      exact: true,
-    },
-    {
-      href: "/kabinet/to-lovlar",
-      label: "To'lovlar & Cheklar",
-      icon: CreditCard,
-      exact: true,
-    },
-    {
-      href: "/kabinet/sertifikat",
-      label: "Sertifikat",
-      icon: Award,
-      exact: true,
-    },
-    {
-      href: "/kabinet/referral",
-      label: "Referral & Bonus",
-      icon: Share2,
-      exact: true,
-    },
-    {
-      href: "/portfolio",
-      label: "Portfoliolar",
-      icon: Briefcase,
-      exact: true,
-    },
-    {
-      href: "/kabinet/sozlamalar",
-      label: "Sozlamalar",
-      icon: Settings,
-      exact: true,
-    },
-  ];
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const mobileItems = [primaryItems[0], primaryItems[1], primaryItems[3], utilityItems[1]];
 
   return (
-    <div className="w-full bg-cream-warm border-b border-border mb-8 sticky top-16 md:top-[72px] z-30 shadow-sm backdrop-blur-sm">
-      <div className="mx-auto w-full max-w-[1360px] px-5 md:px-8 lg:px-10">
-        <div className="flex items-center justify-start py-2 overflow-x-auto scrollbar-none w-full">
-          <nav className="flex items-center gap-1.5 md:gap-2 w-max shrink-0">
-            {navItems.map((item) => {
-              const isActive = item.exact
-                ? pathname === item.href
-                : pathname.startsWith(item.href);
+    <>
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-72 border-r border-border bg-bg-elevated px-5 py-6 lg:block">
+        <SidebarContent pathname={pathname} />
+      </aside>
 
-              const Icon = item.icon;
-
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs md:text-sm font-semibold whitespace-nowrap transition-all ${
-                    isActive
-                      ? "bg-accent text-white shadow-sm"
-                      : "text-ink-muted hover:text-ink hover:bg-cream-deep"
-                  }`}
-                >
-                  <Icon className="w-4 h-4 shrink-0" />
-                  <span>{item.label}</span>
-                </Link>
-              );
-            })}
-          </nav>
-
-        </div>
+      <div className="fixed inset-x-0 top-0 z-40 flex h-16 items-center justify-between border-b border-border bg-bg-elevated/95 px-4 backdrop-blur md:h-[72px] md:px-6 lg:hidden">
+        <Dialog.Root open={drawerOpen} onOpenChange={setDrawerOpen}>
+          <Dialog.Trigger asChild>
+            <button type="button" className="grid h-11 w-11 place-items-center rounded-lg text-ink-muted hover:bg-bg-sunken hover:text-ink" aria-label="Kabinet menyusini ochish">
+              <Menu className="h-5 w-5" aria-hidden="true" />
+            </button>
+          </Dialog.Trigger>
+          <Dialog.Portal>
+            <Dialog.Overlay className="fixed inset-0 z-50 bg-ink/60 backdrop-blur-sm" />
+            <Dialog.Content className="fixed inset-y-0 left-0 z-50 w-[min(86vw,320px)] border-r border-border bg-bg-elevated p-5 shadow-2xl">
+              <Dialog.Title className="sr-only">Kabinet menyusini ochish</Dialog.Title>
+              <Dialog.Close className="absolute right-3 top-3 grid h-11 w-11 place-items-center rounded-lg text-ink-muted hover:bg-bg-sunken" aria-label="Menyuni yopish">
+                <X className="h-5 w-5" aria-hidden="true" />
+              </Dialog.Close>
+              <SidebarContent pathname={pathname} onNavigate={() => setDrawerOpen(false)} />
+            </Dialog.Content>
+          </Dialog.Portal>
+        </Dialog.Root>
+        <Link href="/kabinet" className="flex min-h-11 items-center gap-2 font-display text-base font-semibold text-ink">
+          <span className="grid h-8 w-8 place-items-center rounded-md bg-ink text-xs text-bg-elevated">VC</span>Kabinet
+        </Link>
+        <span className="w-11" aria-hidden="true" />
       </div>
-    </div>
+
+      <nav aria-label="Mobil navigatsiya" className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 border-t border-border bg-bg-elevated/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden">
+        {mobileItems.map((item) => {
+          const active = isItemActive(pathname, item);
+          const Icon = item.icon;
+          return (
+            <Link key={item.href} href={item.href} aria-current={active ? "page" : undefined} className={`flex min-h-[60px] flex-col items-center justify-center gap-1 px-1 text-[11px] font-semibold ${active ? "text-brand" : "text-ink-muted"}`}>
+              <Icon className="h-5 w-5" aria-hidden="true" />
+              <span>{item.shortLabel}</span>
+            </Link>
+          );
+        })}
+      </nav>
+    </>
   );
 }

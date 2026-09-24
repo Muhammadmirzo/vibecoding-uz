@@ -3,13 +3,21 @@ import { Award, Clock, Eye, Loader2, Send } from "lucide-react";
 import { formatLastActive, statusBadgeStyle, statusLabel } from "./useActivity";
 import type { StudentActivityItem } from "./types";
 interface Props { students: StudentActivityItem[]; loading: boolean; onSelect: (s: StudentActivityItem) => void; onReminder: (s: StudentActivityItem) => void; }
+
+function MobileActivityCards({ students, loading, onSelect, onReminder }: Pick<Props, "students" | "loading" | "onSelect" | "onReminder">) {
+  if (loading) return <div role="status" className="grid min-h-48 place-items-center rounded-2xl border border-border bg-bg-elevated md:hidden"><div className="text-center"><Loader2 className="mx-auto h-6 w-6 animate-spin text-brand" /><p className="mt-2 text-sm text-ink-muted">Ma&apos;lumotlar yuklanmoqda...</p></div></div>;
+  if (!students.length) return <div className="rounded-2xl border border-dashed border-border bg-bg-elevated p-10 text-center text-sm text-ink-muted md:hidden">Talabalar topilmadi. Qidiruv shartlarini tekshiring.</div>;
+  return <div className="space-y-3 md:hidden">{students.map((student) => <article key={student.id} className="rounded-xl border border-border bg-bg-elevated p-4"><div className="flex items-start justify-between gap-3"><div className="flex min-w-0 items-center gap-3"><span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent-soft font-semibold text-accent">{student.fullName.charAt(0)}</span><div className="min-w-0"><h3 className="truncate font-semibold text-ink">{student.fullName}</h3><p className="truncate text-xs text-ink-muted">{student.phone}</p></div></div><span className={`rounded-md border px-2 py-1 text-[11px] ${statusBadgeStyle(student.status)}`}>{statusLabel(student.status)}</span></div><dl className="mt-4 grid grid-cols-2 gap-3 text-sm"><div><dt className="text-xs text-ink-subtle">Guruh</dt><dd className="mt-1 truncate text-ink">{student.cohortName}</dd></div><div><dt className="text-xs text-ink-subtle">Dars</dt><dd className="mt-1 font-semibold text-ink">{student.lessonProgressPercent}%</dd></div><div><dt className="text-xs text-ink-subtle">Topshiriq</dt><dd className="mt-1 text-ink">{student.homeworkStats.approved}/{student.homeworkStats.total} o&apos;tdi</dd></div><div><dt className="text-xs text-ink-subtle">Quiz</dt><dd className="mt-1 text-ink">{student.quizScores.avgQuizScorePercent}%</dd></div></dl><div className="mt-4 flex gap-2 border-t border-border pt-3"><button type="button" onClick={() => onSelect(student)} className="min-h-11 flex-1 rounded-lg bg-bg-sunken px-3 text-sm font-medium text-ink">Batafsil</button><button type="button" onClick={() => onReminder(student)} className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-lg bg-telegram-soft px-3 text-sm font-medium text-telegram"><Send className="h-4 w-4" />Eslatma</button></div></article>)}</div>;
+}
+
 export function ActivityTable({ students, loading, onSelect, onReminder }: Props) { return (<>
+      <MobileActivityCards students={students} loading={loading} onSelect={onSelect} onReminder={onReminder} />
       {/* Main Student Activity Table */}
-      <div className="bg-cream-warm border border-border rounded-xl overflow-hidden shadow-sm">
+      <div className="hidden overflow-hidden rounded-xl border border-border bg-bg-sunken shadow-sm md:block">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-border bg-cream-deep/60 text-[11px] font-mono font-semibold text-ink-muted uppercase tracking-wider">
+              <tr className="border-b border-border bg-bg-sunken/60 text-[11px] font-mono font-semibold text-ink-muted uppercase tracking-wider">
                 <th className="py-3 px-4">Talaba</th>
                 <th className="py-3 px-4">Guruh</th>
                 <th className="py-3 px-4">Dars Progressi</th>
@@ -38,11 +46,11 @@ export function ActivityTable({ students, loading, onSelect, onReminder }: Props
                 </tr>
               ) : (
                 students.map((student) => (
-                  <tr key={student.id} className="hover:bg-cream/60 transition-colors">
+                  <tr key={student.id} className="hover:bg-bg-elevated/60 transition-colors">
                     {/* Student Info */}
                     <td className="py-3.5 px-4 font-medium">
                       <div className="flex items-center space-x-3">
-                        <div className="w-8 h-8 rounded-full bg-accent-soft text-accent border border-accent-line font-bold flex items-center justify-center text-xs">
+                        <div className="w-8 h-8 rounded-full bg-accent-soft text-accent border border-border font-bold flex items-center justify-center text-xs">
                           {student.fullName.charAt(0)}
                         </div>
                         <div>
@@ -68,7 +76,7 @@ export function ActivityTable({ students, loading, onSelect, onReminder }: Props
                             {student.completedLessonsCount}/{student.totalLessonsCount} dars
                           </span>
                         </div>
-                        <div className="w-full h-2 rounded-full bg-cream-deep overflow-hidden border border-border/50">
+                        <div className="w-full h-2 rounded-full bg-bg-sunken overflow-hidden border border-border/50">
                           <div
                             className="h-full bg-accent rounded-full transition-all duration-500"
                             style={{ width: `${student.lessonProgressPercent}%` }}
@@ -92,9 +100,9 @@ export function ActivityTable({ students, loading, onSelect, onReminder }: Props
                           {student.homeworkStats.submitted}/{student.homeworkStats.total} topshirilgan
                         </div>
                         <div className="text-[10px] font-mono text-ink-muted flex items-center gap-1">
-                          <span className="text-emerald-700">{student.homeworkStats.approved} o&apos;tdi</span>
+                          <span className="text-success">{student.homeworkStats.approved} o&apos;tdi</span>
                           {student.homeworkStats.pending > 0 && (
-                            <span className="text-amber-700">· {student.homeworkStats.pending} kutilmoqda</span>
+                            <span className="text-gold">· {student.homeworkStats.pending} kutilmoqda</span>
                           )}
                         </div>
                       </div>
@@ -127,14 +135,14 @@ export function ActivityTable({ students, loading, onSelect, onReminder }: Props
                       <div className="flex items-center justify-end space-x-2">
                         <button
                           onClick={() => onSelect(student)}
-                          className="p-1.5 rounded-md hover:bg-cream border border-border text-ink-muted hover:text-ink transition-colors"
+                          className="p-1.5 rounded-md hover:bg-bg-elevated border border-border text-ink-muted hover:text-ink transition-colors"
                           title="Batafsil monitoring"
                         >
                           <Eye className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => onReminder(student)}
-                          className="p-1.5 rounded-md hover:bg-accent-soft border border-accent-line text-accent transition-colors"
+                          className="p-1.5 rounded-md hover:bg-accent-soft border border-border text-accent transition-colors"
                           title="Telegram eslatmasini yuborish"
                         >
                           <Send className="w-4 h-4" />

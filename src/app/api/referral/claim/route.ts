@@ -1,14 +1,10 @@
 import { NextResponse } from "next/server";
-import { db } from "@/db";
-import { auditLogs } from "@/db/schema";
 import { requireAuth } from "@/lib/auth/require-auth";
 import { referralClaimBonusSchema } from "@/lib/validations";
-import {
-  checkRateLimit,
-  getClientIp,
-  createRateLimitResponse,
-  PRESETS,
-} from "@/lib/security/rateLimit";
+import { checkRateLimit, getClientIp, createRateLimitResponse, PRESETS } from "@/lib/security/rateLimit";
+import { drizzleReferralsRepository } from "@/features/referrals/server/referrals.repository";
+import { PayoutError, payoutRequestSchema, requestPayout } from "@/features/referrals/server/payout.service";
+import { TIYIN_PER_SUM } from "@/features/payments/domain/money";
 
 export async function POST(request: Request) {
   try {
@@ -18,46 +14,57 @@ export async function POST(request: Request) {
 
     const authResult = await requireAuth(request);
     if (!authResult.ok) return authResult.response;
-    const authSession = authResult.session;
 
-    const body = await request.json();
-    const parseResult = referralClaimBonusSchema.safeParse(body);
-
-    if (!parseResult.success) {
+    const legacy = referralClaimBonusSchema.safeParse(await request.json().catch(() => null));
+    if (!legacy.success) {
       return NextResponse.json(
-        {
-          error: "Ma'lumotlar noto'g'ri kiritildi",
-          details: parseResult.error.flatten(),
-        },
-        { status: 400 }
+        { error: "Ma'lumotlar noto'g'ri kiritildi", details: legacy.error.flatten() },
+        { status: 400 },
       );
     }
 
-    const data = parseResult.data;
+    // Legacy clients send amountSum (sum); the service works in tiyin and
+    // re-checks the amount against the server-computed balance.
+    const parsed = payoutRequestSchema.safeParse({
+      payoutMethod: legacy.data.payoutMethod,
+      cardNumber: legacy.data.cardNumber,
+      cardHolder: legacy.data.cardHolder,
+      amountTiyin: Math.round(legacy.data.amountSum * TIYIN_PER_SUM),
+    });
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Ma'lumotlar noto'g'ri kiritildi" }, { status: 400 });
+    }
 
-    // Log referral bonus withdrawal request
-    await db.insert(auditLogs).values({
-      userId: authSession.userId,
+    const outcome = await requestPayout(drizzleReferralsRepository, {
+      ...parsed.data,
+      userId: authResult.session.userId,
+    });
+
+    await drizzleReferralsRepository.recordAudit({
+      userId: authResult.session.userId,
       action: "referral.claim_bonus",
       entityType: "referral_payout",
+      entityId: outcome.payoutId,
       details: {
-        payoutMethod: data.payoutMethod,
-        cardNumber: data.cardNumber ? data.cardNumber.slice(0, 4) + " **** **** " + data.cardNumber.slice(-4) : null,
-        amountSum: data.amountSum,
-        requestedAt: new Date().toISOString(),
+        payoutMethod: parsed.data.payoutMethod,
+        cardLast4: parsed.data.cardNumber ? parsed.data.cardNumber.slice(-4) : null,
+        amountTiyin: outcome.amountTiyin,
       },
-      ipAddress: request.headers.get("x-forwarded-for") || "127.0.0.1",
+      ip: request.headers.get("x-forwarded-for") || "127.0.0.1",
     });
 
     return NextResponse.json({
       success: true,
-      message: `${data.amountSum.toLocaleString("uz-UZ")} UZS miqdoridagi referral bonusi bo'yicha so'rovingiz qabul qilindi. 24 soat ichida hisobingizga o'tkaziladi.`,
+      payoutId: outcome.payoutId,
+      status: outcome.status,
+      balanceTiyin: outcome.balanceTiyin,
+      message: "So'rovingiz qabul qilindi. 24 soat ichida hisobingizga o'tkaziladi.",
     });
   } catch (error) {
+    if (error instanceof PayoutError) {
+      return NextResponse.json({ error: error.message }, { status: 422 });
+    }
     console.error("POST /api/referral/claim error:", error);
-    return NextResponse.json(
-      { error: "So'rovni yuborishda xatolik yuz berdi" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "So'rovni yuborishda xatolik yuz berdi" }, { status: 500 });
   }
 }
