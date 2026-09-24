@@ -12,8 +12,22 @@
     {
       "idx": 1,
       "version": "7",
+      "when": 1790199552000,
+      "tag": "0001_daily_tarot",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
       "when": 1790222135236,
-      "tag": "0001_next_shooting_star",
+      "tag": "0002_next_shooting_star",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1790223131106,
+      "tag": "0003_payment_status_cancelled",
       "breakpoints": true
     }
   ]

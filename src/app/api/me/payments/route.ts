@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
-import { desc, eq } from "drizzle-orm";
 import { z } from "zod";
-import { db } from "@/db";
-import { payments } from "@/db/schema";
+import { listUserPayments } from "@/features/payments/server/payments.repository";
 import { getDbSession } from "@/lib/auth/require-auth";
+import { errorResponse } from "@/lib/http/errors";
 
 const paymentResponseSchema = z.object({
   id: z.string().uuid(),
@@ -35,21 +34,7 @@ export async function GET() {
       );
     }
 
-    const rows = await db
-      .select({
-        id: payments.id,
-        provider: payments.provider,
-        providerTxnId: payments.providerTxnId,
-        amountSum: payments.amountSum,
-        status: payments.status,
-        paidAt: payments.paidAt,
-        receiptUrl: payments.receiptUrl,
-        createdAt: payments.createdAt,
-        enrollmentId: payments.enrollmentId,
-      })
-      .from(payments)
-      .where(eq(payments.userId, authSession.userId))
-      .orderBy(desc(payments.createdAt));
+    const rows = await listUserPayments(authSession.userId);
 
     const result = paymentsResponseSchema.parse({
       payments: rows.map((row) => ({
@@ -68,10 +53,6 @@ export async function GET() {
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error("GET /api/me/payments error:", error);
-    return NextResponse.json(
-      { error: "To'lovlarni yuklashda xatolik yuz berdi" },
-      { status: 500 }
-    );
+    return errorResponse(error);
   }
 }

@@ -1,105 +1,32 @@
-import { NextResponse } from "next/server";
-import { z } from "zod";
-import { db } from "@/db";
-import { homeworkSubmissions, homeworkReviews } from "@/db/schema";
-import { eq } from "drizzle-orm";
-import { gradeHomeworkSchema } from "@/lib/validations";
 import { requireMentor } from "@/lib/auth/require-auth";
+import { errorResponse, okResponse } from "@/lib/http/errors";
+import { adminIdParamSchema } from "@/lib/validations";
+import { reviewHomeworkBodySchema } from "@/features/crm/domain/homework-policy";
+import { drizzleHomeworkRepository } from "@/features/crm/server/homework.repository";
+import { reviewSubmission } from "@/features/crm/server/homework.service";
 
-const paramsSchema = z.object({ id: z.string().uuid() });
+const repo = drizzleHomeworkRepository;
 
-export async function POST(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     // Authoritative gate: mentor/admin session only. body.mentorId is ignored.
     const auth = await requireMentor(request);
     if (!auth.ok) return auth.response;
-    const mentorId = auth.session.userId;
-
-    const parsedParams = paramsSchema.safeParse(await params);
-    if (!parsedParams.success) {
-      return NextResponse.json({ error: "Topshiriq IDsi noto'g'ri" }, { status: 400 });
-    }
-    const { id } = parsedParams.data;
-    const body = await request.json();
-
-    const parseResult = gradeHomeworkSchema.safeParse({
-      ...body,
+    const { id } = adminIdParamSchema.parse(await params);
+    const body = reviewHomeworkBodySchema.parse(await request.json());
+    const ip = request.headers.get("x-forwarded-for") || "127.0.0.1";
+    const { submission, review } = await reviewSubmission(repo, {
       submissionId: id,
+      reviewerId: auth.session.userId,
+      reviewerRole: auth.session.role,
+      criteriaResults: body.criteriaResults,
+      score: body.score,
+      feedbackMd: body.feedbackMd,
+      status: body.status,
+      ip,
     });
-
-    if (!parseResult.success) {
-      return NextResponse.json(
-        {
-          error: "Ma'lumotlar noto'g'ri kiritildi",
-          details: parseResult.error.flatten(),
-        },
-        { status: 400 }
-      );
-    }
-
-    const data = parseResult.data;
-
-    // 1. Update homework_submissions status
-    const [updatedSubmission] = await db
-      .update(homeworkSubmissions)
-      .set({
-        status: data.status,
-      })
-      .where(eq(homeworkSubmissions.id, id))
-      .returning();
-
-    if (!updatedSubmission) {
-      return NextResponse.json(
-        { error: "Topshiriq topilmadi" },
-        { status: 404 }
-      );
-    }
-
-    // 2. Upsert homework_reviews record
-    const existingReviews = await db
-      .select()
-      .from(homeworkReviews)
-      .where(eq(homeworkReviews.submissionId, id));
-
-    let reviewResult;
-    if (existingReviews.length > 0) {
-      [reviewResult] = await db
-        .update(homeworkReviews)
-        .set({
-          mentorId,
-          criteriaResults: data.criteriaResults,
-          score: data.score.toFixed(2),
-          feedbackMd: data.feedbackMd || "",
-          reviewedAt: new Date(),
-        })
-        .where(eq(homeworkReviews.submissionId, id))
-        .returning();
-    } else {
-      [reviewResult] = await db
-        .insert(homeworkReviews)
-        .values({
-          submissionId: id,
-          mentorId,
-          criteriaResults: data.criteriaResults,
-          score: data.score.toFixed(2),
-          feedbackMd: data.feedbackMd || "",
-        })
-        .returning();
-    }
-
-    return NextResponse.json({
-      success: true,
-      submission: updatedSubmission,
-      review: reviewResult,
-    });
+    return okResponse({ success: true, submission, review });
   } catch (error) {
-    console.error("POST /api/admin/homework/[id]/review error:", error);
-    return NextResponse.json(
-      { error: "Topshiriqni baholashda xatolik yuz berdi" },
-      { status: 500 }
-    );
+    return errorResponse(error);
   }
 }

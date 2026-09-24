@@ -121,3 +121,32 @@ export type CriterionResult = z.infer<typeof criterionResultSchema>;
 export type GradeHomeworkInput = z.infer<typeof gradeHomeworkSchema>;
 export type AnalyticsQueryInput = z.infer<typeof analyticsQuerySchema>;
 export type StudentActivityFilterInput = z.infer<typeof studentActivityFilterSchema>;
+
+// --- Admin list query schemas (W4-ARCH-C: every admin route query is Zod-validated) ---
+
+const pageSchema = z.coerce.number().int().positive().default(1);
+const limitSchema = z.coerce.number().int().positive().max(200).default(100);
+
+export const leadsAdminQuerySchema = z.object({
+  status: z.string().default("all"),
+  q: z.string().optional(),
+  page: pageSchema,
+  limit: limitSchema,
+});
+
+export const homeworkAdminQuerySchema = z.object({
+  status: z.string().default("all"),
+  page: pageSchema,
+  limit: limitSchema,
+});
+
+export const usersAdminQuerySchema = z.object({
+  search: z.string().optional(),
+  role: z.string().default("all"),
+  page: pageSchema,
+  limit: limitSchema,
+});
+
+export type LeadsAdminQuery = z.infer<typeof leadsAdminQuerySchema>;
+export type HomeworkAdminQuery = z.infer<typeof homeworkAdminQuerySchema>;
+export type UsersAdminQuery = z.infer<typeof usersAdminQuerySchema>;

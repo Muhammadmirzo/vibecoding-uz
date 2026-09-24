@@ -7,7 +7,7 @@ import {
   performTransaction,
 } from "@/features/payments/server/payme.service";
 import { handleClickWebhook } from "@/features/payments/server/click.service";
-import type { DbExecutor, PaymentRecord, PaymentsRepository } from "@/features/payments/server/payments.repository";
+import type { DbExecutor, CreatePaymentInput, PaymentRecord, PaymentsRepository } from "@/features/payments/server/payments.repository";
 import type { ClickWebhookInput } from "@/lib/validations/payment";
 
 vi.mock("@/db", () => ({
@@ -35,6 +35,38 @@ function fakeRepo(state: FakeState): PaymentsRepository {
     const p = state.payments.get(id);
     return Promise.resolve(p && p.provider === provider ? { ...p } : null);
   };
+  const findPending = (enrollmentId: string, provider: PaymentRecord["provider"]) => {
+    for (const p of state.payments.values()) {
+      if (p.enrollmentId === enrollmentId && p.provider === provider && p.status === "pending") return Promise.resolve({ ...p });
+    }
+    return Promise.resolve(null);
+  };
+  const insertPayment = (input: CreatePaymentInput) => {
+    const row = payment({ id: `pay-${state.payments.size + 1}`, ...input, status: "pending", paidAt: null, providerTxnId: null });
+    state.payments.set(row.id, row);
+    return Promise.resolve({ ...row });
+  };
+  const lookupEnrollment = (userId: string, enrollmentId: string) => {
+    const e = state.enrollments.get(enrollmentId);
+    if (!e || e.userId !== userId) return Promise.resolve(null);
+    return Promise.resolve({ enrollmentId, userId, enrollmentStatus: e.status, enrolledAt: e.enrolledAt, cohortId: e.cohortId, ...COHORT });
+  };
+  const lookupActiveEnrollment = (userId: string, cohortId: string) => {
+    for (const [id, e] of state.enrollments) {
+      if (e.userId === userId && e.cohortId === cohortId) {
+        return Promise.resolve({ enrollmentId: id, userId, enrollmentStatus: e.status, enrolledAt: e.enrolledAt, cohortId, ...COHORT });
+      }
+    }
+    return Promise.resolve(null);
+  };
+  const lookupCohort = (cohortId: string) => Promise.resolve(cohortId === "cohort-1"
+    ? { enrollmentId: "", userId: "", enrollmentStatus: "active", enrolledAt: NOW, cohortId, ...COHORT }
+    : null);
+  const insertEnrollment = (userId: string, cohortId: string) => {
+    const id = `enr-${state.enrollments.size + 1}`;
+    state.enrollments.set(id, { status: "active", userId, cohortId, enrolledAt: NOW });
+    return Promise.resolve({ id });
+  };
   return {
     findPaymentById: find,
     findPaymentByIdTx: (_ex: DbExecutor, id: string, provider: PaymentRecord["provider"]) => find(id, provider),
@@ -50,43 +82,23 @@ function fakeRepo(state: FakeState): PaymentsRepository {
       }
       return null;
     },
-    findPendingByEnrollment: async (enrollmentId, provider) => {
-      for (const p of state.payments.values()) {
-        if (p.enrollmentId === enrollmentId && p.provider === provider && p.status === "pending") return { ...p };
-      }
-      return null;
-    },
-    createPayment: async (input) => {
-      const row = payment({ id: `pay-${state.payments.size + 1}`, ...input, status: "pending", paidAt: null, providerTxnId: null });
-      state.payments.set(row.id, row);
-      return { ...row };
-    },
+    findPendingByEnrollment: (enrollmentId, provider) => findPending(enrollmentId, provider),
+    findPendingByEnrollmentTx: (_ex: DbExecutor, enrollmentId, provider) => findPending(enrollmentId, provider),
+    createPayment: (input) => insertPayment(input),
+    createPaymentTx: (_ex: DbExecutor, input) => insertPayment(input),
     setPaymentTx: async (_ex: DbExecutor, id, patch) => {
       const current = state.payments.get(id);
       if (!current) return;
       state.payments.set(id, { ...current, ...(patch as Partial<PaymentRecord>) });
     },
-    findUserEnrollment: async (userId, enrollmentId) => {
-      const e = state.enrollments.get(enrollmentId);
-      if (!e || e.userId !== userId) return null;
-      return { enrollmentId, userId, enrollmentStatus: e.status, enrolledAt: e.enrolledAt, cohortId: e.cohortId, ...COHORT };
-    },
-    findActiveUserEnrollment: async (userId, cohortId) => {
-      for (const [id, e] of state.enrollments) {
-        if (e.userId === userId && e.cohortId === cohortId) {
-          return { enrollmentId: id, userId, enrollmentStatus: e.status, enrolledAt: e.enrolledAt, cohortId, ...COHORT };
-        }
-      }
-      return null;
-    },
-    findCohort: async (cohortId) => (cohortId === "cohort-1"
-      ? { enrollmentId: "", userId: "", enrollmentStatus: "active", enrolledAt: NOW, cohortId, ...COHORT }
-      : null),
-    createPendingEnrollment: async (userId, cohortId, _source) => {
-      const id = `enr-${state.enrollments.size + 1}`;
-      state.enrollments.set(id, { status: "active", userId, cohortId, enrolledAt: NOW });
-      return { id };
-    },
+    findUserEnrollment: (userId, enrollmentId) => lookupEnrollment(userId, enrollmentId),
+    findUserEnrollmentTx: (_ex: DbExecutor, userId, enrollmentId) => lookupEnrollment(userId, enrollmentId),
+    findActiveUserEnrollment: (userId, cohortId) => lookupActiveEnrollment(userId, cohortId),
+    findActiveUserEnrollmentTx: (_ex: DbExecutor, userId, cohortId) => lookupActiveEnrollment(userId, cohortId),
+    findCohort: (cohortId) => lookupCohort(cohortId),
+    findCohortTx: (_ex: DbExecutor, cohortId) => lookupCohort(cohortId),
+    createPendingEnrollment: (userId, cohortId, _source) => insertEnrollment(userId, cohortId),
+    createPendingEnrollmentTx: (_ex: DbExecutor, userId, cohortId, _source) => insertEnrollment(userId, cohortId),
     setEnrollmentStatusTx: async (_ex: DbExecutor, enrollmentId, status) => {
       const e = state.enrollments.get(enrollmentId);
       if (e) state.enrollments.set(enrollmentId, { ...e, status });
@@ -100,7 +112,9 @@ function fakeRepo(state: FakeState): PaymentsRepository {
     },
     recordAudit: async () => undefined,
     findRefundByKey: async () => null,
+    findRefundByKeyTx: async () => null,
     createRefundRequest: async () => { throw new Error("not used here"); },
+    createRefundRequestTx: async () => { throw new Error("not used here"); },
     countCompletedModules: async () => 0,
   };
 }

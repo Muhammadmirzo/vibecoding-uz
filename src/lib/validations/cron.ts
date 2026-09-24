@@ -23,3 +23,13 @@ export const cronResultSchema = z.object({
 });
 
 export type CronResult = z.infer<typeof cronResultSchema>;
+
+/**
+ * W4-ARCH-D: validated input for the cron reminder service. `action` selects
+ * which reminder pipeline runs; the service computes its own timestamps.
+ */
+export const reminderRunSchema = z.object({
+  action: z.enum(["all", "drip", "homework", "inactivity"]).default("all"),
+});
+
+export type ReminderRunInput = z.infer<typeof reminderRunSchema>;

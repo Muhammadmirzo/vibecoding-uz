@@ -22,10 +22,28 @@ export interface CertificateProgress {
   existingIssuedAt: Date | null;
 }
 
+export type DbExecutor = Pick<typeof db, "select" | "update" | "insert">;
+
+export interface SaveCertificateInput {
+  enrollmentId: string;
+  code: string;
+  holderName: string;
+  courseTitle: string;
+  finalScore: string;
+  pdfUrl: string;
+}
+
 export interface CertificatesRepository {
   loadProgress(userId: string, enrollmentId?: string): Promise<CertificateProgress | null>;
-  saveCertificate(input: { enrollmentId: string; code: string; holderName: string; courseTitle: string; finalScore: string; pdfUrl: string }): Promise<typeof certificates.$inferSelect>;
+  saveCertificate(input: SaveCertificateInput): Promise<typeof certificates.$inferSelect>;
   markEnrollmentFinished(enrollmentId: string, code: string, finalScore: string): Promise<void>;
+  /**
+   * Optional atomic variants. Repositories backed by Drizzle implement these
+   * so the service can persist issuance + enrollment finalization in one
+   * transaction; legacy fakes omit them and get sequential writes.
+   */
+  saveCertificateTx?(ex: DbExecutor, input: SaveCertificateInput): Promise<typeof certificates.$inferSelect>;
+  markEnrollmentFinishedTx?(ex: DbExecutor, enrollmentId: string, code: string, finalScore: string): Promise<void>;
 }
 
 export const drizzleCertificatesRepository: CertificatesRepository = {
@@ -111,7 +129,25 @@ export const drizzleCertificatesRepository: CertificatesRepository = {
     }).returning();
     return inserted;
   },
+  async saveCertificateTx(ex, input) {
+    const [existing] = await ex.select().from(certificates).where(eq(certificates.enrollmentId, input.enrollmentId)).limit(1);
+    if (existing) {
+      const [updated] = await ex.update(certificates).set({
+        holderName: input.holderName, courseTitle: input.courseTitle,
+        finalScore: input.finalScore, pdfUrl: input.pdfUrl,
+      }).where(eq(certificates.id, existing.id)).returning();
+      return updated;
+    }
+    const [inserted] = await ex.insert(certificates).values({
+      enrollmentId: input.enrollmentId, code: input.code, holderName: input.holderName,
+      courseTitle: input.courseTitle, finalScore: input.finalScore, pdfUrl: input.pdfUrl,
+    }).returning();
+    return inserted;
+  },
   async markEnrollmentFinished(enrollmentId, code, finalScore) {
     await db.update(enrollments).set({ certificateCode: code, finalScore, status: "finished" }).where(eq(enrollments.id, enrollmentId));
+  },
+  async markEnrollmentFinishedTx(ex, enrollmentId, code, finalScore) {
+    await ex.update(enrollments).set({ certificateCode: code, finalScore, status: "finished" }).where(eq(enrollments.id, enrollmentId));
   },
 };

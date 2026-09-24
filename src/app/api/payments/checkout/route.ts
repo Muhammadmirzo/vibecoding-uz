@@ -7,8 +7,9 @@ import {
   createRateLimitResponse,
   PRESETS,
 } from "@/lib/security/rateLimit";
-import { createCheckout, checkoutInputSchema, CheckoutError } from "@/features/payments/server/checkout.service";
+import { createCheckout, checkoutInputSchema } from "@/features/payments/server/checkout.service";
 import { drizzlePaymentsRepository } from "@/features/payments/server/payments.repository";
+import { errorResponse } from "@/lib/http/errors";
 
 export async function POST(request: Request) {
   try {
@@ -20,13 +21,9 @@ export async function POST(request: Request) {
     if (!authResult.ok) return authResult.response;
 
     const parsed = studentPaymentRequestSchema.safeParse(await request.json());
-    if (!parsed.success) {
-      return NextResponse.json({ error: "Ma'lumotlar noto'g'ri kiritildi" }, { status: 400 });
-    }
+    if (!parsed.success) return errorResponse(parsed.error);
     const input = checkoutInputSchema.safeParse(parsed.data);
-    if (!input.success) {
-      return NextResponse.json({ error: "Ma'lumotlar noto'g'ri kiritildi" }, { status: 400 });
-    }
+    if (!input.success) return errorResponse(input.error);
 
     const result = await createCheckout(
       drizzlePaymentsRepository,
@@ -52,11 +49,6 @@ export async function POST(request: Request) {
         : result.reused ? "Mavjud to'lov sessiyasi qaytarildi" : "To'lov sessiyasi yaratildi",
     });
   } catch (error) {
-    if (error instanceof CheckoutError) {
-      const status = error.code === "PROVIDER_UNAVAILABLE" ? 503 : error.code === "NOT_FOUND" ? 404 : 400;
-      return NextResponse.json({ error: error.message }, { status });
-    }
-    console.error("POST /api/payments/checkout error:", error);
-    return NextResponse.json({ error: "To'lov jarayonini boshlashda xatolik yuz berdi" }, { status: 500 });
+    return errorResponse(error);
   }
 }

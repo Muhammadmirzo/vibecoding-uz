@@ -1,102 +1,32 @@
-import { NextResponse } from "next/server";
-import { db } from "@/db";
-import { leads } from "@/db/schema";
-import { eq } from "drizzle-orm";
-import { updateLeadSchema } from "@/lib/validations";
 import { requireAdmin } from "@/lib/auth/require-auth";
+import { errorResponse, okResponse } from "@/lib/http/errors";
+import { adminIdParamSchema, updateLeadSchema } from "@/lib/validations";
+import { drizzleLeadsRepository } from "@/features/crm/server/leads.repository";
+import { deleteLead, updateLead } from "@/features/crm/server/leads.service";
 
-export async function PATCH(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+const repo = drizzleLeadsRepository;
+
+export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const auth = await requireAdmin(request);
     if (!auth.ok) return auth.response;
-    const { id } = await params;
-    const body = await request.json();
-    const parseResult = updateLeadSchema.safeParse(body);
-
-    if (!parseResult.success) {
-      return NextResponse.json(
-        {
-          error: "Ma'lumotlar noto'g'ri kiritildi",
-          details: parseResult.error.flatten(),
-        },
-        { status: 400 }
-      );
-    }
-
-    const data = parseResult.data;
-    const updateData: Record<string, unknown> = {};
-
-    if (data.name !== undefined) updateData.name = data.name;
-    if (data.phone !== undefined) updateData.phone = data.phone;
-    if (data.source !== undefined) updateData.source = data.source;
-    if (data.status !== undefined) updateData.status = data.status;
-    if (data.recommendedCourseId !== undefined) updateData.recommendedCourseId = data.recommendedCourseId;
-    if (data.quizAnswers !== undefined) updateData.quizAnswers = data.quizAnswers;
-    if (data.utm !== undefined) updateData.utm = data.utm;
-    if (data.assignedManagerId !== undefined) updateData.assignedManagerId = data.assignedManagerId;
-    if (data.nextContactAt !== undefined) {
-      updateData.nextContactAt = data.nextContactAt ? new Date(data.nextContactAt) : null;
-    }
-
-    const [updatedLead] = await db
-      .update(leads)
-      .set(updateData)
-      .where(eq(leads.id, id))
-      .returning();
-
-    if (!updatedLead) {
-      return NextResponse.json(
-        { error: "Lead topilmadi" },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json({
-      success: true,
-      lead: updatedLead,
-    });
+    const { id } = adminIdParamSchema.parse(await params);
+    const body = updateLeadSchema.parse(await request.json());
+    const lead = await updateLead(repo, id, body);
+    return okResponse({ success: true, lead });
   } catch (error) {
-    console.error("PATCH /api/admin/leads/[id] error:", error);
-    return NextResponse.json(
-      { error: "Leadni yangilashda xatolik yuz berdi" },
-      { status: 500 }
-    );
+    return errorResponse(error);
   }
 }
 
-export async function DELETE(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const auth = await requireAdmin(request);
     if (!auth.ok) return auth.response;
-    const { id } = await params;
-
-    const [deleted] = await db
-      .delete(leads)
-      .where(eq(leads.id, id))
-      .returning();
-
-    if (!deleted) {
-      return NextResponse.json(
-        { error: "Lead topilmadi" },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json({
-      success: true,
-      message: "Lead muvaffaqiyatli o'chirildi",
-    });
+    const { id } = adminIdParamSchema.parse(await params);
+    await deleteLead(repo, id);
+    return okResponse({ success: true, message: "Lead muvaffaqiyatli o'chirildi" });
   } catch (error) {
-    console.error("DELETE /api/admin/leads/[id] error:", error);
-    return NextResponse.json(
-      { error: "Leadni o'chirishda xatolik yuz berdi" },
-      { status: 500 }
-    );
+    return errorResponse(error);
   }
 }

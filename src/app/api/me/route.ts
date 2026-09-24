@@ -1,68 +1,56 @@
 import { NextResponse } from "next/server";
-import { db } from "@/db";
-import { users, userProfiles } from "@/db/schema";
-import { eq } from "drizzle-orm";
 import { getDbSession, requireAuth } from "@/lib/auth/require-auth";
-import { updateMeSchema } from "@/lib/validations";
+import { errorResponse, okResponse } from "@/lib/http/errors";
+import { updateMyProfileSchema } from "@/lib/validations/student";
+import { drizzleProfileRepository } from "@/features/crm/server/profile.repository";
+import { updateMyProfile } from "@/features/crm/server/profile.service";
+
+function toPayload(record: {
+  id: string; phone: string; email: string | null; fullName: string; avatarUrl: string | null;
+  role: string; locale: string; createdAt: Date; lastLoginAt: Date | null;
+  profile: {
+    birthDate: Date | null; city: string | null; profession: string | null;
+    goal: string | null; source: string | null; bio: string | null;
+  } | null;
+}) {
+  return {
+    user: {
+      id: record.id,
+      phone: record.phone,
+      email: record.email,
+      fullName: record.fullName,
+      avatarUrl: record.avatarUrl,
+      role: record.role,
+      locale: record.locale,
+      createdAt: record.createdAt,
+      lastLoginAt: record.lastLoginAt,
+      profile: record.profile
+        ? {
+          birthDate: record.profile.birthDate,
+          city: record.profile.city,
+          profession: record.profile.profession,
+          goal: record.profile.goal,
+          source: record.profile.source,
+          bio: record.profile.bio,
+        }
+        : null,
+    },
+  };
+}
 
 export async function GET() {
   try {
     const authSession = await getDbSession();
     if (!authSession) {
-      return NextResponse.json(
-        { error: "Avtorizatsiyadan o'tilmagan" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Avtorizatsiyadan o'tilmagan" }, { status: 401 });
     }
-
-    const [userRecord] = await db
-      .select({
-        user: users,
-        profile: userProfiles,
-      })
-      .from(users)
-      .leftJoin(userProfiles, eq(users.id, userProfiles.userId))
-      .where(eq(users.id, authSession.userId))
-      .limit(1);
-
-    if (!userRecord || !userRecord.user) {
-      return NextResponse.json(
-        { error: "Foydalanuvchi topilmadi" },
-        { status: 404 }
-      );
+    const record = await drizzleProfileRepository.findMe(authSession.userId);
+    if (!record) {
+      return NextResponse.json({ error: "Foydalanuvchi topilmadi" }, { status: 404 });
     }
-
-    const { user, profile } = userRecord;
-
-    return NextResponse.json({
-      user: {
-        id: user.id,
-        phone: user.phone,
-        email: user.email,
-        fullName: user.fullName,
-        avatarUrl: user.avatarUrl,
-        role: user.role,
-        locale: user.locale,
-        createdAt: user.createdAt,
-        lastLoginAt: user.lastLoginAt,
-        profile: profile
-          ? {
-              birthDate: profile.birthDate,
-              city: profile.city,
-              profession: profile.profession,
-              goal: profile.goal,
-              source: profile.source,
-              bio: profile.bio,
-            }
-          : null,
-      },
-    });
+    return NextResponse.json(toPayload(record));
   } catch (error) {
-    console.error("GET /api/me error:", error);
-    return NextResponse.json(
-      { error: "Ma'lumotlarni yuklashda xatolik yuz berdi" },
-      { status: 500 }
-    );
+    return errorResponse(error);
   }
 }
 
@@ -70,112 +58,11 @@ export async function PATCH(request: Request) {
   try {
     const authResult = await requireAuth(request);
     if (!authResult.ok) return authResult.response;
-    const authSession = authResult.session;
-
-    const body = await request.json();
-    const parseResult = updateMeSchema.safeParse(body);
-
-    if (!parseResult.success) {
-      return NextResponse.json(
-        {
-          error: "Ma'lumotlar noto'g'ri kiritildi",
-          details: parseResult.error.flatten(),
-        },
-        { status: 400 }
-      );
-    }
-
-    const { fullName, email, avatarUrl, city, profession, goal, bio, birthDate } = parseResult.data;
-
-    // Update main user fields if provided
-    const userUpdates: { fullName?: string; email?: string | null; avatarUrl?: string | null } = {};
-    if (fullName !== undefined) userUpdates.fullName = fullName;
-    if (email !== undefined) userUpdates.email = email;
-    if (avatarUrl !== undefined) userUpdates.avatarUrl = avatarUrl;
-
-    if (Object.keys(userUpdates).length > 0) {
-      await db
-        .update(users)
-        .set(userUpdates)
-        .where(eq(users.id, authSession.userId));
-    }
-
-    // Update profile fields if provided
-    if (
-      city !== undefined ||
-      profession !== undefined ||
-      goal !== undefined ||
-      bio !== undefined ||
-      birthDate !== undefined
-    ) {
-      const profileUpdates: {
-        userId: string;
-        birthDate?: Date | null;
-        city?: string | null;
-        profession?: string | null;
-        goal?: string | null;
-        bio?: string | null;
-      } = {
-        userId: authSession.userId,
-      };
-
-      if (city !== undefined) profileUpdates.city = city;
-      if (profession !== undefined) profileUpdates.profession = profession;
-      if (goal !== undefined) profileUpdates.goal = goal;
-      if (bio !== undefined) profileUpdates.bio = bio;
-      if (birthDate !== undefined) profileUpdates.birthDate = birthDate ? new Date(birthDate) : null;
-
-      await db
-        .insert(userProfiles)
-        .values(profileUpdates)
-        .onConflictDoUpdate({
-          target: userProfiles.userId,
-          set: profileUpdates,
-        });
-    }
-
-    // Fetch updated record
-    const [updatedRecord] = await db
-      .select({
-        user: users,
-        profile: userProfiles,
-      })
-      .from(users)
-      .leftJoin(userProfiles, eq(users.id, userProfiles.userId))
-      .where(eq(users.id, authSession.userId))
-      .limit(1);
-
-    const { user, profile } = updatedRecord;
-
-    return NextResponse.json({
-      success: true,
-      user: {
-        id: user.id,
-        phone: user.phone,
-        email: user.email,
-        fullName: user.fullName,
-        avatarUrl: user.avatarUrl,
-        role: user.role,
-        locale: user.locale,
-        createdAt: user.createdAt,
-        lastLoginAt: user.lastLoginAt,
-        profile: profile
-          ? {
-              birthDate: profile.birthDate,
-              city: profile.city,
-              profession: profile.profession,
-              goal: profile.goal,
-              source: profile.source,
-              bio: profile.bio,
-            }
-          : null,
-      },
-    });
+    const body: unknown = await request.json();
+    const input = updateMyProfileSchema.parse(body);
+    const updated = await updateMyProfile(drizzleProfileRepository, authResult.session.userId, input);
+    return okResponse({ success: true, ...toPayload(updated) });
   } catch (error) {
-    console.error("PATCH /api/me error:", error);
-    return NextResponse.json(
-      { error: "Profilni yangilashda xatolik yuz berdi" },
-      { status: 500 }
-    );
+    return errorResponse(error);
   }
 }

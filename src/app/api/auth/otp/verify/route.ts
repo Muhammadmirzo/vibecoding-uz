@@ -1,11 +1,16 @@
 import { NextResponse } from "next/server";
-import { db } from "@/db";
-import { users, sessions, otpCodes, userProfiles } from "@/db/schema";
+import { db, withTransactionLock } from "@/db";
+import { users, sessions, otpCodes } from "@/db/schema";
 import { eq, and, isNull, gte, lt, desc } from "drizzle-orm";
 import { otpVerifySchema } from "@/lib/validations";
 import { normalizePhone, verifyOtpCode } from "@/lib/auth/password";
 import { createSessionToken, setSessionCookie } from "@/lib/auth/session";
 import { checkRateLimit, getClientIp, createRateLimitResponse } from "@/lib/security/rateLimit";
+import { drizzleRegistrationRepository } from "@/features/auth/server/registration.repository";
+import { drizzleReferralsRepository } from "@/features/referrals/server/referrals.repository";
+import { attributeReferralFromCookieTx } from "@/features/referrals/server/attribution.service";
+import { clearRefCodeCookie, parseRefCodeCookie } from "@/features/referrals/domain/referral-code";
+import type { DbExecutor } from "@/features/payments/server/payments.repository";
 
 export async function POST(request: Request) {
   try {
@@ -77,6 +82,7 @@ export async function POST(request: Request) {
       .where(eq(otpCodes.id, otpRecord.id));
 
     // Check or create user
+    let refCodeAttributed = false;
     let [user] = await db
       .select()
       .from(users)
@@ -102,24 +108,31 @@ export async function POST(request: Request) {
         user.fullName = updatePayload.fullName;
       }
     } else {
-      // Create new user
-      const [newUser] = await db
-        .insert(users)
-        .values({
-          phone: normalizedPhone,
-          fullName: fullName || "Foydalanuvchi",
-          role: "student",
-          lastLoginAt: new Date(),
-        })
-        .returning();
+      // New-user registration: user + profile + referral attribution run
+      // inside one transaction. Attribution only happens here — existing
+      // users keep their (possibly absent) referrer untouched.
+      const refCode = parseRefCodeCookie(request.headers.get("cookie"));
+      type RegistrationTxOutcome = { user: typeof users.$inferSelect; attributed: boolean };
+      const registration = await withTransactionLock<RegistrationTxOutcome>(
+        `registration:${normalizedPhone}`,
+        async (tx: DbExecutor | null | undefined) => {
+          const ex = tx ?? null;
+          if (!ex) throw new Error("Registration database transaction is unavailable");
+          const created = await drizzleRegistrationRepository.createUserTx(ex, {
+            phone: normalizedPhone,
+            fullName: fullName || "Foydalanuvchi",
+          });
+          await drizzleRegistrationRepository.createProfileTx(ex, created.id);
+          const attribution = await attributeReferralFromCookieTx(drizzleReferralsRepository, ex, {
+            code: refCode,
+            referredUserId: created.id,
+          });
+          return { user: created, attributed: attribution.attributed };
+        },
+      );
 
-      user = newUser;
-
-      // Create user profile
-      await db
-        .insert(userProfiles)
-        .values({ userId: user.id })
-        .onConflictDoNothing();
+      user = registration.user;
+      if (registration.attributed) refCodeAttributed = true;
     }
 
     // Create session record
@@ -165,6 +178,7 @@ export async function POST(request: Request) {
       secure: process.env.NODE_ENV === "production",
     });
     response.headers.set("Set-Cookie", cookieHeader);
+    if (refCodeAttributed) response.headers.append("Set-Cookie", clearRefCodeCookie());
 
     return response;
   } catch (error) {

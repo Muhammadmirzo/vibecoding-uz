@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { uzbekPhoneRegex } from "./auth";
 
+export { referralCodeSchema, type ReferralCode } from "@/features/referrals/domain/referral-code";
+
 export const updateStudentProfileSchema = z.object({
   fullName: z.string().min(2, "F.I.SH. kamida 2 ta belgidan iborat bo'lishi kerak"),
   email: z.string().email("Noto'g'ri email formati").optional().or(z.literal("")),
@@ -55,4 +57,22 @@ export type UpdateStudentProfileInput = z.infer<typeof updateStudentProfileSchem
 export type StudentChangePasswordInput = z.infer<typeof studentChangePasswordSchema>;
 export type StudentNotificationSettingsInput = z.infer<typeof studentNotificationSettingsSchema>;
 export type ReferralClaimBonusInput = z.infer<typeof referralClaimBonusSchema>;
+
+/**
+ * W4-ARCH-D: profile update body for PATCH /api/me. Every field is optional —
+ * the service only writes the tables that received fields (users vs
+ * user_profiles) inside one transaction.
+ */
+export const updateMyProfileSchema = z.object({
+  fullName: z.string().min(2, "F.I.SH. kamida 2 ta belgidan iborat bo'lishi kerak").optional(),
+  email: z.string().email("Noto'g'ri email formati").optional().or(z.literal("")),
+  avatarUrl: z.string().url("Avatar havola formati noto'g'ri").optional().or(z.literal("")),
+  city: z.string().max(120).optional(),
+  profession: z.string().max(120).optional(),
+  goal: z.string().max(500).optional(),
+  bio: z.string().max(1000).optional(),
+  birthDate: z.string().max(30).optional(),
+});
+
+export type UpdateMyProfileInput = z.infer<typeof updateMyProfileSchema>;
 export type StudentPaymentRequestInput = z.infer<typeof studentPaymentRequestSchema>;

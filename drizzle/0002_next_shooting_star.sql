@@ -1,5 +1,4 @@
 CREATE TYPE "public"."payout_status" AS ENUM('pending', 'approved', 'paid', 'rejected');--> statement-breakpoint
-ALTER TYPE "public"."payment_status" ADD VALUE 'cancelled';--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "referral_payouts" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"user_id" uuid NOT NULL,
@@ -51,8 +50,6 @@ CREATE TABLE IF NOT EXISTS "portfolios" (
 );
 --> statement-breakpoint
 ALTER TABLE "blog_posts" ALTER COLUMN "author_name" SET DEFAULT 'Mirzo Academy Team';--> statement-breakpoint
-ALTER TABLE "leads" ALTER COLUMN "phone" DROP NOT NULL;--> statement-breakpoint
-ALTER TABLE "leads" ADD COLUMN "telegram" varchar(64);--> statement-breakpoint
 ALTER TABLE "payments" ADD COLUMN "amount_tiyin" integer DEFAULT 0 NOT NULL;--> statement-breakpoint
 UPDATE "payments" SET "amount_tiyin" = (ROUND("amount_sum" * 100))::int WHERE "amount_tiyin" = 0;--> statement-breakpoint
 DO $$ BEGIN

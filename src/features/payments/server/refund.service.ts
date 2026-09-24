@@ -60,12 +60,13 @@ export async function requestRefund(repo: PaymentsRepository, input: RefundReque
   if (!eligibility.eligible) throw new RefundError("INELIGIBLE", eligibility.message);
 
   const amountTiyin = sumToTiyin(payment.amountSum);
-  const created = await withTransactionLock(`refund:${key}`, async (tx: DbExecutor | null | undefined) => {
-    const ex = (tx ?? null) as DbExecutor | null;
+  type RefundTxOutcome = { id: string; status: string; replay: boolean };
+  const created = await withTransactionLock<RefundTxOutcome>(`refund:${key}`, async (tx: DbExecutor | null | undefined) => {
+    const ex = tx ?? null;
     if (!ex) throw new Error("Payment database transaction is unavailable");
-    const replay = await repo.findRefundByKey(key);
-    if (replay) return { id: replay.id, status: replay.status, replay: true as const };
-    const row = await repo.createRefundRequest({
+    const replay = await repo.findRefundByKeyTx(ex, key);
+    if (replay) return { id: replay.id, status: replay.status, replay: true };
+    const row = await repo.createRefundRequestTx(ex, {
       userId: input.userId,
       paymentId: payment.id,
       enrollmentId: payment.enrollmentId,
@@ -76,7 +77,7 @@ export async function requestRefund(repo: PaymentsRepository, input: RefundReque
     // Revoke access immediately; the provider-side money movement is tracked
     // via the request status (never silently marked "refunded").
     if (payment.enrollmentId) await repo.setEnrollmentStatusTx(ex, payment.enrollmentId, "paused");
-    return { id: row.id, status: row.status, replay: false as const };
+    return { id: row.id, status: row.status, replay: false };
   });
 
   return { refundId: created.id, status: created.status, amountTiyin, replay: created.replay };

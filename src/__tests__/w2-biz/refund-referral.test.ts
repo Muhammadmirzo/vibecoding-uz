@@ -2,42 +2,101 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { requestRefund, RefundError } from "@/features/payments/server/refund.service";
 import { checkPayoutAmount, earnedBonusTiyin, payoutBalanceTiyin } from "@/features/referrals/domain/policy";
 import { requestPayout, PayoutError } from "@/features/referrals/server/payout.service";
-import type { PaymentsRepository } from "@/features/payments/server/payments.repository";
-import type { ReferralsRepository } from "@/features/referrals/server/referrals.repository";
+import type {
+  DbExecutor,
+  EnrollmentWithCohort,
+  PaymentRecord,
+  PaymentsRepository,
+} from "@/features/payments/server/payments.repository";
+import type { ReferralsRepository, CreatePayoutInput } from "@/features/referrals/server/referrals.repository";
 
 vi.mock("@/db", () => ({
   withTransactionLock: async (_key: string, fn: (tx: unknown) => Promise<unknown>) => fn({}),
 }));
 
-describe("refund workflow service", () => {
-  const paymentRow = {
-    id: "pay-1", userId: "user-1", enrollmentId: "enr-1", provider: "payme" as const,
-    providerTxnId: "txn-1", amountSum: "3000000.00", amountTiyin: 300_000_000,
-    status: "paid" as const, paidAt: new Date(), meta: {},
+const paymentRow: PaymentRecord = {
+  id: "pay-1", userId: "user-1", enrollmentId: "enr-1", provider: "payme",
+  providerTxnId: "txn-1", amountSum: "3000000.00", amountTiyin: 300_000_000,
+  status: "paid", paidAt: new Date(), meta: {},
+};
+
+const enrollmentRow: EnrollmentWithCohort = {
+  enrollmentId: "enr-1", userId: "user-1", enrollmentStatus: "active",
+  enrolledAt: new Date(), cohortId: "cohort-1",
+  priceSum: "3000000.00", earlyPriceSum: null, earlyDeadline: null,
+};
+
+function unexpectedCall(method: string): () => Promise<never> {
+  return async () => {
+    throw new Error(`unexpected repository call: ${method}`);
   };
-  let refunds: Map<string, { id: string; status: string; amountTiyin: number }>;
+}
+
+describe("refund workflow service", () => {
+  let refunds: Map<string, { id: string; status: "pending"; amountTiyin: number }>;
   let revoked: string[];
-  const repo = (overrides: Partial<PaymentsRepository> = {}): PaymentsRepository =>
-    ({
-      findPaymentById: async (id: string) => (id === "pay-1" ? { ...paymentRow } : null),
-      findUserEnrollment: async () => ({
-        enrollmentId: "enr-1", userId: "user-1", enrollmentStatus: "active",
-        enrolledAt: new Date(), cohortId: "cohort-1",
-        priceSum: "3000000.00", earlyPriceSum: null, earlyDeadline: null,
-      }),
-      countCompletedModules: async () => 1,
-      findRefundByKey: async (key: string) => {
+  const repo = (overrides: Partial<PaymentsRepository> = {}): PaymentsRepository => {
+    const base: PaymentsRepository = {
+      findPaymentById: async (id) => (id === "pay-1" ? { ...paymentRow } : null),
+      findPaymentByIdTx: async () => null,
+      findByProviderTxnId: unexpectedCall("findByProviderTxnId"),
+      findByProviderTxnIdTx: unexpectedCall("findByProviderTxnIdTx"),
+      findPendingByEnrollment: async () => null,
+      findPendingByEnrollmentTx: async () => null,
+      createPayment: unexpectedCall("createPayment"),
+      createPaymentTx: unexpectedCall("createPaymentTx"),
+      setPaymentTx: async () => undefined,
+      findUserEnrollment: async () => ({ ...enrollmentRow }),
+      findUserEnrollmentTx: async () => ({ ...enrollmentRow }),
+      findActiveUserEnrollment: async () => null,
+      findActiveUserEnrollmentTx: async () => null,
+      findCohort: async () => null,
+      findCohortTx: async () => null,
+      createPendingEnrollment: unexpectedCall("createPendingEnrollment"),
+      createPendingEnrollmentTx: unexpectedCall("createPendingEnrollmentTx"),
+      setEnrollmentStatusTx: async (_ex: DbExecutor, enrollmentId: string) => {
+        revoked.push(enrollmentId);
+      },
+      countOtherPaidPaymentsTx: async () => 0,
+      recordAudit: async () => undefined,
+      findRefundByKey: async (key) => {
         const found = refunds.get(key);
-        return found ? { ...found, userId: "user-1", paymentId: "pay-1", enrollmentId: "enr-1", reason: null, idempotencyKey: key, createdAt: new Date() } : null;
+        return found
+          ? {
+              ...found, userId: "user-1", paymentId: "pay-1", enrollmentId: "enr-1",
+              reason: null, idempotencyKey: key, createdAt: new Date(),
+            }
+          : null;
+      },
+      findRefundByKeyTx: async (_ex: DbExecutor, key) => {
+        const found = refunds.get(key);
+        return found
+          ? {
+              ...found, userId: "user-1", paymentId: "pay-1", enrollmentId: "enr-1",
+              reason: null, idempotencyKey: key, createdAt: new Date(),
+            }
+          : null;
       },
       createRefundRequest: async (input) => {
-        const row = { id: `ref-${refunds.size + 1}`, status: "pending", amountTiyin: input.amountTiyin };
+        const row = { id: `ref-${refunds.size + 1}`, status: "pending" as const, amountTiyin: input.amountTiyin };
         refunds.set(input.idempotencyKey, row);
-        return { ...row, userId: "user-1", paymentId: "pay-1", enrollmentId: "enr-1", reason: null, idempotencyKey: input.idempotencyKey, createdAt: new Date() };
+        return {
+          ...row, userId: "user-1", paymentId: "pay-1", enrollmentId: "enr-1",
+          reason: null, idempotencyKey: input.idempotencyKey, createdAt: new Date(),
+        };
       },
-      setEnrollmentStatusTx: async (_ex, enrollmentId) => { revoked.push(enrollmentId); },
-      ...overrides,
-    }) as unknown as PaymentsRepository;
+      createRefundRequestTx: async (_ex: DbExecutor, input) => {
+        const row = { id: `ref-${refunds.size + 1}`, status: "pending" as const, amountTiyin: input.amountTiyin };
+        refunds.set(input.idempotencyKey, row);
+        return {
+          ...row, userId: "user-1", paymentId: "pay-1", enrollmentId: "enr-1",
+          reason: null, idempotencyKey: input.idempotencyKey, createdAt: new Date(),
+        };
+      },
+      countCompletedModules: async () => 1,
+    };
+    return { ...base, ...overrides };
+  };
 
   beforeEach(() => {
     refunds = new Map();
@@ -62,7 +121,7 @@ describe("refund workflow service", () => {
     expect(revoked).toEqual([]);
   });
   it("rejects unpaid payments", async () => {
-    const bad = repo({ findPaymentById: async () => ({ ...paymentRow, status: "pending" as const }) });
+    const bad = repo({ findPaymentById: async () => ({ ...paymentRow, status: "pending" }) });
     await expect(requestRefund(bad, { paymentId: "pay-1", userId: "user-1" })).rejects.toMatchObject({ code: "NOT_PAID" });
   });
 });
@@ -84,22 +143,40 @@ describe("referral payout policy", () => {
 });
 
 describe("referral payout service", () => {
-  let payouts: Map<string, { id: string; status: string; amountTiyin: number }>;
-  const repo = (balanceTiyin: number): ReferralsRepository =>
-    ({
-      findPayoutByKey: async (key: string) => {
-        const found = payouts.get(key);
-        return found ? { ...found, userId: "user-1", payoutMethod: "uzcard_humo", cardLast4: "1234", idempotencyKey: key, createdAt: new Date() } : null;
-      },
-      createPayout: async (input) => {
-        const row = { id: `p-${payouts.size + 1}`, status: "pending", amountTiyin: input.amountTiyin };
-        payouts.set(input.idempotencyKey, row);
-        return { ...row, userId: "user-1", payoutMethod: input.payoutMethod, cardLast4: "1234", idempotencyKey: input.idempotencyKey, createdAt: new Date() };
-      },
-      loadBalance: async () => ({ earnedTiyin: balanceTiyin, reservedTiyin: 0, balanceTiyin, referredPaidCount: 1 }),
+  let payouts: Map<string, { id: string; status: "pending"; amountTiyin: number }>;
+  const repo = (balanceTiyin: number): ReferralsRepository => {
+    const lookup = async (key: string) => {
+      const found = payouts.get(key);
+      return found
+        ? {
+            ...found, userId: "user-1", payoutMethod: "uzcard_humo", cardLast4: "1234",
+            idempotencyKey: key, createdAt: new Date(),
+          }
+        : null;
+    };
+    const insert = async (input: CreatePayoutInput) => {
+      const row = { id: `p-${payouts.size + 1}`, status: "pending" as const, amountTiyin: input.amountTiyin };
+      payouts.set(input.idempotencyKey, row);
+      return {
+        ...row, userId: "user-1", payoutMethod: input.payoutMethod, cardLast4: "1234",
+        idempotencyKey: input.idempotencyKey, createdAt: new Date(),
+      };
+    };
+    const balance = async () => ({ earnedTiyin: balanceTiyin, reservedTiyin: 0, balanceTiyin, referredPaidCount: 1 });
+    return {
+      findPayoutByKey: lookup,
+      findPayoutByKeyTx: async (_ex: DbExecutor, key) => lookup(key),
+      createPayout: insert,
+      createPayoutTx: async (_ex: DbExecutor, input) => insert(input),
+      loadBalance: balance,
+      loadBalanceTx: async () => balance(),
       attributeReferral: async () => undefined,
+      attributeReferralTx: async () => undefined,
+      resolveReferrerByCode: async () => null,
+      resolveReferrerByCodeTx: async () => null,
       recordAudit: async () => undefined,
-    }) as unknown as ReferralsRepository;
+    };
+  };
 
   beforeEach(() => {
     payouts = new Map();

@@ -53,7 +53,7 @@ export async function handleClickWebhook(
   if (decision.action === "reject") return fail("Invalid transaction state");
   if (decision.action === "fail") {
     await withTransactionLock(`click:${data.click_trans_id}`, async (tx: DbExecutor | null | undefined) => {
-      const ex = (tx ?? null) as DbExecutor | null;
+      const ex = tx ?? null;
       if (!ex) throw new Error("Payment database transaction is unavailable");
       const current = await repo.findPaymentByIdTx(ex, payment.id, "click");
       if (current && current.status === "pending") {
@@ -69,7 +69,7 @@ export async function handleClickWebhook(
 
   if (decision.action === "prepare") {
     const merchantPrepareId = await withTransactionLock(`click:${data.click_trans_id}`, async (tx: DbExecutor | null | undefined) => {
-      const ex = (tx ?? null) as DbExecutor | null;
+      const ex = tx ?? null;
       if (!ex) throw new Error("Payment database transaction is unavailable");
       const current = await repo.findPaymentByIdTx(ex, payment.id, "click");
       if (!current || current.status !== "pending") return null;
@@ -87,7 +87,7 @@ export async function handleClickWebhook(
 
   // Complete (idempotent: replaying a paid payment returns the stored confirm id).
   const completed = await withTransactionLock(`click:${data.click_trans_id}`, async (tx: DbExecutor | null | undefined) => {
-    const ex = (tx ?? null) as DbExecutor | null;
+    const ex = tx ?? null;
     if (!ex) throw new Error("Payment database transaction is unavailable");
     const current = await repo.findPaymentByIdTx(ex, payment.id, "click");
     if (!current) return null;

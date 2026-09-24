@@ -19,6 +19,9 @@ export const createBlogPostSchema = z.object({
 
 export const updateBlogPostSchema = createBlogPostSchema.partial();
 
+export type CreateBlogPostInput = z.infer<typeof createBlogPostSchema>;
+export type UpdateBlogPostInput = z.infer<typeof updateBlogPostSchema>;
+
 export const siteSettingsSchema = z.object({
   siteTitle: z.string().min(1, { message: "Sayt nomi kiritilishi shart" }),
   supportPhone: z.string().min(1, { message: "Qo'llab-quvvatlash telefoni kiritilishi shart" }),
@@ -78,6 +81,9 @@ export const updateUserRoleSchema = z.object({
   role: userRoleSchema,
 });
 
+export type CreateBroadcastInput = z.infer<typeof createBroadcastSchema>;
+export type SiteSettingsInput = z.infer<typeof siteSettingsSchema>;
+
 export const createStaffSchema = z.object({
   phone: z.string().regex(uzbekPhoneRegex, {
     message: "Telefon raqam +998 bilan boshlanishi va 12 xonali bo'lishi kerak (masalan: +998901234567)",
@@ -94,3 +100,46 @@ export const createStaffSchema = z.object({
 
 export type UpdateUserRoleInput = z.infer<typeof updateUserRoleSchema>;
 export type CreateStaffInput = z.infer<typeof createStaffSchema>;
+
+// --- Shared admin route schemas (W4-ARCH-C) ---
+
+/** Validates URL `:id` params on admin routes. */
+export const adminIdParamSchema = z.object({ id: z.string().uuid({ message: "ID noto'g'ri formatda" }) });
+export type AdminIdParam = z.infer<typeof adminIdParamSchema>;
+
+const adminPageSchema = z.coerce.number().int().positive().default(1);
+const adminLimitSchema = z.coerce.number().int().positive().max(200).default(100);
+
+export const blogAdminQuerySchema = z.object({
+  search: z.string().optional(),
+  status: z.string().default("all"),
+  page: adminPageSchema,
+  limit: adminLimitSchema,
+});
+export type BlogAdminQuery = z.infer<typeof blogAdminQuerySchema>;
+
+export const auditLogsQuerySchema = z.object({
+  action: z.string().default("all"),
+  search: z.string().optional(),
+  limit: z.coerce.number().int().positive().max(200).default(100),
+});
+export type AuditLogsQuery = z.infer<typeof auditLogsQuerySchema>;
+
+/** W4-ARCH-D: period filter for aggregate-backed admin analytics. */
+export const analyticsPeriodSchema = z.enum(["7d", "30d", "90d", "1y", "all"]);
+
+export const adminAnalyticsQuerySchema = z.object({
+  period: analyticsPeriodSchema.default("30d"),
+});
+
+export const adminStudentActivityQuerySchema = z.object({
+  search: z.string().trim().min(1).max(120).optional(),
+  cohortId: z.string().uuid({ message: "Guruh ID si noto'g'ri" }).optional(),
+  status: z.enum(["all", "active", "at_risk", "completed", "inactive"]).default("all"),
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(20),
+});
+
+export type AnalyticsPeriod = z.infer<typeof analyticsPeriodSchema>;
+export type AdminAnalyticsQueryInput = z.infer<typeof adminAnalyticsQuerySchema>;
+export type AdminStudentActivityQueryInput = z.infer<typeof adminStudentActivityQuerySchema>;

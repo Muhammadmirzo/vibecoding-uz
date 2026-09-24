@@ -3,8 +3,9 @@ import { requireAuth } from "@/lib/auth/require-auth";
 import { referralClaimBonusSchema } from "@/lib/validations";
 import { checkRateLimit, getClientIp, createRateLimitResponse, PRESETS } from "@/lib/security/rateLimit";
 import { drizzleReferralsRepository } from "@/features/referrals/server/referrals.repository";
-import { PayoutError, payoutRequestSchema, requestPayout } from "@/features/referrals/server/payout.service";
+import { payoutRequestSchema, requestPayout } from "@/features/referrals/server/payout.service";
 import { TIYIN_PER_SUM } from "@/features/payments/domain/money";
+import { errorResponse } from "@/lib/http/errors";
 
 export async function POST(request: Request) {
   try {
@@ -16,12 +17,7 @@ export async function POST(request: Request) {
     if (!authResult.ok) return authResult.response;
 
     const legacy = referralClaimBonusSchema.safeParse(await request.json().catch(() => null));
-    if (!legacy.success) {
-      return NextResponse.json(
-        { error: "Ma'lumotlar noto'g'ri kiritildi", details: legacy.error.flatten() },
-        { status: 400 },
-      );
-    }
+    if (!legacy.success) return errorResponse(legacy.error);
 
     // Legacy clients send amountSum (sum); the service works in tiyin and
     // re-checks the amount against the server-computed balance.
@@ -31,9 +27,7 @@ export async function POST(request: Request) {
       cardHolder: legacy.data.cardHolder,
       amountTiyin: Math.round(legacy.data.amountSum * TIYIN_PER_SUM),
     });
-    if (!parsed.success) {
-      return NextResponse.json({ error: "Ma'lumotlar noto'g'ri kiritildi" }, { status: 400 });
-    }
+    if (!parsed.success) return errorResponse(parsed.error);
 
     const outcome = await requestPayout(drizzleReferralsRepository, {
       ...parsed.data,
@@ -61,10 +55,6 @@ export async function POST(request: Request) {
       message: "So'rovingiz qabul qilindi. 24 soat ichida hisobingizga o'tkaziladi.",
     });
   } catch (error) {
-    if (error instanceof PayoutError) {
-      return NextResponse.json({ error: error.message }, { status: 422 });
-    }
-    console.error("POST /api/referral/claim error:", error);
-    return NextResponse.json({ error: "So'rovni yuborishda xatolik yuz berdi" }, { status: 500 });
+    return errorResponse(error);
   }
 }

@@ -1,61 +1,19 @@
-import { NextResponse } from "next/server";
-import { db } from "@/db";
-import { auditLogs, users } from "@/db/schema";
-import { desc, eq, like, or } from "drizzle-orm";
 import { requireAdmin } from "@/lib/auth/require-auth";
+import { errorResponse, okResponse } from "@/lib/http/errors";
+import { auditLogsQuerySchema } from "@/lib/validations";
+import { drizzleAdminRepository } from "@/features/crm/server/admin.repository";
+import { listAuditLogs } from "@/features/crm/server/admin.service";
+
+const repo = drizzleAdminRepository;
 
 export async function GET(request: Request) {
   try {
     const auth = await requireAdmin(request);
     if (!auth.ok) return auth.response;
-    const { searchParams } = new URL(request.url);
-    const action = searchParams.get("action");
-    const search = searchParams.get("search");
-
-    const conditions = [];
-
-    if (action && action !== "all") {
-      conditions.push(eq(auditLogs.action, action));
-    }
-
-    if (search) {
-      conditions.push(
-        or(
-          like(auditLogs.action, `%${search}%`),
-          like(auditLogs.entityType, `%${search}%`),
-          like(auditLogs.userEmail, `%${search}%`)
-        )
-      );
-    }
-
-    const logs = await db
-      .select({
-        id: auditLogs.id,
-        userId: auditLogs.userId,
-        userEmail: auditLogs.userEmail,
-        action: auditLogs.action,
-        entityType: auditLogs.entityType,
-        entityId: auditLogs.entityId,
-        details: auditLogs.details,
-        ipAddress: auditLogs.ipAddress,
-        createdAt: auditLogs.createdAt,
-        userName: users.fullName,
-      })
-      .from(auditLogs)
-      .leftJoin(users, eq(auditLogs.userId, users.id))
-      .where(conditions.length > 0 ? or(...conditions) : undefined)
-      .orderBy(desc(auditLogs.createdAt))
-      .limit(100);
-
-    return NextResponse.json({
-      success: true,
-      logs,
-    });
+    const query = auditLogsQuerySchema.parse(Object.fromEntries(new URL(request.url).searchParams));
+    const logs = await listAuditLogs(repo, query);
+    return okResponse({ success: true, logs });
   } catch (error) {
-    console.error("GET /api/admin/audit-logs error:", error);
-    return NextResponse.json(
-      { error: "Audit jurnallarini yuklashda xatolik yuz berdi" },
-      { status: 500 }
-    );
+    return errorResponse(error);
   }
 }

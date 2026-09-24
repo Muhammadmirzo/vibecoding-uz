@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { withTransactionLock } from "@/db";
 import {
   buildClickCheckoutUrl,
   buildPaymeCheckoutUrl,
@@ -10,7 +11,7 @@ import {
   type PaymentProvider,
 } from "../domain/policy";
 import { tiyinToSumString } from "../domain/money";
-import type { PaymentsRepository } from "./payments.repository";
+import type { DbExecutor, PaymentsRepository } from "./payments.repository";
 
 export const checkoutInputSchema = z.object({
   enrollmentId: z.string().uuid().optional(),
@@ -44,6 +45,59 @@ function checkoutUrlFor(provider: PaymentProvider, paymentId: string, amountTiyi
   return buildClickCheckoutUrl(secrets.clickServiceId!.trim(), secrets.clickMerchantId!.trim(), paymentId, amountTiyin);
 }
 
+interface CheckoutTxParams {
+  enrollmentId: string;
+  priceTiyin: number;
+}
+
+type CheckoutTxOutcome = { paymentId: string; amountTiyin: number; reused: boolean };
+
+/**
+ * Reuse-or-create inside one transaction: the pending-payment check and
+ * the payment insert run on the same `ex`, so concurrent checkouts for
+ * one enrollment cannot create duplicate pending payments.
+ */
+async function checkoutWithEnrollment(
+  repo: PaymentsRepository,
+  ex: DbExecutor,
+  params: CheckoutTxParams & Pick<CheckoutInput, "userId" | "provider" | "installmentMonth">,
+  now: Date,
+): Promise<CheckoutTxOutcome> {
+  const pending = await repo.findPendingByEnrollmentTx(ex, params.enrollmentId, params.provider);
+  const decision = decideCheckout(pending?.id ?? null, params.priceTiyin);
+  if (decision.action === "reuse") {
+    return {
+      paymentId: decision.paymentId,
+      amountTiyin: pending!.amountTiyin > 0 ? pending!.amountTiyin : params.priceTiyin,
+      reused: true,
+    };
+  }
+  const created = await repo.createPaymentTx(ex, {
+    userId: params.userId,
+    enrollmentId: params.enrollmentId,
+    provider: params.provider,
+    amountSum: tiyinToSumString(decision.amountTiyin),
+    amountTiyin: decision.amountTiyin,
+    meta: { installmentMonth: params.installmentMonth ?? 1, initiatedAt: now.toISOString() },
+  });
+  return { paymentId: created.id, amountTiyin: decision.amountTiyin, reused: false };
+}
+
+function toResult(
+  outcome: CheckoutTxOutcome,
+  input: Pick<CheckoutInput, "provider">,
+  secrets: ReturnType<typeof readProviderSecrets>,
+  sandbox: boolean,
+): CheckoutResult {
+  return {
+    paymentId: outcome.paymentId,
+    amountTiyin: outcome.amountTiyin,
+    checkoutUrl: sandbox ? null : checkoutUrlFor(input.provider, outcome.paymentId, outcome.amountTiyin, secrets),
+    sandbox,
+    reused: outcome.reused,
+  };
+}
+
 export async function createCheckout(
   repo: PaymentsRepository,
   input: CheckoutInput,
@@ -56,55 +110,54 @@ export async function createCheckout(
     throw new CheckoutError("PROVIDER_UNAVAILABLE", "To'lov tizimi vaqtincha sozlanmoqda. Telegram orqali murojaat qiling.");
   }
 
-  // Resolve the enrollment: existing one, or create a pending one for a new student.
-  let enrollmentId = input.enrollmentId ?? null;
-  let price: { tiyin: number };
-  if (enrollmentId) {
-    const found = await repo.findUserEnrollment(input.userId, enrollmentId);
+  // Existing enrollment path: price from the enrollment's cohort.
+  if (input.enrollmentId) {
+    const found = await repo.findUserEnrollment(input.userId, input.enrollmentId);
     if (!found) throw new CheckoutError("NOT_FOUND", "Enrollment topilmadi");
-    price = effectivePriceTiyin(found, now);
-  } else {
-    const cohort = await repo.findCohort(input.cohortId!);
-    if (!cohort) throw new CheckoutError("NOT_FOUND", "Guruh topilmadi");
-    price = effectivePriceTiyin(cohort, now);
-    const existing = await repo.findActiveUserEnrollment(input.userId, input.cohortId!);
-    if (existing) {
-      enrollmentId = existing.enrollmentId;
-      price = effectivePriceTiyin(existing, now);
-    } else {
-      const created = await repo.createPendingEnrollment(input.userId, input.cohortId!, "checkout");
-      enrollmentId = created.id;
-    }
-  }
-
-  // One active pending payment per enrollment: reuse it instead of duplicating.
-  const pending = await repo.findPendingByEnrollment(enrollmentId!, input.provider);
-  const decision = decideCheckout(pending?.id ?? null, price.tiyin);
-
-  let paymentId: string;
-  let reused = false;
-  let amountTiyin = price.tiyin;
-  if (decision.action === "reuse") {
-    paymentId = decision.paymentId;
-    reused = true;
-    amountTiyin = pending!.amountTiyin > 0 ? pending!.amountTiyin : price.tiyin;
-  } else {
-    const created = await repo.createPayment({
-      userId: input.userId,
-      enrollmentId: enrollmentId!,
-      provider: input.provider,
-      amountSum: tiyinToSumString(decision.amountTiyin),
-      amountTiyin: decision.amountTiyin,
-      meta: { installmentMonth: input.installmentMonth ?? 1, initiatedAt: now.toISOString() },
+    const price = effectivePriceTiyin(found, now);
+    const outcome = await withTransactionLock<CheckoutTxOutcome>(`checkout:${input.enrollmentId}`, async (tx: DbExecutor | null | undefined) => {
+      const ex = tx ?? null;
+      if (!ex) throw new Error("Payment database transaction is unavailable");
+      return checkoutWithEnrollment(repo, ex, {
+        userId: input.userId, enrollmentId: input.enrollmentId!, provider: input.provider,
+        installmentMonth: input.installmentMonth, priceTiyin: price.tiyin,
+      }, now);
     });
-    paymentId = created.id;
+    return toResult(outcome, input, secrets, sandbox);
   }
 
-  return {
-    paymentId,
-    amountTiyin,
-    checkoutUrl: sandbox ? null : checkoutUrlFor(input.provider, paymentId, amountTiyin, secrets),
-    sandbox,
-    reused,
-  };
+  // New enrollment path: price from the cohort; the active-enrollment
+  // re-check, the pending-enrollment insert, and the payment insert all
+  // run inside one transaction.
+  const cohort = await repo.findCohort(input.cohortId!);
+  if (!cohort) throw new CheckoutError("NOT_FOUND", "Guruh topilmadi");
+  const cohortPrice = effectivePriceTiyin(cohort, now).tiyin;
+  const existing = await repo.findActiveUserEnrollment(input.userId, input.cohortId!);
+  if (existing) {
+    const price = effectivePriceTiyin(existing, now);
+    const outcome = await withTransactionLock<CheckoutTxOutcome>(`checkout:${existing.enrollmentId}`, async (tx: DbExecutor | null | undefined) => {
+      const ex = tx ?? null;
+      if (!ex) throw new Error("Payment database transaction is unavailable");
+      return checkoutWithEnrollment(repo, ex, {
+        userId: input.userId, enrollmentId: existing.enrollmentId, provider: input.provider,
+        installmentMonth: input.installmentMonth, priceTiyin: price.tiyin,
+      }, now);
+    });
+    return toResult(outcome, input, secrets, sandbox);
+  }
+
+  const outcome = await withTransactionLock<CheckoutTxOutcome>(`checkout:new:${input.userId}:${input.cohortId}`, async (tx: DbExecutor | null | undefined) => {
+    const ex = tx ?? null;
+    if (!ex) throw new Error("Payment database transaction is unavailable");
+    const rechecked = await repo.findActiveUserEnrollmentTx(ex, input.userId, input.cohortId!);
+    const enrollmentId = rechecked
+      ? rechecked.enrollmentId
+      : (await repo.createPendingEnrollmentTx(ex, input.userId, input.cohortId!, "checkout")).id;
+    const priceTiyin = rechecked ? effectivePriceTiyin(rechecked, now).tiyin : cohortPrice;
+    return checkoutWithEnrollment(repo, ex, {
+      userId: input.userId, enrollmentId, provider: input.provider,
+      installmentMonth: input.installmentMonth, priceTiyin,
+    }, now);
+  });
+  return toResult(outcome, input, secrets, sandbox);
 }

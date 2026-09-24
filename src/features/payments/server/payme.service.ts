@@ -42,8 +42,9 @@ export async function createTransaction(
   amountTiyin: number,
   createTime: number,
 ): Promise<PaymeResult> {
-  const outcome = await withTransactionLock(`payme:${providerTxnId}`, async (tx: DbExecutor | null | undefined) => {
-    const ex = (tx ?? null) as DbExecutor | null;
+  type Outcome = { error: number } | { terminal: true } | { created: true; createTime: number };
+  const outcome = await withTransactionLock<Outcome>(`payme:${providerTxnId}`, async (tx: DbExecutor | null | undefined) => {
+    const ex = tx ?? null;
     if (!ex) throw new Error("Payment database transaction is unavailable");
     const payment = await repo.findPaymentByIdTx(ex, orderId, "payme");
     if (!payment || !sumMatchesTiyin(payment.amountSum, amountTiyin)) return { error: INVALID_AMOUNT };
@@ -70,8 +71,9 @@ export async function createTransaction(
 }
 
 export async function performTransaction(repo: PaymentsRepository, providerTxnId: string): Promise<PaymeResult> {
-  const outcome = await withTransactionLock(`payme:${providerTxnId}`, async (tx: DbExecutor | null | undefined) => {
-    const ex = (tx ?? null) as DbExecutor | null;
+  type Outcome = { error: number } | { replay: boolean; performTime: number };
+  const outcome = await withTransactionLock<Outcome>(`payme:${providerTxnId}`, async (tx: DbExecutor | null | undefined) => {
+    const ex = tx ?? null;
     if (!ex) throw new Error("Payment database transaction is unavailable");
     const payment = await repo.findByProviderTxnIdTx(ex, "payme", providerTxnId);
     if (!payment) return { error: TRANSACTION_NOT_FOUND };
@@ -91,8 +93,9 @@ export async function performTransaction(repo: PaymentsRepository, providerTxnId
 }
 
 export async function cancelTransaction(repo: PaymentsRepository, providerTxnId: string, reason: unknown): Promise<PaymeResult> {
-  const outcome = await withTransactionLock(`payme:${providerTxnId}`, async (tx: DbExecutor | null | undefined) => {
-    const ex = (tx ?? null) as DbExecutor | null;
+  type Outcome = { error: number } | { cancelTime: number };
+  const outcome = await withTransactionLock<Outcome>(`payme:${providerTxnId}`, async (tx: DbExecutor | null | undefined) => {
+    const ex = tx ?? null;
     if (!ex) throw new Error("Payment database transaction is unavailable");
     const payment = await repo.findByProviderTxnIdTx(ex, "payme", providerTxnId);
     if (!payment) return { error: TRANSACTION_NOT_FOUND };

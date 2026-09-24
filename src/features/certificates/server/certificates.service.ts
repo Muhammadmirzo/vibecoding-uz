@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
+import { withTransactionLock } from "@/db";
 import { evaluateEligibility } from "../domain/policy";
-import type { CertificatesRepository } from "./certificates.repository";
+import type { CertificatesRepository, DbExecutor, SaveCertificateInput } from "./certificates.repository";
 
 export interface CertificateReadModel {
   code: string;
@@ -48,15 +49,34 @@ export async function getMyCertificate(
   }
 
   const code = progress.existingCode ?? toCode();
-  const saved = await repo.saveCertificate({
+  const scoreText = (eligibility.score ?? 0).toFixed(2);
+  const payload: SaveCertificateInput = {
     enrollmentId: progress.enrollmentId,
     code,
     holderName: progress.fullName,
     courseTitle: progress.courseTitle,
-    finalScore: eligibility.score.toFixed(2),
+    finalScore: scoreText,
     pdfUrl: `/api/me/certificate/download?code=${code}`,
-  });
-  await repo.markEnrollmentFinished(progress.enrollmentId, code, eligibility.score.toFixed(2));
+  };
+
+  // Multi-write: certificate row + enrollment finalization must be atomic.
+  // Tx-capable repositories persist both under one advisory-locked
+  // transaction; legacy repositories fall back to sequential writes.
+  const saved = repo.saveCertificateTx && repo.markEnrollmentFinishedTx
+    ? await withTransactionLock(`certificate:${progress.enrollmentId}`, async (tx: DbExecutor | null | undefined) => {
+      const ex = tx ?? null;
+      if (!ex || !repo.saveCertificateTx || !repo.markEnrollmentFinishedTx) {
+        throw new Error("Certificate database transaction is unavailable");
+      }
+      const row = await repo.saveCertificateTx(ex, payload);
+      await repo.markEnrollmentFinishedTx(ex, progress.enrollmentId, code, scoreText);
+      return row;
+    })
+    : await (async () => {
+      const row = await repo.saveCertificate(payload);
+      await repo.markEnrollmentFinished(progress.enrollmentId, code, scoreText);
+      return row;
+    })();
 
   return {
     status: "issued",

@@ -1,16 +1,24 @@
 import { z } from "zod";
 
+// Every MCP tool accepts an optional authToken argument. It is compared with
+// crypto.timingSafeEqual against MCP_AUTH_TOKEN (see mcp-server/auth.ts).
+// Tokens are never logged.
+export const mcpAuthTokenField = z.string().min(1).optional();
+
 export const mcpGetPlatformKpisSchema = z.object({
   period: z.enum(["7d", "30d", "90d", "1y", "all"]).optional().default("30d"),
+  authToken: mcpAuthTokenField,
 });
 
 export const mcpQueryLeadsPipelineSchema = z.object({
   status: z.string().optional().default("new"),
   limit: z.number().int().positive().optional().default(10),
+  authToken: mcpAuthTokenField,
 });
 
 export const mcpGetCohortStatusSchema = z.object({
   cohortId: z.string().optional(),
+  authToken: mcpAuthTokenField,
 });
 
 export const mcpGradeHomeworkSchema = z.object({
@@ -18,6 +26,9 @@ export const mcpGradeHomeworkSchema = z.object({
   score: z.number().min(0).max(100, { message: "Score must be between 0 and 100" }),
   feedback: z.string().min(1, { message: "Feedback is required" }),
   status: z.enum(["approved", "needs_revision", "rejected"]).optional(),
+  // homework_reviews.mentor_id is NOT NULL: grading requires a mentor user id.
+  mentorId: z.string().uuid().optional(),
+  authToken: mcpAuthTokenField,
 });
 
 export const mcpBroadcastNotificationSchema = z.object({
@@ -33,6 +44,7 @@ export const mcpBroadcastNotificationSchema = z.object({
   ]).default("all_users"),
   messageBody: z.string().min(5, { message: "Message body must be at least 5 characters" }),
   cohortId: z.string().optional(),
+  authToken: mcpAuthTokenField,
 });
 
 export const mcpGenerateDiscountPromocodeSchema = z.object({
@@ -41,6 +53,7 @@ export const mcpGenerateDiscountPromocodeSchema = z.object({
   discountValue: z.number().positive({ message: "Discount value must be positive" }),
   maxUses: z.number().int().positive().optional().default(100),
   expiresInDays: z.number().positive().optional().default(7),
+  authToken: mcpAuthTokenField,
 });
 
 export const mcpGetStudentActivitySchema = z.object({
@@ -49,6 +62,7 @@ export const mcpGetStudentActivitySchema = z.object({
   cohortId: z.string().optional(),
   status: z.enum(["all", "active", "at_risk", "completed", "inactive"]).optional().default("all"),
   limit: z.number().int().positive().optional().default(10),
+  authToken: mcpAuthTokenField,
 });
 
 export type McpGetPlatformKpisInput = z.infer<typeof mcpGetPlatformKpisSchema>;
