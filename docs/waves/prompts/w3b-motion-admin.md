@@ -10,5 +10,5 @@ MISSION: owner controls animations from the admin panel.
 4. Admin UI: new "Animatsiyalar" tab in CRM settings: segmented control for level (O'chiq / Yengil / To'liq) with one-line explanations, toggles for each flag (hero, scroll reveal, pointer effects, ambient, page transitions) disabled when level = off, a live preview card that plays a sample animation reflecting the current choice, "Standartga qaytarish" button, save with optimistic UI + Uzbek success/error toasts. Theme tokens only, accessible (labels, keyboard, focus).
 5. Tests: service (valid, invalid json, DB throws → defaults, cache tag), route (unauthorized 401/403, invalid body 400, success).
 SCOPE: motion settings storage + admin tab + layout wiring. No new animations.
-Dev server: port 3205; stop ONLY with `kill $(lsof -t -i:3205)` — NEVER `pkill -f`. No Playwright.
+Dev server: port 3205; stop ONLY with `ss -ltnp | grep ':3205 ' | grep -o 'pid=[0-9]*' | cut -d= -f2 | xargs -r kill` (lsof misses next-server; a leftover server eats RAM and makes later tests hit a stale build) — NEVER `pkill -f`. No Playwright.
 GATE: tsc, vitest, build green. Report docs/waves/reports/W3B-MOTION-ADMIN.md. Commit: `git add -A && git commit -m "feat(admin): animation controls"`. Do not push.

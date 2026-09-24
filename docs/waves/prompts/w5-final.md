@@ -9,5 +9,5 @@ If docs/waves/reports/W5-FINAL.md exists, CONTINUE from it.
 4. Fix anything P0/P1 you find directly (small, safe fixes). List P2 leftovers.
 5. Run: `npx tsc --noEmit`, `npx vitest run`, `npm run build`, `E2E_PORT=3208 npx playwright test e2e/responsive.spec.ts`. Record results.
 6. Write docs/waves/reports/W5-FINAL.md: launch checklist, remaining risks, owner action items (DB restore → `npm run db:migrate` incl. 0004, BotFather steps, token rotation), and a short Uzbek summary for the owner.
-Port 3208; stop ONLY with `kill $(lsof -t -i:3208)` — NEVER `pkill -f`.
+Port 3208; stop ONLY with `ss -ltnp | grep ':3208 ' | grep -o 'pid=[0-9]*' | cut -d= -f2 | xargs -r kill` (lsof misses next-server; a leftover server eats RAM and makes later tests hit a stale build) — NEVER `pkill -f`.
 Commit: `git add -A && git commit -m "chore: W5 final QA"`. Do not push, do not deploy (the orchestrator deploys).
