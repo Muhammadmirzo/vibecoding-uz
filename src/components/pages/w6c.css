@@ -62,8 +62,8 @@ html[data-motion="full"][data-motion-hero="on"] .w6c-load {
 /* Long-form reading surface: calm, never animated. */
 .w6c-prose { max-width: 46rem; color: var(--ink-muted); font-size: 1.0625rem; line-height: 1.75; }
 .w6c-prose > * + * { margin-top: 1.25rem; }
-.w6c-prose h2 { margin-top: 2.75rem; color: var(--ink); font-family: var(--font-display); font-size: 1.5rem; font-weight: 600; letter-spacing: -.02em; line-height: 1.3; }
-.w6c-prose h3 { margin-top: 2rem; color: var(--ink); font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; }
+.w6c-prose h2 { margin-top: 2.75rem; color: var(--ink); font-family: var(--font-display), var(--font-sans), system-ui, sans-serif; font-size: 1.5rem; font-weight: 600; letter-spacing: -.02em; line-height: 1.3; }
+.w6c-prose h3 { margin-top: 2rem; color: var(--ink); font-family: var(--font-display), var(--font-sans), system-ui, sans-serif; font-size: 1.2rem; font-weight: 600; }
 .w6c-prose ul { list-style: disc; padding-left: 1.4rem; }
 .w6c-prose ol { list-style: decimal; padding-left: 1.4rem; }
 .w6c-prose li + li { margin-top: .5rem; }
@@ -71,7 +71,7 @@ html[data-motion="full"][data-motion-hero="on"] .w6c-load {
 .w6c-prose code { border: 1px solid var(--border); border-radius: 6px; background: var(--bg-sunken); padding: .1rem .4rem; font-family: var(--font-mono); font-size: .85em; }
 .w6c-prose pre { overflow-x: auto; border: 1px solid var(--terminal-border); border-radius: var(--radius-md); background: var(--terminal-bg); color: var(--terminal-ink); padding: 1.1rem 1.25rem; font-family: var(--font-mono); font-size: .85rem; line-height: 1.7; }
 .w6c-prose pre code { border: 0; background: transparent; padding: 0; color: inherit; }
-.w6c-prose blockquote { border-left: 3px solid var(--gold); padding: .25rem 0 .25rem 1.1rem; color: var(--ink); font-family: var(--font-display); font-size: 1.2rem; line-height: 1.5; }
+.w6c-prose blockquote { border-left: 3px solid var(--gold); padding: .25rem 0 .25rem 1.1rem; color: var(--ink); font-family: var(--font-display), var(--font-sans), system-ui, sans-serif; font-size: 1.2rem; line-height: 1.5; }
 .w6c-prose table { width: 100%; border-collapse: collapse; font-size: .95rem; }
 .w6c-prose th, .w6c-prose td { border: 1px solid var(--border); padding: .6rem .8rem; text-align: left; }
 .w6c-prose th { background: var(--bg-sunken); color: var(--ink); }
