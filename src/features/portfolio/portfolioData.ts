@@ -4,7 +4,7 @@ export interface PortfolioItem {
   title: string;
   url: string;
   domain: string;
-  category: "Startup MVP" | "EdTech" | "AI Bot" | "B2B SaaS";
+  category: string;
   description: string;
   imageUrl: string;
   userCount?: string | null;
@@ -14,7 +14,16 @@ export interface PortfolioItem {
   note?: string;
   badgeText: string;
   isFeatured: boolean;
+  featuredRank: number | null;
   sortOrder: number;
+  ownership: "owner" | "student" | "client" | "demo";
+  status: "published" | "draft" | "hidden";
+  coverUrl: string;
+  liveUrl: string;
+  repoUrl: string;
+  techStack: string[];
+  highlights: string[];
+  publishedAt: string | null;
 }
 
 /**
@@ -23,7 +32,9 @@ export interface PortfolioItem {
  * The PortfolioCard component will show a high-tech fallback mockup for empty imageUrl.
  * Admin panel users can click "OG rasm olish" to auto-fetch the og:image from the site.
  */
-export const PORTFOLIO_DATA: PortfolioItem[] = [
+type PortfolioMetadata = Pick<PortfolioItem, "featuredRank" | "ownership" | "status" | "publishedAt">;
+
+const RAW_PORTFOLIO_DATA: Array<Omit<PortfolioItem, keyof PortfolioMetadata | "coverUrl" | "liveUrl" | "repoUrl" | "techStack" | "highlights">> = [
   {
     id: "clash-nexus",
     slug: "clash-nexus",
@@ -50,7 +61,7 @@ export const PORTFOLIO_DATA: PortfolioItem[] = [
     source: "https://edubaza.uz",
     note: "Bu raqam loyihaning o'z saytidagi ochiq raqam; mustaqil audit qilinmagan.",
     badgeText: "Shu metod bilan qurilgan",
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 1,
   },
   {
@@ -66,7 +77,7 @@ export const PORTFOLIO_DATA: PortfolioItem[] = [
     source: "https://chatla.uz",
     note: "Bu raqam loyihaning o'z saytidagi ochiq raqam; mustaqil audit qilinmagan.",
     badgeText: "Shu metod bilan qurilgan",
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 2,
   },
   {
@@ -82,7 +93,7 @@ export const PORTFOLIO_DATA: PortfolioItem[] = [
     source: "https://imkonday.uz",
     note: "Bu raqam loyihaning o'z saytidagi ochiq raqam; mustaqil audit qilinmagan.",
     badgeText: "Shu metod bilan qurilgan",
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 3,
   },
   {
@@ -98,7 +109,7 @@ export const PORTFOLIO_DATA: PortfolioItem[] = [
     source: "https://t.me/edubazabot",
     note: "Bu raqam loyihaning o'z kanalidagi ochiq raqam; mustaqil audit qilinmagan.",
     badgeText: "Shu metod bilan qurilgan",
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 4,
   },
   {
@@ -114,7 +125,7 @@ export const PORTFOLIO_DATA: PortfolioItem[] = [
     source: "https://viberesume.uz",
     note: "Bu raqam loyihaning o'z saytidagi ochiq raqam; mustaqil audit qilinmagan.",
     badgeText: "Talabalarimiz loyihasi",
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 5,
   },
   {
@@ -130,7 +141,7 @@ export const PORTFOLIO_DATA: PortfolioItem[] = [
     source: "https://fastform.uz",
     note: "Bu raqam loyihaning o'z saytidagi ochiq raqam; mustaqil audit qilinmagan.",
     badgeText: "Talabalarimiz loyihasi",
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 6,
   },
   {
@@ -166,3 +177,31 @@ export const PORTFOLIO_DATA: PortfolioItem[] = [
     sortOrder: 8,
   },
 ];
+
+/** VERIFIED by the site owner: the only safe static public fallback entry. */
+const VERIFIED_METADATA: Record<string, PortfolioMetadata> = {
+  "clash-nexus": { ownership: "owner", status: "published", featuredRank: 1, publishedAt: "2026-01-01T00:00:00.000Z" },
+  // Unverified inserted examples. They stay available for migration/audit, never public.
+  edubaza: { ownership: "demo", status: "hidden", featuredRank: null, publishedAt: null },
+  chatla: { ownership: "demo", status: "hidden", featuredRank: null, publishedAt: null },
+  imkonday: { ownership: "demo", status: "hidden", featuredRank: null, publishedAt: null },
+  edubazabot: { ownership: "demo", status: "hidden", featuredRank: null, publishedAt: null },
+  viberesume: { ownership: "demo", status: "hidden", featuredRank: null, publishedAt: null },
+  fastform: { ownership: "demo", status: "hidden", featuredRank: null, publishedAt: null },
+  legalhelper: { ownership: "demo", status: "hidden", featuredRank: null, publishedAt: null },
+  shopspeed: { ownership: "demo", status: "hidden", featuredRank: null, publishedAt: null },
+};
+
+export const PORTFOLIO_DATA: PortfolioItem[] = RAW_PORTFOLIO_DATA.map((item) => ({
+  ...item,
+  ...VERIFIED_METADATA[item.id],
+  coverUrl: item.imageUrl,
+  liveUrl: item.url,
+  repoUrl: "",
+  techStack: [],
+  highlights: [],
+}));
+
+export const VERIFIED_PORTFOLIO_FALLBACK = PORTFOLIO_DATA.filter(
+  (item) => item.ownership === "owner" && item.status === "published",
+);
