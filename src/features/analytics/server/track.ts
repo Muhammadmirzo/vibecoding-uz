@@ -1,4 +1,5 @@
 import { createHash, randomUUID } from "node:crypto";
+import { after } from "next/server";
 import { analyticsEventRepository } from "./event.repository";
 import { hashVisitorToken } from "./ingest";
 import {
@@ -19,6 +20,19 @@ function stableServerSessionId(userId: string | null, occurredAt: Date): string 
  * The optional visitorToken is hashed immediately and is never persisted raw.
  */
 export async function trackServerEvent(input: ServerAnalyticsEvent): Promise<void> {
+  // Callers fire-and-forget (`void trackServerEvent(...)`). On Vercel a promise left running after
+  // the response can be frozen and lost, so inside a request we hand the write to `after()`, which
+  // keeps the function alive until it finishes. Outside a request scope (scripts, tests) `after`
+  // throws and we simply run the write inline.
+  try {
+    after(() => recordServerEvent(input));
+    return;
+  } catch {
+    return recordServerEvent(input);
+  }
+}
+
+async function recordServerEvent(input: ServerAnalyticsEvent): Promise<void> {
   try {
     const event = serverAnalyticsEventSchema.parse(input);
     const eventId = event.eventId ?? randomUUID();
