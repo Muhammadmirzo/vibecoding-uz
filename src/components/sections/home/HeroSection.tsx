@@ -9,7 +9,7 @@ const session = [
   "✓ Telegram-bot buyurtma qabuli",
   "✓ To'lov va yetkazish ulandi",
   "✓ Vercel'ga deploy qilindi",
-  "✓ Tayyor: https://nonvoyxona.vercel.app",
+  "✓ Tayyor: ilova Vercel'da jonli ishlamoqda",
 ] as const;
 
 function AppPreview() {
