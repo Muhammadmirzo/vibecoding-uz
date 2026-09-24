@@ -27,6 +27,7 @@ export interface ApplyFormState {
   coverLetter: string;
   loading: boolean;
   success: boolean;
+  receiptId: string;
   errors: Record<string, string>;
   setFullName: React.Dispatch<React.SetStateAction<string>>;
   setPhone: React.Dispatch<React.SetStateAction<string>>;

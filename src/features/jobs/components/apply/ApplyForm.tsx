@@ -1,7 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { applyJobSchema } from "@/lib/validations/jobs";
+import { applyJobSchema, jobApplicationReceiptSchema } from "@/lib/validations/jobs";
+import { fetchWithTimeout } from "@/lib/http/fetch";
 import { getFieldErrors, normalizePhone } from "./ApplyValidation";
 import type { ApplyFormState, ApplyJobTarget } from "./types";
 
@@ -19,6 +20,7 @@ export function useApplyForm(
   const [coverLetter, setCoverLetter] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const [success, setSuccess] = React.useState(false);
+  const [receiptId, setReceiptId] = React.useState("");
   const [errors, setErrors] = React.useState<Record<string, string>>({});
 
   React.useEffect(() => {
@@ -53,17 +55,26 @@ export function useApplyForm(
     }
     setLoading(true);
     try {
-      const res = await fetch("/api/ish/apply", {
+      const res = await fetchWithTimeout("Ariza", "/api/ish/apply", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(parseResult.data),
-      });
-      const resData = await res.json();
+      }, 10_000);
+      const resData: unknown = await res.json();
       if (!res.ok) {
-        setErrors({ general: resData.error || "Ariza yuborishda xatolik yuz berdi" });
+        const message = typeof resData === "object" && resData !== null && "message" in resData && typeof resData.message === "string"
+          ? resData.message : "Ariza yuborishda xatolik yuz berdi";
+        setErrors({ general: message });
         setLoading(false);
         return;
       }
+      const receipt = jobApplicationReceiptSchema.safeParse(resData);
+      if (!receipt.success) {
+        setErrors({ general: "Ariza saqlangan deb tasdiqlanmadi. Qayta urinib ko'ring." });
+        setLoading(false);
+        return;
+      }
+      setReceiptId(receipt.data.leadId);
       setSuccess(true);
     } catch (err) {
       setErrors({ general: networkError });
@@ -82,7 +93,7 @@ export function useApplyForm(
 
   return {
     fullName, phone, telegramUsername, resumeUrl, portfolioUrl, experience,
-    coverLetter, loading, success, errors, setFullName, setPhone,
+    coverLetter, loading, success, receiptId, errors, setFullName, setPhone,
     setTelegramUsername, setResumeUrl, setPortfolioUrl, setExperience,
     setCoverLetter, handlePhoneChange, handleSubmit, resetForAnotherApplication,
   };

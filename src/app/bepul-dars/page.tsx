@@ -34,7 +34,7 @@ const NOT_FOR = [
 const FAQS = [
   {
     question: "Dars haqiqatan bepulmi?",
-    answer: "Ha, to'liq bepul. Faqat so'rov qoldiring — havola 24 soat ichida Telegram orqali yuboriladi.",
+    answer: "Ha, to'liq bepul. So'rovni qoldiring; saqlanish tasdiqlanganidan keyin Telegram orqali murojaat qilish yoki bepul dars sahifasidan foydalanish mumkin.",
   },
   {
     question: "Darsni ko'rish uchun dasturlash bilish shartmi?",

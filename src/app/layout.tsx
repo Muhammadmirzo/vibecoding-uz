@@ -51,9 +51,7 @@ export const metadata: Metadata = {
   description,
   applicationName: BRAND.name,
   keywords: ["Naqsh", "naqsh maktabi", "vibe coding O'zbekiston", "Claude Code kursi", "AI bilan dasturlash"],
-  alternates: {
-    canonical: "/",
-  },
+  alternates: {},
   manifest: "/manifest.json",
   icons: {
     icon: "/icon.svg",
@@ -67,7 +65,7 @@ export const metadata: Metadata = {
   openGraph: {
     title,
     description,
-    url: "/",
+    url: undefined,
     siteName: BRAND.name,
     locale: BRAND.locale,
     type: "website",

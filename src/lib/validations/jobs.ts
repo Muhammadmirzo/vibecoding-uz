@@ -37,5 +37,12 @@ export const applyJobSchema = z.object({
   }
 });
 
+export const jobApplicationReceiptSchema = z.object({
+  success: z.literal(true),
+  message: z.string(),
+  leadId: z.string().uuid(),
+  status: z.literal("received"),
+});
+
 export type JobOpening = z.infer<typeof jobOpeningSchema>;
 export type ApplyJobInput = z.infer<typeof applyJobSchema>;

@@ -9,7 +9,7 @@ import { Container, Eyebrow, Heading, Section } from "@/components/ui/Layout";
 import { NextStepCTA } from "@/components/ui/NextStepCTA";
 import { PORTFOLIO_DATA } from "@/features/portfolio/portfolioData";
 import { siteConfig } from "@/lib/siteConfig";
-import { BRAND } from "@/config/brand";
+import { courseJsonLd, routeMetadata, serializeJsonLd } from "@/lib/seo";
 import { COMPARISON_ROWS, COURSES, COURSE_SLUGS, getCoursePricing } from "@/features/courses/content";
 import { CourseCheckoutCard } from "../CourseCheckoutCard";
 import { StickyBuyBar } from "./StickyBuyBar";
@@ -26,10 +26,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const course = COURSES[slug];
   if (!course) return { title: "Kurs topilmadi" };
-  return {
-    title: `${course.title} — ${course.subtitle}`,
-    description: course.description,
-  };
+  return routeMetadata({ title: `${course.title} — ${course.subtitle}`, description: course.description, path: `/kurs/${slug}` });
 }
 
 export default async function CourseDetailPage({ params }: Props) {
@@ -39,23 +36,11 @@ export default async function CourseDetailPage({ params }: Props) {
   const pricing = getCoursePricing(slug);
   const projects = PORTFOLIO_DATA.filter((item) => item.isFeatured).slice(0, 3);
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Course",
-    name: course.title,
-    description: course.description,
-    provider: { "@type": "Organization", name: BRAND.name, url: BRAND.url },
-    hasCourseInstance: {
-      "@type": "CourseInstance",
-      courseMode: "online",
-      courseWorkload: course.duration,
-      startDate: siteConfig.nextCohortDate,
-    },
-  };
+  const jsonLd = courseJsonLd({ name: course.title, description: course.description, price: pricing.price, path: `/kurs/${slug}`, startDate: siteConfig.nextCohortDate });
 
   return (
     <div className="bg-bg">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }} />
       <Section eyebrow={course.level} title="">
         <div className="grid items-start gap-10 lg:grid-cols-[1fr_380px]">
           <div className="space-y-6">

@@ -17,7 +17,7 @@ interface AuthContextType {
   login: (phone: string) => Promise<boolean>;
   verifyOtp: (code: string) => Promise<boolean>;
   logout: () => Promise<void>;
-  openAuthModal: (step?: "login" | "otp") => void;
+  openAuthModal: (step?: "login" | "otp", redirect?: string) => void;
   closeAuthModal: () => void;
   clearError: () => void;
   clearToast: () => void;
@@ -58,8 +58,9 @@ export function AuthProvider({ children, initialUser = null }: { children: React
     setToastType(null);
   }, []);
 
-  const openAuthModal = useCallback((step: "login" | "otp" = "login") => {
+  const openAuthModal = useCallback((step: "login" | "otp" = "login", redirect?: string) => {
     clearMessages();
+    if (redirect && isInternalRedirect(redirect)) loginRedirect.current = redirect;
     setAuthStep(step);
     setIsAuthModalOpen(true);
   }, [clearMessages]);
