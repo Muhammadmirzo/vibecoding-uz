@@ -16,7 +16,9 @@
 
 ## 📍 Current Status
 
-**New session? Read [docs/HANDOFF_2026-09-24.md](docs/HANDOFF_2026-09-24.md) §0 first** — live state, blockers (Supabase DB down), Telegram bot (@Boyakagabot), and next steps. Owner speaks Uzbek — reply in Uzbek.
+**Active work: Naqsh rebrand/motion/Telegram-signup waves → read [docs/waves/STATE.md](docs/waves/STATE.md) first and follow its "davom et" protocol.**
+
+**Background: [docs/HANDOFF_2026-09-24.md](docs/HANDOFF_2026-09-24.md) §0** — live state, blockers (Supabase DB down), Telegram bot (@Boyakagabot), and next steps. Owner speaks Uzbek — reply in Uzbek.
 
 ---
 
