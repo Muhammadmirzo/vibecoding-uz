@@ -24,13 +24,13 @@
 .w6c-hero-dark .w6c-lede { opacity: .78; }
 .w6c-hero-dark .w6c-hero-mesh { opacity: .35; }
 
-/* Above-fold load entrance: staggered fade + 14px rise, gated. */
+/* Above-fold load entrance: LCP-safe rise (transform-only, so the element
+ * counts for LCP at first paint); staggered via --i, gated. */
 html[data-motion="full"][data-motion-hero="on"] .w6c-load {
-  opacity: 0;
-  animation: w6c-load var(--motion-base) var(--motion-ease-out) forwards;
+  animation: w6c-load var(--motion-base) var(--motion-ease-out) both;
   animation-delay: calc(var(--i, 0) * var(--motion-stagger));
 }
-@keyframes w6c-load { to { opacity: 1; } }
+@keyframes w6c-load { from { transform: translateY(10px); } to { transform: none; } }
 
 /* Girih section transition (same polygon vocabulary as home). */
 .w6c-wipe { position: relative; }
@@ -120,7 +120,7 @@ html[data-motion="off"] .w6c-hero-mesh, html[data-motion="off"] .w6c-hero-grain 
 
 @media (prefers-reduced-motion: reduce) {
   .scroll-fill-base { clip-path: none; }
-  .w6c-load { opacity: 1 !important; animation: none !important; }
+  .w6c-load { animation: none !important; }
   .w6c-path-progress { transform: scaleY(1) !important; animation: none !important; }
   .w6c-seal-draw { stroke-dashoffset: 0 !important; animation: none !important; }
   .w6c-skel { animation: none !important; }
