@@ -41,7 +41,7 @@ export function registerMenuHandlers(bot: Telegraf) {
       "• Xarajat: <b>1 500$ — 4 000$</b>",
       "• Muddat: <b>2 — 4 oy</b>",
       "• Doimiy to'lov va qaramlik.\n",
-      "⚡️ <b>Vibecoding usuli (O'zingiz qurasiz):</b>",
+      "⚡️ <b>Naqsh usuli (O'zingiz qurasiz):</b>",
       "• Xarajat: <b>0$</b> (Faqat kurs narxi evaziga)",
       "• Muddat: <b>4 — 7 kun</b>",
       "• To'liq erkinlik va o'z qo'lingizdagi boshqaruv!\n",

@@ -187,7 +187,7 @@ describe("Infrastructure Integrations: SMS, Email, Cron, Search & PWA", () => {
 
       const content = fs.readFileSync(manifestPath, "utf-8");
       const parsed = JSON.parse(content);
-      expect(parsed.name).toContain("Mirzo Academy");
+      expect(parsed.name).toContain("Naqsh");
       expect(parsed.start_url).toBe("/");
       expect(parsed.display).toBe("standalone");
     });
@@ -197,7 +197,7 @@ describe("Infrastructure Integrations: SMS, Email, Cron, Search & PWA", () => {
       expect(fs.existsSync(swPath)).toBe(true);
 
       const content = fs.readFileSync(swPath, "utf-8");
-      expect(content).toContain("vibecoding-v1");
+      expect(content).toContain("naqsh-v1");
       expect(content).toContain("addEventListener(\"install\"");
       expect(content).toContain("addEventListener(\"fetch\"");
     });

@@ -25,7 +25,7 @@ export function registerStartHandler(bot: Telegraf) {
 
       if (result.success && result.user) {
         return ctx.reply(
-          `🎉 Xush kelibsiz, <b>${result.user.fullName}</b>!\n\nHisobingiz Vibecoding platformasiga muvaffaqiyatli ulandi.\nBarcha dars yangiliklari va uyga vazifa baholari shu bot orqali boradi.`,
+          `🎉 Xush kelibsiz, <b>${result.user.fullName}</b>!\n\nHisobingiz Naqsh platformasiga muvaffaqiyatli ulandi.\nBarcha dars yangiliklari va uyga vazifa baholari shu bot orqali boradi.`,
           {
             parse_mode: "HTML",
             ...Markup.inlineKeyboard([
@@ -37,7 +37,7 @@ export function registerStartHandler(bot: Telegraf) {
     }
 
     const welcomeText = [
-      "🚀 <b>Vibecoding — AI bilan real mahsulotlar yaratish akademiyasi</b>\n",
+      "🚀 <b>Naqsh — AI bilan real mahsulotlar yaratish maktabi</b>\n",
       "Bu bot orqali siz:",
       "• 8 haftada g'oyadan jonli dasturgacha chiqarish metodini o'rganasiz",
       "• Dasturchilarsiz startap qurish bo'yicha bepul darslarni ko'rasiz",

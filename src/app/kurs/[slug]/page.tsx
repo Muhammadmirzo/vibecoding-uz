@@ -9,6 +9,7 @@ import { Container, Eyebrow, Heading, Section } from "@/components/ui/Layout";
 import { NextStepCTA } from "@/components/ui/NextStepCTA";
 import { PORTFOLIO_DATA } from "@/features/portfolio/portfolioData";
 import { siteConfig } from "@/lib/siteConfig";
+import { BRAND } from "@/config/brand";
 import { COMPARISON_ROWS, COURSES, COURSE_SLUGS, getCoursePricing } from "@/features/courses/content";
 import { CourseCheckoutCard } from "../CourseCheckoutCard";
 import { StickyBuyBar } from "./StickyBuyBar";
@@ -43,7 +44,7 @@ export default async function CourseDetailPage({ params }: Props) {
     "@type": "Course",
     name: course.title,
     description: course.description,
-    provider: { "@type": "Organization", name: "VibeCoding", url: "https://vibecoding.uz" },
+    provider: { "@type": "Organization", name: BRAND.name, url: BRAND.url },
     hasCourseInstance: {
       "@type": "CourseInstance",
       courseMode: "online",
@@ -172,11 +173,11 @@ export default async function CourseDetailPage({ params }: Props) {
         <h3 className="mb-4 mt-12 font-display text-xl font-semibold text-ink">Qaysi yo&apos;l sizga to&apos;g&apos;ri keladi?</h3>
         <div className="overflow-x-auto rounded-xl border border-border">
           <table className="w-full min-w-[560px] border-collapse bg-bg-elevated text-left text-sm">
-            <caption className="sr-only">VibeCoding, an'anaviy bootcamp va YouTube solishtiruvi</caption>
+            <caption className="sr-only">Naqsh, an&apos;anaviy bootcamp va YouTube solishtiruvi</caption>
             <thead>
               <tr className="border-b border-border bg-bg-sunken">
                 <th scope="col" className="px-5 py-4 font-semibold text-ink">Mezon</th>
-                <th scope="col" className="px-5 py-4 font-semibold text-brand">VibeCoding</th>
+                <th scope="col" className="px-5 py-4 font-semibold text-brand">Naqsh</th>
                 <th scope="col" className="px-5 py-4 font-semibold text-ink-muted">An'anaviy bootcamp</th>
                 <th scope="col" className="px-5 py-4 font-semibold text-ink-muted">YouTube</th>
               </tr>

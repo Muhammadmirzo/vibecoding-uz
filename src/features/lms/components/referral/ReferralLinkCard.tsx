@@ -67,7 +67,7 @@ export function ReferralLinkCard({
           href={`https://t.me/share/url?url=${encodeURIComponent(
             referralUrl,
           )}&text=${encodeURIComponent(
-            "Mirzo Academy kursiga qo'shiling va o'rganishni davom ettiring!",
+            "Naqsh kursiga qo'shiling va o'rganishni davom ettiring!",
           )}`}
           target="_blank"
           rel="noreferrer"

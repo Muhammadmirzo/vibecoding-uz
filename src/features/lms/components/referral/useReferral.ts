@@ -1,6 +1,7 @@
 "use client";
 import * as React from "react";
 import { useAuth } from "@/context/AuthContext";
+import { BRAND } from "@/config/brand";
 import { referralClaimBonusSchema } from "@/lib/validations/student";
 import type {
   PayoutMethod,
@@ -17,7 +18,7 @@ export function useReferral() {
   const referralUrl =
     typeof window !== "undefined"
       ? `${window.location.origin}/ref/${referralCode}`
-      : `https://vibecoding.uz/ref/${referralCode}`;
+      : `${BRAND.url}/ref/${referralCode}`;
   const handleCopy = () => {
     navigator.clipboard.writeText(referralUrl);
     setCopied(true);

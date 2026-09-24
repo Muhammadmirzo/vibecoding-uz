@@ -6,6 +6,7 @@ import {
   WelcomeEmailInput,
   DripUnlockEmailInput,
 } from "@/lib/validations/email";
+import { BRAND } from "@/config/brand";
 
 export interface SendEmailResult {
   success: boolean;
@@ -21,7 +22,7 @@ export async function sendEmail(input: SendEmailInput): Promise<SendEmailResult>
   const validated = sendEmailSchema.parse(input);
 
   const apiKey = process.env.RESEND_API_KEY;
-  const fromEmail = validated.from || process.env.RESEND_FROM_EMAIL || "Mirzo Academy <no-reply@academy.mirzo.uz>";
+  const fromEmail = validated.from || process.env.RESEND_FROM_EMAIL || `${BRAND.name} <no-reply@academy.mirzo.uz>`;
   const toList = Array.isArray(validated.to) ? validated.to : [validated.to];
 
   if (!apiKey) {
@@ -99,16 +100,16 @@ export async function sendWelcomeEmail(input: WelcomeEmailInput): Promise<SendEm
     <body>
       <div class="card">
         <div class="header">
-          <a href="https://vibecoding.uz" class="brand">Mirzo Academy</a>
+          <a href="${BRAND.url}" class="brand">${BRAND.name}</a>
         </div>
         <div class="title">Xush kelibsiz, ${validated.fullName}! 🎉</div>
         <p>Siz <strong>${courseName}</strong> platformasida muvaffaqiyatli ro'yxatdan o'tdingiz.</p>
         <p>AI yordamida dasturlashsiz real mahsulotlar qurish va amaliy ko'nikmalarni egallash safaringiz boshlandi!</p>
         <div style="text-align: center;">
-          <a href="https://vibecoding.uz/kabinet" class="btn">Shaxsiy kabinetga o'tish</a>
+          <a href="${BRAND.url}/kabinet" class="btn">Shaxsiy kabinetga o'tish</a>
         </div>
         <div class="footer">
-          &copy; ${new Date().getFullYear()} Mirzo Academy. Barcha huquqlar himoyalangan.
+          &copy; ${new Date().getFullYear()} ${BRAND.name}. Barcha huquqlar himoyalangan.
         </div>
       </div>
     </body>
@@ -117,7 +118,7 @@ export async function sendWelcomeEmail(input: WelcomeEmailInput): Promise<SendEm
 
   return sendEmail({
     to: validated.to,
-    subject: `Mirzo Academy'ga xush kelibsiz, ${validated.fullName}!`,
+    subject: `${BRAND.name}ga xush kelibsiz, ${validated.fullName}!`,
     html,
   });
 }
@@ -144,7 +145,7 @@ export async function sendDripUnlockEmail(input: DripUnlockEmailInput): Promise<
     </head>
     <body>
       <div class="card">
-        <a href="https://vibecoding.uz" class="brand">Mirzo Academy</a>
+        <a href="${BRAND.url}" class="brand">${BRAND.name}</a>
         <div class="title">Yangi darsingiz ochildi! 🚀</div>
         <p>Salom, ${validated.fullName}. Kursingizdagi navbatdagi dars tayyor:</p>
         <div class="lesson-box">

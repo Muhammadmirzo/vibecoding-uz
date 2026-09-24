@@ -29,7 +29,7 @@ export const STATIC_TESTIMONIALS: TestimonialExampleItem[] = [
     courseTitle: "Vibe Coding Express",
     cohortName: "Sentyabr 2026 Kohortasi",
     type: "text",
-    body: "Men ilgari faqat Figma'da dizayn chizardim. Lekin Vibecoding Express orqali o'zim o'ylagan dizaynni Next.js va Tailwind'da to'liq jonli saytga aylantirishni o'rgandim. Birinchi mijozim uchun ta'lim platformasini 1200$ ga muvaffaqiyatli topshirdim!",
+    body: "Men ilgari faqat Figma'da dizayn chizardim. Lekin Vibe Coding Express orqali o'zim o'ylagan dizaynni Next.js va Tailwind'da to'liq jonli saytga aylantirishni o'rgandim. Birinchi mijozim uchun ta'lim platformasini 1200$ ga muvaffaqiyatli topshirdim!",
     rating: 5,
     verified: false,
     isExample: true,

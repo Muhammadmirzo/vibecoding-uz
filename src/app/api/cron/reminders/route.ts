@@ -7,6 +7,7 @@ import { sendSms } from "@/lib/sms/eskiz";
 import { drizzleRemindersRepository } from "@/features/crm/server/reminders.repository";
 import { runReminders, type ReminderNotifier } from "@/features/crm/server/reminders.service";
 import { isCronAuthorized } from "@/lib/security/cron";
+import { BRAND } from "@/config/brand";
 
 const notifier: ReminderNotifier = {
   sendTelegram: async (tgUserId, html) => { await sendTelegramMessage(tgUserId, html); },
@@ -15,7 +16,7 @@ const notifier: ReminderNotifier = {
       to: input.to,
       fullName: input.fullName,
       lessonTitle: input.lessonTitle,
-      lessonUrl: "https://vibecoding.uz/kabinet",
+      lessonUrl: `${BRAND.url}/kabinet`,
     });
   },
   sendSms: async (input) => { await sendSms({ phone: input.phone, message: input.message }); },

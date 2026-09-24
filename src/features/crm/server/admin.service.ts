@@ -9,7 +9,7 @@ import type { AdminRepository, AuditLogItem, DbExecutor } from "./admin.reposito
  */
 
 export const DEFAULT_SETTINGS: Record<string, unknown> = {
-  siteTitle: "Mirzo Academy",
+  siteTitle: "Naqsh",
   supportPhone: "+998 71 200 00 00",
   supportTelegram: "@mirzo_academy_support_bot",
   maintenanceMode: false,

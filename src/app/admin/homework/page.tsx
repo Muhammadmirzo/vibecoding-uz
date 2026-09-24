@@ -1,7 +1,7 @@
 import { HomeworkQueue } from "@/features/crm/components/HomeworkQueue";
 
 export const metadata = {
-  title: "Uy Vazifalari Navbati | Vibecoding Admin",
+  title: "Uy Vazifalari Navbati | Naqsh",
 };
 
 export default function AdminHomeworkPage() {

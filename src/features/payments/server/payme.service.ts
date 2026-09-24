@@ -29,7 +29,7 @@ export async function checkPerform(repo: PaymentsRepository, orderId: string, am
       allow: true,
       detail: {
         receipt_type: 0,
-        items: [{ title: "Vibecoding kurs to'lovi", price: amountTiyin, count: 1, code: "1000000000", vat_percent: 0 }],
+        items: [{ title: "Naqsh kurs to'lovi", price: amountTiyin, count: 1, code: "1000000000", vat_percent: 0 }],
       },
     },
   };

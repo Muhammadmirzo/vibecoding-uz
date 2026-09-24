@@ -57,7 +57,7 @@ export default async function BlogPostDetailPage({ params }: Props) {
     image: post.coverUrl,
     datePublished: post.publishedAt,
     author: { "@type": "Person", name: post.authorName },
-    publisher: { "@type": "Organization", name: "Mirzo Academy" },
+    publisher: { "@type": "Organization", name: "Naqsh" },
     mainEntityOfPage: `${siteUrl}/blog/${post.slug}`,
   };
 

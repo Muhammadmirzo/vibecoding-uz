@@ -88,6 +88,6 @@ export async function sendSms(input: SendSmsInput): Promise<SendSmsResult> {
 /** Sends an OTP verification code via SMS. */
 export async function sendOtpSms(input: SendOtpSmsInput): Promise<SendSmsResult> {
   const validated = sendOtpSmsSchema.parse(input);
-  const message = `academy.mirzo.uz — Tasdiqlash kodingiz: ${validated.code}. Kodni hech kimga bermang!`;
+  const message = `Naqsh — Tasdiqlash kodingiz: ${validated.code}. Kodni hech kimga bermang!`;
   return sendSms({ phone: validated.phone, message });
 }

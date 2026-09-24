@@ -41,7 +41,7 @@ function Brand() {
   return (
     <Link href="/admin" className="flex min-h-11 items-center gap-3 rounded-lg px-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
       <span className="grid h-10 w-10 place-items-center rounded-xl bg-brand-soft text-brand"><ShieldCheck className="h-5 w-5" /></span>
-      <span><span className="block font-display text-sm font-semibold text-ink">Mirzo Academy</span><span className="block text-xs text-ink-muted">Boshqaruv markazi</span></span>
+      <span><span className="block font-display text-sm font-semibold text-ink">Naqsh</span><span className="block text-xs text-ink-muted">Boshqaruv markazi</span></span>
     </Link>
   );
 }

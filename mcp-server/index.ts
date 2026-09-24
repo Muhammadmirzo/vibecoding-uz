@@ -10,7 +10,7 @@ import { dispatchTool, listToolDefs } from "./server";
 async function main(): Promise<void> {
   requireServerToken();
   const server = new Server(
-    { name: "vibecoding-mcp-server", version: "2.0.0" },
+    { name: "naqsh-mcp-server", version: "2.0.0" },
     { capabilities: { tools: {} } }
   );
   server.setRequestHandler(ListToolsRequestSchema, async () => ({
@@ -21,7 +21,7 @@ async function main(): Promise<void> {
     return { content: result.content, isError: result.isError ?? false };
   });
   await server.connect(new StdioServerTransport());
-  console.error("Vibecoding MCP Server running on stdio...");
+  console.error("Naqsh MCP Server running on stdio...");
 }
 
 main().catch((error: unknown) => {

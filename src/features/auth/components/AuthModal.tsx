@@ -25,7 +25,7 @@ export function AuthModal() {
             <div className="min-w-0">
               <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-gold-soft px-2.5 py-1 text-xs font-semibold text-gold-hover">
                 <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-                <span>Vibecoding platformasi</span>
+                <span>Naqsh platformasi</span>
               </div>
               <Dialog.Title className="font-display text-2xl font-bold tracking-tight text-ink sm:text-3xl">
                 {isOtpStep ? "Kodni tasdiqlash" : "Tizimga kirish"}

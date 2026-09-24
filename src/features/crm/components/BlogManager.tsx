@@ -6,7 +6,7 @@ import { BlogFormModal } from "./Blogs/BlogFormModal";
 import { BlogTable } from "./Blogs/BlogTable";
 import { useBlogs } from "./Blogs/useBlogs";
 import type { BlogForm, BlogPost, EditorTab } from "./Blogs/types";
-const blank = (): BlogForm => ({ title: "", slug: "", category: "Vibe Coding", authorName: "Mirzo Academy Team", coverUrl: "", excerpt: "", contentMd: "", seoTitle: "", seoDescription: "", status: "published", publishedAt: new Date().toISOString().slice(0, 16) });
+const blank = (): BlogForm => ({ title: "", slug: "", category: "Vibe Coding", authorName: "Naqsh jamoasi", coverUrl: "", excerpt: "", contentMd: "", seoTitle: "", seoDescription: "", status: "published", publishedAt: new Date().toISOString().slice(0, 16) });
 export type { BlogPost } from "./Blogs/types";
 export function BlogManager() {
   const data = useBlogs(); const [open, setOpen] = useState(false); const [editing, setEditing] = useState<BlogPost | null>(null); const [form, setForm] = useState<BlogForm>(blank); const [tab, setTab] = useState<EditorTab>("edit");

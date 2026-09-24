@@ -1,7 +1,7 @@
 import { UserManager } from "@/features/crm/components/UserManager";
 
 export const metadata = {
-  title: "Foydalanuvchilar & Audit | Vibecoding Admin",
+  title: "Foydalanuvchilar & Audit | Naqsh",
   description: "Xodimlar rollari va tizim audit jurnali paneli",
 };
 

@@ -1,7 +1,7 @@
 import { SettingsManager } from "@/features/crm/components/SettingsManager";
 
 export const metadata = {
-  title: "Admin Profili va Xavfsizlik | Vibecoding Admin",
+  title: "Admin Profili va Xavfsizlik | Naqsh",
   description: "Parol va login ma'lumotlarini o'zgartirish paneli",
 };
 

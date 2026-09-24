@@ -29,7 +29,7 @@ export async function seedUsers(context: SeedContext): Promise<void> {
           profession: user.role === "student" ? "Startapchi / Tadbirkor" : "AI Injiniring Mutaxassisi",
           goal: "AI yordamida tezkor mahsulotlar qurish va biznesni avtomatlashtirish",
           source: "Telegram Mini App",
-          bio: `${user.fullName} Mirzo Academy jamiyatining faol a'zosi.`,
+          bio: `${user.fullName} Naqsh jamiyatining faol a'zosi.`,
         })
         .onConflictDoNothing();
     }

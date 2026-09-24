@@ -9,7 +9,7 @@ export const createBlogPostSchema = z.object({
   excerpt: z.string().optional().nullable(),
   contentMd: z.string().min(5, { message: "Maqola matni kiritilishi shart" }),
   coverUrl: z.string().optional().nullable(),
-  authorName: z.string().default("Mirzo Academy Team"),
+  authorName: z.string().default("Naqsh jamoasi"),
   category: z.string().default("Vibe Coding"),
   seoTitle: z.string().optional().nullable(),
   seoDescription: z.string().optional().nullable(),
