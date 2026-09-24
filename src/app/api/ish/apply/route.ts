@@ -3,8 +3,13 @@ import { applyJobSchema } from "@/lib/validations";
 import { applyForJob, drizzleJobApplicationsRepository, JobApplyError } from "@/features/jobs/server/apply.service";
 import { checkRateLimit, getClientIp, createRateLimitResponse, PRESETS } from "@/lib/security/rateLimit";
 import { errorResponse } from "@/lib/http/errors";
+import { isClosed } from "@/lib/features/closed";
 
 export async function POST(request: Request) {
+  // W10: ish o'rinlari vaqtincha yopiq — legacy shaklda 404 (marshrut legacy).
+  if (isClosed("jobs")) {
+    return NextResponse.json({ error: "Bu bo'lim vaqtincha yopiq" }, { status: 404 });
+  }
   try {
     const ip = getClientIp(request);
     const rl = await checkRateLimit(`apply:${ip}`, PRESETS.PUBLIC_WRITE);
