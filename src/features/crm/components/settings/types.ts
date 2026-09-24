@@ -1,4 +1,4 @@
-export type SettingsTab = "general" | "pricing" | "guarantee" | "integrations" | "features" | "security";
+export type SettingsTab = "general" | "pricing" | "guarantee" | "integrations" | "features" | "motion" | "security";
 
 export type SettingsState = {
   siteTitle: string;
