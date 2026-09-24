@@ -54,8 +54,8 @@ function renderLine(line: string, key: number, startDelay: number) {
 
 export function TerminalWindow({ lines, className, title = "build — claude-code", startDelay = 0 }: TerminalWindowProps) {
   return (
-    <div className={cn("overflow-hidden rounded-xl bg-ink text-bg shadow-lg", className)}>
-      <div className="flex items-center gap-2 border-b border-bg/10 px-4 py-3 font-mono text-xs text-bg/60">
+    <div className={cn("overflow-hidden rounded-xl bg-terminal text-terminal-ink shadow-lg", className)}>
+      <div className="flex items-center gap-2 border-b border-terminal px-4 py-3 font-mono text-xs text-terminal-muted">
         <span className="size-2 rounded-full bg-danger" aria-hidden="true" />
         <span className="size-2 rounded-full bg-gold" aria-hidden="true" />
         <span className="size-2 rounded-full bg-success" aria-hidden="true" />

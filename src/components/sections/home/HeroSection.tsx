@@ -1,4 +1,4 @@
-import { ArrowRight, CirclePlay, MapPin, ShieldCheck, ShoppingBag, Star } from "lucide-react";
+import { ArrowRight, CirclePlay, MapPin, ShieldCheck, ShoppingBag } from "lucide-react";
 import { Button, Container, GirihPattern, TerminalWindow } from "@/components/ui";
 import { MagneticButton } from "@/features/motion/ui/MagneticButton";
 import { ParallaxCard } from "@/features/motion/ui/ParallaxCard";
@@ -12,8 +12,7 @@ const session = [
   "✓ Baza: products, orders",
   "✓ Telegram-bot buyurtma qabuli",
   "✓ To'lov va yetkazish ulandi",
-  "✓ Vercel'ga deploy qilindi",
-  "✓ Tayyor: ilova Vercel'da jonli ishlamoqda",
+  "✓ deployed → https://demo.invalid/nonvoyxona",
 ] as const;
 
 function AppPreview() {
@@ -22,7 +21,7 @@ function AppPreview() {
       <div className="mb-3 flex items-center justify-between border-b border-border pb-2">
         <div className="flex items-center gap-2">
           <span className="flex size-7 items-center justify-center rounded-md bg-gold-soft text-brand"><ShoppingBag className="size-3.5" /></span>
-          <span className="text-xs font-bold text-ink">Nonvoyxa</span>
+          <span className="text-xs font-bold text-ink">Nonvoyxona</span>
         </div>
         <span className="rounded-full bg-success-soft px-2 py-0.5 text-[9px] font-bold text-success">Ochiq</span>
       </div>
@@ -33,7 +32,7 @@ function AppPreview() {
           <span className="text-[10px] font-bold text-ink">28k</span>
         </div>
         <div className="flex items-center justify-between rounded-md border border-border px-2 py-2 text-[10px] text-ink-muted"><span className="flex items-center gap-1"><MapPin className="size-3 text-accent" />Yetkazib berish</span><span className="font-semibold text-ink">25–35 min</span></div>
-        <div className="flex items-center gap-1 text-[9px] text-ink-subtle"><Star className="size-3 fill-gold text-gold" />4.9 · 320+ buyurtma</div>
+        <p className="text-xs text-ink-muted">Demo interfeys · real buyurtma emas</p>
       </div>
     </div>
   );
@@ -43,7 +42,7 @@ export function HeroSection() {
   return (
     <section className="relative isolate overflow-hidden bg-bg py-16 sm:py-24 lg:py-28">
       <GirihPattern className="absolute inset-0 -z-10 h-full w-full text-brand opacity-[0.06]" aria-hidden="true" />
-      <GirihWeave className="pointer-events-none absolute -right-16 top-1/2 -z-10 hidden h-[420px] w-[420px] -translate-y-1/2 text-brand opacity-[0.12] md:block dark:opacity-[0.16]" />
+      <GirihWeave className="pointer-events-none absolute right-4 top-1/2 -z-10 hidden h-[360px] w-[360px] -translate-y-1/2 text-brand opacity-[0.12] md:block dark:opacity-[0.16]" />
       <div className="absolute left-1/2 top-8 -z-10 h-72 w-[min(92vw,900px)] -translate-x-1/2 rounded-full bg-accent-soft/55 blur-3xl" aria-hidden="true" />
       <Container className="grid items-center gap-14 lg:grid-cols-[2fr_1fr] lg:gap-12 xl:gap-16">
         <div>

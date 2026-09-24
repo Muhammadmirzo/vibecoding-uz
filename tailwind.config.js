@@ -14,6 +14,7 @@ module.exports = {
         success: { DEFAULT: "var(--success)", soft: "var(--success-soft)", line: "var(--success-line)" },
         danger: { DEFAULT: "var(--danger)", soft: "var(--danger-soft)" },
         telegram: { DEFAULT: "var(--telegram)", hover: "var(--telegram-hover)", soft: "var(--telegram-soft)" },
+        terminal: { DEFAULT: "var(--terminal-bg)", ink: "var(--terminal-ink)", muted: "var(--terminal-muted)", border: "var(--terminal-border)" },
       },
       fontFamily: { display: ["var(--font-display)", "var(--font-sans)", "sans-serif"], sans: ["var(--font-sans)", "system-ui", "sans-serif"], mono: ["var(--font-mono)", "monospace"] },
       borderRadius: { sm: "var(--radius-sm)", md: "var(--radius-md)", lg: "var(--radius-lg)", xl: "var(--radius-xl)" },

@@ -29,6 +29,10 @@
     --telegram: #229ed9;
     --telegram-hover: #1688bd;
     --telegram-soft: #e2f5fc;
+    --terminal-bg: #0e1a2b;
+    --terminal-ink: #eef2f8;
+    --terminal-muted: #a9b4c6;
+    --terminal-border: #2a3b57;
     --shadow-color: 14 26 43;
     --radius-sm: 8px;
     --radius-md: 14px;
