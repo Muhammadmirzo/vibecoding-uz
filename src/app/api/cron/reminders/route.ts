@@ -6,6 +6,7 @@ import { sendDripUnlockEmail } from "@/lib/email/resend";
 import { sendSms } from "@/lib/sms/eskiz";
 import { drizzleRemindersRepository } from "@/features/crm/server/reminders.repository";
 import { runReminders, type ReminderNotifier } from "@/features/crm/server/reminders.service";
+import { cleanupRateLimitBuckets } from "@/lib/security/rateLimit/postgresLimiter";
 import { isCronAuthorized } from "@/lib/security/cron";
 import { BRAND } from "@/config/brand";
 
@@ -40,6 +41,8 @@ async function handleCronRequest(req: NextRequest) {
     const input = parsed.success ? parsed.data : { action: "all" as const };
     const now = new Date();
     const outcome = await runReminders(drizzleRemindersRepository, notifier, input, now);
+    // W10: shared rate-limit buckets cleanup — best-effort, never fails the cron run.
+    await cleanupRateLimitBuckets();
     return NextResponse.json(cronResultSchema.parse({
       success: true,
       timestamp: now.toISOString(),
