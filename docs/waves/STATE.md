@@ -28,8 +28,8 @@ Parallel agents allowed (max 2) — heavy commands serialized with `scripts/wave
 | Wave | Model | Status | Branch | Report | Notes |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | W6A Design + motion: HOME | space-bunny-free (muse rate-limited) | 🏃 | wave/w6a-design-home | reports/W6A-DESIGN-HOME.md | scroll-driven storytelling, bento, micro-interactions; port 3301 |
-| W6B Portfolio management | space-bunny-free | 🏃 | wave/w6b-portfolio | reports/W6B-PORTFOLIO.md | featured rank, ownership, admin CRUD; new migration (orchestrator applies); port 3302 |
-| W6C Design rollout: all pages | muse-spark-1.3 | ⏳ after W6A approved | — | reports/W6C-DESIGN-PAGES.md | reuse W6A primitives |
+| W6B Portfolio management | space-bunny-free | 🔍 finished (ef9f9cf, log exit=1 after commit) — NEEDS ORCHESTRATOR REVIEW + migration apply | wave/w6b-portfolio | reports/W6B-PORTFOLIO.md | featured rank, ownership, admin CRUD; new migration (orchestrator applies); port 3302 |
+| W6C Design rollout: all pages | muse-spark-1.3 / space-bunny | ✅ APPROVED by owner — dispatch right after W6A passes orchestrator review (no extra owner approval needed); write prompt docs/waves/prompts/w6c-design-pages.md from W6A report | — | reports/W6C-DESIGN-PAGES.md | reuse W6A primitives |
 | W7 Chat centre (visitor ↔ admin ↔ AI agent) | space-bunny | ⏳ owner approval | — | reports/W7-CHAT.md | |
 | W8 First-party analytics + world-class MCP | — | ⏳ owner approval | — | reports/W8-MCP.md | tracking first, then MCP (OAuth, analytics tools, charts) |
 | W9 Mobile-ready API (/api/v1, OpenAPI, token auth) | — | ⏳ owner approval | — | reports/W9-MOBILE-API.md | |
