@@ -5,6 +5,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { HeaderVisibility } from "@/components/layout/HeaderVisibility";
 import { AuthProvider } from "@/context/AuthContext";
 import { ClientModals } from "@/components/layout/ClientModals";
 import { userSchema, User } from "@/lib/validations/auth";
@@ -13,6 +14,7 @@ import { MotionRoot } from "@/features/motion/ui/MotionRoot";
 import { RevealRoot } from "@/features/motion/ui/RevealRoot";
 import { getMotionSettings } from "@/features/motion/server/motion-settings";
 import { ChatLauncher } from "@/features/chat/ui/ChatLauncher";
+import { AnalyticsTracker } from "@/features/analytics/client/AnalyticsTracker";
 
 const onest = Onest({
   subsets: ["latin", "latin-ext"],
@@ -114,9 +116,11 @@ export default async function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} themes={["light", "dark"]} nonce={nonce}>
           <AuthProvider initialUser={initialUser}>
             <RevealRoot />
+            <AnalyticsTracker />
             <Header />
             <main id="main">{children}</main>
-            <Footer />
+            {/* Admin has its own shell: hide the public footer there, like the header. */}
+            <HeaderVisibility><Footer /></HeaderVisibility>
             <ClientModals />
             <ChatLauncher />
           </AuthProvider>

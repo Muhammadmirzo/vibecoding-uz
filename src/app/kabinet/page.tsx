@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { BookOpen, CirclePlay, CreditCard, Gift, Settings } from "lucide-react";
-import { Button } from "@/components/ui";
+import { Button } from "@/components/ui/Button";
 import { KabinetNav } from "@/features/lms/components/KabinetNav";
 import { KabinetPageHeader, KabinetSkeleton, KabinetState } from "@/features/lms/components/KabinetPage";
 import { fetchWithTimeout } from "@/lib/http/fetch";
@@ -75,16 +75,30 @@ export default function KabinetDashboardPage() {
 
 function ActiveCourse() {
   return (
-    <section className="overflow-hidden rounded-2xl border border-border bg-bg-elevated shadow-sm">
-      <div className="grid gap-6 p-6 md:grid-cols-[1fr_auto] md:items-center md:p-8">
+    <section className="card-glow relative overflow-hidden rounded-2xl border border-border bg-bg-elevated shadow-sm">
+      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_80%_at_85%_20%,var(--accent-soft),transparent_70%),radial-gradient(ellipse_40%_60%_at_10%_90%,var(--brand-soft),transparent_70%)]" />
+      </div>
+      <div className="relative grid gap-6 p-6 md:grid-cols-[1fr_auto] md:items-center md:p-8">
         <div>
-          <p className="text-sm font-semibold text-success">Faol a&apos;zolik</p>
-          <h2 className="mt-2 font-display text-xl font-semibold text-ink">Vibe Coding Express</h2>
-          <p className="mt-2 max-w-xl text-base leading-relaxed text-ink-muted">Kursga kirishda keyingi dars va topshiriqlar tizimdagi haqiqiy ma&apos;lumotlar asosida ko&apos;rsatiladi.</p>
+          <p className="inline-flex items-center gap-1.5 rounded-full bg-success-soft px-3 py-1 text-xs font-bold text-success">
+            <span className="relative flex size-2" aria-hidden="true">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-60" />
+              <span className="relative inline-flex size-2 rounded-full bg-success" />
+            </span>
+            Faol a&apos;zolik
+          </p>
+          <h2 className="mt-3 font-display text-xl font-semibold text-ink md:text-2xl">Vibe Coding Express</h2>
+          <p className="mt-2 max-w-xl text-base leading-relaxed text-ink-muted">Qayerda to&apos;xtagan bo&apos;lsangiz — shu yerdan davom eting. Keyingi dars va topshiriqlar tizimdagi haqiqiy ma&apos;lumotlar asosida ko&apos;rsatiladi.</p>
         </div>
-        <Button href="/kabinet/kurs/vibe-coding-express" className="w-full md:w-auto">
-          <CirclePlay className="h-5 w-5" aria-hidden="true" /> Kursga o&apos;tish
-        </Button>
+        <div className="flex flex-col gap-2">
+          <Button href="/kabinet/kurs/vibe-coding-express" size="lg" className="w-full md:w-auto">
+            <CirclePlay className="h-5 w-5" aria-hidden="true" /> Davom etish
+          </Button>
+          <Button href="/kabinet/baholar" variant="ghost" size="sm" className="w-full md:w-auto">
+            Baholarimni ko&apos;rish
+          </Button>
+        </div>
       </div>
     </section>
   );
@@ -103,7 +117,7 @@ function QuickLinks() {
         {links.map((item) => {
           const Icon = item.icon;
           return (
-            <Link key={item.href} href={item.href} className="flex min-h-28 items-center gap-4 rounded-xl border border-border bg-bg-elevated p-5 transition-colors hover:border-brand">
+            <Link key={item.href} href={item.href} className="card-glow flex min-h-28 items-center gap-4 rounded-xl border border-border bg-bg-elevated p-5 transition hover:-translate-y-0.5">
               <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-brand-soft text-brand"><Icon className="h-5 w-5" aria-hidden="true" /></span>
               <span><span className="block font-semibold text-ink">{item.label}</span><span className="mt-1 block text-sm text-ink-muted">{item.text}</span></span>
             </Link>

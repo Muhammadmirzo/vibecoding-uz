@@ -1,4 +1,5 @@
 import { withTransactionLock } from "@/db";
+import { trackServerEvent } from "@/features/analytics/server/track";
 import { sumMatchesTiyin } from "../domain/money";
 import { decidePaymeCancel, paymeProtocolState } from "../domain/policy";
 import type { DbExecutor, PaymentRecord, PaymentsRepository } from "./payments.repository";
@@ -71,7 +72,10 @@ export async function createTransaction(
 }
 
 export async function performTransaction(repo: PaymentsRepository, providerTxnId: string): Promise<PaymeResult> {
-  type Outcome = { error: number } | { replay: boolean; performTime: number };
+  type Outcome =
+    | { error: number }
+    | { replay: true; performTime: number }
+    | { replay: false; performTime: number; paymentId: string; userId: string; valueUzs: number };
   const outcome = await withTransactionLock<Outcome>(`payme:${providerTxnId}`, async (tx: DbExecutor | null | undefined) => {
     const ex = tx ?? null;
     if (!ex) throw new Error("Payment database transaction is unavailable");
@@ -86,9 +90,24 @@ export async function performTransaction(repo: PaymentsRepository, providerTxnId
       meta: { ...metaOf(payment), paymeState: 2, performTime },
     });
     if (payment.enrollmentId) await repo.setEnrollmentStatusTx(ex, payment.enrollmentId, "active");
-    return { replay: false, performTime };
+    return {
+      replay: false,
+      performTime,
+      paymentId: payment.id,
+      userId: payment.userId,
+      valueUzs: Math.round(Number(payment.amountSum)),
+    };
   });
   if ("error" in outcome) return { ok: false, code: outcome.error };
+  if (!outcome.replay) {
+    void trackServerEvent({
+      type: "payment_success",
+      userId: outcome.userId,
+      path: "/api/payments/payme",
+      props: { paymentId: outcome.paymentId },
+      valueUzs: outcome.valueUzs,
+    });
+  }
   return { ok: true, result: { transaction: providerTxnId, perform_time: outcome.performTime, state: 2 } };
 }
 

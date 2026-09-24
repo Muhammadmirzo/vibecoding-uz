@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
+import { ScrollFillText } from "@/features/motion/ui/ScrollFillText";
 import { parseMarkdown, type MarkdownBlock } from "./markdown";
+import "@/components/pages/w6c.css";
 
 function boldText(text: string): ReactNode[] {
   return text.split("**").map((part, index) =>
@@ -46,7 +48,11 @@ function renderBlock(block: MarkdownBlock) {
         </div>
       );
     case "quote":
-      return <blockquote key={`quote-${block.line}`} className="my-6 p-4 rounded-r-xl border-l-4 border-accent bg-accent-soft text-ink font-medium italic text-sm leading-relaxed">{block.text}</blockquote>;
+      return (
+        <blockquote key={`quote-${block.line}`} className="my-8 border-l-[3px] border-gold py-1 pl-5 font-display text-xl font-medium leading-snug md:text-2xl">
+          <ScrollFillText text={block.text} />
+        </blockquote>
+      );
   }
 }
 

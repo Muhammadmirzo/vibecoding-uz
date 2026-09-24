@@ -1,4 +1,5 @@
 import { withTransactionLock } from "@/db";
+import { trackServerEvent } from "@/features/analytics/server/track";
 import { ServiceError } from "@/lib/http/errors";
 import type { TelegramAuthInput } from "@/lib/validations/telegram";
 import type { DbExecutor } from "@/features/payments/server/payments.repository";
@@ -93,6 +94,8 @@ export async function loginWithTelegram(
     });
     return session?.id ?? user.id;
   });
+
+  void trackServerEvent({ type: "login", userId: user.id, path: "/api/auth/telegram", props: { method: "telegram" } });
 
   const token = await signer.sign({
     sessionId,

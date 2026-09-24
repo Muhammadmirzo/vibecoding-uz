@@ -5,6 +5,7 @@ import {
   verifySessionToken,
 } from "@/lib/auth/session";
 import { contentSecurityPolicy, SECURITY_HEADERS } from "@/lib/security/headers";
+import { isClosedRoute } from "@/lib/features/closed";
 
 const ADMIN_ROLES = ["superadmin", "admin", "manager"];
 const ALL_AUTHENTICATED_ROLES = ["superadmin", "admin", "manager", "mentor", "student"];
@@ -48,6 +49,20 @@ export async function middleware(request: NextRequest) {
   }
 
   const pathname = request.nextUrl.pathname || "";
+
+  // W10: yopiq funksiyalar sahifalari (reestr: src/lib/features/closed.ts)
+  // hidden va unreachable — kod saqlanadi, bayroq ochilganda qaytadi.
+  // Layout'dagi notFound() statik prerenderda 200 qaytargani uchun
+  // real 404 shu yerda kafolatlanadi.
+  if (isClosedRoute(pathname)) {
+    return withSecurityHeaders(
+      new NextResponse("Bu sahifa topilmadi", {
+        status: 404,
+        headers: { "content-type": "text/plain; charset=utf-8" },
+      }),
+      nonce,
+    );
+  }
 
   const isAdminRoute = pathname.startsWith("/admin") || pathname.startsWith("/api/admin");
   const isStudentCabinetRoute = pathname.startsWith("/kabinet") || pathname.startsWith("/api/kabinet");

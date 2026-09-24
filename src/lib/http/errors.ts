@@ -72,9 +72,11 @@ const RECOVERY_MESSAGE = "Texnik xizmat vaqtincha ishlamayapti. Ma'lumotlaringiz
 /**
  * Converts any thrown error into a JSON error response.
  * Zod validation failures → 400, known domain codes → mapped status,
- * everything else → 500 with a generic code (message is kept for
- * debuggability but never leaks secrets — services must not put
- * secrets in error messages).
+ * everything else → 500 with a generic code. Unknown 5xx messages are
+ * NEVER sent to the client (they may contain paths, SQL or provider
+ * internals) — the client gets the Uzbek recovery text while the real
+ * error is logged server-side. Only an explicit ServiceError keeps its
+ * own 5xx message, because services craft user-safe texts.
  */
 export function errorResponse(error: unknown): NextResponse {
   if (error instanceof z.ZodError) {
@@ -88,7 +90,10 @@ export function errorResponse(error: unknown): NextResponse {
     const rateLimitUnavailable = error instanceof Error && /rate limit service/i.test(error.message);
     const status = databaseUnavailable || rateLimitUnavailable ? 503 : statusOf(error);
     const code = databaseUnavailable ? "database_unavailable" : rateLimitUnavailable ? "rate_limit_unavailable" : codeOf(error);
-    const message = databaseUnavailable || rateLimitUnavailable ? RECOVERY_MESSAGE : error instanceof Error ? error.message : code;
+    const leaksMessage = error instanceof ServiceError || status < 500;
+    const message = databaseUnavailable || rateLimitUnavailable || !leaksMessage
+      ? RECOVERY_MESSAGE
+      : error instanceof Error ? error.message : code;
     const retryable = status === 503 || status === 429 || status === 408;
     if (status >= 500) {
       console.error(`[api] ${code}:`, error);

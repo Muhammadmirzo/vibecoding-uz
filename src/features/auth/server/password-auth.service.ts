@@ -1,4 +1,5 @@
 import { withTransactionLock } from "@/db";
+import { trackServerEvent } from "@/features/analytics/server/track";
 import { normalizePhone } from "@/lib/auth/password";
 import { ServiceError } from "@/lib/http/errors";
 import type { DbExecutor } from "@/features/payments/server/payments.repository";
@@ -87,6 +88,8 @@ export async function loginWithPassword(
     await users.updateLoginFieldsTx(ex, user.id, { lastLoginAt: new Date() });
     return session?.id ?? user.id;
   });
+
+  void trackServerEvent({ type: "login", userId: user.id, path: "/api/auth/login", props: { method: "password" } });
 
   const token = await signer.sign({
     sessionId,

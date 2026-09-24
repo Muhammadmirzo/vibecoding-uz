@@ -1,0 +1,128 @@
+/* W6C shared route primitives — CSS-first, SSR-final, token-only.
+ * Pattern source: W6A home (home-sections.css / home-motion.css).
+ * Rules: transform / opacity / clip-path only; final state is the default;
+ * animation applies ONLY under data-motion gates; no-JS shows finished
+ * content; prefers-reduced-motion always wins (see bottom). */
+
+.w6c-hero { position: relative; overflow: hidden; }
+.w6c-hero-mesh {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 44% 42% at 78% 22%, var(--accent-soft), transparent 70%),
+    radial-gradient(ellipse 38% 48% at 46% 84%, var(--brand-soft), transparent 72%),
+    radial-gradient(ellipse 20% 20% at 16% 12%, var(--gold-soft), transparent 74%);
+  mask-image: linear-gradient(to bottom, black 55%, transparent 100%);
+}
+.w6c-hero-grain {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: .2;
+  background-image: radial-gradient(var(--ink) .45px, transparent .45px);
+  background-size: 5px 5px;
+  mask-image: linear-gradient(to bottom, black, transparent 70%);
+}
+.w6c-hero-dark { background: var(--terminal-bg); color: var(--terminal-ink); }
+.w6c-hero-dark .w6c-dark-title { color: var(--terminal-ink); }
+.w6c-hero-dark .w6c-lede { opacity: .78; }
+.w6c-hero-dark .w6c-hero-mesh { opacity: .35; }
+
+/* Above-fold load entrance: LCP-safe rise (transform-only, so the element
+ * counts for LCP at first paint); staggered via --i, gated. */
+html[data-motion="full"][data-motion-hero="on"] .w6c-load {
+  animation: w6c-load var(--motion-base) var(--motion-ease-out) both;
+  animation-delay: calc(var(--i, 0) * var(--motion-stagger));
+}
+@keyframes w6c-load { from { transform: translateY(10px); } to { transform: none; } }
+
+/* Girih section transition (same polygon vocabulary as home). */
+.w6c-wipe { position: relative; }
+.w6c-wipe::before {
+  content: ""; position: absolute; z-index: 0; top: 0; right: 0; left: 0;
+  height: 72px; pointer-events: none; background: var(--accent-soft);
+  clip-path: polygon(0 0,100% 0,100% 28%,94% 42%,94% 76%,82% 76%,82% 100%,62% 100%,62% 66%,38% 66%,38% 100%,18% 100%,18% 76%,6% 76%,6% 42%,0 28%);
+}
+
+/* Scroll-progress gradient text fill (same contract as W6A home). */
+.scroll-fill-text { display: inline-grid; color: var(--ink-subtle); }
+.scroll-fill-text > span { grid-area: 1 / 1; min-width: 0; }
+.scroll-fill-base { color: transparent; background: linear-gradient(105deg, var(--brand) 0%, var(--brand-hover) 38%, var(--accent) 88%, var(--gold) 100%); background-clip: text; -webkit-background-clip: text; clip-path: inset(0 100% 0 0); }
+
+/* Scroll-drawn vertical path (curriculum / process). Static by default;
+ * the gold progress line and step lighting enhance under view-timeline. */
+.w6c-path { position: relative; view-timeline-name: --w6c-path; }
+.w6c-path-rail { position: absolute; top: 8px; bottom: 8px; left: 11px; width: 2px; border-radius: 2px; background: var(--border); }
+.w6c-path-progress { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 2px; background: linear-gradient(to bottom, var(--brand), var(--accent), var(--gold)); transform: scaleY(1); transform-origin: 50% 0; }
+.w6c-step { position: relative; padding-left: 3rem; }
+.w6c-step-dot { position: absolute; top: 4px; left: 4px; width: 1rem; height: 1rem; border: 2px solid var(--border-strong); border-radius: 50%; background: var(--bg); transition: border-color var(--motion-fast), background-color var(--motion-fast); }
+.w6c-step-card { border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--bg-elevated); padding: 1.25rem; box-shadow: var(--shadow-sm); transition: transform var(--motion-base) var(--motion-ease-out), box-shadow var(--motion-base) var(--motion-ease-out), border-color var(--motion-base) var(--motion-ease-out); }
+.w6c-step-card:hover { transform: translateY(-3px); border-color: var(--border-strong); box-shadow: var(--shadow-md); }
+
+/* Sticky table of contents (calm: hover only, never animated text). */
+.w6c-toc { position: sticky; top: 6rem; }
+.w6c-toc a { display: block; border-left: 2px solid var(--border); padding: .4rem 0 .4rem 1rem; color: var(--ink-muted); font-size: .875rem; transition: border-color var(--motion-fast), color var(--motion-fast); }
+.w6c-toc a:hover { border-color: var(--gold); color: var(--ink); }
+
+/* Long-form reading surface: calm, never animated. */
+.w6c-prose { max-width: 46rem; color: var(--ink-muted); font-size: 1.0625rem; line-height: 1.75; }
+.w6c-prose > * + * { margin-top: 1.25rem; }
+.w6c-prose h2 { margin-top: 2.75rem; color: var(--ink); font-family: var(--font-display), var(--font-sans), system-ui, sans-serif; font-size: 1.5rem; font-weight: 600; letter-spacing: -.02em; line-height: 1.3; }
+.w6c-prose h3 { margin-top: 2rem; color: var(--ink); font-family: var(--font-display), var(--font-sans), system-ui, sans-serif; font-size: 1.2rem; font-weight: 600; }
+.w6c-prose ul { list-style: disc; padding-left: 1.4rem; }
+.w6c-prose ol { list-style: decimal; padding-left: 1.4rem; }
+.w6c-prose li + li { margin-top: .5rem; }
+.w6c-prose a { color: var(--brand); text-decoration: underline; text-underline-offset: 3px; }
+.w6c-prose code { border: 1px solid var(--border); border-radius: 6px; background: var(--bg-sunken); padding: .1rem .4rem; font-family: var(--font-mono); font-size: .85em; }
+.w6c-prose pre { overflow-x: auto; border: 1px solid var(--terminal-border); border-radius: var(--radius-md); background: var(--terminal-bg); color: var(--terminal-ink); padding: 1.1rem 1.25rem; font-family: var(--font-mono); font-size: .85rem; line-height: 1.7; }
+.w6c-prose pre code { border: 0; background: transparent; padding: 0; color: inherit; }
+.w6c-prose blockquote { border-left: 3px solid var(--gold); padding: .25rem 0 .25rem 1.1rem; color: var(--ink); font-family: var(--font-display), var(--font-sans), system-ui, sans-serif; font-size: 1.2rem; line-height: 1.5; }
+.w6c-prose table { width: 100%; border-collapse: collapse; font-size: .95rem; }
+.w6c-prose th, .w6c-prose td { border: 1px solid var(--border); padding: .6rem .8rem; text-align: left; }
+.w6c-prose th { background: var(--bg-sunken); color: var(--ink); }
+
+/* Certificate seal: stroke draw on first paint, gated. */
+.w6c-seal-draw { fill: none; stroke: var(--gold); stroke-width: 2; }
+html[data-motion="full"] .w6c-seal-draw {
+  stroke-dasharray: 1; stroke-dashoffset: 1;
+  animation: w6c-seal var(--motion-epic) var(--motion-ease-out) forwards;
+  animation-delay: 200ms;
+}
+@keyframes w6c-seal { to { stroke-dashoffset: 0; } }
+
+/* Quiz result reveal (feedback-fast, entrance-calm). */
+html[data-motion="full"] .w6c-result, html[data-motion="subtle"] .w6c-result {
+  animation: w6c-result var(--motion-slow) var(--motion-ease-out) both;
+}
+@keyframes w6c-result { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.w6c-quizbar { height: 6px; overflow: hidden; border-radius: 999px; background: var(--bg-sunken); }
+.w6c-quizbar > span { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--brand), var(--accent), var(--gold)); transform-origin: 0 50%; transition: transform var(--motion-base) var(--motion-ease-out); }
+
+/* Portfolio filter: View Transitions API enhancement. */
+html[data-motion="full"][data-motion-page="on"] .w6c-cover { view-transition-name: var(--w6c-vt); }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 200ms; }
+
+/* Skeleton shimmer without layout shift (opacity-only pulse). */
+.w6c-skel { border-radius: var(--radius-md); background: var(--bg-sunken); animation: w6c-skel-pulse 1.4s ease-in-out infinite; }
+@keyframes w6c-skel-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
+
+@supports (animation-timeline: view()) {
+  html[data-motion-scroll="on"] .scroll-fill-base { animation: scroll-fill linear both; animation-timeline: view(); animation-range: entry 20% cover 45%; }
+  html[data-motion-scroll="on"] .w6c-wipe::before { animation: w6c-wipe var(--motion-slow) var(--motion-ease-out) both; animation-timeline: view(); animation-range: entry 0% cover 18%; }
+  html[data-motion-scroll="on"] .w6c-path-progress { transform: scaleY(0); animation: w6c-path-draw linear both; animation-timeline: --w6c-path; animation-range: cover 0% cover 100%; }
+  html[data-motion-scroll="on"] .w6c-step { view-timeline-name: --w6c-step; view-timeline-axis: block; }
+  html[data-motion-scroll="on"] .w6c-step-dot { animation: w6c-dot linear both; animation-timeline: --w6c-step; animation-range: entry 0% cover 30%; }
+  html[data-motion-scroll="on"] .w6c-step-card { animation: w6c-step-lit linear both; animation-timeline: --w6c-step; animation-range: entry 0% cover 30%; }
+}
+@keyframes scroll-fill { to { clip-path: inset(0 0 0 0); } }
+@keyframes w6c-wipe { from { clip-path: polygon(0 0,100% 0,100% 0,94% 0,94% 0,82% 0,82% 0,62% 0,62% 0,38% 0,38% 0,18% 0,18% 0,6% 0,6% 0,0 0); } to { clip-path: polygon(0 0,100% 0,100% 28%,94% 42%,94% 76%,82% 76%,82% 100%,62% 100%,62% 66%,38% 66%,38% 100%,18% 100%,18% 76%,6% 76%,6% 42%,0 28%); } }
+@keyframes w6c-path-draw { to { transform: scaleY(1); } }
+@keyframes w6c-dot { from { border-color: var(--border-strong); background: var(--bg); } to { border-color: var(--gold); background: var(--gold-soft); } }
+@keyframes w6c-step-lit { from { border-color: var(--border); } to { border-color: var(--border-strong); } }
+
+html[data-motion="off"] .w6c-hero-mesh, html[data-motion="off"] .w6c-hero-grain { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-fill-base { clip-path: none; }
+  .w6c-load { animation: none !important; }
+  .w6c-path-progress { transform: scaleY(1) !important; animation: none !important; }
+  .w6c-seal-draw { stroke-dashoffset: 0 !important; animation: none !important; }
+  .w6c-skel { animation: none !important; }
+  .w6c-result { animation: none !important; }
+}

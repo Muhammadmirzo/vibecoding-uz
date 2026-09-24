@@ -99,13 +99,20 @@ export function DiagnosticQuiz() {
             aria-valuemin={0}
             aria-valuemax={100}
             aria-valuenow={progressPercent}
-            className="h-2 w-full overflow-hidden rounded-full bg-bg-sunken"
+            className="w6c-quizbar"
           >
-            <div
-              className="h-full rounded-full bg-accent transition-all duration-300 ease-out"
-              style={{ width: `${progressPercent}%` }}
-            />
+            <span style={{ transform: `scaleX(${progressPercent / 100})` }} />
           </div>
+          <ol className="mt-3 flex items-center gap-1.5" aria-hidden="true">
+            {QUIZ_QUESTIONS.map((_, dotIndex) => (
+              <li
+                key={dotIndex}
+                className={`h-1.5 flex-1 rounded-full transition-colors ${
+                  dotIndex < stepIndex || phase !== "quiz" ? "bg-accent" : dotIndex === stepIndex ? "bg-gold" : "bg-border"
+                }`}
+              />
+            ))}
+          </ol>
           <p className="sr-only" aria-live="polite">
             {phase === "contact"
               ? "Barcha savollar javoblandi"
@@ -115,7 +122,9 @@ export function DiagnosticQuiz() {
       )}
 
       {phase === "result" ? (
-        <QuizResultCard course={recommendation} answers={answers} leadName={leadName} />
+        <div className="w6c-result">
+          <QuizResultCard course={recommendation} answers={answers} leadName={leadName} />
+        </div>
       ) : phase === "contact" ? (
         <div key="contact" className="animate-fade-up">
           <LeadCaptureForm

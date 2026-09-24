@@ -10,7 +10,7 @@ export function HeaderShell({ children }: { children: ReactNode }) {
   return (
     <header
       className={cn(
-        "site-header sticky top-0 z-50 border-b border-border/80 bg-bg/90 backdrop-blur-xl",
+        "site-header sticky top-0 z-50 border-b border-border bg-[color-mix(in_srgb,var(--bg)_90%,transparent)] backdrop-blur-xl",
         scrolled && "is-scrolled",
       )}
     >

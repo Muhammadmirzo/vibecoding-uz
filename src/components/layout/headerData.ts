@@ -1,5 +1,6 @@
 import type { LucideIcon } from "lucide-react";
 import { BookOpen, Briefcase, FileText, LayoutGrid, Pencil } from "lucide-react";
+import { isClosedRoute } from "@/lib/features/closed";
 
 export interface NavItem {
   href: string;
@@ -32,12 +33,19 @@ export const courseLinks: NavItem[] = [
   },
 ];
 
-export const resourceLinks: NavItem[] = [
+const allResourceLinks: NavItem[] = [
   { href: "/blog", title: "Blog", description: "Maqolalar va tahlillar", icon: Pencil },
   { href: "/resurslar", title: "Bepul resurslar", description: "Qo'llanmalar va soha hublari", icon: FileText },
+  // W10 yopiq (/ish): ro'yxatda saqlanadi, pastdagi filtr yashiradi.
   { href: "/ish", title: "Ish o'rinlari", description: "Vakansiyalar", icon: Briefcase },
   { href: "/portfolio", title: "Portfoliolar", description: "Vibe Coding loyihalari", icon: LayoutGrid },
 ];
+
+/**
+ * W10: yopiq funksiyalar havolalari shu yerda filtrlanadi.
+ * `closed.ts` dagi bayroqni ochish havolani avtomatik qaytaradi.
+ */
+export const resourceLinks: NavItem[] = allResourceLinks.filter((link) => !isClosedRoute(link.href));
 
 export const staticHeaderSettings: Required<Pick<HeaderSettings,
   "headerCtaText" | "headerCtaLink" | "telegramBotLink" | "announcementBannerText" |
