@@ -23,3 +23,6 @@ fi
 for f in .env .env.local; do [ -f "$root/$f" ] && [ ! -f "$wt/$f" ] && cp "$root/$f" "$wt/$f"; done
 cd "$wt" && timeout 5400 opencode run --auto -m "opencode/$model#medium" --title "$wave" "$(cat "$prompt")" > "$log" 2>&1
 echo "exit=$?" >> "$log"
+# Worktrees share the root node_modules via symlink; an agent running npm
+# install on an older package.json prunes deps other waves added. Restore.
+npm --prefix "$root" install --no-audit --no-fund >/dev/null 2>&1

@@ -6,7 +6,7 @@
 >    - Finished + report exists + gate green → review, merge (`git merge --no-ff wave/<wave>`), mark ✅.
 >    - Died/incomplete → re-run the same command; the prompt tells the agent to continue from its report + git state.
 > 3. Dispatch: `scripts/waves/dispatch.sh <wave> <model>` (run in background). Models: `muse-spark-1.3-contributor-free`, `space-bunny-free` (fallback `muse-spark-1.2-contributor-free`). Never nemotron.
-> 4. After each merge: `npm run build && npx vitest run` on main, update this table, commit `docs(waves): state`.
+> 4. After each merge: `npm install && npm run build && npx vitest run` on main (worktrees share node_modules; an agent can prune deps), update this table, commit `docs(waves): state`.
 > 5. Deploy only in W5: `git push origin main && git push origin main:master`.
 
 | Wave | Model | Status | Branch / commit | Report | Notes |
@@ -15,7 +15,7 @@
 | W1A Audit | space-bunny-free | ✅ | wave/w1a-audit (32edce9) | reports/W1A-AUDIT.md | read-only, port 3201 |
 | W1B Brand | muse-spark-1.3-contributor-free | ✅ | wave/w1b-brand (f8f8052) | reports/W1B-BRAND.md | logo redrawn by orchestrator; geometry in src/components/brand/logoGeometry.ts; migration 0004 = blog author default |
 | W2 Telegram | space-bunny-free | ✅ | wave/w2-telegram (3 rounds: 0458ca2 rejected → 53ba867 → aebcd4b) | reports/W2-TELEGRAM.md | migration 0005 = telegram_login_requests; bot confirm step (anti-phishing) |
-| W3A Motion | muse-spark-1.3 → space-bunny | 🏃 finishing (PROMPT=w3a-motion-resume); muse hit provider rate limit, WIP saved fa93555 | wave/w3a-motion | reports/W3A-MOTION.md | |
+| W3A Motion | muse-spark-1.3 → space-bunny | ✅ | wave/w3a-motion (ccfa473) | reports/W3A-MOTION.md | +2 kB home JS; `/` dynamic because root layout reads cookies() → W4A |
 | W3B Motion admin | space-bunny | ⏳ | — | reports/W3B-MOTION-ADMIN.md | |
 | W4A Perf | space-bunny | ⏳ | — | reports/W4A-PERF.md | |
 | W4B Audit fixes | space-bunny-free | ⏸ killed (low RAM) — 43 uncommitted files in worktree, no report yet; resume after W3A: `scripts/waves/dispatch.sh w4b-fixes space-bunny-free` | wave/w4b-fixes | reports/W4B-FIXES.md | |
