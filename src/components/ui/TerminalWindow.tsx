@@ -5,9 +5,14 @@ interface TerminalWindowProps {
   lines: readonly string[];
   className?: string;
   title?: string;
+  /**
+   * Base delay in ms before the first line (syncs with hero headline).
+   * Lines keep their 180ms stagger. Pure CSS — SSR safe.
+   */
+  startDelay?: number;
 }
 
-function renderLine(line: string, key: number) {
+function renderLine(line: string, key: number, startDelay: number) {
   const isSuccess = line.startsWith("✓");
   const isPrompt = line.startsWith("›") || line.startsWith(">");
   const glyph = isSuccess ? "✓" : "›";
@@ -21,8 +26,8 @@ function renderLine(line: string, key: number) {
   return (
     <p
       key={`${line}-${key}`}
-      style={{ animationDelay: `${key * 180}ms` }}
-      className="flex gap-3 motion-safe:animate-fade-up"
+      style={{ "--tl-delay": `${startDelay + key * 180}ms` } as React.CSSProperties}
+      className="terminal-line flex gap-3"
     >
       <span
         className={cn(
@@ -47,7 +52,7 @@ function renderLine(line: string, key: number) {
   );
 }
 
-export function TerminalWindow({ lines, className, title = "build — claude-code" }: TerminalWindowProps) {
+export function TerminalWindow({ lines, className, title = "build — claude-code", startDelay = 0 }: TerminalWindowProps) {
   return (
     <div className={cn("overflow-hidden rounded-xl bg-ink text-bg shadow-lg", className)}>
       <div className="flex items-center gap-2 border-b border-bg/10 px-4 py-3 font-mono text-xs text-bg/60">
@@ -57,7 +62,7 @@ export function TerminalWindow({ lines, className, title = "build — claude-cod
         <span className="ml-2 truncate">{title}</span>
       </div>
       <div className="p-5 font-mono text-[13px] leading-7 sm:text-sm" aria-label="Claude Code build transcript">
-        {lines.map((line, index) => renderLine(line, index))}
+        {lines.map((line, index) => renderLine(line, index, startDelay))}
       </div>
     </div>
   );

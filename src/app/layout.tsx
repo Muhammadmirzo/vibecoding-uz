@@ -10,6 +10,9 @@ import { PwaRegister } from "@/components/layout/PwaRegister";
 import { ClientModals } from "@/components/layout/ClientModals";
 import { userSchema, User } from "@/lib/validations/auth";
 import { BRAND } from "@/config/brand";
+import { MotionRoot } from "@/features/motion/ui/MotionRoot";
+import { RevealRoot } from "@/features/motion/ui/RevealRoot";
+import { getMotionSettings } from "@/features/motion/server/motion-settings";
 
 const onest = Onest({
   subsets: ["latin"],
@@ -102,13 +105,18 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const initialUser = await getInitialUser();
+  const motionSettings = getMotionSettings();
 
   return (
-    <html lang="uz" suppressHydrationWarning className={`${onest.variable} ${unbounded.variable} ${instrumentSerif.variable} ${jetBrainsMono.variable}`}>
+    <MotionRoot
+      settings={motionSettings}
+      className={`${onest.variable} ${unbounded.variable} ${instrumentSerif.variable} ${jetBrainsMono.variable}`}
+    >
       <body className="antialiased">
         <a href="#main" className="skip-to-content">Asosiy kontentga o'tish</a>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} themes={["light", "dark"]}>
           <AuthProvider initialUser={initialUser}>
+            <RevealRoot />
             <Header />
             <main id="main">{children}</main>
             <Footer />
@@ -117,6 +125,6 @@ export default async function RootLayout({
           </AuthProvider>
         </ThemeProvider>
       </body>
-    </html>
+    </MotionRoot>
   );
 }

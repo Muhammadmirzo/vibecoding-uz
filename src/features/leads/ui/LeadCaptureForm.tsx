@@ -2,9 +2,10 @@
 
 import * as React from "react";
 import { z } from "zod";
-import { ArrowRight, CheckCircle2, Loader2, Send } from "lucide-react";
+import { ArrowRight, Loader2, Send } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { FieldError, Input, Label } from "@/components/ui/Form";
+import { SuccessCheck } from "@/features/motion/ui/SuccessCheck";
 import {
   formatPhoneMask,
   isValidTelegramUsername,
@@ -122,8 +123,8 @@ export function LeadCaptureForm({
   if (done && !redirectUrl) {
     return (
       <div className="space-y-4 py-4 text-center" role="status">
-        <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-success-soft text-success">
-          <CheckCircle2 className="size-7" aria-hidden="true" />
+        <div className="mx-auto flex size-12 items-center justify-center">
+          <SuccessCheck size={48} label="So'rovingiz qabul qilindi" />
         </div>
         <h3 className="font-display text-xl font-semibold text-ink">{revealTitle}</h3>
         <p className="mx-auto max-w-md text-sm text-ink-muted">

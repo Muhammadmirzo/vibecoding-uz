@@ -13,6 +13,7 @@ import { BRAND } from "@/config/brand";
 import { COMPARISON_ROWS, COURSES, COURSE_SLUGS, getCoursePricing } from "@/features/courses/content";
 import { CourseCheckoutCard } from "../CourseCheckoutCard";
 import { StickyBuyBar } from "./StickyBuyBar";
+import { ScrollProgress } from "@/features/motion/ui/ScrollProgress";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -55,6 +56,7 @@ export default async function CourseDetailPage({ params }: Props) {
 
   return (
     <div className="bg-bg">
+      <ScrollProgress />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <Section eyebrow={course.level} title="">
         <div className="grid items-start gap-10 lg:grid-cols-[1fr_380px]">

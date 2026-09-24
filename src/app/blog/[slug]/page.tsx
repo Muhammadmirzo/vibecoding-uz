@@ -7,6 +7,7 @@ import { ArticleMain } from "@/features/blog/ArticleMain";
 import { BlogSidebar } from "@/features/blog/BlogSidebar";
 import { RelatedPosts } from "@/features/blog/RelatedPosts";
 import { ShareProvider } from "@/features/blog/ShareActions";
+import { ScrollProgress } from "@/features/motion/ui/ScrollProgress";
 import { NextStepCTA } from "@/components/ui/NextStepCTA";
 
 interface Props {
@@ -64,7 +65,7 @@ export default async function BlogPostDetailPage({ params }: Props) {
   return (
     <ShareProvider>
     <div className="pt-28 pb-20 min-h-screen bg-bg text-ink">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
+      <ScrollProgress />      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       <div className="mx-auto w-full max-w-[1360px] px-5 md:px-8 lg:px-10 space-y-8">
         <ArticleBreadcrumb title={post.title} />
         <ArticleHeader post={post} />

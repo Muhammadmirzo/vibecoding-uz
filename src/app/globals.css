@@ -102,4 +102,288 @@
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  .scroll-progress, .weave-shimmer { display: none !important; }
+  [data-reveal], .text-reveal .tr-word { opacity: 1 !important; transform: none !important; filter: none !important; }
 }
+
+/* ================= Naqsh motion system (W3A) =================
+ * Restrained, meaningful motion. Rules:
+ * - Only transform / opacity / filter / clip-path (+ one SVG stroke-draw
+ *   exception for the girih signature, explicitly requested).
+ * - Final state is always the default; animations apply ONLY under the
+ *   matching `data-motion` gates, so SSR and no-JS show finished content.
+ * - `prefers-reduced-motion: reduce` always wins (block above + JS guards).
+ * Tokens: durations instant 120 / fast 200 / base 320 / slow 560 / epic 900 ms;
+ * easings out-expo, out-quint, spring (linear() with cubic fallback).
+ */
+:root {
+  --motion-instant: 120ms;
+  --motion-fast: 200ms;
+  --motion-base: 320ms;
+  --motion-slow: 560ms;
+  --motion-epic: 900ms;
+  --motion-ease-out: cubic-bezier(.16, 1, .3, 1);
+  --motion-ease-quint: cubic-bezier(.22, 1, .36, 1);
+  --motion-ease-spring: cubic-bezier(.34, 1.45, .44, 1);
+  --motion-rise: 14px;
+  --motion-stagger: 70ms;
+}
+@supports (transition-timing-function: linear(0, 0.5 50%, 1)) {
+  :root {
+    --motion-ease-spring: linear(0, 0.17 5%, 0.54 15%, 0.83 25%, 1 35%, 1.06 43%, 1.03 52%, 1 62%, 0.99 72%, 1 82%, 1);
+  }
+}
+
+/* Master off switch — static page, focus styles untouched. */
+html[data-motion="off"] { scroll-behavior: auto; }
+html[data-motion="off"] *, html[data-motion="off"] *::before, html[data-motion="off"] *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* ---------- Scroll reveal: fade + 14px rise + slight blur-in ---------- */
+html[data-motion="full"][data-motion-scroll="on"] [data-reveal],
+html[data-motion="subtle"][data-motion-scroll="on"] [data-reveal] {
+  transition:
+    opacity var(--motion-base) var(--motion-ease-out),
+    transform var(--motion-base) var(--motion-ease-out),
+    filter var(--motion-base) var(--motion-ease-out);
+  transition-delay: calc(var(--i, 0) * var(--motion-stagger));
+}
+/* Hidden pre-state exists ONLY once JS arms the system (no-JS stays visible). */
+html.motion-armed[data-motion-scroll="on"] [data-reveal]:not(.is-visible) {
+  opacity: 0;
+  transform: translateY(var(--motion-rise));
+  filter: blur(4px);
+  will-change: opacity, transform, filter;
+}
+
+/* ---------- Headline word mask slide ---------- */
+.text-reveal .tr-mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  padding-bottom: 0.09em;
+  margin-bottom: -0.09em;
+}
+.text-reveal .tr-word { display: inline-block; }
+@keyframes tr-rise { to { opacity: 1; transform: translateY(0); } }
+/* Load mode (hero): plays once on first paint. */
+html[data-motion="full"][data-motion-hero="on"] [data-text-reveal="load"] .tr-word {
+  opacity: 0;
+  transform: translateY(110%);
+  animation: tr-rise var(--motion-base) var(--motion-ease-out) forwards;
+  animation-delay: calc(var(--tr-base, 0ms) + var(--i, 0) * 55ms);
+  will-change: transform, opacity;
+}
+/* Scroll mode: transitions when an ancestor (or self) is revealed. */
+html.motion-armed[data-motion-scroll="on"] [data-text-reveal="scroll"] .tr-word {
+  opacity: 0;
+  transform: translateY(110%);
+  transition:
+    opacity var(--motion-base) var(--motion-ease-out),
+    transform var(--motion-base) var(--motion-ease-out);
+  transition-delay: calc(var(--i, 0) * 55ms);
+}
+html.motion-armed[data-motion-scroll="on"] .is-visible [data-text-reveal="scroll"] .tr-word,
+html.motion-armed[data-motion-scroll="on"] [data-text-reveal="scroll"].is-visible .tr-word {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ---------- Girih weave (hero signature) ---------- */
+@keyframes weave-draw { to { stroke-dashoffset: 0; } }
+html[data-motion="full"][data-motion-hero="on"] .girih-weave .weave-stroke {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: weave-draw var(--motion-epic) var(--motion-ease-out) forwards;
+  animation-delay: calc(150ms + var(--i, 0) * 140ms);
+}
+.girih-weave .weave-glow { opacity: 0; stroke-dasharray: 0.22 0.78; }
+@keyframes weave-shimmer { from { stroke-dashoffset: 1; } to { stroke-dashoffset: -1; } }
+html[data-motion="full"][data-motion-ambient="on"] .girih-weave .weave-glow {
+  opacity: 1;
+  animation: weave-shimmer 7s linear infinite;
+}
+html.is-tab-hidden .girih-weave .weave-glow,
+.girih-weave.is-paused .weave-glow { animation-play-state: paused; }
+
+/* ---------- Terminal transcript (hero choreography) ---------- */
+html[data-motion="full"][data-motion-hero="on"] .terminal-line {
+  opacity: 0;
+  animation: fade-up var(--motion-base) var(--motion-ease-out) forwards;
+  animation-delay: var(--tl-delay, 0ms);
+}
+html[data-motion="subtle"] .terminal-line,
+html[data-motion-hero="off"] .terminal-line {
+  animation: none;
+}
+
+/* ---------- Hero mark wipe (gold underline, synced with headline) ---------- */
+@keyframes mark-wipe {
+  from { transform: scaleX(0) rotate(-1deg); }
+  to { transform: scaleX(1) rotate(-1deg); }
+}
+html[data-motion="full"][data-motion-hero="on"] .hero-mark-wipe {
+  transform: scaleX(0) rotate(-1deg);
+  transform-origin: 0 50%;
+  animation: mark-wipe var(--motion-base) var(--motion-ease-out) forwards;
+  animation-delay: 300ms;
+}
+
+/* ---------- Marquee (CSS only) ---------- */
+.marquee-viewport { overflow-x: auto; scrollbar-width: none; }
+.marquee-viewport::-webkit-scrollbar { display: none; }
+.marquee-track { display: flex; width: max-content; }
+.marquee-list { display: flex; align-items: center; gap: 2rem; padding-right: 2rem; }
+html[data-motion="full"][data-motion-ambient="on"] .marquee-viewport { overflow: hidden; }
+html[data-motion="full"][data-motion-ambient="on"] .marquee-track {
+  animation: marquee 28s linear infinite;
+}
+.marquee:hover .marquee-track,
+.marquee:focus-within .marquee-track,
+.marquee.is-paused .marquee-track,
+html.is-tab-hidden .marquee-track {
+  animation-play-state: paused;
+}
+
+/* ---------- Spotlight cards + gradient border glow ---------- */
+.spotlight { position: relative; }
+html[data-motion="full"][data-motion-pointer="on"] .spotlight::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(320px circle at var(--mx, 50%) var(--my, 50%), var(--gold-soft), transparent 65%);
+  opacity: 0;
+  transition: opacity var(--motion-base) var(--motion-ease-out);
+}
+html[data-motion="full"][data-motion-pointer="on"] .spotlight:hover::before { opacity: 0.9; }
+.card-glow { position: relative; }
+html[data-motion="full"] .card-glow::after,
+html[data-motion="subtle"] .card-glow::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background: linear-gradient(135deg, var(--gold), var(--accent));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity var(--motion-base) var(--motion-ease-out);
+}
+html[data-motion="full"] .card-glow:hover::after,
+html[data-motion="subtle"] .card-glow:hover::after,
+html[data-motion="full"] .card-glow:focus-within::after,
+html[data-motion="subtle"] .card-glow:focus-within::after {
+  opacity: 1;
+}
+
+/* ---------- Magnetic CTA (transform only; spring release) ---------- */
+.magnetic.is-magnetic { transition: transform var(--motion-slow) var(--motion-ease-spring); }
+.magnetic.is-magnetic:hover { will-change: transform; }
+
+/* ---------- Animated underline for nav + inline links ---------- */
+.link-underline { position: relative; }
+html[data-motion="full"] .link-underline::after,
+html[data-motion="subtle"] .link-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 1px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--gold);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform var(--motion-base) var(--motion-ease-out);
+}
+html[data-motion="full"] .link-underline:hover::after,
+html[data-motion="subtle"] .link-underline:hover::after,
+html[data-motion="full"] .link-underline:focus-visible::after,
+html[data-motion="subtle"] .link-underline:focus-visible::after {
+  transform: scaleX(1);
+}
+
+/* ---------- Button press + logo hover ---------- */
+html[data-motion="full"] .btn-press:active,
+html[data-motion="subtle"] .btn-press:active {
+  transform: scale(0.98);
+}
+html[data-motion="off"] .btn-press:active { transform: none !important; }
+.naqsh-mark-diamond { transform-box: fill-box; transform-origin: center; }
+html[data-motion="full"][data-motion-pointer="on"] .brand-link:hover .naqsh-mark-diamond {
+  transform: rotate(45deg);
+  transition: transform var(--motion-slow) var(--motion-ease-spring);
+}
+
+/* ---------- Header: condense without layout shift ----------
+ * Height never changes (CLS 0): only shadow + logo scale (transform). */
+.site-header { transition: box-shadow var(--motion-fast) ease-out, background-color var(--motion-fast) ease-out; }
+.site-header.is-scrolled {
+  box-shadow: var(--shadow-md);
+}
+.site-header .site-logo { transition: transform var(--motion-base) var(--motion-ease-spring); transform-origin: left center; }
+.site-header.is-scrolled .site-logo { transform: scale(0.94); }
+
+/* ---------- Scroll progress hairline ---------- */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 60;
+  height: 2px;
+  pointer-events: none;
+}
+.scroll-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--brand), var(--accent), var(--gold));
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+}
+html[data-motion="off"] .scroll-progress { display: none; }
+
+/* ---------- Success check draw ---------- */
+.success-check { display: inline-flex; }
+.success-check svg .sc-circle { stroke: var(--success-line); stroke-width: 2.5; }
+.success-check svg .sc-check { stroke: var(--success); stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; }
+html[data-motion="full"] .success-check .sc-circle,
+html[data-motion="subtle"] .success-check .sc-circle {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: sc-draw var(--motion-slow) var(--motion-ease-out) forwards;
+}
+html[data-motion="full"] .success-check .sc-check,
+html[data-motion="subtle"] .success-check .sc-check {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: sc-draw var(--motion-base) var(--motion-ease-out) forwards;
+  animation-delay: 350ms;
+}
+@keyframes sc-draw { to { stroke-dashoffset: 0; } }
+
+/* ---------- Quiz answer micro-feedback ---------- */
+@keyframes option-pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.015); }
+  100% { transform: scale(1); }
+}
+html[data-motion="full"] .quiz-option:has(input:checked),
+html[data-motion="subtle"] .quiz-option:has(input:checked) {
+  animation: option-pop var(--motion-fast) var(--motion-ease-out);
+}
+
+/* ---------- View Transitions (progressive enhancement, MPA) ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+}
+html[data-motion="full"][data-motion-page="on"] .site-header { view-transition-name: site-header; }
+html[data-motion="full"][data-motion-page="on"] .site-logo { view-transition-name: site-logo; }
