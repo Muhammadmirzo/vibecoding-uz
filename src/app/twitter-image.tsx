@@ -1,4 +1,6 @@
-import OpengraphImage, { size, contentType, alt, runtime } from "./opengraph-image";
+import OpengraphImage, { size, contentType, alt } from "./opengraph-image";
 
-export { size, contentType, alt, runtime };
+// Route segment config must be declared literally (Next can't read re-exports).
+export const runtime = "edge";
+export { size, contentType, alt };
 export default OpengraphImage;

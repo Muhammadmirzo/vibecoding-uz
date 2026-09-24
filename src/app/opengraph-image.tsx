@@ -1,5 +1,7 @@
 import { ImageResponse } from "next/og";
 import { BRAND } from "@/config/brand";
+import { LogoMarkShapes } from "@/components/brand/Logo";
+import { LOGO_DIAMOND, LOGO_VIEWBOX } from "@/components/brand/logoGeometry";
 
 export const runtime = "edge";
 export const size = { width: 1200, height: 630 };
@@ -40,28 +42,16 @@ async function loadDisplayFont(): Promise<ArrayBuffer | null> {
 function GirihTile({ s, opacity }: { s: number; opacity: number }) {
   return (
     <svg width={s} height={s} viewBox="0 0 32 32" fill="none" opacity={opacity}>
-      <rect x="8" y="8" width="16" height="16" stroke={BRAND_BLUE} strokeWidth="1.5" />
-      <path d="M16 5 L27 16 L16 27 L5 16 Z" stroke={BRAND_BLUE} strokeWidth="1.5" strokeLinejoin="round" />
+      <rect x="7" y="7" width="18" height="18" stroke={BRAND_BLUE} strokeWidth="1.5" />
+      <path d={LOGO_DIAMOND} stroke={BRAND_BLUE} strokeWidth="1.5" />
     </svg>
   );
 }
 
 function NaqshMark({ s }: { s: number }) {
   return (
-    <svg width={s} height={s} viewBox="0 0 32 32" fill="none">
-      <rect x="8" y="8" width="16" height="16" stroke={BRAND_BLUE} strokeWidth="2.75" />
-      <path
-        d="M16 5 L27 16 L16 27 L5 16 Z"
-        stroke={GOLD}
-        strokeWidth="2.75"
-        strokeLinejoin="round"
-        strokeDasharray="12.756 2.8"
-        strokeDashoffset={9.913}
-      />
-      <g stroke={ACCENT} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-        <polyline points="13.5,12.5 17.5,16 13.5,19.5" />
-        <line x1="20.5" y1="12.5" x2="20.5" y2="19.5" />
-      </g>
+    <svg width={s} height={s} viewBox={LOGO_VIEWBOX} fill="none">
+      {LogoMarkShapes({ colors: { square: BRAND_BLUE, diamond: GOLD, caret: ACCENT } })}
     </svg>
   );
 }
