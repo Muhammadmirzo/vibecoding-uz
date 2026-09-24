@@ -12,7 +12,7 @@
 | Wave | Model | Status | Branch / commit | Report | Notes |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | W0 Plan | orchestrator | ✅ | main | PLAN.md | brand = Naqsh, contracts fixed |
-| W1A Audit | space-bunny-free | 🏃 | wave/w1a-audit | reports/W1A-AUDIT.md | read-only, port 3201 |
+| W1A Audit | space-bunny-free | ✅ | wave/w1a-audit (32edce9) | reports/W1A-AUDIT.md | read-only, port 3201 |
 | W1B Brand | muse-spark-1.3-contributor-free | 🏃 | wave/w1b-brand | reports/W1B-BRAND.md | port 3202 |
 | W2 Telegram | muse-spark-1.3 | ⏳ | — | reports/W2-TELEGRAM.md | after W1 merge |
 | W3A Motion | muse-spark-1.3 | ⏳ | — | reports/W3A-MOTION.md | |
