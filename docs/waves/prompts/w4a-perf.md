@@ -1,0 +1,12 @@
+You are a web performance engineer (Core Web Vitals specialist, Next.js App Router expert). Work autonomously until fully done.
+
+FIRST read: docs/waves/PLAN.md, docs/CODER_AGENT_RULES.md, docs/waves/reports/W1A-AUDIT.md (performance baseline + perf findings), docs/waves/reports/W3A-MOTION.md, next.config.*, src/app/layout.tsx.
+If docs/waves/reports/W4A-PERF.md exists, CONTINUE from it.
+
+MISSION: make the site measurably faster without losing any feature or animation.
+1. Measure first: `npm run build` → per-route First Load JS table; if possible run Lighthouse (`npx lighthouse http://localhost:3206/ --preset=desktop` and mobile, via `npx next start -p 3206` after build) for /, /diagnostika, /kurs/vibe-coding-express, /bepul-dars, /blog. Record LCP, CLS, TBT, INP proxy.
+2. Fix, in order of impact: unnecessary "use client" (push client boundaries down to leaves), heavy components loaded eagerly (next/dynamic for modals: AuthModal, SearchModal, SpinWheel, anything below the fold and interaction-only), lucide-react imports (ensure per-icon/optimizePackageImports), fonts (next/font, subsets latin + latin-ext only, display swap, preload only the hero font weights, fewer weights), images (next/image with sizes, AVIF/WebP, priority only on LCP), third-party scripts (Telegram widget only on interaction, `next/script` strategy), static generation/ISR for public pages (make sure pages that don't need request data are static; DB-backed public reads cached with revalidate + fail-safe fallback), headers: long-cache immutable static assets, compression, `experimental.optimizePackageImports`, remove unused deps and dead code (check with `npx knip` or grep), PWA service worker must not cache HTML stale forever.
+3. Must not break: SSR-visible content, motion system, auth, admin. DB is DOWN — pages must still build and render with fallbacks.
+4. Re-measure and report before/after table. Target: every public route First Load JS ≤ 130 kB, home LCP < 2.0 s desktop / < 2.5 s mobile (simulated), CLS 0.
+Dev/prod server port 3206; stop ONLY with `kill $(lsof -t -i:3206)` — NEVER `pkill -f`. Playwright: `E2E_PORT=3206 npx playwright test e2e/responsive.spec.ts` must stay green.
+GATE: tsc, vitest, build green. Report docs/waves/reports/W4A-PERF.md. Commit: `git add -A && git commit -m "perf: faster loading — client boundaries, lazy modals, fonts, caching"`. Do not push.
