@@ -1,0 +1,11 @@
+import { NextRequest } from "next/server";
+import { getOrCreateVisitorToken, visitorTokenFromRequest } from "@/features/chat/server/visitor-token";
+import { sendVisitorMessage, listMessages, getVisitorConversation } from "@/features/chat/server/chat.service";
+import { messagesQuerySchema, sendMessageSchema } from "@/features/chat/contracts";
+import { ok, created, fail } from "@/lib/api/v1/respond";
+import { checkRateLimit, createRateLimitResponse, getClientIp } from "@/lib/security/rateLimit";
+import { getChatSettings } from "@/features/chat/server/settings.service";
+import { trackServerEvent } from "@/features/analytics/server/track";
+
+export async function GET(request: NextRequest) { try { const parsed = messagesQuerySchema.safeParse(Object.fromEntries(request.nextUrl.searchParams)); if (!parsed.success) return fail(Response.json({ error: "validation_error", message: "So'rov ma'lumotlari noto'g'ri" }, { status: 400 })); const token = visitorTokenFromRequest(request) || (await getOrCreateVisitorToken()).token; const [conversation, messages] = await Promise.all([getVisitorConversation(token), listMessages(token, parsed.data.after)]); return ok({ conversation, messages }); } catch (error) { return fail(error); } }
+export async function POST(request: NextRequest) { try { const ip = getClientIp(request); const burst = await checkRateLimit(`chat-msg:${ip}`, { limit: 5, windowSeconds: 1, prefix: "chat-burst" }); if (!burst.success) return createRateLimitResponse(burst); const hourly = await checkRateLimit(`chat-hour:${ip}`, { limit: 60, windowSeconds: 3600, prefix: "chat-hour" }); if (!hourly.success) return createRateLimitResponse(hourly); const body = sendMessageSchema.safeParse(await request.json().catch(() => null)); if (!body.success) return fail(Response.json({ error: "validation_error", message: "Xabar 2000 belgidan oshmasligi kerak" }, { status: 400 })); if (body.data.honeypot) return created({ accepted: true }); const token = visitorTokenFromRequest(request) || (await getOrCreateVisitorToken()).token; const message = await sendVisitorMessage(token, body.data); void trackServerEvent({ type: "chat_message", path: body.data.sourcePath, props: { sender: "visitor" } }); return created({ message, settings: await getChatSettings() }); } catch (error) { return fail(error); } }

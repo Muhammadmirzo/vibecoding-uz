@@ -13,6 +13,7 @@ import {
   GraduationCap,
   LayoutDashboard,
   Menu,
+  MessageCircle,
   Send,
   Settings,
   ShieldCheck,
@@ -34,6 +35,7 @@ const navItems: NavItem[] = [
   { href: "/admin/students", label: "Talabalar", icon: Users },
   { href: "/admin/users", label: "Foydalanuvchilar", icon: Users },
   { href: "/admin/analytics", label: "Analitika", icon: BarChart3 },
+  { href: "/admin/chat", label: "Chat inbox", icon: MessageCircle },
   { href: "/admin/settings", label: "Sozlamalar", icon: Settings },
 ];
 

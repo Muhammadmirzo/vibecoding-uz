@@ -1,5 +1,6 @@
 import { Telegraf } from "telegraf";
 import { registerAccountHandlers } from "./handlers/contact";
+import { handleTelegramChatReply } from "./chat-bridge";
 import { registerMenuHandlers } from "./handlers/commands";
 import { registerStartHandler } from "./handlers/start";
 import { registerTelegramLoginCallback } from "./handlers/callback";
@@ -16,6 +17,7 @@ export function initTelegramBot(): Telegraf | null {
   registerTelegramLoginCallback(bot);
   registerMenuHandlers(bot);
   registerAccountHandlers(bot);
+  bot.on("message", async (ctx) => { await handleTelegramChatReply(ctx.update as unknown as Parameters<typeof handleTelegramChatReply>[0]); });
 
   botInstance = bot;
   return bot;

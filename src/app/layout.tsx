@@ -12,6 +12,7 @@ import { BRAND } from "@/config/brand";
 import { MotionRoot } from "@/features/motion/ui/MotionRoot";
 import { RevealRoot } from "@/features/motion/ui/RevealRoot";
 import { getMotionSettings } from "@/features/motion/server/motion-settings";
+import { ChatLauncher } from "@/features/chat/ui/ChatLauncher";
 
 const onest = Onest({
   subsets: ["latin", "latin-ext"],
@@ -117,6 +118,7 @@ export default async function RootLayout({
             <main id="main">{children}</main>
             <Footer />
             <ClientModals />
+            <ChatLauncher />
           </AuthProvider>
         </ThemeProvider>
       </body>
