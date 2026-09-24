@@ -1,76 +1,228 @@
 "use client";
 
 import { Loader2, Send, ShieldCheck } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { BRAND } from "@/config/brand";
-import type { User } from "@/lib/validations/auth";
+import {
+  telegramStartResponseSchema,
+  telegramStatusResponseSchema,
+  type telegramPublicUserSchema,
+} from "@/lib/validations/auth";
+import { TelegramQr } from "./TelegramQr";
+import { z } from "zod";
 
-type State = "idle" | "starting" | "waiting" | "success" | "error" | "timeout";
+type FlowState = "idle" | "starting" | "waiting" | "success" | "error" | "timeout";
+type PublicUser = z.infer<typeof telegramPublicUserSchema>;
 
-function MiniQr({ value }: { value: string }) {
-  const cells = useMemo(() => Array.from({ length: 121 }, (_, index) => `${value}:${index}`).map((item) => item.split(":").reduce((hash, part) => (hash * 31 + part.length) | 0, 7) % 2 === 0), [value]);
-  return <svg viewBox="0 0 33 33" className="h-28 w-28 rounded bg-white p-1" role="img" aria-label="Telegram havolasi QR kodi" shapeRendering="crispEdges"><rect width="33" height="33" fill="white" />{cells.map((on, index) => on ? <rect key={index} x={(index % 11) * 3} y={Math.floor(index / 11) * 3} width="3" height="3" className="fill-ink" /> : null)}</svg>;
+interface LoginAttempt {
+  id: string;
+  deepLink: string;
+  expiresAt: number;
+}
+
+const PHONE_FALLBACK_MESSAGE = "Telegram orqali kirish vaqtincha ishlamayapti — telefon raqami orqali davom eting";
+const BACKOFF_MS = [2_000, 3_000, 5_000] as const;
+
+async function readJson(response: Response): Promise<unknown | null> {
+  try {
+    return await response.json();
+  } catch {
+    return null;
+  }
+}
+
+function focusPhoneInput(): void {
+  window.requestAnimationFrame(() => document.getElementById("phone-input")?.focus());
 }
 
 export function TelegramAuthFlow() {
-  const { setAuthenticatedUser } = useAuth();
-  const [state, setState] = useState<State>("idle");
-  const [deepLink, setDeepLink] = useState<string | null>(null);
+  const { closeAuthModal, refreshAuth } = useAuth();
+  const [state, setState] = useState<FlowState>("idle");
+  const [attempt, setAttempt] = useState<LoginAttempt | null>(null);
   const [message, setMessage] = useState<string | null>(null);
-  const [user, setUser] = useState<User | null>(null);
-  const [seconds, setSeconds] = useState(300);
+  const [user, setUser] = useState<PublicUser | null>(null);
+  const [seconds, setSeconds] = useState(0);
+  const requestControllerRef = useRef<AbortController | null>(null);
+  const attemptNumberRef = useRef(0);
 
-  const begin = useCallback(async () => {
-    setState("starting"); setMessage(null); setSeconds(300);
-    try {
-      const response = await fetch("/api/auth/telegram/start", { method: "POST" });
-      const data: unknown = await response.json();
-      if (!response.ok || !data || typeof data !== "object" || !("deepLink" in data) || typeof data.deepLink !== "string") {
-        setMessage(response.status === 503 ? "Hozircha Telegram orqali kirish ishlamayapti. Telefon raqami orqali davom eting." : "Telegram ulanishida muammo bor. Qayta urinib ko'ring.");
-        setState("error"); return;
-      }
-      setDeepLink(data.deepLink); setState("waiting");
-      if (window.matchMedia("(max-width: 640px)").matches) window.location.href = data.deepLink;
-      else window.open(data.deepLink, "_blank", "noopener,noreferrer");
-    } catch { setMessage("Tarmoq xatosi. Telefon raqami orqali davom eting."); setState("error"); }
+  useEffect(() => () => requestControllerRef.current?.abort(), []);
+
+  const showPhoneFallback = useCallback(() => {
+    setMessage(PHONE_FALLBACK_MESSAGE);
+    setState("error");
+    focusPhoneInput();
   }, []);
 
+  const begin = useCallback(async () => {
+    const attemptNumber = attemptNumberRef.current + 1;
+    attemptNumberRef.current = attemptNumber;
+    requestControllerRef.current?.abort();
+    const controller = new AbortController();
+    requestControllerRef.current = controller;
+    const desktopPointer = window.matchMedia("(pointer: fine) and (min-width: 640px)").matches;
+    const telegramWindow = desktopPointer ? window.open("about:blank", "_blank") : null;
+    if (telegramWindow) telegramWindow.opener = null;
+
+    setState("starting");
+    setMessage(null);
+    setAttempt(null);
+    setUser(null);
+    try {
+      const response = await fetch("/api/auth/telegram/start", {
+        method: "POST",
+        cache: "no-store",
+        signal: controller.signal,
+      });
+      const parsed = telegramStartResponseSchema.safeParse(await readJson(response));
+      if (response.status === 503) {
+        telegramWindow?.close();
+        showPhoneFallback();
+        return;
+      }
+      if (!response.ok || !parsed.success) {
+        telegramWindow?.close();
+        setMessage("Telegram ulanishida muammo bor. Qayta urinib ko'ring.");
+        setState("error");
+        return;
+      }
+
+      setAttempt({
+        id: parsed.data.id,
+        deepLink: parsed.data.deepLink,
+        expiresAt: new Date(parsed.data.expiresAt).getTime(),
+      });
+      setState("waiting");
+      if (telegramWindow) telegramWindow.location.href = parsed.data.deepLink;
+      else if (!desktopPointer) window.location.href = parsed.data.deepLink;
+    } catch (error) {
+      if (controller.signal.aborted || attemptNumberRef.current !== attemptNumber) return;
+      telegramWindow?.close();
+      setMessage("Tarmoq xatosi. Telefon raqami orqali davom eting.");
+      setState("error");
+    }
+  }, [showPhoneFallback]);
+
   useEffect(() => {
-    if (state !== "waiting" || !deepLink) return;
-    const id = new URL(deepLink).searchParams.get("start")?.replace("login_", "");
-    if (!id) return;
-    let stopped = false; let timer: ReturnType<typeof setTimeout> | undefined;
+    if (state !== "waiting" || !attempt) return;
+    const attemptNumber = attemptNumberRef.current;
+    const backoffIndexRef = { current: 0 };
+    let stopped = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let requestTimeout: ReturnType<typeof setTimeout> | undefined;
+    let controller: AbortController | null = null;
+    let wakeWhenVisible: (() => void) | undefined;
+    const visible = new Promise<void>((resolve) => { wakeWhenVisible = resolve; });
+
+    const onVisibilityChange = () => {
+      if (!document.hidden) wakeWhenVisible?.();
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
+    const wait = (duration: number) => new Promise<void>((resolve) => {
+      timer = setTimeout(resolve, duration);
+    });
+    const expire = () => {
+      stopped = true;
+      setMessage("Telegram orqali kirish muddati tugadi. Qayta urinib ko'ring.");
+      setState("timeout");
+    };
+
     const poll = async () => {
-      if (stopped) return;
-      if (document.hidden) { timer = setTimeout(poll, 2000); return; }
-      try {
-        const response = await fetch(`/api/auth/telegram/status?id=${encodeURIComponent(id)}`, { cache: "no-store" });
-        const data: unknown = await response.json();
-        if (data && typeof data === "object" && "state" in data && data.state === "approved" && "user" in data && data.user) {
-          setUser(data.user as User); setAuthenticatedUser(data.user as User); setState("success"); stopped = true; return;
+      while (!stopped && attemptNumberRef.current === attemptNumber) {
+        if (Date.now() >= attempt.expiresAt) {
+          expire();
+          return;
         }
-        if (data && typeof data === "object" && "state" in data && (data.state === "expired" || data.state === "consumed" || data.state === "unknown")) { setMessage("Havola muddati tugagan. Qayta urinish uchun Telegram tugmasini bosing."); setState("timeout"); stopped = true; return; }
-      } catch { /* retry on the next bounded poll */ }
-      if (seconds <= 1) { setMessage("Telegram orqali kirish muddati tugadi. Qayta urinib ko'ring."); setState("timeout"); stopped = true; return; }
-      timer = setTimeout(poll, 2000);
+        if (document.hidden) {
+          backoffIndexRef.current = 0;
+          await visible;
+          continue;
+        }
+
+        controller = new AbortController();
+        requestTimeout = setTimeout(() => controller?.abort(), 10_000);
+        try {
+          const response = await fetch(`/api/auth/telegram/status?id=${encodeURIComponent(attempt.id)}`, {
+            cache: "no-store",
+            signal: controller.signal,
+          });
+          const parsed = telegramStatusResponseSchema.safeParse(await readJson(response));
+          if (response.status === 503) {
+            stopped = true;
+            showPhoneFallback();
+            return;
+          }
+          if (parsed.success && parsed.data.state === "approved") {
+            stopped = true;
+            setUser(parsed.data.user);
+            setState("success");
+            return;
+          }
+          if (parsed.success && ["expired", "consumed", "unknown"].includes(parsed.data.state)) {
+            stopped = true;
+            setMessage("Havola muddati tugagan. Qayta urinish uchun Telegram tugmasini bosing.");
+            setState("timeout");
+            return;
+          }
+        } catch {
+          if (stopped) return;
+        } finally {
+          if (requestTimeout) clearTimeout(requestTimeout);
+        }
+
+        const delay = BACKOFF_MS[backoffIndexRef.current] ?? BACKOFF_MS[2];
+        backoffIndexRef.current = Math.min(backoffIndexRef.current + 1, BACKOFF_MS.length - 1);
+        await wait(delay);
+      }
     };
     void poll();
-    return () => { stopped = true; if (timer) clearTimeout(timer); };
-  }, [state, deepLink, seconds, setAuthenticatedUser]);
+
+    return () => {
+      stopped = true;
+      if (timer) clearTimeout(timer);
+      if (requestTimeout) clearTimeout(requestTimeout);
+      controller?.abort();
+      wakeWhenVisible?.();
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
+  }, [attempt, showPhoneFallback, state]);
 
   useEffect(() => {
-    if (state !== "waiting") return;
-    const interval = setInterval(() => setSeconds((value) => Math.max(0, value - 1)), 1000);
+    if (state !== "waiting" || !attempt) return;
+    const update = () => setSeconds(Math.max(0, Math.ceil((attempt.expiresAt - Date.now()) / 1_000)));
+    update();
+    const interval = setInterval(update, 1_000);
     return () => clearInterval(interval);
-  }, [state]);
+  }, [attempt, state]);
 
-  if (state === "success" && user) return <div role="status" className="rounded-lg border border-success-line bg-success-soft p-4 text-sm text-success">Xush kelibsiz, {user.fullName}!</div>;
-  return <div className="rounded-lg border border-border bg-bg-sunken p-4">
-    <div className="flex items-start gap-3"><ShieldCheck className="mt-0.5 h-5 w-5 text-telegram" aria-hidden="true" /><div><p className="font-semibold text-ink">Telegram orqali davom etish</p><p className="mt-1 text-sm text-ink-muted">Yangi foydalanuvchi bo'lsangiz ham, Telegram orqali ro'yxatdan o'tasiz.</p></div></div>
-    {state === "waiting" && <div className="mt-4 text-center"><MiniQr value={deepLink ?? ""} /><p className="mt-2 text-sm text-ink-muted" aria-live="polite">Telegram'da botni oching va Start bosing… {Math.floor(seconds / 60)}:{String(seconds % 60).padStart(2, "0")}</p><button type="button" onClick={begin} className="mt-3 min-h-11 rounded-md border border-border px-3 text-sm font-medium text-ink">Qayta yuborish</button></div>}
-    {(state === "starting" || state === "waiting") && <p className="mt-3 flex items-center justify-center gap-2 text-sm text-ink-muted"><Loader2 className="h-4 w-4 animate-spin text-telegram" aria-hidden="true" />Telegram tekshirilmoqda...</p>}
-    {message && <p role="alert" className="mt-3 text-sm text-danger">{message}</p>}
-    {state !== "waiting" && <button type="button" onClick={() => void begin()} disabled={state === "starting"} className="mt-4 flex min-h-11 w-full items-center justify-center gap-2 rounded-md bg-telegram px-4 font-semibold text-white disabled:opacity-60"><Send className="h-4 w-4" aria-hidden="true" />Telegram orqali davom etish</button>}
-  </div>;
+  useEffect(() => {
+    if (state !== "success") return;
+    const timer = setTimeout(() => {
+      void refreshAuth().finally(closeAuthModal);
+    }, 1_200);
+    return () => clearTimeout(timer);
+  }, [closeAuthModal, refreshAuth, state]);
+
+  if (state === "success" && user) {
+    return <div role="status" className="rounded-lg border border-success-line bg-success-soft p-4 text-sm text-success">Xush kelibsiz, {user.fullName}!</div>;
+  }
+
+  return (
+    <div className="rounded-lg border border-border bg-bg-sunken p-4">
+      <div className="flex items-start gap-3">
+        <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-telegram" aria-hidden="true" />
+        <div><p className="font-semibold text-ink">Telegram orqali davom etish</p><p className="mt-1 text-sm text-ink-muted">Yangi foydalanuvchi bo'lsangiz ham, Telegram orqali ro'yxatdan o'tasiz.</p></div>
+      </div>
+      {state === "waiting" && attempt ? (
+        <div className="mt-4 text-center">
+          <TelegramQr value={attempt.deepLink} />
+          <p className="mt-2 text-sm text-ink-muted" aria-live="polite">Telegram'da botni oching va Start bosing… {Math.floor(seconds / 60)}:{String(seconds % 60).padStart(2, "0")}</p>
+          <button type="button" onClick={() => void begin()} className="mt-3 min-h-11 rounded-md border border-border px-3 text-sm font-medium text-ink">Qayta urinish</button>
+        </div>
+      ) : null}
+      {(state === "starting" || state === "waiting") ? <p className="mt-3 flex items-center justify-center gap-2 text-sm text-ink-muted"><Loader2 className="h-4 w-4 animate-spin text-telegram" aria-hidden="true" />Telegram tekshirilmoqda...</p> : null}
+      {message ? <p role="alert" className="mt-3 text-sm text-danger">{message}</p> : null}
+      {state !== "waiting" ? <button type="button" onClick={() => void begin()} disabled={state === "starting"} className="mt-4 flex min-h-11 w-full items-center justify-center gap-2 rounded-md bg-telegram px-4 font-semibold text-white disabled:opacity-60"><Send className="h-4 w-4" aria-hidden="true" />Telegram orqali davom etish</button> : null}
+    </div>
+  );
 }

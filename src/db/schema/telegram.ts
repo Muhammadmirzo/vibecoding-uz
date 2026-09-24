@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, timestamp } from "drizzle-orm/pg-core";
+import { index, pgTable, uuid, text, timestamp } from "drizzle-orm/pg-core";
 import { users } from "./users";
 
 export const telegramLoginRequests = pgTable("telegram_login_requests", {
@@ -13,4 +13,6 @@ export const telegramLoginRequests = pgTable("telegram_login_requests", {
   consumedAt: timestamp("consumed_at"),
   ip: text("ip"),
   userAgent: text("user_agent"),
-});
+}, (table) => [
+  index("telegram_login_requests_tg_pending_idx").on(table.tgUserId, table.status, table.expiresAt),
+]);

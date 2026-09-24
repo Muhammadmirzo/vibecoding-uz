@@ -1,0 +1,1 @@
+CREATE INDEX IF NOT EXISTS "telegram_login_requests_tg_pending_idx" ON "telegram_login_requests" USING btree ("tg_user_id","status","expires_at");

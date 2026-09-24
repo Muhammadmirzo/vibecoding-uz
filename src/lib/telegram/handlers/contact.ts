@@ -1,8 +1,9 @@
 import { Markup, Telegraf } from "telegraf";
 import { BRAND } from "@/config/brand";
-import { approveTelegramLogin, takeTelegramLoginContact } from "@/features/auth/server/telegram-login.service";
-import { linkTelegramAccount } from "../linkAccount";
+import { approveTelegramLogin } from "@/features/auth/server/telegram-login.service";
+import { ServiceError } from "@/lib/http/errors";
 import { handleOperatorHandoff } from "../handoff";
+import { linkTelegramAccount } from "../linkAccount";
 
 const mainKeyboard = Markup.keyboard([
   ["📚 Kurslar va Narxlar", "🎯 Bepul Diagnostika"],
@@ -10,25 +11,32 @@ const mainKeyboard = Markup.keyboard([
   ["📱 Hisobni Ulash (Telefon)", "🆘 Mentor / Operator"],
 ]).resize();
 
-/**
- * Ownership check: Telegram marks contacts shared via the "request contact"
- * button with the sender's own user id. A fabricated contact (someone
- * else's number) must never link an account.
- */
+function escapeHtml(value: string): string {
+  const entities: Record<string, string> = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  };
+  return value.replace(/[&<>"']/g, (character) => entities[character] ?? character);
+}
+
 export function isContactOwnedBySender(
   contactUserId: number | string | null | undefined,
-  senderId: number | string
+  senderId: number | string,
 ): boolean {
   if (contactUserId === null || contactUserId === undefined) return false;
   return String(contactUserId) === String(senderId);
 }
 
-export function registerAccountHandlers(bot: Telegraf) {  bot.hears("📱 Hisobni Ulash (Telefon)", async (ctx) => ctx.reply(
+export function registerAccountHandlers(bot: Telegraf) {
+  bot.hears("📱 Hisobni Ulash (Telefon)", async (ctx) => ctx.reply(
     "Platformadagi akkauntingizni ushbu botga bog'lash uchun quyidagi tugma orqali telefon raqamingizni yuboring:",
     Markup.keyboard([
       [Markup.button.contactRequest("📱 Raqamimni tasdiqlash")],
       ["🔙 Asosiy Menyu"],
-    ]).resize()
+    ]).resize(),
   ));
 
   bot.hears("🔙 Asosiy Menyu", async (ctx) => ctx.reply("Asosiy menyu:", mainKeyboard));
@@ -37,42 +45,51 @@ export function registerAccountHandlers(bot: Telegraf) {  bot.hears("📱 Hisobn
     const contact = ctx.message.contact;
     if (!contact) return;
 
-    // Ownership check: Telegram marks contacts shared via the "request
-    // contact" button with the sender's own user id. A fabricated contact
-    // (forwarded/shared contact of someone else) must never link an account.
     if (!isContactOwnedBySender(contact.user_id, ctx.from.id)) {
-      return ctx.reply(
-        "⚠️ Faqat o'zingizning telefon raqamingizni yuboring (tugma orqali). Boshqa kontaktni ulab bo'lmaydi.",
-        { parse_mode: "HTML" }
-      );
+      return ctx.reply("⚠️ Faqat o'zingizning telefon raqamingizni yuboring (tugma orqali). Boshqa kontaktni ulab bo'lmaydi.");
     }
 
     const phone = contact.phone_number;
-    const loginToken = takeTelegramLoginContact(ctx.from.id.toString());
-    if (loginToken) {
-      try {
-        const result = await approveTelegramLogin({ token: loginToken, tgUserId: ctx.from.id.toString(), tgUsername: ctx.from.username, fullName: [ctx.from.first_name, ctx.from.last_name].filter(Boolean).join(" "), phone });
-        return ctx.reply(`✅ Tayyor! ${result.user.fullName}, ${BRAND.name} saytida hisobingizga kirdingiz.`, { parse_mode: "HTML", ...Markup.inlineKeyboard([[Markup.button.url("Saytga qaytish", BRAND.url)]]) });
-      } catch {
-        return ctx.reply("Bu kirish havolasi eskirgan yoki allaqachon ishlatilgan. Iltimos, saytdagi Telegram tugmasini qayta bosing.");
+    try {
+      await approveTelegramLogin({
+        tgUserId: ctx.from.id.toString(),
+        tgUsername: ctx.from.username,
+        fullName: [ctx.from.first_name, ctx.from.last_name].filter(Boolean).join(" "),
+        phone,
+      });
+      return ctx.reply(
+        `✅ Tayyor! ${BRAND.name} saytida hisobingizga kirdingiz.`,
+        {
+          reply_markup: {
+            ...Markup.removeKeyboard().reply_markup,
+            ...Markup.inlineKeyboard([[Markup.button.url("Saytga qaytish", BRAND.url)]]).reply_markup,
+          },
+        },
+      );
+    } catch (error) {
+      if (error instanceof ServiceError && error.code === "CONFLICT") {
+        return ctx.reply("Bu Telegram akkaunti boshqa telefon raqamiga bog'langan. Avval saytdagi telefon orqali kirib, Telegram akkauntini almashtiring.");
+      }
+      if (!(error instanceof ServiceError) || error.code !== "INVALID_TOKEN") {
+        return ctx.reply("Texnik xatolik yuz berdi. Birozdan keyin qayta urinib ko'ring.");
       }
     }
+
     const result = await linkTelegramAccount({
       tgUserId: ctx.from.id.toString(),
       tgUsername: ctx.from.username,
       phone,
     });
-
     if (result.success && result.user) {
       return ctx.reply(
-        `✅ Rahmat, <b>${result.user.fullName}</b>!\n\nHisobingiz muvaffaqiyatli ulandi. Endi darslar va vazifalar xabarnomalari to'g'ridan-to'g'ri shu yerga keladi.`,
-        { parse_mode: "HTML", ...mainKeyboard }
+        `✅ Rahmat, <b>${escapeHtml(result.user.fullName)}</b>!\n\nHisobingiz muvaffaqiyatli ulandi. Endi darslar va vazifalar xabarnomalari shu yerga keladi.`,
+        { parse_mode: "HTML", ...mainKeyboard },
       );
     }
 
     return ctx.reply(
-      `⚠️ Telefon raqam (<b>${phone}</b>) bo'yicha platformada foydalanuvchi topilmadi.\nIltimos, avval saytda ro'yxatdan o'ting: https://master-2-jade.vercel.app`,
-      { parse_mode: "HTML" }
+      `⚠️ Telefon raqam (<b>${escapeHtml(phone)}</b>) bo'yicha platformada foydalanuvchi topilmadi.\nIltimos, avval saytda ro'yxatdan o'ting: ${BRAND.url}`,
+      { parse_mode: "HTML" },
     );
   });
 
