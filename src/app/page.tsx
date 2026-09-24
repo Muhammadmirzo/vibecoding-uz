@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
+import "./../components/sections/home/home-motion.css";
+import "./../components/sections/home/home-sections.css";
+import "./../components/sections/home/home-story.css";
 import { HeroSection } from "@/components/sections/home/HeroSection";
+import { BuildStory } from "@/components/sections/home/BuildStory";
 import { ToolStrip } from "@/components/sections/home/ToolStrip";
 import { ProblemShift } from "@/components/sections/home/ProblemShift";
 import { Transformation } from "@/components/sections/home/Transformation";
@@ -23,4 +27,4 @@ export const metadata: Metadata = { title: { absolute: `${title} — ${BRAND.nam
 const organization = { "@context": "https://schema.org", "@type": "Organization", name: BRAND.name, url: siteUrl, description };
 const courseList = { "@context": "https://schema.org", "@type": "ItemList", itemListElement: Object.keys(siteConfig.courses).map((slug, index) => ({ "@type": "ListItem", position: index + 1, item: { "@type": "Course", name: slug === "ai-asoslari" ? "AI Asoslari" : "Vibe Coding Express", description: slug === "ai-asoslari" ? "AI vositalarini amaliy qo'llash kursi" : "AI bilan ishlaydigan ilova qurish kursi", url: `${siteUrl}/kurs/${slug}`, provider: { "@id": `${siteUrl}/#organization` } } })) };
 
-export default function HomePage() { return <><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify([{ ...organization, "@id": `${siteUrl}/#organization` }, courseList]) }} /><HeroSection /><ToolStrip /><ProblemShift /><Transformation /><Roadmap /><Projects /><Mentor /><Pricing /><Comparison /><Faq /><NextStepCTA /></>; }
+export default function HomePage() { return <><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify([{ ...organization, "@id": `${siteUrl}/#organization` }, courseList]) }} /><HeroSection /><BuildStory /><ToolStrip /><ProblemShift /><Transformation /><Roadmap /><Projects /><Mentor /><Pricing /><Comparison /><Faq /><NextStepCTA /></>; }

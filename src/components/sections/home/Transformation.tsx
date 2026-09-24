@@ -1,8 +1,72 @@
-import { ArrowRight, CircleCheck, Code2 } from "lucide-react";
+import { BrainCircuit, CheckCircle2, MessageSquareText, Rocket } from "lucide-react";
 import { Container, Section } from "@/components/ui";
+import { ProcessDemo } from "@/features/motion/ui/ProcessDemo";
+import { Reveal } from "@/features/motion/ui/Reveal";
+import { ScrollFillText } from "@/features/motion/ui/ScrollFillText";
+import { Spotlight } from "@/features/motion/ui/Spotlight";
+import { Tilt } from "@/features/motion/ui/Tilt";
 
-const steps = ["G'oyani aniqlashtirish", "AI bilan prototip", "Interfeys va ma'lumotlar", "Test va iteratsiya", "Yayilash"];
+const Icon = BrainCircuit;
+const CheckIcon = CheckCircle2;
+const MessageIcon = MessageSquareText;
+const LaunchIcon = Rocket;
 
 export function Transformation() {
-  return <Section pattern={false} className="bg-bg"><Container><div className="max-w-2xl"><p className="mb-4 text-sm font-semibold text-brand">0-haftadan 8-haftagacha</p><h2 className="font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">Siz o'zgartirasiz: g'oyadan ishlaydigan versiyagacha.</h2></div><div className="mt-12 grid gap-6 md:grid-cols-[.8fr_1.2fr]"><div className="rounded-2xl border border-border bg-bg-sunken p-7"><p className="text-sm text-ink-subtle">0-hafta</p><h3 className="mt-3 text-2xl font-semibold text-ink">Faqat g'oya</h3><p className="mt-3 text-ink-muted">Nima qilmoqchi, lekin qayerdan boshlash noma'lum.</p></div><div className="rounded-2xl border border-accent/30 bg-accent-soft p-7"><p className="text-sm text-accent">8-hafta</p><h3 className="mt-3 text-2xl font-semibold text-ink">Ishlaydigan ilova</h3><ul className="mt-5 grid gap-3 text-ink sm:grid-cols-2">{steps.map((step) => <li key={step} className="flex items-center gap-2"><CircleCheck className="size-4 text-success" aria-hidden="true" />{step}</li>)}</ul></div></div><div className="mt-8 flex items-center gap-3 text-sm font-semibold text-brand"><Code2 className="size-5" aria-hidden="true" />Bilim yo'q emas — yo'nalish va amaliyot kerak.<ArrowRight className="size-4" aria-hidden="true" /></div></Container></Section>;
+  return (
+    <Section pattern={false} className="bg-bg py-24 sm:py-32">
+      <Container>
+        <div className="grid gap-8 lg:grid-cols-[1fr_.65fr] lg:items-end">
+          <div>
+            <p className="mb-4 font-mono text-sm text-brand">transformatsiya / 0 → 8 hafta</p>
+            <h2 className="max-w-4xl font-display text-[clamp(2rem,1.2rem+3vw,3.6rem)] font-semibold leading-[1.08] tracking-[-0.045em] text-ink">
+              <ScrollFillText text="G'oyadan — ishlaydigan mahsulotgacha." />
+            </h2>
+          </div>
+          <p className="max-w-xl text-lg leading-relaxed text-ink-muted lg:pb-2">
+            Har bir hafta bitta aniq natija: muammo aniqroq, interfeys aniqroq, qaror sizga ochiqroq. Kurs nazariy emas — ko'rinadigan o'zgarishlar ketma-ketligi.
+          </p>
+        </div>
+
+        <div className="bento-grid mt-14">
+          <Reveal className="bento-tile bento-wide" index={0}>
+            <Spotlight className="h-full"><Tilt className="h-full">
+              <article className="bento-card h-full">
+                <div className="bento-index">01</div><Icon className="bento-icon" aria-hidden="true" />
+                <div className="mt-auto"><h3>Avval muammoni kichraytiramiz.</h3><p>Vazifa, kim uchun va muvaffaqiyat nimani anglatishi — prompt yozilishidan oldin aniq bo'ladi.</p></div>
+              </article>
+            </Tilt></Spotlight>
+          </Reveal>
+
+          <Reveal className="bento-tile" index={1}>
+            <Spotlight className="h-full"><Tilt className="h-full">
+              <article className="bento-card h-full">
+                <div className="bento-index">02</div><MessageIcon className="bento-icon" aria-hidden="true" />
+                <h3>AI bilan tez iteratsiya.</h3><p>Kod, matn va rasmni bir vaqtda solishtirib, kerakli yo'nalishni tanlaysiz.</p>
+                <ProcessDemo kind="prompt" />
+              </article>
+            </Tilt></Spotlight>
+          </Reveal>
+
+          <Reveal className="bento-tile" index={2}>
+            <Spotlight className="h-full"><Tilt className="h-full">
+              <article className="bento-card h-full">
+                <div className="bento-index">03</div><CheckIcon className="bento-icon" aria-hidden="true" />
+                <h3>Qaror o'zingizniki.</h3><p>AI variant taklif qiladi; siz maqsad va foydalanuvchi uchun to'g'ri qarorni tasdiqlaysiz.</p>
+                <ProcessDemo kind="toggle" />
+              </article>
+            </Tilt></Spotlight>
+          </Reveal>
+
+          <Reveal className="bento-tile bento-wide" index={3}>
+            <Spotlight className="h-full"><Tilt className="h-full">
+              <article className="bento-card h-full">
+                <div className="bento-index">04</div><LaunchIcon className="bento-icon" aria-hidden="true" />
+                <div className="mt-auto"><h3>Ishlashdan e'lon qilishgacha.</h3><p>Test, xato tuzatish va haqiqiy foydalanuvchiga taqdim etish kursi yakunlanishi emas, tugash nuqtasi emas.</p></div>
+              </article>
+            </Tilt></Spotlight>
+          </Reveal>
+        </div>
+      </Container>
+    </Section>
+  );
 }
