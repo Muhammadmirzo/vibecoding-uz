@@ -18,7 +18,7 @@
 | W3A Motion | muse-spark-1.3 | 🏃 | wave/w3a-motion | reports/W3A-MOTION.md | |
 | W3B Motion admin | space-bunny | ⏳ | — | reports/W3B-MOTION-ADMIN.md | |
 | W4A Perf | space-bunny | ⏳ | — | reports/W4A-PERF.md | |
-| W4B Audit fixes | muse-spark-1.3 | ⏳ | — | reports/W4B-FIXES.md | |
+| W4B Audit fixes | space-bunny-free | 🏃 | wave/w4b-fixes | reports/W4B-FIXES.md | |
 | W5 Final QA + deploy | space-bunny + orchestrator | ⏳ | main | reports/W5-FINAL.md | |
 
 Legend: ✅ merged · 🏃 running · ⏳ waiting · ❌ failed (see notes)
