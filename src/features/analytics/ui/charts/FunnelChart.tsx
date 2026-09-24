@@ -1,0 +1,5 @@
+import type { FunnelDatum } from "./chart-types";
+
+export function FunnelChart({ data, title }: { data: FunnelDatum[]; title: string }) {
+  return <figure><div role="img" aria-label={title} className="space-y-2">{data.map((item) => <div key={item.label}><div className="mb-1 flex justify-between text-sm"><span className="font-semibold text-ink">{item.label}</span><span className="text-ink-muted">{item.value.toLocaleString("uz-UZ")} · {item.percentage.toFixed(1)}%</span></div><div className="h-3 rounded-full bg-bg-sunken"><div className="h-3 rounded-full bg-brand" style={{ width: `${Math.max(2, item.percentage)}%` }} /></div></div>)}</div><details className="mt-3 text-sm text-ink-muted"><summary>Jadval ko‘rinishi</summary><table className="mt-2 w-full text-left"><thead><tr><th className="py-1">Bosqich</th><th className="py-1">Soni</th><th className="py-1">Ulush</th></tr></thead><tbody>{data.map((item) => <tr key={item.label} className="border-t border-border"><td className="py-1">{item.label}</td><td className="py-1">{item.value}</td><td className="py-1">{item.percentage.toFixed(1)}%</td></tr>)}</tbody></table></details></figure>;
+}

@@ -1,4 +1,5 @@
 import { withTransactionLock } from "@/db";
+import { trackServerEvent } from "@/features/analytics/server/track";
 import { hashOtpCode, normalizePhone, verifyOtpCode } from "@/lib/auth/password";
 import { ServiceError } from "@/lib/http/errors";
 import type { SendSmsResult } from "@/lib/sms/eskiz";
@@ -104,6 +105,7 @@ export async function verifyOtp(
   await otpRepo.markUsed(record.id, new Date());
 
   let user = await users.findByPhone(normalizedPhone);
+  const isNewUser = !user;
   let refCodeAttributed = false;
   if (user) {
     // Single update: last-login touch plus first-name fill for placeholder names.
@@ -143,6 +145,13 @@ export async function verifyOtp(
     user = created;
     refCodeAttributed = completed.attributed;
   }
+
+  void trackServerEvent({
+    type: isNewUser ? "signup" : "login",
+    userId: user.id,
+    path: "/api/auth/otp/verify",
+    props: { method: isNewUser ? "otp_registration" : "otp_login" },
+  });
 
   const expiresAt = new Date(Date.now() + SESSION_TTL_MS);
   // Single write outside the registration tx (W4-ARCH: single write, fine).

@@ -1,4 +1,5 @@
 import { withTransactionLock } from "@/db";
+import { trackServerEvent } from "@/features/analytics/server/track";
 import { sumMatchesTiyin, sumToTiyin } from "../domain/money";
 import { decideClickTransition } from "../domain/policy";
 import type { DbExecutor, PaymentRecord, PaymentsRepository } from "./payments.repository";
@@ -64,6 +65,12 @@ export async function handleClickWebhook(
         });
       }
     });
+    void trackServerEvent({
+      type: "payment_failed",
+      userId: payment.userId,
+      path: "/api/payments/click",
+      props: { paymentId: payment.id, reasonCode: `click_${String(data.error ?? "unknown")}` },
+    });
     return fail("Tranzaksiya xatolik bilan yakunlandi");
   }
 
@@ -96,7 +103,7 @@ export async function handleClickWebhook(
     const incomingPrepare = Number(data.merchant_prepare_id);
     const existingConfirm = metaOf(current).merchantConfirmId;
     if (current.status === "paid") {
-      return typeof existingConfirm === "number" ? existingConfirm : null;
+      return typeof existingConfirm === "number" ? { confirmId: existingConfirm, replay: true } : null;
     }
     if (current.status !== "pending") return null;
     if (!Number.isSafeInteger(incomingPrepare) || incomingPrepare <= 0 || incomingPrepare !== storedPrepare) return null;
@@ -108,8 +115,23 @@ export async function handleClickWebhook(
       meta: { ...metaOf(current), clickTransId, merchantPrepareId: incomingPrepare, merchantConfirmId, clickState: "completed" },
     });
     if (current.enrollmentId) await repo.setEnrollmentStatusTx(ex, current.enrollmentId, "active");
-    return merchantConfirmId;
+    return {
+      confirmId: merchantConfirmId,
+      replay: false,
+      paymentId: current.id,
+      userId: current.userId,
+      valueUzs: Math.round(Number(current.amountSum)),
+    };
   });
   if (completed === null) return fail("Invalid transaction state");
-  return { ok: true, body: { click_trans_id: clickTransId, merchant_trans_id: data.merchant_trans_id, merchant_confirm_id: completed, error: 0, error_note: "Success" } };
+  if (!completed.replay) {
+    void trackServerEvent({
+      type: "payment_success",
+      userId: completed.userId,
+      path: "/api/payments/click",
+      props: { paymentId: completed.paymentId },
+      valueUzs: completed.valueUzs,
+    });
+  }
+  return { ok: true, body: { click_trans_id: clickTransId, merchant_trans_id: data.merchant_trans_id, merchant_confirm_id: completed.confirmId, error: 0, error_note: "Success" } };
 }

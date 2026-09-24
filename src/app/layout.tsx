@@ -12,6 +12,7 @@ import { BRAND } from "@/config/brand";
 import { MotionRoot } from "@/features/motion/ui/MotionRoot";
 import { RevealRoot } from "@/features/motion/ui/RevealRoot";
 import { getMotionSettings } from "@/features/motion/server/motion-settings";
+import { AnalyticsTracker } from "@/features/analytics/client/AnalyticsTracker";
 
 const onest = Onest({
   subsets: ["latin", "latin-ext"],
@@ -113,6 +114,7 @@ export default async function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} themes={["light", "dark"]} nonce={nonce}>
           <AuthProvider initialUser={initialUser}>
             <RevealRoot />
+            <AnalyticsTracker />
             <Header />
             <main id="main">{children}</main>
             <Footer />

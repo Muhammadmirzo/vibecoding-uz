@@ -10,6 +10,7 @@ import {
 import { createCheckout, checkoutInputSchema } from "@/features/payments/server/checkout.service";
 import { drizzlePaymentsRepository } from "@/features/payments/server/payments.repository";
 import { errorResponse } from "@/lib/http/errors";
+import { trackServerEvent } from "@/features/analytics/server/track";
 
 export async function POST(request: Request) {
   try {
@@ -29,6 +30,8 @@ export async function POST(request: Request) {
       drizzlePaymentsRepository,
       { ...input.data, userId: authResult.session.userId },
     );
+
+    void trackServerEvent({ type: "checkout_start", userId: authResult.session.userId, path: "/api/payments/checkout", props: {} });
 
     await drizzlePaymentsRepository.recordAudit({
       userId: authResult.session.userId,

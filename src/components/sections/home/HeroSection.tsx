@@ -58,9 +58,9 @@ export function HeroSection() {
           <p className="mt-6 max-w-2xl text-lg leading-relaxed text-ink-muted">AI bilan — kod yozishni bilmasangiz ham. Dasturchi yollash kutilganidek qimmat emas. Siz g&apos;oyangizni, Claude Code yordamida qadam-baqadam ishlaydigan ilovaga aylantirasiz.</p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <MagneticButton>
-              <Button href="/diagnostika" size="lg">Bepul diagnostika — 2 daqiqa <ArrowRight className="size-5" aria-hidden="true" /></Button>
+              <Button href="/diagnostika" data-track="hero_diagnostic" size="lg">Bepul diagnostika — 2 daqiqa <ArrowRight className="size-5" aria-hidden="true" /></Button>
             </MagneticButton>
-            <Button href="/bepul-dars" size="lg" variant="outline"><CirclePlay className="size-5" aria-hidden="true" />Bepul darsga yozilish</Button>
+            <Button href="/bepul-dars" data-track="hero_free_lesson" size="lg" variant="outline"><CirclePlay className="size-5" aria-hidden="true" />Bepul darsga yozilish</Button>
           </div>
           <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-ink-muted">
             <span>Keyingi guruh: <strong className="text-ink">{siteConfig.nextCohortDate}</strong></span>
