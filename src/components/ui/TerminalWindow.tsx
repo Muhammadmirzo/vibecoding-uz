@@ -33,9 +33,15 @@ function renderLine(line: string, key: number) {
       >
         {glyph}
       </span>
-      <span>
-        {before}
-        {url ? <span className="text-gold">{url}</span> : null}
+      <span className="min-w-0">
+        {url ? (
+          <>
+            <span className="block">{before}</span>
+            <span className="block break-all text-gold">{url}</span>
+          </>
+        ) : (
+          content
+        )}
       </span>
     </p>
   );

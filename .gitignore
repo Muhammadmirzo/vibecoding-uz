@@ -38,3 +38,5 @@ next-env.d.ts
 *.pem
 .env*
 .orchestra/
+playwright-report/
+test-results/

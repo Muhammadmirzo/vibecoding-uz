@@ -1,5 +1,7 @@
 # AGENTS.md — AI Agent Guidance & Architectural Rulebook
 
+
+> 🛑 **MANDATORY FIRST READ:** [docs/CODER_AGENT_RULES.md](docs/CODER_AGENT_RULES.md) — coding, architecture, design, responsive, security and process-safety rules for every coder agent. They override older guidance below where they conflict.
 Welcome AI Agent (Claude Code, Cursor, DeepSeek, Z.ai, OpenRouter, AGY)!
 This document serves as your **authoritative architectural map**, **token-sparing context rulebook**, and **engineering guidelines document**.
 

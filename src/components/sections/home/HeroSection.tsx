@@ -3,9 +3,9 @@ import { Button, Container, GirihPattern, TerminalWindow } from "@/components/ui
 import { siteConfig } from "@/lib/siteConfig";
 
 const session = [
-  "› Nonvoyxona uchun buyurtma ilovasi",
+  "› Nonvoyxona buyurtma ilovasi",
   "✓ Menyu va buyurtma sahifalari",
-  "✓ Baza: products, orders, couriers",
+  "✓ Baza: products, orders",
   "✓ Telegram-bot buyurtma qabuli",
   "✓ To'lov va yetkazish ulandi",
   "✓ Vercel'ga deploy qilindi",
