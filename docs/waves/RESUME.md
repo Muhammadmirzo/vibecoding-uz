@@ -33,7 +33,7 @@ Then read `docs/waves/STATE.md` → "Phase 2" table (source of truth).
 1. ~~Which portfolio projects are theirs~~ — answered: only Clash Nexus for now (Bozor bot later).
 2. Approve W7 / W8 / W9?
 3. Approve cuts: /ekspertlar, /testimoniyalar, /ish, SpinWheel, unbuilt feature flags?
-4. Admin password reset ("parolni yangila") — reset via `scripts/create-admin.ts` with a generated password; never read or print existing secrets.
+4. ~~Admin password reset~~ done 2026-09-24 (repeat on request: "parolni yangila") — reset via `scripts/create-admin.ts` with a generated password; never read or print existing secrets.
 
 ## Hard rules
 Never `pkill -f` (stop servers by PID from `ss -ltnp | grep :<port>`). Heavy commands via `scripts/waves/locked.sh`. Never nemotron. Machine has 7.6 GB RAM.
