@@ -20,6 +20,7 @@
   mask-image: linear-gradient(to bottom, black, transparent 70%);
 }
 .w6c-hero-dark { background: var(--ink); color: var(--bg); }
+.w6c-hero-dark .w6c-lede { opacity: .8; }
 .w6c-hero-dark .w6c-hero-mesh { opacity: .5; }
 
 /* Above-fold load entrance: staggered fade + 14px rise, gated. */

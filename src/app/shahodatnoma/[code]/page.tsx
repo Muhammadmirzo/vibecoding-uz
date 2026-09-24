@@ -52,7 +52,7 @@ export default async function CertificateVerificationPage({ params }: Props) {
       </div>
 
       <Container className="max-w-[700px]">
-        <div className="rounded-[var(--radius-xl)] border-2 border-gold/60 bg-bg-elevated p-8 text-left shadow-[var(--shadow-md)] sm:p-10">
+        <div className="rounded-[var(--radius-xl)] border-2 border-gold bg-bg-elevated p-8 text-left shadow-[var(--shadow-md)] sm:p-10">
           <p className="text-center font-display text-sm font-semibold uppercase tracking-[0.2em] text-ink-subtle">— Sertifikat —</p>
           <dl className="mt-6 space-y-0 text-sm">
             {ROWS.map((row) => (

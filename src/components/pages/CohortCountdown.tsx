@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { siteConfig } from "@/lib/siteConfig";
 
 const UZ_MONTHS: Record<string, number> = {
   yanvar: 0, fevral: 1, mart: 2, aprel: 3, may: 4, iyun: 5,
@@ -18,20 +17,21 @@ function parseCohortDate(raw: string): Date | null {
 }
 
 /**
- * Live cohort countdown derived from the REAL `siteConfig.nextCohortDate`.
- * Renders nothing until mounted (no hydration mismatch) and hides itself
- * when the date is past or unparseable.
+ * Live cohort countdown derived from the REAL `siteConfig.nextCohortDate`
+ * (passed as a plain string prop so the services catalog never enters the
+ * client bundle). Renders nothing until mounted (no hydration mismatch)
+ * and hides itself when the date is past or unparseable.
  */
-export function CohortCountdown({ className }: { className?: string }) {
+export function CohortCountdown({ date, className }: { date: string; className?: string }) {
   const [days, setDays] = React.useState<number | null>(null);
 
   React.useEffect(() => {
-    const target = parseCohortDate(siteConfig.nextCohortDate);
+    const target = parseCohortDate(date);
     if (!target) return;
     const diff = Math.ceil((target.getTime() - Date.now()) / 86_400_000);
     if (diff < 0) return;
     setDays(diff);
-  }, []);
+  }, [date]);
 
   if (days === null) return null;
   return (

@@ -61,7 +61,7 @@ export function PageHero({
               <h1 className="w6c-load mt-3 max-w-4xl text-balance font-display text-[clamp(2.1rem,1.2rem+3.4vw,3.6rem)] font-semibold leading-[1.1] tracking-[-0.04em] text-bg" style={{ "--i": 1 } as React.CSSProperties}>
                 {title}
               </h1>
-              {lede && <p className="w6c-load mt-5 max-w-2xl text-lg leading-relaxed text-bg/75" style={{ "--i": 2 } as React.CSSProperties}>{lede}</p>}
+              {lede && <p className="w6c-load w6c-lede mt-5 max-w-2xl text-lg leading-relaxed" style={{ "--i": 2 } as React.CSSProperties}>{lede}</p>}
               {meta}
               {actions && <div className="w6c-load mt-7 flex flex-col gap-3 sm:flex-row" style={{ "--i": 3 } as React.CSSProperties}>{actions}</div>}
             </div>

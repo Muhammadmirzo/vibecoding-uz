@@ -1,10 +1,11 @@
 "use client";
 
 import * as React from "react";
-import { Share2 } from "lucide-react";
-import { Button } from "@/components/ui/Button";
 
-/** Shareable certificate link: Web Share API with clipboard fallback. */
+/**
+ * Shareable certificate link: Web Share API with clipboard fallback.
+ * Self-contained (no UI kit imports) to keep this route's JS near zero.
+ */
 export function ShareCertButton({ code, title }: { code: string; title: string }) {
   const [copied, setCopied] = React.useState(false);
 
@@ -29,9 +30,16 @@ export function ShareCertButton({ code, title }: { code: string; title: string }
   }
 
   return (
-    <Button type="button" variant="outline" onClick={share}>
-      <Share2 className="size-4" aria-hidden="true" />
+    <button
+      type="button"
+      onClick={share}
+      className="btn-press inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-border bg-bg-elevated px-4 text-sm font-semibold text-ink transition hover:border-brand"
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="size-4" aria-hidden="true">
+        <circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" />
+        <path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4" />
+      </svg>
       {copied ? "Havola nusxalandi" : "Ulashish"}
-    </Button>
+    </button>
   );
 }

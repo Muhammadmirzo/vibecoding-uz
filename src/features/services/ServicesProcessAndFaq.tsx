@@ -14,7 +14,7 @@ export function ServicesProcessAndFaq() {
         </Reveal>
         <RevealGroup className="mt-12 grid gap-4 md:grid-cols-3">
           {page.process.map((step, index) => (
-            <article key={step.title} className="rounded-xl border border-white/20 bg-white/10 p-6 transition hover:-translate-y-1 hover:border-gold/60">
+            <article key={step.title} className="rounded-xl border border-white/20 bg-white/10 p-6 transition hover:-translate-y-1 hover:border-gold">
               <span className="font-mono text-sm font-bold text-gold">0{index + 1}</span>
               <h3 className="mt-10 text-xl font-bold">{step.title}</h3>
               <p className="mt-3 text-sm leading-relaxed text-white/75">{step.description}</p>
