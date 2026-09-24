@@ -1,20 +1,16 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { users, auditLogs } from "@/db/schema";
-import { getAuthSession } from "@/lib/auth/session";
+import { requireAuth } from "@/lib/auth/require-auth";
 import { hashPassword, verifyPassword, normalizePhone } from "@/lib/auth/password";
 import { changePasswordSchema } from "@/lib/validations";
 import { eq } from "drizzle-orm";
 
 export async function POST(request: Request) {
   try {
-    const authSession = await getAuthSession();
-    if (!authSession) {
-      return NextResponse.json(
-        { error: "Avtorizatsiyadan o'tilmagan" },
-        { status: 401 }
-      );
-    }
+    const authResult = await requireAuth(request);
+    if (!authResult.ok) return authResult.response;
+    const authSession = authResult.session;
 
     const body = await request.json();
     const parseResult = changePasswordSchema.safeParse(body);

@@ -23,4 +23,14 @@ export const PRESETS = {
   LOGIN: { limit: 5, windowSeconds: 900, prefix: "login" },
   /** Quiz form submissions: max 5 submissions per 10 minutes (600s) */
   QUIZ: { limit: 5, windowSeconds: 600, prefix: "quiz" },
+  /** Public write endpoints (leads, job apply): max 10 per 10 minutes */
+  PUBLIC_WRITE: { limit: 10, windowSeconds: 600, prefix: "public_write" },
+  /** Payment provider webhooks: max 120 per minute per IP */
+  WEBHOOK: { limit: 120, windowSeconds: 60, prefix: "webhook" },
+  /** Authenticated checkout initiations: max 20 per 10 minutes */
+  CHECKOUT: { limit: 20, windowSeconds: 600, prefix: "checkout" },
+  /** Referral payout claims: max 5 per hour */
+  REFERRAL: { limit: 5, windowSeconds: 3600, prefix: "referral" },
+  /** Public search: max 60 per minute */
+  SEARCH: { limit: 60, windowSeconds: 60, prefix: "search" },
 } as const;

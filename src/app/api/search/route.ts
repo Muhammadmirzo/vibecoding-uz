@@ -10,6 +10,12 @@ import {
   matchStaticItems,
   type SearchResponse,
 } from "./searchIndex";
+import {
+  checkRateLimit,
+  getClientIp,
+  createRateLimitResponse,
+  PRESETS,
+} from "@/lib/security/rateLimit";
 
 const CACHE_TTL_MS = 60 * 1000;
 const searchCache = new Map<string, { data: SearchResponse; expiresAt: number }>();
@@ -18,6 +24,9 @@ const CACHE_HEADERS = { "Cache-Control": "public, s-maxage=60, stale-while-reval
 
 export async function GET(req: NextRequest) {
   try {
+    const rl = await checkRateLimit(`search:${getClientIp(req)}`, PRESETS.SEARCH);
+    if (!rl.success) return createRateLimitResponse(rl);
+
     const url = new URL(req.url);
     const rawQuery = url.searchParams.get("q") || "";
     const rawCategory = url.searchParams.get("category") || "all";

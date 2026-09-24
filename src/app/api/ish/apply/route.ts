@@ -2,9 +2,19 @@ import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { leads, auditLogs } from "@/db/schema";
 import { applyJobSchema } from "@/lib/validations";
+import {
+  checkRateLimit,
+  getClientIp,
+  createRateLimitResponse,
+  PRESETS,
+} from "@/lib/security/rateLimit";
 
 export async function POST(request: Request) {
   try {
+    const ip = getClientIp(request);
+    const rl = await checkRateLimit(`apply:${ip}`, PRESETS.PUBLIC_WRITE);
+    if (!rl.success) return createRateLimitResponse(rl);
+
     const body = await request.json();
     const parseResult = applyJobSchema.safeParse(body);
 

@@ -8,8 +8,20 @@ const mainKeyboard = Markup.keyboard([
   ["📱 Hisobni Ulash (Telefon)", "🆘 Mentor / Operator"],
 ]).resize();
 
-export function registerAccountHandlers(bot: Telegraf) {
-  bot.hears("📱 Hisobni Ulash (Telefon)", async (ctx) => ctx.reply(
+/**
+ * Ownership check: Telegram marks contacts shared via the "request contact"
+ * button with the sender's own user id. A fabricated contact (someone
+ * else's number) must never link an account.
+ */
+export function isContactOwnedBySender(
+  contactUserId: number | string | null | undefined,
+  senderId: number | string
+): boolean {
+  if (contactUserId === null || contactUserId === undefined) return false;
+  return String(contactUserId) === String(senderId);
+}
+
+export function registerAccountHandlers(bot: Telegraf) {  bot.hears("📱 Hisobni Ulash (Telefon)", async (ctx) => ctx.reply(
     "Platformadagi akkauntingizni ushbu botga bog'lash uchun quyidagi tugma orqali telefon raqamingizni yuboring:",
     Markup.keyboard([
       [Markup.button.contactRequest("📱 Raqamimni tasdiqlash")],
@@ -22,6 +34,16 @@ export function registerAccountHandlers(bot: Telegraf) {
   bot.on("contact", async (ctx) => {
     const contact = ctx.message.contact;
     if (!contact) return;
+
+    // Ownership check: Telegram marks contacts shared via the "request
+    // contact" button with the sender's own user id. A fabricated contact
+    // (forwarded/shared contact of someone else) must never link an account.
+    if (!isContactOwnedBySender(contact.user_id, ctx.from.id)) {
+      return ctx.reply(
+        "⚠️ Faqat o'zingizning telefon raqamingizni yuboring (tugma orqali). Boshqa kontaktni ulab bo'lmaydi.",
+        { parse_mode: "HTML" }
+      );
+    }
 
     const phone = contact.phone_number;
     const result = await linkTelegramAccount({

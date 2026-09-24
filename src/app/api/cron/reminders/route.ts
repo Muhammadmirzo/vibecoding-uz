@@ -13,6 +13,7 @@ import {
   hasHomeworkSubmission,
 } from "../reminderQueries";
 import type { ReminderDetails } from "../reminderTypes";
+import { isCronAuthorized } from "@/lib/security/cron";
 
 export async function GET(req: NextRequest) {
   return handleCronRequest(req);
@@ -20,15 +21,6 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   return handleCronRequest(req);
-}
-
-function isAuthorized(req: NextRequest): boolean {
-  const cronSecret = process.env.CRON_SECRET;
-  if (!cronSecret) return true;
-  const authHeader = req.headers.get("authorization");
-  const secretHeader = req.headers.get("x-cron-secret");
-  const token = authHeader ? authHeader.replace(/^Bearer\s+/i, "") : secretHeader;
-  return token === cronSecret;
 }
 
 async function processDripReminders(now: Date, details: ReminderDetails): Promise<void> {
@@ -92,7 +84,7 @@ async function processInactivityReminders(now: Date, details: ReminderDetails): 
 }
 
 async function handleCronRequest(req: NextRequest) {
-  if (!isAuthorized(req)) {
+  if (!isCronAuthorized(req)) {
     return NextResponse.json({ error: "Ruxsat berilmagan (Unauthorized)" }, { status: 401 });
   }
 

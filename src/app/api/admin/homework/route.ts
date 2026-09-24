@@ -8,9 +8,12 @@ import {
   users,
 } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
+import { requireAdmin } from "@/lib/auth/require-auth";
 
 export async function GET(request: Request) {
   try {
+    const auth = await requireAdmin(request);
+    if (!auth.ok) return auth.response;
     const { searchParams } = new URL(request.url);
     const statusParam = searchParams.get("status") || "all";
 

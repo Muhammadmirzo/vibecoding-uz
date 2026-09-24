@@ -1,32 +1,7 @@
-"use client";
-
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { siteConfig } from "@/lib/siteConfig";
 
-interface SiteBannerProps {
-  text: string;
-  link?: string;
-}
-
-export function SiteBanner({ text, link }: SiteBannerProps) {
-  if (!text) return null;
-
-  const content = (
-    <>
-      <span>{text}</span>
-      {link ? <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" /> : null}
-    </>
-  );
-
-  return (
-    <div className="relative z-[51] flex items-center justify-center gap-2 bg-accent px-4 py-2 text-center text-xs font-semibold text-white">
-      {link ? (
-        <Link href={link} className="inline-flex items-center gap-1 hover:underline">
-          {content}
-        </Link>
-      ) : (
-        <span className="inline-flex items-center gap-1">{content}</span>
-      )}
-    </div>
-  );
+export function SiteBanner() {
+  return <div className="relative z-[51] bg-brand text-white"><Link href="/kurs/vibe-coding-express" className="mx-auto flex max-w-container items-center justify-center gap-2 px-5 py-2 text-center text-xs font-semibold">Keyingi guruh: {siteConfig.nextCohortShortDate} · o&apos;rni band qiling <ArrowRight className="size-3.5" aria-hidden="true" /></Link></div>;
 }

@@ -3,9 +3,12 @@ import { db } from "@/db";
 import { broadcastNotifications, users, enrollments, leads, auditLogs } from "@/db/schema";
 import { createBroadcastSchema } from "@/lib/validations";
 import { desc, eq, count } from "drizzle-orm";
+import { requireAdmin } from "@/lib/auth/require-auth";
 
 export async function GET() {
   try {
+    const auth = await requireAdmin();
+    if (!auth.ok) return auth.response;
     const list = await db
       .select()
       .from(broadcastNotifications)
@@ -26,6 +29,8 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const auth = await requireAdmin(request);
+    if (!auth.ok) return auth.response;
     const body = await request.json();
     const parseResult = createBroadcastSchema.safeParse(body);
 

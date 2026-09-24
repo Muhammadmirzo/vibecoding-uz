@@ -3,6 +3,7 @@ import { db } from "@/db";
 import { siteSettings, auditLogs } from "@/db/schema";
 import { siteSettingsSchema } from "@/lib/validations";
 import { eq } from "drizzle-orm";
+import { requireAdmin } from "@/lib/auth/require-auth";
 
 const DEFAULT_SETTINGS = {
   siteTitle: "Mirzo Academy",
@@ -42,6 +43,8 @@ const DEFAULT_SETTINGS = {
 
 export async function GET() {
   try {
+    const auth = await requireAdmin();
+    if (!auth.ok) return auth.response;
     const rows = await db.select().from(siteSettings);
     const settingsMap: Record<string, unknown> = { ...DEFAULT_SETTINGS };
 
@@ -64,6 +67,8 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const auth = await requireAdmin(request);
+    if (!auth.ok) return auth.response;
     const body = await request.json();
     const parseResult = siteSettingsSchema.safeParse(body);
 

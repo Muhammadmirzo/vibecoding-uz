@@ -3,9 +3,12 @@ import { db } from "@/db";
 import { leads, courses, users } from "@/db/schema";
 import { eq, desc, or, ilike } from "drizzle-orm";
 import { createLeadSchema } from "@/lib/validations";
+import { requireAdmin } from "@/lib/auth/require-auth";
 
 export async function GET(request: Request) {
   try {
+    const auth = await requireAdmin(request);
+    if (!auth.ok) return auth.response;
     const { searchParams } = new URL(request.url);
     const statusParam = searchParams.get("status");
     const searchParam = searchParams.get("q");
@@ -61,6 +64,8 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    const auth = await requireAdmin(request);
+    if (!auth.ok) return auth.response;
     const body = await request.json();
     const parseResult = createLeadSchema.safeParse(body);
 

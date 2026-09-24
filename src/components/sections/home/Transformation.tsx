@@ -1,0 +1,8 @@
+import { ArrowRight, CircleCheck, Code2 } from "lucide-react";
+import { Container, Section } from "@/components/ui";
+
+const steps = ["G'oyani aniqlashtirish", "AI bilan prototip", "Interfeys va ma'lumotlar", "Test va iteratsiya", "Yayilash"];
+
+export function Transformation() {
+  return <Section pattern={false} className="bg-bg"><Container><div className="max-w-2xl"><p className="mb-4 text-sm font-semibold text-brand">0-haftadan 8-haftagacha</p><h2 className="font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">Siz o'zgartirasiz: g'oyadan ishlaydigan versiyagacha.</h2></div><div className="mt-12 grid gap-6 md:grid-cols-[.8fr_1.2fr]"><div className="rounded-2xl border border-border bg-bg-sunken p-7"><p className="text-sm text-ink-subtle">0-hafta</p><h3 className="mt-3 text-2xl font-semibold text-ink">Faqat g'oya</h3><p className="mt-3 text-ink-muted">Nima qilmoqchi, lekin qayerdan boshlash noma'lum.</p></div><div className="rounded-2xl border border-accent/30 bg-accent-soft p-7"><p className="text-sm text-accent">8-hafta</p><h3 className="mt-3 text-2xl font-semibold text-ink">Ishlaydigan ilova</h3><ul className="mt-5 grid gap-3 text-ink sm:grid-cols-2">{steps.map((step) => <li key={step} className="flex items-center gap-2"><CircleCheck className="size-4 text-success" aria-hidden="true" />{step}</li>)}</ul></div></div><div className="mt-8 flex items-center gap-3 text-sm font-semibold text-brand"><Code2 className="size-5" aria-hidden="true" />Bilim yo'q emas — yo'nalish va amaliyot kerak.<ArrowRight className="size-4" aria-hidden="true" /></div></Container></Section>;
+}

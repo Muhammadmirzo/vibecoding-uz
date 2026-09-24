@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { randomInt } from "crypto";
 import { db } from "@/db";
 import { otpCodes } from "@/db/schema";
 import { otpSendSchema } from "@/lib/validations";
@@ -37,8 +38,8 @@ export async function POST(request: Request) {
       return createRateLimitResponse(phoneRlResult);
     }
 
-    // Generate random 6-digit OTP code
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    // Generate random 6-digit OTP code via CSPRNG
+    const code = randomInt(100000, 1000000).toString();
     const codeHash = hashOtpCode(code);
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes expiration
 

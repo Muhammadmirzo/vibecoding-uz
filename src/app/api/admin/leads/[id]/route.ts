@@ -3,12 +3,15 @@ import { db } from "@/db";
 import { leads } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { updateLeadSchema } from "@/lib/validations";
+import { requireAdmin } from "@/lib/auth/require-auth";
 
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const auth = await requireAdmin(request);
+    if (!auth.ok) return auth.response;
     const { id } = await params;
     const body = await request.json();
     const parseResult = updateLeadSchema.safeParse(body);
@@ -69,6 +72,8 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const auth = await requireAdmin(request);
+    if (!auth.ok) return auth.response;
     const { id } = await params;
 
     const [deleted] = await db

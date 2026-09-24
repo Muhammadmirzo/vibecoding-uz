@@ -6,6 +6,11 @@ import { db, withTransactionLock } from "@/db";
 import { enrollments, payments } from "@/db/schema";
 import { clickAmountMatches, computeClickSign, createMerchantPrepareId, verifyClickSign } from "@/features/payments/click";
 import { clickWebhookSchema, type ClickWebhookInput } from "@/lib/validations/payment";
+import {
+  checkRateLimit,
+  getClientIp,
+  PRESETS,
+} from "@/lib/security/rateLimit";
 
 type PaymentRow = typeof payments.$inferSelect;
 type PaymentDatabase = Pick<typeof db, "select" | "update">;
@@ -35,6 +40,10 @@ export async function POST(req: NextRequest) {
   const secretKey = process.env.CLICK_SECRET_KEY?.trim();
   const serviceId = process.env.CLICK_SERVICE_ID?.trim();
   if (!secretKey || !serviceId) return protocolError("Payment provider is not configured", 503);
+
+  // Rate-limit before signature verification to blunt credential-stuffing/replay floods.
+  const rl = await checkRateLimit(`click:${getClientIp(req)}`, PRESETS.WEBHOOK);
+  if (!rl.success) return protocolError("Too many requests", 429);
 
   const formData = await req.formData().catch(() => null);
   if (!formData) return protocolError("Invalid form payload");

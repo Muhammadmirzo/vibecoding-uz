@@ -1,15 +1,26 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
 import { db } from "@/db";
 import { portfolios } from "@/db/schema";
 import { portfolioUpdateSchema } from "@/lib/validations/portfolio";
+import { requireAdmin } from "@/lib/auth/require-auth";
 import { eq } from "drizzle-orm";
+
+const paramsSchema = z.object({ id: z.string().uuid() });
 
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params;
+    const auth = await requireAdmin(request);
+    if (!auth.ok) return auth.response;
+
+    const parsedParams = paramsSchema.safeParse(await params);
+    if (!parsedParams.success) {
+      return NextResponse.json({ error: "Loyiha IDsi noto'g'ri" }, { status: 400 });
+    }
+    const { id } = parsedParams.data;
     const body = await request.json();
     const parseResult = portfolioUpdateSchema.safeParse(body);
 
@@ -47,11 +58,18 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params;
+    const auth = await requireAdmin(request);
+    if (!auth.ok) return auth.response;
+
+    const parsedParams = paramsSchema.safeParse(await params);
+    if (!parsedParams.success) {
+      return NextResponse.json({ error: "Loyiha IDsi noto'g'ri" }, { status: 400 });
+    }
+    const { id } = parsedParams.data;
     const deleted = await db
       .delete(portfolios)
       .where(eq(portfolios.id, id))

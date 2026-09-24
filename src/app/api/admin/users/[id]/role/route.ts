@@ -3,12 +3,15 @@ import { db } from "@/db";
 import { users, auditLogs } from "@/db/schema";
 import { updateUserRoleSchema } from "@/lib/validations";
 import { eq } from "drizzle-orm";
+import { requireAdmin } from "@/lib/auth/require-auth";
 
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const auth = await requireAdmin(request);
+    if (!auth.ok) return auth.response;
     const { id } = await params;
     const body = await request.json();
     const parseResult = updateUserRoleSchema.safeParse(body);

@@ -3,9 +3,12 @@ import { db } from "@/db";
 import { cohorts, courses, enrollments } from "@/db/schema";
 import { eq, desc, count } from "drizzle-orm";
 import { createCohortSchema } from "@/lib/validations";
+import { requireAdmin } from "@/lib/auth/require-auth";
 
 export async function GET() {
   try {
+    const auth = await requireAdmin();
+    if (!auth.ok) return auth.response;
     const rawCohorts = await db
       .select({
         cohort: cohorts,
@@ -74,6 +77,8 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const auth = await requireAdmin(request);
+    if (!auth.ok) return auth.response;
     const body = await request.json();
     const parseResult = createCohortSchema.safeParse(body);
 

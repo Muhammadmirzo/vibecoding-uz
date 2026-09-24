@@ -1,18 +1,24 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { auditLogs } from "@/db/schema";
-import { getAuthSession } from "@/lib/auth/session";
+import { requireAuth } from "@/lib/auth/require-auth";
 import { referralClaimBonusSchema } from "@/lib/validations";
+import {
+  checkRateLimit,
+  getClientIp,
+  createRateLimitResponse,
+  PRESETS,
+} from "@/lib/security/rateLimit";
 
 export async function POST(request: Request) {
   try {
-    const authSession = await getAuthSession();
-    if (!authSession) {
-      return NextResponse.json(
-        { error: "Avtorizatsiyadan o'tilmagan" },
-        { status: 401 }
-      );
-    }
+    const ip = getClientIp(request);
+    const rl = await checkRateLimit(`referral:${ip}`, PRESETS.REFERRAL);
+    if (!rl.success) return createRateLimitResponse(rl);
+
+    const authResult = await requireAuth(request);
+    if (!authResult.ok) return authResult.response;
+    const authSession = authResult.session;
 
     const body = await request.json();
     const parseResult = referralClaimBonusSchema.safeParse(body);

@@ -3,12 +3,15 @@ import { db } from "@/db";
 import { blogPosts, auditLogs } from "@/db/schema";
 import { updateBlogPostSchema } from "@/lib/validations";
 import { eq } from "drizzle-orm";
+import { requireAdmin } from "@/lib/auth/require-auth";
 
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const auth = await requireAdmin(request);
+    if (!auth.ok) return auth.response;
     const { id } = await params;
     const [post] = await db
       .select()
@@ -35,6 +38,8 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const auth = await requireAdmin(request);
+    if (!auth.ok) return auth.response;
     const { id } = await params;
     const body = await request.json();
     const parseResult = updateBlogPostSchema.safeParse(body);
@@ -102,6 +107,8 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const auth = await requireAdmin(request);
+    if (!auth.ok) return auth.response;
     const { id } = await params;
     const [deletedPost] = await db
       .delete(blogPosts)

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowRight, Check, CirclePlay, Send, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { Button } from "@/components/ui/Button";
 import { getCourseCtaState } from "./cta";
 
 interface CourseCheckoutCardProps {
@@ -28,39 +29,51 @@ export function CourseCheckoutCard({ price, oldPrice, installment, sessionFormat
   };
 
   return (
-    <div className="sticky top-24 bg-[var(--color-cream-warm)] border-2 border-[var(--color-accent)] rounded-[var(--radius-xl)] p-7 space-y-6 shadow-[var(--shadow-lg)]">
+    <div className="rounded-xl border-2 border-accent bg-bg-elevated p-7 shadow-lg lg:sticky lg:top-24">
       <div className="space-y-1">
-        {oldPrice !== price && <div className="text-xs font-mono font-bold text-[var(--color-ink-subtle)] line-through">{oldPrice}</div>}
-        <div className="text-3xl font-extrabold text-[var(--color-ink)]">{price}</div>
-        <div className="text-xs font-mono text-[var(--color-accent)] font-semibold">Bo&apos;lib to&apos;lash: {installment}</div>
+        {oldPrice !== price && (
+          <p className="font-mono text-xs font-bold text-ink-subtle line-through">{oldPrice}</p>
+        )}
+        <p className="font-display text-3xl font-semibold text-ink">{price}</p>
+        <p className="font-mono text-xs font-semibold text-accent">Bo&apos;lib to&apos;lash: {installment}</p>
       </div>
-      <div className="space-y-3 pt-2 border-t border-[var(--color-border)]">
-        <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-[var(--color-accent)]">Narxga nima kiradi?</h3>
-        <div className="space-y-2.5">
-          {[sessionFormat, "Telegram bot orqali uy vazifalari tekshiruvi", "Mirzodan shaxsiy feedback", "Bitiruv sertifikati", guaranteeText].map((item, index) => (
-            <div key={index} className="flex items-start gap-2.5 text-xs font-medium text-[var(--color-ink)]">
-              <Check className="w-4 h-4 text-success flex-shrink-0 mt-0.5" /><span>{item}</span>
-            </div>
+      <div className="space-y-3 border-t border-border pt-4">
+        <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-accent">
+          Narxga nima kiradi?
+        </h3>
+        <ul className="space-y-2.5">
+          {[sessionFormat, "Telegram bot orqali uy vazifalari tekshiruvi", "Mentordan shaxsiy fikr-mulohaza", "Bitiruv sertifikati", guaranteeText].map((item) => (
+            <li key={item} className="flex items-start gap-2.5 text-xs font-medium text-ink">
+              <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
+              {item}
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
       <div className="space-y-3 pt-2">
-        <button type="button" onClick={handlePrimaryCta} className="btn-primary h-12 min-h-[48px] px-6 rounded-[var(--radius-md)] text-sm font-semibold inline-flex items-center justify-center gap-2 w-full whitespace-nowrap active:scale-[0.98] transition-transform">
+        <Button onClick={handlePrimaryCta} size="lg" className="w-full">
           {ctaState === "login" ? "Kursga o'tish uchun kiring" : "Kursni band qilish"}
-          <ArrowRight className="w-4 h-4" />
-        </button>
-        <p className="text-[11px] leading-relaxed text-[var(--color-ink-muted)]">To&apos;lov oynasi Telegram orqali emas, shu sahifada ochiladi.</p>
-        <a href="https://t.me/m/ODAfK_QIMjky" target="_blank" rel="noreferrer" className="btn-secondary h-12 px-6 rounded-[var(--radius-md)] text-sm font-semibold inline-flex items-center justify-center gap-2 w-full">
-          <Send className="w-4 h-4 text-[var(--color-accent)]" /> Telegram orqali maslahat
-        </a>
+          <ArrowRight className="size-4" aria-hidden="true" />
+        </Button>
+        <p className="text-[11px] leading-relaxed text-ink-muted">
+          To&apos;lov oynasi shu sahifada ochiladi — hisobingizga kirgan bo'lishingiz kifoya.
+        </p>
+        <Button href="https://t.me/m/ODAfK_QIMjky" variant="secondary" className="w-full">
+          <Send className="size-4 text-accent" aria-hidden="true" /> Telegram orqali maslahat
+        </Button>
         <Link href="/bepul-dars" prefetch className="block">
-          <button type="button" className="btn-secondary h-12 px-6 rounded-[var(--radius-md)] text-sm font-semibold inline-flex items-center justify-center gap-2 w-full">
-            <CirclePlay className="w-4 h-4 text-[var(--color-accent)]" /> Bepul darsni ko&apos;rish
-          </button>
+          <Button variant="outline" className="w-full">
+            <CirclePlay className="size-4 text-accent" aria-hidden="true" /> Bepul darsni ko&apos;rish
+          </Button>
         </Link>
       </div>
-      <div className="p-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-cream)] font-mono text-xs text-[var(--color-ink-muted)] text-center">To&apos;lov: Payme · Click · bo&apos;lib to&apos;lash</div>
-      <div className="flex items-center gap-2 text-[11px] text-[var(--color-ink-muted)] pt-2 border-t border-[var(--color-border)]"><ShieldCheck className="w-4 h-4 text-[var(--color-accent)] flex-shrink-0" /><span>Click va Payme orqali xavfsiz to&apos;lov</span></div>
+      <p className="rounded-md border border-border bg-bg-sunken px-3 py-2 text-center font-mono text-xs text-ink-muted">
+        To&apos;lov: Payme · Click · bo&apos;lib to&apos;lash
+      </p>
+      <p className="flex items-center gap-2 border-t border-border pt-3 text-[11px] text-ink-muted">
+        <ShieldCheck className="size-4 shrink-0 text-accent" aria-hidden="true" />
+        Click va Payme orqali xavfsiz to&apos;lov
+      </p>
     </div>
   );
 }

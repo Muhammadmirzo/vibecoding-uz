@@ -12,15 +12,15 @@ export function getUserInitials(name: string) {
   return name.slice(0, 2).toUpperCase() || "U";
 }
 
-const menuLinkClass = "flex cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-ink hover:bg-cream-warm focus:outline-none";
+const menuLinkClass = "flex cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-ink hover:bg-bg-sunken focus:outline-none";
 
 export function UserMenu() {
   const { user, isLoading, openAuthModal, logout } = useAuth();
 
-  if (isLoading) return <div className="hidden h-10 w-10 shrink-0 animate-pulse rounded-full bg-cream-warm md:block" aria-label="Profil yuklanmoqda" />;
+  if (isLoading) return <div className="hidden h-10 w-10 shrink-0 animate-pulse rounded-full bg-bg-sunken md:block" aria-label="Profil yuklanmoqda" />;
   if (!user) {
     return (
-      <button type="button" onClick={() => openAuthModal("login")} className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border bg-cream-warm text-ink transition-colors hover:bg-cream-deep md:flex" title="Tizimga kirish" aria-label="Tizimga kirish">
+      <button type="button" onClick={() => openAuthModal("login")} className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border bg-bg-sunken text-ink transition-colors hover:bg-bg-sunken md:flex" title="Tizimga kirish" aria-label="Tizimga kirish">
         <LogIn className="h-4 w-4 text-accent" aria-hidden="true" />
       </button>
     );
@@ -44,7 +44,7 @@ function AuthenticatedMenu({ user, logout }: { user: User; logout: () => Promise
         </button>
       </DropdownMenu.Trigger>
       <DropdownMenu.Portal>
-        <DropdownMenu.Content align="end" className="z-50 mt-1 w-56 rounded-xl border border-border bg-cream p-1.5 shadow-lg">
+        <DropdownMenu.Content align="end" className="z-50 mt-1 w-56 rounded-xl border border-border bg-bg-elevated p-1.5 shadow-lg">
           <div className="mb-1 border-b border-border px-3 py-2">
             <p className="truncate text-sm font-semibold text-ink">{user.fullName}</p>
             <p className="font-mono text-xs text-ink-muted">{user.phone}</p>
@@ -55,7 +55,7 @@ function AuthenticatedMenu({ user, logout }: { user: User; logout: () => Promise
             </DropdownMenu.Item>
           ))}
           <DropdownMenu.Separator className="my-1 h-px bg-border" />
-          <DropdownMenu.Item onClick={() => void logout()} className="flex cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-500/10 focus:outline-none dark:text-red-400">
+          <DropdownMenu.Item onClick={() => void logout()} className="flex cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-danger hover:bg-red-500/10 focus:outline-none dark:text-red-400">
             <LogOut className="h-4 w-4" aria-hidden="true" /> Chiqish
           </DropdownMenu.Item>
         </DropdownMenu.Content>

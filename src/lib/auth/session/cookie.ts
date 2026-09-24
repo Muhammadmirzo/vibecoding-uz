@@ -58,7 +58,7 @@ export function createSessionCookieHeader(
   const maxAge = options.maxAgeSeconds ?? DEFAULT_SESSION_TTL_HOURS * 3600;
   const path = options.path || "/";
   const httpOnly = options.httpOnly ?? true;
-  const secure = options.secure ?? false;
+  const secure = options.secure ?? process.env.NODE_ENV === "production";
   const sameSite = options.sameSite || "Lax";
 
   let header = `${name}=${token}; Path=${path}; Max-Age=${maxAge}; SameSite=${sameSite}`;
@@ -77,7 +77,9 @@ export function createClearSessionCookieHeader(
   cookieName = SESSION_COOKIE_NAME,
   path = "/"
 ): string {
-  return `${cookieName}=; Path=${path}; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax; HttpOnly`;
+  let header = `${cookieName}=; Path=${path}; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax; HttpOnly`;
+  if (process.env.NODE_ENV === "production") header += "; Secure";
+  return header;
 }
 
 export const removeSessionCookie = createClearSessionCookieHeader;

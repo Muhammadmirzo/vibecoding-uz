@@ -1,80 +1,24 @@
-import Link from "next/link";
-import { HeroSection } from "@/components/sections/HeroSection";
-import { ProofStats } from "@/components/sections/ProofStats";
-import { CourseCards } from "@/components/sections/CourseCards";
-import { PortfolioSection } from "@/components/sections/PortfolioSection";
-import { IdeaSimulator } from "@/components/sections/IdeaSimulator";
-import { RiskFreeGuarantee } from "@/components/sections/RiskFreeGuarantee";
-import { TeaserBanner } from "@/components/sections/TeaserBanner";
-import { HowItWorks } from "@/components/sections/HowItWorks";
-import { FaqSection } from "@/components/sections/FaqSection";
+import type { Metadata } from "next";
+import { HeroSection } from "@/components/sections/home/HeroSection";
+import { ToolStrip } from "@/components/sections/home/ToolStrip";
+import { ProblemShift } from "@/components/sections/home/ProblemShift";
+import { Transformation } from "@/components/sections/home/Transformation";
+import { Roadmap } from "@/components/sections/home/Roadmap";
+import { Projects } from "@/components/sections/home/Projects";
+import { Mentor } from "@/components/sections/home/Mentor";
+import { Pricing } from "@/components/sections/home/Pricing";
+import { Comparison } from "@/components/sections/home/Comparison";
+import { Faq } from "@/components/sections/home/Faq";
+import { NextStepCTA } from "@/components/ui";
 import { siteConfig } from "@/lib/siteConfig";
-import { Video, Users, ShieldCheck, HelpCircle } from "lucide-react";
 
-export default function HomePage() {
-  return (
-    <>
-      <HeroSection />
-      <ProofStats />
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://academy.mirzo.uz";
+const title = "G'oyangizni AI bilan ishlaydigan ilovaga aylantiring";
+const description = "Kod yozishni bilmasangiz ham, AI va Claude Code yordamida 8 haftada g'oyangizni ishlaydigan ilovaga aylantiring.";
 
-      {/* Halol Isbot Strip Section */}
-      <section className="w-full py-6 bg-cream border-b border-border">
-        <div className="mx-auto w-full max-w-[1360px] px-5 md:px-8 lg:px-10">
-          <div className="bg-cream-warm border border-border-strong rounded-xl p-4 md:p-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center md:text-left">
-              <div className="flex items-center justify-center md:justify-start gap-3">
-                <div className="p-2.5 rounded-lg bg-accent-soft text-accent flex-shrink-0">
-                  <Video className="w-5 h-5 text-accent" />
-                </div>
-                <span className="text-sm font-semibold text-ink">
-                  {siteConfig.sessionFormat}
-                </span>
-              </div>
+export const metadata: Metadata = { title, description, alternates: { canonical: "/" }, openGraph: { title, description, url: "/", siteName: "VibeCoding.uz", locale: "uz_UZ", type: "website" } };
 
-              <div className="flex items-center justify-center md:justify-start gap-3 border-t md:border-t-0 md:border-l border-border pt-3 md:pt-0 md:pl-6">
-                <div className="p-2.5 rounded-lg bg-accent-soft text-accent flex-shrink-0">
-                  <Users className="w-5 h-5 text-accent" />
-                </div>
-                <span className="text-sm font-semibold text-ink">
-                  Birinchi guruhga yozuv ochiq — natijalar shu yerda e&apos;lon qilinadi
-                </span>
-              </div>
+const organization = { "@context": "https://schema.org", "@type": "Organization", name: "VibeCoding.uz", url: siteUrl, description };
+const courseList = { "@context": "https://schema.org", "@type": "ItemList", itemListElement: Object.keys(siteConfig.courses).map((slug, index) => ({ "@type": "ListItem", position: index + 1, item: { "@type": "Course", name: slug === "ai-asoslari" ? "AI Asoslari" : "Vibe Coding Express", description: slug === "ai-asoslari" ? "AI vositalarini amaliy qo'llash kursi" : "AI bilan ishlaydigan ilova qurish kursi", url: `${siteUrl}/kurs/${slug}`, provider: { "@id": `${siteUrl}/#organization` } } })) };
 
-              <div className="flex items-center justify-center md:justify-start gap-3 border-t md:border-t-0 md:border-l border-border pt-3 md:pt-0 md:pl-6">
-                <div className="p-2.5 rounded-lg bg-accent-soft text-accent flex-shrink-0">
-                  <ShieldCheck className="w-5 h-5 text-success" />
-                </div>
-                <span className="text-sm font-semibold text-ink">
-                  {siteConfig.guaranteeText}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <IdeaSimulator />
-
-      <CourseCards />
-      <PortfolioSection />
-      <RiskFreeGuarantee />
-
-      {/* Quiz tie-in bar ostida */}
-      <div className="w-full py-4 bg-cream border-t border-b border-border">
-        <div className="mx-auto w-full max-w-[1360px] px-5 md:px-8 text-center">
-          <Link
-            href="/diagnostika"
-            className="inline-flex items-center justify-center gap-2 text-sm font-semibold text-accent hover:underline decoration-accent underline-offset-4 transition-all"
-          >
-            <HelpCircle className="w-4 h-4 text-accent flex-shrink-0" />
-            <span>Qaysi kurs sizga mos? 2 daqiqalik diagnostika bilan aniqlang</span>
-          </Link>
-        </div>
-      </div>
-
-      <TeaserBanner />
-      <HowItWorks />
-      <FaqSection />
-    </>
-  );
-}
+export default function HomePage() { return <><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify([{ ...organization, "@id": `${siteUrl}/#organization` }, courseList]) }} /><HeroSection /><ToolStrip /><ProblemShift /><Transformation /><Roadmap /><Projects /><Mentor /><Pricing /><Comparison /><Faq /><NextStepCTA /></>; }

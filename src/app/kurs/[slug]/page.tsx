@@ -1,56 +1,214 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Award, Calendar, Clock, X, XCircle } from "lucide-react";
+import { Calendar, Check, Clock, User, X } from "lucide-react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/Accordion";
+import { Badge } from "@/components/ui/Surfaces";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Surfaces";
+import { Container, Eyebrow, Heading, Section } from "@/components/ui/Layout";
+import { NextStepCTA } from "@/components/ui/NextStepCTA";
+import { PORTFOLIO_DATA } from "@/features/portfolio/portfolioData";
 import { siteConfig } from "@/lib/siteConfig";
+import { COMPARISON_ROWS, COURSES, COURSE_SLUGS, getCoursePricing } from "@/features/courses/content";
 import { CourseCheckoutCard } from "../CourseCheckoutCard";
+import { StickyBuyBar } from "./StickyBuyBar";
 
-interface Props { params: Promise<{ slug: string }> }
+interface Props {
+  params: Promise<{ slug: string }>;
+}
 
-const COURSES_DATA: Record<string, { title: string; subtitle: string; description: string; duration: string; level: string; price: string; oldPrice: string; installment: string; modules: string[] }> = {
-  "vibe-coding-express": {
-    title: "Vibe Coding Express", subtitle: "AI bilan real mahsulotlar (web, bot, MVP) qurish mentorlik kursi", description: "8 haftalik amaliy guruh kursi. Dasturchilarsiz, Claude Code va Cursor yordamida g'oyangizni ishlaydigan haqiqiy mahsulotga aylantirasiz.", duration: "8 hafta (Intensiv)", level: "Tadbirkorlar va Mutaxassislar", ...siteConfig.courses["vibe-coding-express"], modules: ["1-Modul: Vibe Coding va Prompt Injiniring asoslari", "2-Modul: Claude Code & Cursor muhitini sozlash", "3-Modul: Front-end va Tayyor UI Komponentlar yaratish", "4-Modul: Ma'lumotlar bazasi va Drizzle ORM PostgreSQL", "5-Modul: Telegram Bot API va Avtomatlashtirish", "6-Modul: Payme va Click To'lov Tizimlarini integratsiya qilish", "7-Modul: Xavfsizlik, Rate-limiting va High-Load tayyorgarligi", "8-Modul: Vercel / Cloudflare R2 ga real deploy qilish va Sertifikat"],
-  },
-  "ai-asoslari": {
-    title: "AI Asoslari", subtitle: "Prompt-injiniring va AI vositalarini noldan o'rganing", description: "4 haftalik self-serve kurs. ChatGPT, Claude va Gemini orqali kundalik ishingiz va kontent tayyorlashni 90% ga avtomatlashtiring.", duration: "4 hafta", level: "Boshlang'ich", ...siteConfig.courses["ai-asoslari"], modules: ["1-Modul: Sun'iy intellekt turlari va to'g'ri topshiriq berish", "2-Modul: Matn va Kontent yaratish (ChatGPT & Claude)", "3-Modul: Media, Vizuallar va PDF tahlil (Midjourney & Gemini)", "4-Modul: Ish unumdorligini 10x ga oshirish"],
-  },
-};
+export async function generateStaticParams() {
+  return COURSE_SLUGS.map((slug) => ({ slug }));
+}
 
-export async function generateStaticParams() { return Object.keys(COURSES_DATA).map((slug) => ({ slug })); }
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params; const course = COURSES_DATA[slug];
-  return course ? { title: `${course.title} — ${course.subtitle} | Mirzo Academy`, description: course.description } : { title: "Kurs Topilmadi" };
+  const { slug } = await params;
+  const course = COURSES[slug];
+  if (!course) return { title: "Kurs topilmadi" };
+  return {
+    title: `${course.title} — ${course.subtitle}`,
+    description: course.description,
+  };
 }
 
 export default async function CourseDetailPage({ params }: Props) {
-  const { slug } = await params; const course = COURSES_DATA[slug];
+  const { slug } = await params;
+  const course = COURSES[slug];
   if (!course) notFound();
+  const pricing = getCoursePricing(slug);
+  const projects = PORTFOLIO_DATA.filter((item) => item.isFeatured).slice(0, 3);
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    name: course.title,
+    description: course.description,
+    provider: { "@type": "Organization", name: "VibeCoding", url: "https://vibecoding.uz" },
+    hasCourseInstance: {
+      "@type": "CourseInstance",
+      courseMode: "online",
+      courseWorkload: course.duration,
+      startDate: siteConfig.nextCohortDate,
+    },
+  };
 
   return (
-    <div className="pt-28 pb-20 min-h-screen bg-[var(--color-cream)]">
-      <div className="mx-auto w-full max-w-[1360px] px-5 md:px-8 lg:px-10">
-        <div className="grid lg:grid-cols-[1fr_400px] gap-10 items-start">
+    <main className="bg-bg">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <Section eyebrow={course.level} title="">
+        <div className="grid items-start gap-10 lg:grid-cols-[1fr_380px]">
           <div className="space-y-6">
-            <div className="flex flex-wrap items-center gap-3 font-mono text-xs">
-              <span className="px-3 py-1 rounded-full bg-[var(--color-accent-soft)] text-[var(--color-accent)] font-bold border border-[var(--color-accent-line)]">{course.level}</span>
-              <span className="flex items-center gap-1.5 text-[var(--color-ink-muted)]"><Clock className="w-4 h-4 text-[var(--color-accent)]" /> {course.duration}</span>
-              <span className="flex items-center gap-1.5 text-[var(--color-ink-muted)]"><Calendar className="w-4 h-4 text-[var(--color-accent)]" /> Keyingi guruh: {siteConfig.nextCohortShortDate}</span>
+            <div className="flex flex-wrap items-center gap-2 font-mono text-xs">
+              <Badge>{course.level}</Badge>
+              <span className="inline-flex items-center gap-1.5 text-ink-muted">
+                <Clock className="size-4 text-accent" aria-hidden="true" /> {course.duration}
+              </span>
+              <span className="inline-flex items-center gap-1.5 text-ink-muted">
+                <Calendar className="size-4 text-accent" aria-hidden="true" /> Keyingi guruh: {siteConfig.nextCohortShortDate}
+              </span>
             </div>
-            <h1 className="text-3xl md:text-5xl font-extrabold text-[var(--color-ink)] leading-tight">{course.title}</h1>
-            <p className="text-base text-[var(--color-ink-muted)] leading-relaxed">{course.description}</p>
-            <div className="space-y-4 pt-6">
-              <h2 className="text-2xl font-bold text-[var(--color-ink)]">O&apos;quv Dasturi Modullari</h2>
-              <div className="space-y-3">{course.modules.map((mod, index) => <div key={index} className="p-4 rounded-[var(--radius-lg)] bg-[var(--color-cream-warm)] border border-[var(--color-border-strong)] flex items-center justify-between text-sm font-semibold text-[var(--color-ink)]"><span>{mod}</span><Award className="w-4 h-4 text-[var(--color-accent)] flex-shrink-0" /></div>)}</div>
-            </div>
-            <div className="pt-6 space-y-4">
-              <div className="p-6 md:p-7 rounded-[var(--radius-xl)] bg-[var(--color-cream-warm)] border border-[var(--color-border-strong)] space-y-4">
-                <h3 className="text-xl font-bold text-[var(--color-ink)] flex items-center gap-2"><XCircle className="w-5 h-5 text-[var(--color-accent)] flex-shrink-0" />Bu kurs KIM UCHUN EMAS</h3>
-                <ul className="space-y-3">{["Tayyor pullik video kurslarni kuzatib o'tirishni istaganlar — bizda har darsda o'zingiz qurasiz", "Dasturlashsiz AI ni imkoniyat deb biluvchilar — kod yozamiz, lekin AI bilan", "Bir kechada boy beradigan sir izlayotganlar — natija 8 hafta mehnat"].map((item, index) => <li key={index} className="flex items-start gap-2.5 text-sm text-[var(--color-ink-muted)] leading-relaxed"><X className="w-4 h-4 text-[var(--color-ink-subtle)] flex-shrink-0 mt-0.5" /><span>{item}</span></li>)}</ul>
-              </div>
+            <h1 className="font-display text-3xl font-semibold leading-tight text-ink sm:text-5xl">
+              {course.title}
+            </h1>
+            <p className="text-lg text-ink-muted">{course.subtitle}</p>
+            <p className="text-ink-muted">{course.description}</p>
+            <Card className="space-y-3">
+              <h2 className="font-display text-lg font-semibold text-ink">Kurs oxirida qo'lingizda bo'ladi</h2>
+              <ul className="space-y-2.5">
+                {course.outcomes.map((outcome) => (
+                  <li key={outcome} className="flex items-start gap-3 text-sm text-ink">
+                    <Check className="mt-0.5 size-5 shrink-0 text-success" aria-hidden="true" /> {outcome}
+                  </li>
+                ))}
+              </ul>
+            </Card>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Button href="/diagnostika" size="lg">Mosligini tekshirish</Button>
+              <Button href="/bepul-dars" size="lg" variant="outline">Avval bepul dars</Button>
             </div>
           </div>
-          <CourseCheckoutCard price={course.price} oldPrice={course.oldPrice} installment={course.installment} sessionFormat={siteConfig.sessionFormat} guaranteeText={siteConfig.guaranteeText} />
+          <CourseCheckoutCard
+            price={pricing.price}
+            oldPrice={pricing.oldPrice}
+            installment={pricing.installment}
+            sessionFormat={course.format}
+            guaranteeText={siteConfig.guaranteeText}
+          />
         </div>
-      </div>
-    </div>
+      </Section>
+
+      <Section pattern={false} className="bg-bg-sunken">
+        <Container className="grid gap-6 md:grid-cols-2">
+          <Card className="space-y-4">
+            <Eyebrow>Kim uchun</Eyebrow>
+            <Heading className="text-2xl">Bu kurs sizga mos, agar...</Heading>
+            <ul className="space-y-3">
+              {course.forWhom.map((item) => (
+                <li key={item} className="flex items-start gap-3 text-sm text-ink">
+                  <Check className="mt-0.5 size-5 shrink-0 text-success" aria-hidden="true" /> {item}
+                </li>
+              ))}
+            </ul>
+          </Card>
+          <Card className="space-y-4">
+            <Eyebrow>Halol ogohlantirish</Eyebrow>
+            <Heading className="text-2xl">Kimga mos emas</Heading>
+            <ul className="space-y-3">
+              {course.notForWhom.map((item) => (
+                <li key={item} className="flex items-start gap-3 text-sm text-ink-muted">
+                  <X className="mt-0.5 size-5 shrink-0 text-ink-subtle" aria-hidden="true" /> {item}
+                </li>
+              ))}
+            </ul>
+          </Card>
+        </Container>
+      </Section>
+
+      <Section eyebrow="Bosqichma-bosqich reja" title="Haftalik yo'l xaritasi">
+        <ol className="relative mt-10 space-y-0 border-l-2 border-brand/20">
+          {course.roadmap.map((week) => (
+            <li key={week.week} className="relative pb-8 pl-8 last:pb-0">
+              <span className="absolute -left-[9px] top-1 size-4 rounded-full border-2 border-brand bg-bg" aria-hidden="true" />
+              <p className="font-mono text-xs font-semibold text-brand">{week.week}</p>
+              <h3 className="mt-1 font-display text-lg font-semibold text-ink">{week.title}</h3>
+              <p className="mt-1 text-sm text-ink-muted">{week.outcome}</p>
+              <p className="mt-2 inline-block rounded-md bg-brand-soft px-3 py-1 text-xs font-semibold text-brand">
+                Amaliy natija: {week.project}
+              </p>
+            </li>
+          ))}
+        </ol>
+      </Section>
+
+      <Section pattern={false} className="bg-bg-sunken" eyebrow="Real loyihalar" title="Shu metod bilan qurilgan ishlar">
+        <div className="mt-8 grid gap-5 md:grid-cols-3">
+          {projects.map((project) => (
+            <Card key={project.id} className="flex flex-col gap-3">
+              <Badge variant="gold">{project.badgeText}</Badge>
+              <h3 className="font-display text-lg font-semibold text-ink">{project.title}</h3>
+              <p className="text-sm text-ink-muted">{project.description}</p>
+              <p className="mt-auto font-mono text-xs text-ink-subtle">{project.domain}</p>
+            </Card>
+          ))}
+        </div>
+        <Button href="/portfolio" variant="outline" className="mt-8">Barcha loyihalarni ko'rish</Button>
+      </Section>
+
+      <Section eyebrow="Mentor" title="Kimdan o'rganasiz?">
+        <Card className="flex flex-col items-start gap-5 sm:flex-row sm:items-center">
+          <span className="flex size-14 shrink-0 items-center justify-center rounded-full bg-brand-soft text-brand" aria-hidden="true">
+            <User className="size-7" />
+          </span>
+          <div>
+            <p className="font-display text-lg font-semibold text-ink">Mirzo</p>
+            <p className="mt-1 text-sm text-ink-muted">
+              EduBaza va Chatla loyihalari muallifi, vibe coding mentori. Har bir
+              vazifangizni shaxsan tekshiradi va yo'nalish beradi.
+            </p>
+          </div>
+        </Card>
+        <div className="mt-10 overflow-x-auto rounded-xl border border-border">
+          <table className="w-full min-w-[560px] border-collapse bg-bg-elevated text-left text-sm">
+            <caption className="sr-only">VibeCoding, an'anaviy bootcamp va YouTube solishtiruvi</caption>
+            <thead>
+              <tr className="border-b border-border bg-bg-sunken">
+                <th scope="col" className="px-5 py-4 font-semibold text-ink">Mezon</th>
+                <th scope="col" className="px-5 py-4 font-semibold text-brand">VibeCoding</th>
+                <th scope="col" className="px-5 py-4 font-semibold text-ink-muted">An'anaviy bootcamp</th>
+                <th scope="col" className="px-5 py-4 font-semibold text-ink-muted">YouTube</th>
+              </tr>
+            </thead>
+            <tbody>
+              {COMPARISON_ROWS.map((row) => (
+                <tr key={row.label} className="border-b border-border last:border-0">
+                  <th scope="row" className="px-5 py-3.5 font-semibold text-ink">{row.label}</th>
+                  <td className="px-5 py-3.5 text-ink">{row.vibe}</td>
+                  <td className="px-5 py-3.5 text-ink-muted">{row.bootcamp}</td>
+                  <td className="px-5 py-3.5 text-ink-muted">{row.youtube}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Section>
+
+      <Section pattern={false} className="bg-bg-sunken" eyebrow="Savol-javob" title="Ko'p so'raladigan savollar">
+        <Accordion type="single" collapsible className="mx-auto mt-8 max-w-3xl rounded-xl border border-border bg-bg-elevated px-6">
+          {course.faqs.map((faq, index) => (
+            <AccordionItem key={faq.question} value={`faq-${index}`}>
+              <AccordionTrigger>{faq.question}</AccordionTrigger>
+              <AccordionContent>{faq.answer}</AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      </Section>
+
+      <NextStepCTA
+        title="Hali ikkilanayapsizmi?"
+        subtitle="Avval 2 daqiqalik diagnostikadan o'ting yoki bepul darsni ko'ring — keyin qaror qiling."
+      />
+      <StickyBuyBar price={pricing.price} title={course.title} />
+      <div className="h-16 lg:hidden" aria-hidden="true" />
+    </main>
   );
 }

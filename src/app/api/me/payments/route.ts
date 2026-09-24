@@ -3,7 +3,7 @@ import { desc, eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/db";
 import { payments } from "@/db/schema";
-import { getAuthSession } from "@/lib/auth/session";
+import { getDbSession } from "@/lib/auth/require-auth";
 
 const paymentResponseSchema = z.object({
   id: z.string().uuid(),
@@ -27,7 +27,7 @@ const paymentsResponseSchema = z.object({
 
 export async function GET() {
   try {
-    const authSession = await getAuthSession();
+    const authSession = await getDbSession();
     if (!authSession) {
       return NextResponse.json(
         { error: "Avtorizatsiyadan o'tilmagan" },

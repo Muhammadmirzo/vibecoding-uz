@@ -2,9 +2,12 @@ import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { auditLogs, users } from "@/db/schema";
 import { desc, eq, like, or } from "drizzle-orm";
+import { requireAdmin } from "@/lib/auth/require-auth";
 
 export async function GET(request: Request) {
   try {
+    const auth = await requireAdmin(request);
+    if (!auth.ok) return auth.response;
     const { searchParams } = new URL(request.url);
     const action = searchParams.get("action");
     const search = searchParams.get("search");

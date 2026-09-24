@@ -4,9 +4,12 @@ import { users, enrollments, auditLogs } from "@/db/schema";
 import { createStaffSchema } from "@/lib/validations";
 import { hashPassword, normalizePhone } from "@/lib/auth/password";
 import { desc, eq, like, or, count } from "drizzle-orm";
+import { requireAdmin } from "@/lib/auth/require-auth";
 
 export async function GET(request: Request) {
   try {
+    const auth = await requireAdmin(request);
+    if (!auth.ok) return auth.response;
     const { searchParams } = new URL(request.url);
     const search = searchParams.get("search");
     const role = searchParams.get("role");
@@ -67,6 +70,8 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    const auth = await requireAdmin(request);
+    if (!auth.ok) return auth.response;
     const body = await request.json();
     const parseResult = createStaffSchema.safeParse(body);
 

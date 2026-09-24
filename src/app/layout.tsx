@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Onest, Instrument_Serif, JetBrains_Mono } from "next/font/google";
+import { Onest, Instrument_Serif, JetBrains_Mono, Unbounded } from "next/font/google";
 import { cookies } from "next/headers";
 import "./globals.css";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
@@ -12,7 +12,14 @@ import { userSchema, User } from "@/lib/validations/auth";
 
 const onest = Onest({
   subsets: ["latin"],
-  variable: "--font-onest",
+  variable: "--font-sans",
+  display: "swap",
+});
+
+const unbounded = Unbounded({
+  subsets: ["latin", "latin-ext"],
+  weight: ["600", "700"],
+  variable: "--font-display",
   display: "swap",
 });
 
@@ -26,7 +33,7 @@ const instrumentSerif = Instrument_Serif({
 
 const jetBrainsMono = JetBrains_Mono({
   subsets: ["latin"],
-  variable: "--font-geist-mono",
+  variable: "--font-mono",
   display: "swap",
 });
 
@@ -105,9 +112,9 @@ export default async function RootLayout({
   const initialUser = await getInitialUser();
 
   return (
-    <html lang="uz" suppressHydrationWarning className={`${onest.variable} ${instrumentSerif.variable} ${jetBrainsMono.variable}`}>
-      <body className="antialiased selection:bg-[var(--color-accent-soft)] selection:text-[var(--color-accent)]">
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} themes={["light", "dark", "likely"]}>
+    <html lang="uz" suppressHydrationWarning className={`${onest.variable} ${unbounded.variable} ${instrumentSerif.variable} ${jetBrainsMono.variable}`}>
+      <body className="antialiased">
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} themes={["light", "dark"]}>
           <AuthProvider initialUser={initialUser}>
             <Header />
             <main id="main">{children}</main>

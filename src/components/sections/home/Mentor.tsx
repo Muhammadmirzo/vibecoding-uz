@@ -1,0 +1,6 @@
+import { MessageCircle, Quote } from "lucide-react";
+import { Button, Card, Container, Section } from "@/components/ui";
+
+export function Mentor() {
+  return <Section pattern={false} className="bg-bg"><Container><div className="grid items-center gap-10 md:grid-cols-[.75fr_1.25fr]"><div className="flex aspect-square max-w-sm items-center justify-center rounded-2xl border border-border bg-brand-soft font-display text-7xl text-brand" aria-label="Mirzo, vibe coding mentori">M</div><Card className="p-8 sm:p-10"><Quote className="size-8 text-accent" aria-hidden="true" /><blockquote className="mt-5 text-2xl font-semibold leading-snug text-ink">“Sizga quruq nazariya bermayman — har bir qadamda ish natijasini ko'rib chiqamiz.”</blockquote><p className="mt-6 font-semibold text-ink">Mirzo</p><p className="text-ink-muted">EduBaza va Chatla loyihalari muallifi · vibe coding mentori</p><p className="mt-6 text-sm leading-relaxed text-ink-muted">Men sizga kod yozishni majburlamayman. Maqsad — g'oyangizni mustaqil qarar qabul qiladigan, tekshiriladigan mahsulotga aylantirish.</p><div className="mt-7 flex flex-wrap gap-3"><Button href="/bepul-dars" variant="outline"><MessageCircle className="size-4" aria-hidden="true" />Bepul darsda ko'rish</Button><Button href="/diagnostika">Qaysi yo'l sizga mos?</Button></div></Card></div></Container></Section>;
+}

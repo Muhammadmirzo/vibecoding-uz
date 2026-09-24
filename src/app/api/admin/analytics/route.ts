@@ -2,9 +2,12 @@ import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { leads, payments, cohorts, enrollments, courses, homeworkSubmissions } from "@/db/schema";
 import { eq, sql, count, sum } from "drizzle-orm";
+import { requireAdmin } from "@/lib/auth/require-auth";
 
 export async function GET(request: Request) {
   try {
+    const auth = await requireAdmin(request);
+    if (!auth.ok) return auth.response;
     const { searchParams } = new URL(request.url);
     const period = searchParams.get("period") || "30d";
 

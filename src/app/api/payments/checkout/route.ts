@@ -4,8 +4,14 @@ import { z } from "zod";
 
 import { db } from "@/db";
 import { auditLogs, cohorts, enrollments, payments } from "@/db/schema";
-import { getAuthSession } from "@/lib/auth/session";
+import { requireAuth } from "@/lib/auth/require-auth";
 import { studentPaymentRequestSchema } from "@/lib/validations";
+import {
+  checkRateLimit,
+  getClientIp,
+  createRateLimitResponse,
+  PRESETS,
+} from "@/lib/security/rateLimit";
 
 const SUPPORT_ERROR = "To'lov tizimi vaqtincha sozlanmoqda. Telegram orqali murojaat qiling.";
 const uuidSchema = z.string().uuid();
@@ -34,10 +40,13 @@ function getProviderConfig(provider: "payme" | "click"): ProviderConfig | null {
 
 export async function POST(request: Request) {
   try {
-    const authSession = await getAuthSession();
-    if (!authSession) {
-      return NextResponse.json({ error: "Avtorizatsiyadan o'tilmagan" }, { status: 401 });
-    }
+    const ip = getClientIp(request);
+    const rl = await checkRateLimit(`checkout:${ip}`, PRESETS.CHECKOUT);
+    if (!rl.success) return createRateLimitResponse(rl);
+
+    const authResult = await requireAuth(request);
+    if (!authResult.ok) return authResult.response;
+    const authSession = authResult.session;
 
     const parsed = studentPaymentRequestSchema.safeParse(await request.json());
     if (!parsed.success) {

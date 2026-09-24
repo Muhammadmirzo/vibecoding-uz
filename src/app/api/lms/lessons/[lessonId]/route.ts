@@ -3,7 +3,7 @@ import { z } from "zod";
 import { asc, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { courses, courseSections, lessons } from "@/db/schema";
-import { getAuthSession } from "@/lib/auth/session";
+import { getDbSession } from "@/lib/auth/require-auth";
 import { isLessonUnlocked } from "@/features/lms/drip/access";
 
 const paramsSchema = z.object({ lessonId: z.string().uuid() });
@@ -12,7 +12,7 @@ type RouteContext = { params: Promise<{ lessonId: string }> };
 export async function GET(_request: Request, context: RouteContext) {
   const parsed = paramsSchema.safeParse(await context.params);
   if (!parsed.success) return NextResponse.json({ error: "Dars IDsi noto'g'ri" }, { status: 400 });
-  const authSession = await getAuthSession();
+  const authSession = await getDbSession();
   if (!authSession) return NextResponse.json({ error: "Avtorizatsiyadan o'tilmagan" }, { status: 401 });
 
   const [row] = await db

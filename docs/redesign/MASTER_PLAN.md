@@ -77,3 +77,11 @@ Rules: route handlers are thin (parse → auth → service → map errors). No D
 - Do NOT commit, push, or install/remove packages unless your task explicitly says so.
 - Do NOT touch `.env*`, secrets, or deployment config.
 - When done, append a short report to `docs/redesign/reports/<WAVE-NAME>.md`: what changed (file list), what's left, risks.
+
+## 7. Responsive standard (MANDATORY for every UI change)
+Must look intentional and polished at: **375px (phone), 390/430px (large phone), 768px (iPad portrait), 1024px (iPad landscape / small laptop), 1280px (laptop), 1440px+ (desktop)**.
+- Mobile-first Tailwind (`sm` 640, `md` 768, `lg` 1024, `xl` 1280, `2xl` 1440). No horizontal scroll at any width (do not hide overflow to mask it — fix it).
+- Touch targets ≥ 44px; readable body ≥ 16px on mobile; no text clipping; images use `next/image` with correct `sizes`.
+- iPad: grids must use sensible intermediate columns (e.g. 1 → 2 → 3), nav switches to drawer below `lg`, sticky bars must not cover content, respect safe-area insets (`env(safe-area-inset-*)`).
+- Desktop: content max 1200px, balanced whitespace, no over-stretched lines (max ~70ch for prose).
+- Test with hover AND touch (no hover-only affordances).

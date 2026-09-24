@@ -14,6 +14,11 @@ import {
   verifyPaymeAuth,
 } from "@/features/payments/payme";
 import { paymeRpcRequestSchema, type PaymeRpcParams } from "@/lib/validations/payment";
+import {
+  checkRateLimit,
+  getClientIp,
+  PRESETS,
+} from "@/lib/security/rateLimit";
 
 type PaymentRow = typeof payments.$inferSelect;
 type PaymentDatabase = Pick<typeof db, "select" | "update">;
@@ -43,6 +48,10 @@ export async function POST(req: NextRequest) {
   const paymeKey = process.env.PAYME_KEY?.trim();
   if (!paymeKey) {
     return NextResponse.json(createPaymeErrorResponse(0, PAYME_ERRORS.AUTH_ERROR), { status: 503 });
+  }
+  const rl = await checkRateLimit(`payme:${getClientIp(req)}`, PRESETS.WEBHOOK);
+  if (!rl.success) {
+    return NextResponse.json(createPaymeErrorResponse(0, PAYME_ERRORS.AUTH_ERROR), { status: 429 });
   }
   if (!verifyPaymeAuth(req.headers.get("authorization"), paymeKey)) {
     return NextResponse.json(createPaymeErrorResponse(0, PAYME_ERRORS.AUTH_ERROR), { status: 401 });

@@ -1,60 +1,172 @@
 import type { Metadata } from "next";
-import { Check, ShieldCheck, Sparkles } from "lucide-react";
-import { FreeLessonForm } from "./FreeLessonForm";
+import { Check, Clock, PlayCircle, ShieldCheck, User, X } from "lucide-react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/Accordion";
+import { Badge } from "@/components/ui/Surfaces";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Surfaces";
+import { Container, Eyebrow, Heading, Section } from "@/components/ui/Layout";
+import { BepulDarsLeadSection } from "./LeadSection";
 
 export const metadata: Metadata = {
-  title: "Bepul Dars — AI bilan 30 Daqiqada Mahsulot Qurish | Mirzo Academy",
-  description: "Claude Code va Cursor yordamida dasturchilarsiz ilova va botlar qurish metodikasi bilan tanishing.",
+  title: "Bepul dars — 30 daqiqada AI bilan mahsulot qurish metodi",
+  description:
+    "Claude Code yordamida dasturchisiz ilova va bot qurish metodini 30 daqiqalik bepul darsda ko'ring.",
 };
+
+const AGENDA = [
+  { time: "0–5 daqiqa", title: "Metod bilan tanishuv", text: "Nega AI bilan qurish an'anaviy yo'ldan tezroq ishlaydi." },
+  { time: "5–15 daqiqa", title: "Jonli qurilish", text: "AI agenti yordamida kichik loyiha noldan yig'iladi." },
+  { time: "15–25 daqiqa", title: "3 ta keng tarqalgan xato", text: "Yangi boshlovchilar yo'l qo'yadigan xatolar va ularning yechimi." },
+  { time: "25–30 daqiqa", title: "Keyingi qadam", text: "Qaysi kurs sizga mosligi va qanday boshlash kerakligi." },
+];
+
+const FOR_WHOM = [
+  "G'oyasi bor, lekin dasturchiga to'lashga byudjeti yo'q tadbirkorlar",
+  "AI dan kundalik ishida foydalanmoqchi mutaxassislar",
+  "Kod yozishni bilmaydigan, lekin mahsulot qurmoqchi talabalar",
+];
+
+const NOT_FOR = [
+  "Tayyor nazariya tinglab o'tirmoqchilar — dars amaliy qurilishga qaratilgan",
+  "Chuqur dasturlash nazariyasi kutganlar — metod AI bilan qurishga asoslangan",
+];
+
+const FAQS = [
+  {
+    question: "Dars haqiqatan bepulmi?",
+    answer: "Ha, to'liq bepul. Faqat so'rov qoldiring — havola 24 soat ichida Telegram orqali yuboriladi.",
+  },
+  {
+    question: "Darsni ko'rish uchun dasturlash bilish shartmi?",
+    answer: "Yo'q. Dars noldan boshlanadi va barcha qadamlar o'zbek tilida tushuntiriladi.",
+  },
+  {
+    question: "Qancha vaqt ketadi?",
+    answer: "30 daqiqa. Istalgan vaqtda to'xtatib, qayta ko'rishingiz mumkin.",
+  },
+  {
+    question: "Keyin kursga yozilish shartmi?",
+    answer: "Yo'q, hech qanday majburiyat yo'q. Darsdan keyin qaysi yo'nalish mosligini o'zingiz hal qilasiz.",
+  },
+];
 
 export default function BepulDarsPage() {
   return (
-    <div className="pt-28 pb-20 min-h-screen bg-[var(--color-cream)]">
-      <div className="mx-auto w-full max-w-[1360px] px-5 md:px-8 lg:px-10">
-        
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          
-          {/* Left Column: Lesson Details */}
+    <main className="bg-bg">
+      <Section eyebrow="Bepul video dars · 30 daqiqa" title="">
+        <div className="grid items-start gap-10 lg:grid-cols-2">
           <div className="space-y-6">
-            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-[var(--radius-md)] border border-[var(--color-accent-line)] bg-[var(--color-cream-warm)] text-[12px] tracking-wider text-[var(--color-accent)] uppercase font-mono font-bold">
-              <Sparkles className="w-4 h-4" /> Exclusive Bepul Video Dars
-            </span>
-
-            <h1 className="text-3xl md:text-5xl font-extrabold text-[var(--color-ink)] leading-tight">
-              AI bilan 30 daqiqada <span className="accent-serif">haqiqiy loyiha</span> qurish metodikasi.
+            <Badge variant="gold">
+              <PlayCircle className="mr-1 size-3.5" aria-hidden="true" /> Bepul video dars
+            </Badge>
+            <h1 className="font-display text-3xl font-semibold leading-tight text-ink sm:text-5xl">
+              AI bilan 30 daqiqada haqiqiy loyiha qurish metodi
             </h1>
-
-            <p className="text-base text-[var(--color-ink-muted)] leading-relaxed">
-              Ushbu 30 daqiqalik intensiv darsda Mirzo dasturchilarsiz, faqat sun'iy intellekt agentlariga to'g mezoniy ko'rsatma berib mahsulot yaratish sir-asrorlarini ko'rsatib beradi.
+            <p className="text-lg text-ink-muted">
+              Dasturchisiz, faqat AI agentlariga to'g'ri topshiriq berib mahsulot
+              yaratish uslubini jonli misolda ko'ring.
             </p>
-
-            <div className="space-y-3 pt-2">
+            <ul className="space-y-3">
               {[
-                "Dasturchisiz MVP va Telegram bot qurishning 5 bosqichi",
-                "Claude Code va Cursor bilan ishlashda eng ko'p yo'l qo'yiladigan 3 xato",
-                "Kod yozmasdan to'lov tizimlarini ulayotgan real misollar",
-              ].map((item, idx) => (
-                <div key={idx} className="flex items-start gap-3 text-sm font-semibold text-[var(--color-ink)]">
-                  <Check className="w-5 h-5 text-success flex-shrink-0 mt-0.5" />
-                  <span>{item}</span>
-                </div>
+                "MVP va Telegram bot qurishning 5 bosqichi",
+                "Yangi boshlovchilar yo'l qo'yadigan 3 ta xato",
+                "To'lov tizimi ulangan real misol",
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-3 text-sm font-semibold text-ink">
+                  <Check className="mt-0.5 size-5 shrink-0 text-success" aria-hidden="true" />
+                  {item}
+                </li>
               ))}
-            </div>
-
-            <div className="p-4 rounded-[var(--radius-lg)] bg-[var(--color-cream-warm)] border border-[var(--color-border-strong)] flex items-center gap-3">
-              <ShieldCheck className="w-6 h-6 text-[var(--color-accent)] flex-shrink-0" />
-              <div className="text-xs text-[var(--color-ink-muted)]">
+            </ul>
+            <div className="flex items-center gap-3 rounded-lg border border-border bg-bg-sunken p-4">
+              <ShieldCheck className="size-6 shrink-0 text-accent" aria-hidden="true" />
+              <p className="text-xs text-ink-muted">
                 Dars to'liq bepul. Ma'lumotlaringiz xavfsiz saqlanadi va spam yuborilmaydi.
-              </div>
+              </p>
             </div>
           </div>
-
-          {/* Right Column: Lead Form Card / Video Preview */}
-          <FreeLessonForm />
-
+          <BepulDarsLeadSection />
         </div>
+      </Section>
 
-      </div>
-    </div>
+      <Section pattern={false} className="bg-bg-sunken">
+        <Container className="grid gap-10 lg:grid-cols-2">
+          <div>
+            <Eyebrow className="mb-4">Dars rejasi</Eyebrow>
+            <Heading>30 daqiqada nimalarni ko'rasiz</Heading>
+            <ol className="mt-8 space-y-4">
+              {AGENDA.map((item) => (
+                <li key={item.title} className="flex gap-4 rounded-lg border border-border bg-bg-elevated p-5">
+                  <span className="flex shrink-0 items-center gap-1.5 font-mono text-xs font-semibold text-brand">
+                    <Clock className="size-4" aria-hidden="true" /> {item.time}
+                  </span>
+                  <span>
+                    <span className="block font-semibold text-ink">{item.title}</span>
+                    <span className="mt-1 block text-sm text-ink-muted">{item.text}</span>
+                  </span>
+                </li>
+              ))}
+            </ol>
+          </div>
+          <div className="space-y-6">
+            <div>
+              <Eyebrow className="mb-4">Kim uchun</Eyebrow>
+              <Heading className="text-2xl">Bu dars sizga mos, agar...</Heading>
+              <ul className="mt-6 space-y-3">
+                {FOR_WHOM.map((item) => (
+                  <li key={item} className="flex items-start gap-3 rounded-lg border border-border bg-bg-elevated p-4 text-sm text-ink">
+                    <Check className="mt-0.5 size-5 shrink-0 text-success" aria-hidden="true" /> {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <Heading className="text-2xl">Kimga mos emas</Heading>
+              <ul className="mt-6 space-y-3">
+                {NOT_FOR.map((item) => (
+                  <li key={item} className="flex items-start gap-3 rounded-lg border border-border bg-bg-elevated p-4 text-sm text-ink-muted">
+                    <X className="mt-0.5 size-5 shrink-0 text-ink-subtle" aria-hidden="true" /> {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </Container>
+      </Section>
+
+      <Section eyebrow="Mentor" title="Darsni kim o'tadi?">
+        <Card className="flex flex-col items-start gap-5 sm:flex-row sm:items-center">
+          <span className="flex size-14 shrink-0 items-center justify-center rounded-full bg-brand-soft font-display text-xl font-semibold text-brand" aria-hidden="true">
+            <User className="size-7" />
+          </span>
+          <div>
+            <p className="font-display text-lg font-semibold text-ink">Mirzo</p>
+            <p className="mt-1 text-sm text-ink-muted">
+              EduBaza va Chatla loyihalari muallifi, vibe coding mentori. Darsda
+              real loyihalarda qo'llaniladigan usulni ko'rsatadi.
+            </p>
+          </div>
+        </Card>
+      </Section>
+
+      <Section pattern={false} className="bg-bg-sunken" eyebrow="Savol-javob" title="Ko'p so'raladigan savollar">
+        <Accordion type="single" collapsible className="mx-auto mt-8 max-w-3xl rounded-xl border border-border bg-bg-elevated px-6">
+          {FAQS.map((faq, index) => (
+            <AccordionItem key={faq.question} value={`faq-${index}`}>
+              <AccordionTrigger>{faq.question}</AccordionTrigger>
+              <AccordionContent>{faq.answer}</AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+        <div className="mx-auto mt-10 flex max-w-3xl flex-col justify-center gap-3 sm:flex-row">
+          <Button href="/diagnostika" size="lg">
+            Avval diagnostikadan o'tish
+          </Button>
+          <Button href="/kurs/vibe-coding-express" size="lg" variant="outline">
+            Kurs dasturini ko'rish
+          </Button>
+        </div>
+      </Section>
+    </main>
   );
 }

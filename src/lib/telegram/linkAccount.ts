@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { users } from "@/db/schema";
 import { tgAuthLinkSchema, TgAuthLinkInput } from "@/lib/validations";
+import { consumeTelegramLinkToken } from "./linkToken";
 
 function normalizePhone(phone: string): string {
   let cleaned = phone.replace(/[^\d+]/g, "");
@@ -28,6 +29,9 @@ export async function linkTelegramAccount(input: TgAuthLinkInput) {
 
     if (existingUser.length > 0) {
       const user = existingUser[0];
+      // NOTE: callers MUST prove the sender owns this phone number first
+      // (Telegram contact with contact.user_id === sender id). See
+      // handlers/contact.ts. This function links only after that check.
       await db
         .update(users)
         .set({ tgUserId, tgUsername: tgUsername || user.tgUsername })
@@ -38,10 +42,16 @@ export async function linkTelegramAccount(input: TgAuthLinkInput) {
   }
 
   if (linkToken) {
+    // Deep-link payloads are short-lived, signed, single-use tokens issued
+    // for a specific user (see linkToken.ts). Raw user UUIDs are rejected.
+    const verified = await consumeTelegramLinkToken(linkToken);
+    if (!verified) {
+      return { success: false, error: "Havola eskirgan yoki noto'g'ri" };
+    }
     const existingUser = await db
       .select()
       .from(users)
-      .where(eq(users.id, linkToken))
+      .where(eq(users.id, verified.userId))
       .limit(1);
 
     if (existingUser.length > 0) {

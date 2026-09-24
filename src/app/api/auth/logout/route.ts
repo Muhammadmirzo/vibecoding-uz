@@ -6,10 +6,11 @@ import { eq } from "drizzle-orm";
 import {
   SESSION_COOKIE_NAME,
   verifySessionToken,
-  removeSessionCookie,
+  createClearSessionCookieHeader,
 } from "@/lib/auth/session";
 
 export async function POST() {
+  const clearCookieHeader = createClearSessionCookieHeader();
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get(SESSION_COOKIE_NAME)?.value;
@@ -21,19 +22,22 @@ export async function POST() {
       }
     }
 
-    await removeSessionCookie();
-
-    return NextResponse.json({
-      success: true,
-      message: "Tizimdan muvaffaqiyatli chiqildi",
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Tizimdan muvaffaqiyatli chiqildi",
+      },
+      { headers: { "Set-Cookie": clearCookieHeader } }
+    );
   } catch (error) {
     console.error("Logout error:", error);
     // Still ensure cookie is cleared even if DB deletion fails
-    await removeSessionCookie();
-    return NextResponse.json({
-      success: true,
-      message: "Tizimdan chiqildi",
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Tizimdan chiqildi",
+      },
+      { headers: { "Set-Cookie": clearCookieHeader } }
+    );
   }
 }

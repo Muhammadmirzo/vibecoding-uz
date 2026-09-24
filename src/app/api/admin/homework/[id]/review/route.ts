@@ -1,16 +1,28 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
 import { db } from "@/db";
-import { homeworkSubmissions, homeworkReviews, users } from "@/db/schema";
+import { homeworkSubmissions, homeworkReviews } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { gradeHomeworkSchema } from "@/lib/validations";
-import { getAuthSession } from "@/lib/auth/session";
+import { requireMentor } from "@/lib/auth/require-auth";
+
+const paramsSchema = z.object({ id: z.string().uuid() });
 
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params;
+    // Authoritative gate: mentor/admin session only. body.mentorId is ignored.
+    const auth = await requireMentor(request);
+    if (!auth.ok) return auth.response;
+    const mentorId = auth.session.userId;
+
+    const parsedParams = paramsSchema.safeParse(await params);
+    if (!parsedParams.success) {
+      return NextResponse.json({ error: "Topshiriq IDsi noto'g'ri" }, { status: 400 });
+    }
+    const { id } = parsedParams.data;
     const body = await request.json();
 
     const parseResult = gradeHomeworkSchema.safeParse({
@@ -29,26 +41,6 @@ export async function POST(
     }
 
     const data = parseResult.data;
-
-    // Get auth session or fallback to first mentor/admin if needed
-    const authSession = await getAuthSession();
-    let mentorId = data.mentorId || authSession?.userId;
-
-    if (!mentorId) {
-      // Pick first admin/mentor user from DB if not provided
-      const [adminUser] = await db
-        .select({ id: users.id })
-        .from(users)
-        .limit(1);
-      mentorId = adminUser?.id;
-    }
-
-    if (!mentorId) {
-      return NextResponse.json(
-        { error: "Mentor topilmadi" },
-        { status: 400 }
-      );
-    }
 
     // 1. Update homework_submissions status
     const [updatedSubmission] = await db

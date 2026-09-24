@@ -14,11 +14,13 @@ export function registerStartHandler(bot: Telegraf) {
     const tgUserId = ctx.from.id.toString();
 
     if (payload) {
+      // Only short-lived signed single-use link tokens are accepted here
+      // (see lib/telegram/linkToken.ts). Anything else falls through to the
+      // generic welcome message instead of linking an account.
       const result = await linkTelegramAccount({
         tgUserId,
         tgUsername: ctx.from.username,
         linkToken: payload,
-        phone: payload.startsWith("+") ? payload : undefined,
       });
 
       if (result.success && result.user) {

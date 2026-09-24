@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { studentActivityFilterSchema } from "@/lib/validations/crm";
+import { requireAdmin } from "@/lib/auth/require-auth";
 
 export async function GET(request: NextRequest) {
   try {
+    const auth = await requireAdmin(request);
+    if (!auth.ok) return auth.response;
     const { searchParams } = new URL(request.url);
     const rawParams = {
       search: searchParams.get("search") || undefined,

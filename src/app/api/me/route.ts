@@ -2,12 +2,12 @@ import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { users, userProfiles } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { getAuthSession } from "@/lib/auth/session";
+import { getDbSession, requireAuth } from "@/lib/auth/require-auth";
 import { updateMeSchema } from "@/lib/validations";
 
 export async function GET() {
   try {
-    const authSession = await getAuthSession();
+    const authSession = await getDbSession();
     if (!authSession) {
       return NextResponse.json(
         { error: "Avtorizatsiyadan o'tilmagan" },
@@ -68,13 +68,9 @@ export async function GET() {
 
 export async function PATCH(request: Request) {
   try {
-    const authSession = await getAuthSession();
-    if (!authSession) {
-      return NextResponse.json(
-        { error: "Avtorizatsiyadan o'tilmagan" },
-        { status: 401 }
-      );
-    }
+    const authResult = await requireAuth(request);
+    if (!authResult.ok) return authResult.response;
+    const authSession = authResult.session;
 
     const body = await request.json();
     const parseResult = updateMeSchema.safeParse(body);
