@@ -4,12 +4,14 @@ import { handleTelegramLoginCallback } from "@/features/auth/server/telegram-log
 import { telegramLoginCallbackSchema } from "@/lib/validations/auth";
 
 export function registerTelegramLoginCallback(bot: Telegraf): void {
-  bot.on("callback_query", async (ctx) => {
+  bot.on("callback_query", async (ctx, next) => {
     const callback = ctx.callbackQuery;
     const rawData = typeof callback === "object" && callback !== null && "data" in callback && typeof callback.data === "string"
       ? callback.data
       : undefined;
     const match = /^tgl:([yn]):([0-9a-f-]{36})$/.exec(rawData ?? "");
+    // Not a login confirmation — leave it for other callback handlers.
+    if (!rawData?.startsWith("tgl:")) return next();
     const parsed = match ? telegramLoginCallbackSchema.safeParse({
       action: match[1],
       requestId: match[2],
