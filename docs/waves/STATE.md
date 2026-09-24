@@ -14,7 +14,7 @@
 | W0 Plan | orchestrator | ✅ | main | PLAN.md | brand = Naqsh, contracts fixed |
 | W1A Audit | space-bunny-free | ✅ | wave/w1a-audit (32edce9) | reports/W1A-AUDIT.md | read-only, port 3201 |
 | W1B Brand | muse-spark-1.3-contributor-free | 🏃 | wave/w1b-brand | reports/W1B-BRAND.md | port 3202 |
-| W2 Telegram | muse-spark-1.3 | ⏳ | — | reports/W2-TELEGRAM.md | after W1 merge |
+| W2 Telegram | space-bunny-free | 🏃 | wave/w2-telegram | reports/W2-TELEGRAM.md | port 3203; parallel with W1B — expect small merge conflicts in AuthModal / telegram messages |
 | W3A Motion | muse-spark-1.3 | ⏳ | — | reports/W3A-MOTION.md | |
 | W3B Motion admin | space-bunny | ⏳ | — | reports/W3B-MOTION-ADMIN.md | |
 | W4A Perf | space-bunny | ⏳ | — | reports/W4A-PERF.md | |
