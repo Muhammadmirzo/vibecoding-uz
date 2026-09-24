@@ -11,7 +11,7 @@ import {
 import { TelegramQr } from "./TelegramQr";
 import { z } from "zod";
 
-type FlowState = "idle" | "starting" | "waiting" | "success" | "error" | "timeout";
+type FlowState = "idle" | "starting" | "waiting" | "success" | "rejected" | "error" | "timeout";
 type PublicUser = z.infer<typeof telegramPublicUserSchema>;
 
 interface LoginAttempt {
@@ -158,6 +158,12 @@ export function TelegramAuthFlow() {
             setState("success");
             return;
           }
+          if (parsed.success && parsed.data.state === "rejected") {
+            stopped = true;
+            setMessage("Telegram orqali kirish so'rovi rad etildi. Xavfsizlik uchun yangi kirishni boshlashingiz kerak.");
+            setState("rejected");
+            return;
+          }
           if (parsed.success && ["expired", "consumed", "unknown"].includes(parsed.data.state)) {
             stopped = true;
             setMessage("Havola muddati tugagan. Qayta urinish uchun Telegram tugmasini bosing.");
@@ -222,7 +228,7 @@ export function TelegramAuthFlow() {
       ) : null}
       {(state === "starting" || state === "waiting") ? <p className="mt-3 flex items-center justify-center gap-2 text-sm text-ink-muted"><Loader2 className="h-4 w-4 animate-spin text-telegram" aria-hidden="true" />Telegram tekshirilmoqda...</p> : null}
       {message ? <p role="alert" className="mt-3 text-sm text-danger">{message}</p> : null}
-      {state !== "waiting" ? <button type="button" onClick={() => void begin()} disabled={state === "starting"} className="mt-4 flex min-h-11 w-full items-center justify-center gap-2 rounded-md bg-telegram px-4 font-semibold text-white disabled:opacity-60"><Send className="h-4 w-4" aria-hidden="true" />Telegram orqali davom etish</button> : null}
+      {state !== "waiting" ? <button type="button" onClick={() => void begin()} disabled={state === "starting"} className="mt-4 flex min-h-11 w-full items-center justify-center gap-2 rounded-md bg-telegram px-4 font-semibold text-white disabled:opacity-60"><Send className="h-4 w-4" aria-hidden="true" />{state === "rejected" ? "Qayta boshlash" : "Telegram orqali davom etish"}</button> : null}
     </div>
   );
 }

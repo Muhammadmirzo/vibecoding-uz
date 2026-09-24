@@ -2,6 +2,7 @@ import { Telegraf } from "telegraf";
 import { registerAccountHandlers } from "./handlers/contact";
 import { registerMenuHandlers } from "./handlers/commands";
 import { registerStartHandler } from "./handlers/start";
+import { registerTelegramLoginCallback } from "./handlers/callback";
 
 let botInstance: Telegraf | null = null;
 
@@ -12,6 +13,7 @@ export function initTelegramBot(): Telegraf | null {
 
   const bot = new Telegraf(token);
   registerStartHandler(bot);
+  registerTelegramLoginCallback(bot);
   registerMenuHandlers(bot);
   registerAccountHandlers(bot);
 

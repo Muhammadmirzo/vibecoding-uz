@@ -82,6 +82,13 @@ The old widget is secondary and falls into the deep-link flow on its 422 `phone_
 8. Temporarily make the database unavailable: `/start` and `/status` should return JSON 503, the UI should focus the phone field, and phone/OTP should remain available. A non-JSON proxy response must not crash the page.
 9. Confirm successful login closes the modal after about 1.2 seconds, refreshes the user without a hard reload, and follows a valid pending `?auth=1&redirect=/...` path.
 
+## Round 3 — phishing hardening
+
+- `/start login_<token>` now binds the request to the tapping Telegram account but never approves it. Linked accounts and new-user contact flows both receive an explicit confirmation message with a whitelisted browser/OS device label (never the raw user-agent).
+- Added `tgl:y:<request UUID>` and `tgl:n:<request UUID>` callbacks. Approval is an atomic pending/unexpired/bound-user transition; rejection is a terminal `rejected` transition. Foreign, expired, malformed, and replayed callbacks are no-ops and always receive a friendly callback answer.
+- `/status` maps `rejected` to a terminal state, and `TelegramAuthFlow` stops polling with a clear Uzbek security message and a **Qayta boshlash** action.
+- Added callback, idempotency, ownership, rejection, expiry, and linked-user confirmation tests.
+
 ## Risks / follow-up
 
 - The bot process must be restarted after deploying the handler code and must share the same database/session environment as the web app.

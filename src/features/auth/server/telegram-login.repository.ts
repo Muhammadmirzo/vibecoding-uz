@@ -1,4 +1,4 @@
-import { and, desc, eq, gt, isNotNull, sql } from "drizzle-orm";
+import { and, desc, eq, gt, isNotNull, isNull, or, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { auditLogs, telegramLoginRequests, userProfiles, users } from "@/db/schema";
 import type { DbExecutor } from "@/features/payments/server/payments.repository";
@@ -17,7 +17,9 @@ export interface TelegramLoginRequestRepository {
   create(input: { nonceHash: string; expiresAt: Date; ip?: string; userAgent?: string }): Promise<{ id: string; nonceHash: string }>;
   findById(id: string): Promise<TelegramLoginRequest | null>;
   bindTelegramUser(nonceHash: string, tgUserId: string): Promise<TelegramLoginRequest | null>;
-  approve(id: string, tgUserId: string, userId: string): Promise<boolean>;
+  approveBoundTx(ex: DbExecutor, id: string, tgUserId: string, userId: string): Promise<boolean>;
+  confirmBoundTx(ex: DbExecutor, id: string, tgUserId: string): Promise<boolean>;
+  rejectBoundTx(ex: DbExecutor, id: string, tgUserId: string): Promise<boolean>;
   markConsumedTx(ex: DbExecutor, id: string): Promise<boolean>;
   findNewestPendingByTelegramIdTx(ex: DbExecutor, tgUserId: string): Promise<TelegramLoginRequest | null>;
   findUserByPhoneTx(ex: DbExecutor, phone: string): Promise<AuthUser | null>;
@@ -25,7 +27,6 @@ export interface TelegramLoginRequestRepository {
   ensureProfileTx(ex: DbExecutor, userId: string): Promise<void>;
   insertTelegramSignupAuditTx(ex: DbExecutor, input: { userId: string; ip?: string }): Promise<void>;
   linkTelegramUserTx(ex: DbExecutor, userId: string, input: TelegramContactInput): Promise<AuthUser>;
-  approveBoundTx(ex: DbExecutor, id: string, tgUserId: string, userId: string): Promise<boolean>;
 }
 
 export function isAvailable(row: TelegramLoginRequest | null, now = new Date()): row is TelegramLoginRequest {
@@ -56,19 +57,34 @@ export const drizzleTelegramLoginRequestRepository: TelegramLoginRequestReposito
       .where(and(
         eq(telegramLoginRequests.nonceHash, nonceHash),
         eq(telegramLoginRequests.status, "pending"),
+        or(isNull(telegramLoginRequests.tgUserId), eq(telegramLoginRequests.tgUserId, tgUserId)),
         gt(telegramLoginRequests.expiresAt, new Date()),
       ))
       .returning();
     return row ?? null;
   },
-  async approve(id, tgUserId, userId) {
-    const [row] = await db
+  async confirmBoundTx(ex, id, tgUserId) {
+    const [row] = await ex
       .update(telegramLoginRequests)
-      .set({ status: "approved", tgUserId, userId, approvedAt: new Date() })
+      .set({ status: "approved", approvedAt: new Date() })
       .where(and(
         eq(telegramLoginRequests.id, id),
-        eq(telegramLoginRequests.status, "pending"),
         eq(telegramLoginRequests.tgUserId, tgUserId),
+        eq(telegramLoginRequests.status, "pending"),
+        isNotNull(telegramLoginRequests.userId),
+        gt(telegramLoginRequests.expiresAt, new Date()),
+      ))
+      .returning({ id: telegramLoginRequests.id });
+    return Boolean(row);
+  },
+  async rejectBoundTx(ex, id, tgUserId) {
+    const [row] = await ex
+      .update(telegramLoginRequests)
+      .set({ status: "rejected" })
+      .where(and(
+        eq(telegramLoginRequests.id, id),
+        eq(telegramLoginRequests.tgUserId, tgUserId),
+        eq(telegramLoginRequests.status, "pending"),
         gt(telegramLoginRequests.expiresAt, new Date()),
       ))
       .returning({ id: telegramLoginRequests.id });
@@ -143,7 +159,7 @@ export const drizzleTelegramLoginRequestRepository: TelegramLoginRequestReposito
   async approveBoundTx(ex, id, tgUserId, userId) {
     const [row] = await ex
       .update(telegramLoginRequests)
-      .set({ status: "approved", userId, approvedAt: new Date() })
+      .set({ userId })
       .where(and(
         eq(telegramLoginRequests.id, id),
         eq(telegramLoginRequests.tgUserId, tgUserId),
@@ -155,9 +171,9 @@ export const drizzleTelegramLoginRequestRepository: TelegramLoginRequestReposito
   },
 };
 
-export function publicTelegramRequestState(row: TelegramLoginRequest | null, now = new Date()): "pending" | "approved" | "expired" | "consumed" | "unknown" {
+export function publicTelegramRequestState(row: TelegramLoginRequest | null, now = new Date()): "pending" | "approved" | "rejected" | "expired" | "consumed" | "unknown" {
   if (!row) return "unknown";
-  if (row.status === "approved" || row.status === "consumed") return row.status;
+  if (row.status === "approved" || row.status === "consumed" || row.status === "rejected") return row.status;
   if (row.status === "expired" || row.expiresAt <= now) return "expired";
   return "pending";
 }

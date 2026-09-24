@@ -121,6 +121,12 @@ export const telegramLoginTokenSchema = z
 
 export const telegramRequestIdSchema = z.string().uuid();
 
+export const telegramLoginCallbackSchema = z.object({
+  action: z.enum(["y", "n"]),
+  requestId: telegramRequestIdSchema,
+  tgUserId: z.string().regex(/^\d+$/),
+});
+
 function normalizeTelegramPhone(phone: string): string {
   const cleaned = phone.replace(/[^\d+]/g, "");
   if (cleaned.startsWith("+")) return cleaned;
@@ -154,6 +160,7 @@ export const telegramStartResponseSchema = z.object({
 
 export const telegramStatusResponseSchema = z.discriminatedUnion("state", [
   z.object({ state: z.literal("pending") }),
+  z.object({ state: z.literal("rejected") }),
   z.object({ state: z.literal("expired") }),
   z.object({ state: z.literal("consumed") }),
   z.object({ state: z.literal("unknown") }),

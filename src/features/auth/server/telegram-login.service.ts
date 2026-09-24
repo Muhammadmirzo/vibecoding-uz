@@ -4,6 +4,7 @@ import { ServiceError } from "@/lib/http/errors";
 import {
   telegramContactSchema,
   telegramLoginTokenSchema,
+  telegramLoginCallbackSchema,
 } from "@/lib/validations/auth";
 import type { DbExecutor } from "@/features/payments/server/payments.repository";
 import { drizzleAuthSessionRepository, type AuthSessionRepository } from "./auth-session.repository";
@@ -45,7 +46,7 @@ export interface StartTelegramLoginResult {
 }
 
 export interface TelegramStatusResult {
-  state: "pending" | "approved" | "expired" | "consumed" | "unknown";
+  state: "pending" | "approved" | "rejected" | "expired" | "consumed" | "unknown";
   user?: PublicAuthUser;
   token?: string;
 }
@@ -96,7 +97,7 @@ export async function getTelegramLoginStatus(
     const row = await deps.requests.findById(id);
     if (!row || !cookieToken || !sameTokenHash(row.nonceHash, cookieToken)) return { state: "unknown" };
     const state = publicTelegramRequestState(row);
-    if (state === "expired" || state === "consumed") return { state };
+    if (state === "expired" || state === "consumed" || state === "rejected") return { state };
     if (state !== "approved" || !row.userId) return { state: "pending" };
 
     const user = await deps.users.findById(row.userId);
@@ -128,7 +129,7 @@ export async function getTelegramLoginStatus(
 }
 
 export type BeginTelegramLoginResult =
-  | { outcome: "approved"; user: PublicAuthUser }
+  | { outcome: "confirmation"; requestId: string; createdAt: Date; expiresAt: Date; userAgent?: string | null }
   | { outcome: "contact_required" };
 
 export async function beginTelegramLogin(
@@ -143,16 +144,21 @@ export async function beginTelegramLogin(
 
   const user = await deps.users.findByTgId(tgUserId);
   if (!user) return { outcome: "contact_required" };
-  if (!(await deps.requests.approve(request.id, tgUserId, user.id))) {
-    throw new ServiceError("INVALID_TOKEN", "Kirish havolasi eskirgan yoki allaqachon ishlatilgan", 410);
-  }
-  return { outcome: "approved", user: toPublicUser(user) };
+  return { outcome: "confirmation", requestId: request.id, createdAt: request.createdAt, expiresAt: request.expiresAt, userAgent: request.userAgent };
+}
+
+export interface TelegramContactResult {
+  user: PublicAuthUser;
+  requestId: string;
+  createdAt: Date;
+  expiresAt: Date;
+  userAgent?: string | null;
 }
 
 export async function approveTelegramLogin(
   input: TelegramContactInput,
   overrides?: Partial<TelegramLoginDependencies>,
-): Promise<PublicAuthUser> {
+): Promise<TelegramContactResult> {
   const parsed = telegramContactSchema.safeParse(input);
   if (!parsed.success) throw new ServiceError("VALIDATION", "Telegram kontakt ma'lumotlari noto'g'ri", 400);
   const deps = dependencies(overrides);
@@ -178,7 +184,26 @@ export async function approveTelegramLogin(
     if (!(await deps.requests.approveBoundTx(ex, request.id, parsed.data.tgUserId, user.id))) {
       throw new ServiceError("INVALID_TOKEN", "Kirish havolasi eskirgan yoki allaqachon ishlatilgan", 410);
     }
-    return toPublicUser(user);
+    return { user: toPublicUser(user), requestId: request.id, createdAt: request.createdAt, expiresAt: request.expiresAt, userAgent: request.userAgent };
+  });
+}
+
+export type TelegramCallbackOutcome = "approved" | "rejected" | "invalid";
+
+export async function handleTelegramLoginCallback(
+  input: unknown,
+  overrides?: Partial<TelegramLoginDependencies>,
+): Promise<TelegramCallbackOutcome> {
+  const parsed = telegramLoginCallbackSchema.safeParse(input);
+  if (!parsed.success) return "invalid";
+  const deps = dependencies(overrides);
+  return deps.transaction(`telegram-confirm:${parsed.data.requestId}`, async (tx) => {
+    const ex = tx as DbExecutor | null | undefined;
+    if (!ex) throw new ServiceError("PROVIDER_UNAVAILABLE", "Ma'lumotlar bazasi tranzaksiyasi mavjud emas", 503);
+    const changed = parsed.data.action === "y"
+      ? await deps.requests.confirmBoundTx(ex, parsed.data.requestId, parsed.data.tgUserId)
+      : await deps.requests.rejectBoundTx(ex, parsed.data.requestId, parsed.data.tgUserId);
+    return parsed.data.action === "y" ? (changed ? "approved" : "invalid") : (changed ? "rejected" : "invalid");
   });
 }
 

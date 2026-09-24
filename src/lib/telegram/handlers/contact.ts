@@ -4,6 +4,7 @@ import { approveTelegramLogin } from "@/features/auth/server/telegram-login.serv
 import { ServiceError } from "@/lib/http/errors";
 import { handleOperatorHandoff } from "../handoff";
 import { linkTelegramAccount } from "../linkAccount";
+import { loginConfirmationKeyboard, loginConfirmationText } from "./start";
 
 const mainKeyboard = Markup.keyboard([
   ["📚 Kurslar va Narxlar", "🎯 Bepul Diagnostika"],
@@ -51,21 +52,13 @@ export function registerAccountHandlers(bot: Telegraf) {
 
     const phone = contact.phone_number;
     try {
-      await approveTelegramLogin({
+      const result = await approveTelegramLogin({
         tgUserId: ctx.from.id.toString(),
         tgUsername: ctx.from.username,
         fullName: [ctx.from.first_name, ctx.from.last_name].filter(Boolean).join(" "),
         phone,
       });
-      return ctx.reply(
-        `✅ Tayyor! ${BRAND.name} saytida hisobingizga kirdingiz.`,
-        {
-          reply_markup: {
-            ...Markup.removeKeyboard().reply_markup,
-            ...Markup.inlineKeyboard([[Markup.button.url("Saytga qaytish", BRAND.url)]]).reply_markup,
-          },
-        },
-      );
+      return ctx.reply(loginConfirmationText(result), { reply_markup: loginConfirmationKeyboard(result.requestId) });
     } catch (error) {
       if (error instanceof ServiceError && error.code === "CONFLICT") {
         return ctx.reply("Bu Telegram akkaunti boshqa telefon raqamiga bog'langan. Avval saytdagi telefon orqali kirib, Telegram akkauntini almashtiring.");

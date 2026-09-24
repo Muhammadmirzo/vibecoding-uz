@@ -10,6 +10,7 @@ import {
   beginTelegramLogin,
   getTelegramLoginStatus,
   hashTelegramLoginToken,
+  handleTelegramLoginCallback,
   startTelegramLogin,
   type TelegramLoginDependencies,
 } from "@/features/auth/server/telegram-login.service";
@@ -57,7 +58,6 @@ function makeRepository(overrides: Partial<TelegramLoginRequestRepository> = {})
     create: vi.fn(async () => ({ id: requestId, nonceHash: hashTelegramLoginToken(token) })),
     findById: vi.fn(async () => null),
     bindTelegramUser: vi.fn(async () => null),
-    approve: vi.fn(async () => true),
     markConsumedTx: vi.fn(async () => true),
     findNewestPendingByTelegramIdTx: vi.fn(async () => null),
     findUserByPhoneTx: vi.fn(async () => null),
@@ -66,6 +66,8 @@ function makeRepository(overrides: Partial<TelegramLoginRequestRepository> = {})
     insertTelegramSignupAuditTx: vi.fn(async () => undefined),
     linkTelegramUserTx: vi.fn(async (_ex, _id) => makeUser()),
     approveBoundTx: vi.fn(async () => true),
+    confirmBoundTx: vi.fn(async () => true),
+    rejectBoundTx: vi.fn(async () => true),
     ...overrides,
   };
 }
@@ -114,17 +116,14 @@ describe("Telegram deep-link service", () => {
     expect(result).toEqual({ outcome: "contact_required" });
   });
 
-  it("approves immediately when Telegram is already linked", async () => {
-    const requests = makeRepository({
-      bindTelegramUser: vi.fn(async () => makeRequest({ tgUserId: "555" })),
-      approve: vi.fn(async () => true),
-    });
+  it("leaves a linked account pending for explicit confirmation", async () => {
+    const request = makeRequest({ tgUserId: "555" });
+    const requests = makeRepository({ bindTelegramUser: vi.fn(async () => request) });
     const result = await beginTelegramLogin(token, "555", deps(requests, {
       users: { findById: async () => makeUser(), findByTgId: async () => makeUser() },
     }));
 
-    expect(result.outcome).toBe("approved");
-    expect(requests.approve).toHaveBeenCalledWith(requestId, "555", makeUser().id);
+    expect(result).toMatchObject({ outcome: "confirmation", requestId });
   });
 
   it("rejects expired or replayed /start requests", async () => {
@@ -140,7 +139,7 @@ describe("Telegram deep-link service", () => {
     });
     const result = await approveTelegramLogin({ tgUserId: "555", fullName: "Ali", phone: "901234567" }, deps(requests));
 
-    expect(result.id).toBe(user.id);
+    expect(result.user.id).toBe(user.id);
     expect(requests.createTelegramUserTx).toHaveBeenCalledOnce();
     expect(requests.ensureProfileTx).toHaveBeenCalledWith(executor, user.id);
     expect(requests.insertTelegramSignupAuditTx).toHaveBeenCalledWith(executor, { userId: user.id, ip: "127.0.0.1" });
@@ -174,11 +173,28 @@ describe("Telegram deep-link service", () => {
       .rejects.toMatchObject({ code: "INVALID_TOKEN", status: 410 });
   });
 
+  it("approves only the bound Telegram user and rejects without changing the request", async () => {
+    const confirm = vi.fn(async () => true);
+    const reject = vi.fn(async () => true);
+    const requests = makeRepository({ confirmBoundTx: confirm, rejectBoundTx: reject });
+    expect(await handleTelegramLoginCallback({ action: "y", requestId, tgUserId: "555" }, deps(requests))).toBe("approved");
+    expect(confirm).toHaveBeenCalledWith(executor, requestId, "555");
+    expect(await handleTelegramLoginCallback({ action: "n", requestId, tgUserId: "555" }, deps(requests))).toBe("rejected");
+    expect(reject).toHaveBeenCalledWith(executor, requestId, "555");
+  });
+
+  it("makes callback confirmation idempotent and rejects malformed data", async () => {
+    const requests = makeRepository({ confirmBoundTx: vi.fn(async () => false) });
+    expect(await handleTelegramLoginCallback({ action: "y", requestId, tgUserId: "999" }, deps(requests))).toBe("invalid");
+    expect(await handleTelegramLoginCallback({ action: "x", requestId, tgUserId: "555" }, deps(requests))).toBe("invalid");
+  });
+
   it("rejects a wrong initiator cookie, expiry and consumed replay as unknown or terminal", async () => {
     const approved = makeRequest({ status: "approved", userId: makeUser().id });
     const pending = makeRequest();
     const expired = makeRequest({ expiresAt: new Date(Date.now() - 1_000) });
     const consumed = makeRequest({ status: "consumed", userId: makeUser().id });
+    const rejected = makeRequest({ status: "rejected" });
 
     expect(await getTelegramLoginStatus(requestId, "wrong-token", signer, deps(makeRepository({ findById: async () => approved }))))
       .toEqual({ state: "unknown" });
@@ -186,6 +202,8 @@ describe("Telegram deep-link service", () => {
       .toEqual({ state: "expired" });
     expect(await getTelegramLoginStatus(requestId, token, signer, deps(makeRepository({ findById: async () => consumed }))))
       .toEqual({ state: "consumed" });
+    expect(await getTelegramLoginStatus(requestId, token, signer, deps(makeRepository({ findById: async () => rejected }))))
+      .toEqual({ state: "rejected" });
     expect(await getTelegramLoginStatus(requestId, token, signer, deps(makeRepository({ findById: async () => pending }))))
       .toEqual({ state: "pending" });
   });

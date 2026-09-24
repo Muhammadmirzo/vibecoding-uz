@@ -1,6 +1,7 @@
 import { Markup, Telegraf } from "telegraf";
 import { BRAND } from "@/config/brand";
 import { beginTelegramLogin } from "@/features/auth/server/telegram-login.service";
+import { formatTelegramDevice, formatTelegramRequestTime } from "../user-agent";
 import { ServiceError } from "@/lib/http/errors";
 import { linkTelegramAccount } from "../linkAccount";
 
@@ -20,6 +21,16 @@ function escapeHtml(value: string): string {
   })[character] ?? character);
 }
 
+export function loginConfirmationText(request: { createdAt: Date; userAgent?: string | null }): string {
+  return `🔐 ${BRAND.name} saytiga kirish so'rovi\n🕒 ${formatTelegramRequestTime(request.createdAt)}\n💻 ${formatTelegramDevice(request.userAgent)}\n\nAgar hozir saytda o'zingiz «Telegram orqali davom etish» tugmasini bosgan bo'lsangiz — tasdiqlang. Aks holda bu so'rovni rad eting va havolani hech kimga yubormang.`;
+}
+
+export function loginConfirmationKeyboard(requestId: string) {
+  return Markup.inlineKeyboard([
+    [Markup.button.callback("✅ Ha, bu men", `tgl:y:${requestId}`), Markup.button.callback("❌ Men emas", `tgl:n:${requestId}`)],
+  ]).reply_markup;
+}
+
 const siteKeyboard = {
   reply_markup: {
     ...Markup.removeKeyboard().reply_markup,
@@ -36,11 +47,8 @@ export function registerStartHandler(bot: Telegraf) {
       const token = payload.slice("login_".length);
       try {
         const result = await beginTelegramLogin(token, tgUserId);
-        if (result.outcome === "approved") {
-          return ctx.reply(
-            `✅ Tayyor! ${BRAND.name} saytida hisobingizga kirdingiz.`,
-            { ...Markup.removeKeyboard(), ...siteKeyboard },
-          );
+        if (result.outcome === "confirmation") {
+          return ctx.reply(loginConfirmationText(result), { reply_markup: loginConfirmationKeyboard(result.requestId) });
         }
         return ctx.reply(
           `${BRAND.name} saytida kirish uchun avval o'zingizning telefon raqamingizni ulashing.`,
