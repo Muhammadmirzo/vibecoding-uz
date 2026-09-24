@@ -23,13 +23,18 @@ const readCached = unstable_cache(
 );
 
 export async function getMotionSettings(): Promise<MotionSettings> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
   try {
     return await Promise.race([
       readCached(),
-      new Promise<MotionSettings>((resolve) => setTimeout(() => resolve(DEFAULT_MOTION), READ_TIMEOUT_MS)),
+      new Promise<MotionSettings>((resolve) => {
+        timer = setTimeout(() => resolve(DEFAULT_MOTION), READ_TIMEOUT_MS);
+      }),
     ]);
   } catch {
     return DEFAULT_MOTION;
+  } finally {
+    if (timer) clearTimeout(timer);
   }
 }
 

@@ -10,7 +10,7 @@ const levels: Array<{ value: MotionLevel; label: string; description: string }> 
   { value: "full", label: "To'liq", description: "Barcha motion effektlari yoqilgan holda ishlaydi." },
 ];
 const flags: Array<{ key: keyof Omit<MotionSettings, "level">; label: string; description: string }> = [
-  { key: "heroIntro", label: "Hero kirish animatsiyasi", description: "Bosh sarlavha va terminal qatori kirishda hayajlanadi." },
+  { key: "heroIntro", label: "Hero kirish animatsiyasi", description: "Bosh sarlavha va terminal qatori sahifa ochilganda jonlanadi." },
   { key: "scrollReveal", label: "Scroll reveal", description: "Bo'limlar ko'rinishga kirganda paydo bo'ladi." },
   { key: "pointerEffects", label: "Pointer effektlari", description: "Tugma va kartalarda kursor bilan ta'sir." },
   { key: "ambient", label: "Ambient effektlar", description: "Girih shimmer va sekin gradient harakati." },
