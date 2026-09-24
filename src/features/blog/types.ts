@@ -14,6 +14,8 @@ export interface BlogPostItem {
   tags: string[];
 }
 
+export type BlogPostSummary = Omit<BlogPostItem, "contentMd">;
+
 export interface TocItem {
   id: string;
   title: string;

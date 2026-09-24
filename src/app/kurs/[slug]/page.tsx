@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Calendar, Check, Clock, User, X } from "lucide-react";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/Accordion";
+import { FaqDisclosure } from "@/components/ui/FaqDisclosure";
 import { Badge } from "@/components/ui/Surfaces";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Surfaces";
@@ -184,14 +184,7 @@ export default async function CourseDetailPage({ params }: Props) {
       </Section>
 
       <Section pattern={false} className="bg-bg-sunken" eyebrow="Savol-javob" title="Ko'p so'raladigan savollar">
-        <Accordion type="single" collapsible className="mx-auto mt-8 max-w-3xl rounded-xl border border-border bg-bg-elevated px-6">
-          {course.faqs.map((faq, index) => (
-            <AccordionItem key={faq.question} value={`faq-${index}`}>
-              <AccordionTrigger>{faq.question}</AccordionTrigger>
-              <AccordionContent>{faq.answer}</AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
+        <FaqDisclosure items={course.faqs} />
       </Section>
 
       <NextStepCTA

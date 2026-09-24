@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
-import { Onest, Instrument_Serif, JetBrains_Mono, Unbounded } from "next/font/google";
+import { Onest, JetBrains_Mono, Unbounded } from "next/font/google";
 import { cookies, headers } from "next/headers";
 import "./globals.css";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { AuthProvider } from "@/context/AuthContext";
-import { PwaRegister } from "@/components/layout/PwaRegister";
 import { ClientModals } from "@/components/layout/ClientModals";
 import { userSchema, User } from "@/lib/validations/auth";
 import { BRAND } from "@/config/brand";
@@ -15,30 +14,27 @@ import { RevealRoot } from "@/features/motion/ui/RevealRoot";
 import { getMotionSettings } from "@/features/motion/server/motion-settings";
 
 const onest = Onest({
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"],
   variable: "--font-sans",
-  display: "swap",
+  // "optional": no late font swap → no layout shift (CLS). Measured 0.45 with
+  // "swap" under mobile throttling. Fallback metrics are size-adjusted by next/font.
+  display: "optional",
 });
 
 const unbounded = Unbounded({
   subsets: ["latin", "latin-ext"],
   weight: ["600", "700"],
   variable: "--font-display",
-  display: "swap",
-});
-
-const instrumentSerif = Instrument_Serif({
-  subsets: ["latin"],
-  weight: "400",
-  style: ["normal", "italic"],
-  variable: "--font-instrument-serif",
-  display: "swap",
+  display: "optional",
+  preload: true,
 });
 
 const jetBrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "600"],
   variable: "--font-mono",
   display: "swap",
+  preload: false,
 });
 
 const siteUrl = BRAND.url;
@@ -110,7 +106,7 @@ export default async function RootLayout({
   return (
     <MotionRoot
       settings={motionSettings}
-      className={`${onest.variable} ${unbounded.variable} ${instrumentSerif.variable} ${jetBrainsMono.variable}`}
+      className={`${onest.variable} ${unbounded.variable} ${jetBrainsMono.variable}`}
     >
       <body className="antialiased">
         <a href="#main" className="skip-to-content">Asosiy kontentga o'tish</a>
@@ -121,7 +117,6 @@ export default async function RootLayout({
             <main id="main">{children}</main>
             <Footer />
             <ClientModals />
-            <PwaRegister />
           </AuthProvider>
         </ThemeProvider>
       </body>

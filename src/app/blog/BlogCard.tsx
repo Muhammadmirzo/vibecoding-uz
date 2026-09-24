@@ -2,13 +2,13 @@ import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Calendar, Clock } from "lucide-react";
-import { BlogPostItem } from "@/features/blog/blogData";
+import type { BlogPostSummary } from "@/features/blog/blogData";
 
-export const BlogCard = React.memo(function BlogCard({ post }: { post: BlogPostItem }) {
+export const BlogCard = React.memo(function BlogCard({ post, priority = false }: { post: BlogPostSummary; priority?: boolean }) {
   return (
     <article className="group flex flex-col overflow-hidden rounded-2xl border border-border-strong bg-bg-elevated transition-all duration-200 hover:-translate-y-0.5 hover:border-accent/50 hover:shadow-md">
       <div className="relative h-48 w-full overflow-hidden bg-bg-sunken">
-        <Image src={post.coverUrl} alt="" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover transition-transform duration-300 group-hover:scale-105" />
+        <Image src={post.coverUrl} alt="" fill priority={priority} sizes="(max-width: 767px) calc(100vw - 40px), (max-width: 1023px) 50vw, 33vw" className="object-cover transition-transform duration-300 group-hover:scale-105" />
         <div className="absolute left-3 top-3">
           <span className="rounded-full border border-border bg-bg/90 px-3 py-1 font-mono text-[11px] font-bold text-accent backdrop-blur-md">{post.category}</span>
         </div>
@@ -30,7 +30,7 @@ export const BlogCard = React.memo(function BlogCard({ post }: { post: BlogPostI
         </div>
         <div className="flex items-center justify-between border-t border-border pt-4">
           <div className="flex items-center gap-2.5">
-            <Image src={post.authorAvatar} alt="" width={28} height={28} className="h-7 w-7 rounded-full border border-border object-cover" />
+            <Image src={post.authorAvatar} alt="" width={28} height={28} sizes="28px" className="h-7 w-7 rounded-full border border-border object-cover" />
             <span className="text-xs font-semibold text-ink">{post.authorName}</span>
           </div>
           <Link href={`/blog/${post.slug}`} prefetch={true} className="flex min-h-11 min-w-11 items-center justify-center gap-1 px-1 text-xs font-bold text-accent transition-all hover:gap-1.5">

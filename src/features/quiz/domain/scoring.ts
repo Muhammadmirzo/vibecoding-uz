@@ -1,12 +1,6 @@
-import { z } from "zod";
 import { QUIZ_QUESTIONS, type QuizCourseSlug } from "./questions";
 
 /** Answers keyed by question index (0-based) → selected option index. */
-export const quizAnswersSchema = z.record(
-  z.coerce.number().int().min(0),
-  z.number().int().min(0),
-);
-
 export type QuizAnswers = Record<number, number>;
 
 export interface QuizScores {

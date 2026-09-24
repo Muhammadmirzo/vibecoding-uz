@@ -1,6 +1,7 @@
 "use client";
 
 import { AlertCircle, Loader2, Send } from "lucide-react";
+import Script from "next/script";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { TelegramAuthFlow } from "./TelegramAuthFlow";
 import { getBotName, getTelegramErrorMessage, mapTelegramData } from "./telegram-helpers";
@@ -25,7 +26,7 @@ declare global {
 export function TelegramLoginButton({ onSuccess, onError }: TelegramLoginButtonProps) {
   const botName = getBotName();
   const containerRef = useRef<HTMLDivElement>(null);
-  const scriptRef = useRef<HTMLScriptElement | null>(null);
+
   const [status, setStatus] = useState<Status>("idle");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const onSuccessRef = useRef(onSuccess);
@@ -86,20 +87,10 @@ export function TelegramLoginButton({ onSuccess, onError }: TelegramLoginButtonP
 
     const callback = (user: unknown) => { void handleAuth(user); };
     window.onTelegramAuth = callback;
-    const script = document.createElement("script");
-    script.src = "https://telegram.org/js/telegram-widget.js?22";
-    script.async = true;
-    script.setAttribute("data-telegram-login", botName);
-    script.setAttribute("data-size", "large");
-    script.setAttribute("data-onauth", "onTelegramAuth(user)");
-    script.setAttribute("data-request-access", "write");
-    scriptRef.current = script;
-    container.replaceChildren(script);
+    container.replaceChildren();
 
     return () => {
       if (window.onTelegramAuth === callback) delete window.onTelegramAuth;
-      script.remove();
-      if (scriptRef.current === script) scriptRef.current = null;
       container.replaceChildren();
     };
   }, [botName, handleAuth]);
@@ -117,7 +108,17 @@ export function TelegramLoginButton({ onSuccess, onError }: TelegramLoginButtonP
 
   return (
     <div className="w-full">
-      <div ref={containerRef} className="flex min-h-12 w-full items-center justify-center rounded-md border border-telegram/30 bg-telegram-soft" aria-label="Telegram orqali kirish" />
+      <div ref={containerRef} className="flex min-h-12 w-full items-center justify-center rounded-md border border-telegram/30 bg-telegram-soft" aria-label="Telegram orqali kirish">
+        <Script
+          id="telegram-login-widget"
+          src="https://telegram.org/js/telegram-widget.js?22"
+          strategy="afterInteractive"
+          data-telegram-login={botName}
+          data-size="large"
+          data-onauth="onTelegramAuth(user)"
+          data-request-access="write"
+        />
+      </div>
       <p className="mt-2 flex items-center justify-center gap-2 text-center text-xs text-ink-muted">
         <Send className="h-3.5 w-3.5 shrink-0 text-telegram" aria-hidden="true" />
         <span>Telegram tugmasi yuklanmasa — internetni tekshiring</span>

@@ -2,6 +2,11 @@ import { z } from "zod";
 import { QUIZ_QUESTIONS } from "./questions";
 import { buildReasoning, calculateRecommendation, calculateScores, type QuizAnswers } from "./scoring";
 
+export const quizAnswersSchema = z.record(
+  z.coerce.number().int().min(0),
+  z.number().int().min(0),
+);
+
 /**
  * Strict server-side answer validation: every question must be answered
  * exactly once and each option index must exist. Client-computed scores

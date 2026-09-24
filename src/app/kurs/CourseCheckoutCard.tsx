@@ -1,11 +1,7 @@
-"use client";
-
 import Link from "next/link";
-import { ArrowRight, Check, CirclePlay, Send, ShieldCheck } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/context/AuthContext";
+import { Check, CirclePlay, Send, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { getCourseCtaState } from "./cta";
+import { CourseCheckoutButton } from "./CourseCheckoutButton";
 
 interface CourseCheckoutCardProps {
   price: string;
@@ -16,18 +12,6 @@ interface CourseCheckoutCardProps {
 }
 
 export function CourseCheckoutCard({ price, oldPrice, installment, sessionFormat, guaranteeText }: CourseCheckoutCardProps) {
-  const { user, openAuthModal } = useAuth();
-  const router = useRouter();
-  const ctaState = getCourseCtaState({ isAuthenticated: Boolean(user), hasConfiguredProvider: true });
-
-  const handlePrimaryCta = () => {
-    if (ctaState === "login") {
-      openAuthModal("login", "/kabinet/to-lovlar");
-    } else if (ctaState === "checkout") {
-      router.push("/kabinet/to-lovlar");
-    }
-  };
-
   return (
     <div className="rounded-xl border-2 border-accent bg-bg-elevated p-7 shadow-lg lg:sticky lg:top-24">
       <div className="space-y-1">
@@ -51,10 +35,7 @@ export function CourseCheckoutCard({ price, oldPrice, installment, sessionFormat
         </ul>
       </div>
       <div className="space-y-3 pt-2">
-        <Button onClick={handlePrimaryCta} size="lg" className="w-full">
-          {ctaState === "login" ? "Kursga o'tish uchun kiring" : "Kursni band qilish"}
-          <ArrowRight className="size-4" aria-hidden="true" />
-        </Button>
+        <CourseCheckoutButton />
         <p className="text-sm leading-relaxed text-ink-muted">
           To&apos;lov oynasi `Kabinet → To&apos;lovlar` bo&apos;limida ochiladi — avval hisobingizga kiring.
         </p>
