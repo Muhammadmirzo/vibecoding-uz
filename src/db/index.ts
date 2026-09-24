@@ -23,6 +23,19 @@ const client = postgres(effectiveConnectionString, {
 
 export const db = drizzle(client, { schema });
 
+/**
+ * drizzle's postgres-js driver makes the date/time serializers transparent because typed
+ * columns convert Dates themselves. A Date passed as a raw `sql` param has no column, so
+ * postgres-js received the Date object and threw ERR_INVALID_ARG_TYPE in production
+ * (rate limiter, analytics reports). Serialize Dates to ISO here, once, for every query.
+ */
+export function serializeDateParam(value: unknown): unknown {
+  return value instanceof Date ? value.toISOString() : value;
+}
+for (const type of [1184, 1082, 1083, 1114]) {
+  client.options.serializers[type] = serializeDateParam;
+}
+
 type DatabaseTransaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
 function getErrorDetails(error: unknown): { code: unknown; message: string } {

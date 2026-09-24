@@ -7,6 +7,7 @@ import { verifySessionToken } from "./session/token";
 import { parseSessionCookie } from "./session/cookie";
 import { SESSION_COOKIE_NAME } from "./session/types";
 import { passesCsrfCheck } from "@/lib/security/headers";
+import { parseBearerToken, verifyAccessToken } from "./mobile-access";
 
 /**
  * Defense-in-depth authorization for route handlers (Node runtime).
@@ -25,10 +26,13 @@ export interface AuthSession {
   userId: string;
   role: string;
   sessionId: string;
+  /** "cookie" for web, "bearer" for native clients (CSRF skipped). */
+  authMethod?: "cookie" | "bearer";
 }
 
 export interface SessionDeps {
   verifyToken?: typeof verifySessionToken;
+  verifyBearer?: typeof verifyAccessToken;
   findSessionById?: (sessionId: string) => Promise<{ id: string; userId: string; expiresAt: Date } | null>;
   findUserRole?: (userId: string) => Promise<string | null>;
   now?: () => number;
@@ -103,7 +107,7 @@ export async function getDbSession(
   }
   if (!role) return null;
 
-  return { userId: record.userId, role, sessionId: record.id };
+  return { userId: record.userId, role, sessionId: record.id, authMethod: "cookie" };
 }
 
 export type AuthResult =
@@ -126,6 +130,46 @@ function csrfDenies(request: Request | undefined): boolean {
   return !passesCsrfCheck(request);
 }
 
+/**
+ * Bearer (mobile) session resolution. The access token is short-lived and
+ * stateless, but the role is ALWAYS re-read from `users` and the backing
+ * `sessions` row must still exist (logout revocation). Returns null when the
+ * token is missing, forged, expired, has the wrong audience, or the session
+ * row / user is gone.
+ */
+export async function getBearerSession(
+  authorizationHeader: string | null | undefined,
+  deps: SessionDeps = {}
+): Promise<AuthSession | null> {
+  const token = parseBearerToken(authorizationHeader ?? null);
+  if (!token) return null;
+  const verify = deps.verifyBearer ?? verifyAccessToken;
+  const result = await verify(token);
+  if (!("payload" in result)) return null;
+  const { payload } = result;
+
+  const findSession = deps.findSessionById ?? defaultFindSessionById;
+  let record: { id: string; userId: string; expiresAt: Date } | null;
+  try {
+    record = await findSession(payload.sid);
+  } catch {
+    return null;
+  }
+  if (!record || record.userId !== payload.sub) return null;
+  const now = deps.now ? deps.now() : Date.now();
+  if (record.expiresAt.getTime() <= now) return null;
+
+  const findRole = deps.findUserRole ?? defaultFindUserRole;
+  let role: string | null;
+  try {
+    role = await findRole(record.userId);
+  } catch {
+    return null;
+  }
+  if (!role) return null;
+  return { userId: record.userId, role, sessionId: record.id, authMethod: "bearer" };
+}
+
 async function gate(
   cookieHeader: string | null | undefined,
   request: Request | undefined,
@@ -133,6 +177,17 @@ async function gate(
   deps: SessionDeps,
   forbiddenMessage: string
 ): Promise<AuthResult> {
+  // Bearer wins when an Authorization header is present: native clients get
+  // mobile support on every route automatically, with no CSRF requirement
+  // (no ambient cookie is involved). Cookie path below is untouched.
+  if (request?.headers.get("authorization")) {
+    const bearer = await getBearerSession(request.headers.get("authorization"), deps);
+    if (!bearer) return { ok: false, response: unauthorized() };
+    if (allowedRoles && !allowedRoles.includes(bearer.role)) {
+      return { ok: false, response: forbidden(forbiddenMessage) };
+    }
+    return { ok: true, session: bearer };
+  }
   const session = await getDbSession(cookieHeader, deps);
   if (!session) return { ok: false, response: unauthorized() };
   if (allowedRoles && !allowedRoles.includes(session.role)) {

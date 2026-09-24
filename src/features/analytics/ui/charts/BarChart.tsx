@@ -1,0 +1,6 @@
+import type { ChartPoint } from "./chart-types";
+
+export function BarChart({ data, title, description = "Kategoriyalar bo'yicha taqqoslash" }: { data: ChartPoint[]; title: string; description?: string }) {
+  const max = Math.max(1, ...data.map((point) => point.value));
+  return <figure className="space-y-3"><div className="flex h-48 items-end gap-2" role="img" aria-label={`${title}. ${description}`}><svg viewBox="0 0 720 220" className="h-full w-full" aria-hidden="true">{data.map((point, index) => { const slot = 720 / Math.max(1, data.length); const barWidth = Math.min(72, Math.max(2, slot - 16)); const height = (point.value / max) * 190; return <rect key={point.label} x={index * slot + (slot - barWidth) / 2} y={205 - height} width={barWidth} height={height} rx="4" className="fill-accent"><title>{`${point.label}: ${point.value.toLocaleString("uz-UZ")}`}</title></rect>; })}</svg></div><details className="text-sm text-ink-muted"><summary>Jadval ko‘rinishi</summary><ul className="mt-2 space-y-1">{data.map((point) => <li key={point.label} className="flex justify-between border-t border-border py-1"><span>{point.label}</span><span>{point.value.toLocaleString("uz-UZ")}</span></li>)}</ul></details></figure>;
+}

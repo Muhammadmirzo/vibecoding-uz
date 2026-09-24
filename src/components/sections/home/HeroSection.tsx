@@ -26,12 +26,12 @@ export function HeroSection() {
           </p>
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
             <MagneticButton strength={7}>
-              <Button href="/diagnostika" size="lg" className="hero-cta group">
+              <Button href="/diagnostika" data-track="hero_diagnostic" size="lg" className="hero-cta group">
                 Bepul diagnostika — 2 daqiqa
                 <ArrowRight className="hero-arrow size-5" aria-hidden="true" />
               </Button>
             </MagneticButton>
-            <Button href="/bepul-dars" size="lg" variant="outline" className="group">
+            <Button href="/bepul-dars" data-track="hero_free_lesson" size="lg" variant="outline" className="group">
               <CirclePlay className="size-5" aria-hidden="true" />Bepul darsga yozilish
             </Button>
           </div>
