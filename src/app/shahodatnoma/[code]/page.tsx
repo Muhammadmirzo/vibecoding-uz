@@ -3,7 +3,6 @@ import type * as React from "react";
 import Link from "next/link";
 import { ShieldCheck } from "lucide-react";
 import { Container } from "@/components/ui";
-import { Button } from "@/components/ui/Button";
 import { NextStepCTA } from "@/components/ui/NextStepCTA";
 import { Seal } from "@/components/pages/PageBits";
 import { ShareCertButton } from "./ShareButton";
@@ -70,7 +69,12 @@ export default async function CertificateVerificationPage({ params }: Props) {
         </div>
         <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
           <ShareCertButton code={code} title="Sertifikat Tekshiruvi" />
-          <Button href="/kurs/vibe-coding-express" variant="secondary">Men ham o‘qimoqchiman</Button>
+          <a
+            href="/kurs/vibe-coding-express"
+            className="btn-press inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-brand px-5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-hover hover:shadow-md"
+          >
+            Men ham o‘qimoqchiman
+          </a>
         </div>
         <p className="mt-6 text-center text-xs text-ink-subtle">
           Ma’lumot mos kelmadimi? <Link href="/xizmatlar" className="font-semibold text-brand underline underline-offset-4">Biz bilan bog‘laning</Link>.
