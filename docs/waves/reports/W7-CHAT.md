@@ -78,7 +78,7 @@ Review iterations fixed: the top announcement collision, mobile full-sheet cover
 ## Verification
 
 - `npx tsc --noEmit` ✅
-- `npx vitest run` ✅ — 73 files, 537 tests
+- `npx vitest run` ✅ — 73 files, 538 tests
 - `scripts/waves/locked.sh npm run build` ✅ — 99 static/dynamic pages generated
 - `scripts/waves/locked.sh env E2E_PORT=3305 npx playwright test e2e/chat.spec.ts` ✅ — visitor → inbox → visitor round trip
 - `scripts/waves/locked.sh env E2E_PORT=3305 npx playwright test e2e/responsive.spec.ts e2e/visibility.spec.ts` ✅ — 142 tests
