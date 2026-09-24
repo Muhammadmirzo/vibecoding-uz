@@ -21,11 +21,11 @@ html.motion-armed[data-motion-scroll="on"] [data-reveal].is-visible .bento-icon 
 
 .demo-prompt { position: relative; z-index: 1; display: flex; align-items: center; gap: .65rem; margin-top: auto; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--bg-sunken); padding: .85rem; color: var(--ink-muted); font-family: var(--font-mono); font-size: .68rem; }
 .demo-typing { display: flex; min-width: 0; flex: 1; align-items: center; overflow: hidden; white-space: nowrap; }
-.demo-typing-text { overflow: hidden; text-overflow: clip; }
+.demo-typing-text { display: inline-block; max-width: 21ch; overflow: hidden; text-overflow: clip; }
 .demo-caret { width: 1px; height: 1em; flex: none; margin-left: 2px; background: var(--accent); }
-html[data-motion="full"][data-motion-ambient="on"] .demo-typing-text { animation: demo-type 6s steps(37, end) infinite; }
+html[data-motion="full"][data-motion-ambient="on"] .demo-typing-text { animation: demo-type 6s steps(21, end) infinite; }
 html[data-motion="full"][data-motion-ambient="on"] .demo-caret { animation: demo-caret 800ms steps(2, jump-none) infinite; }
-@keyframes demo-type { 0%, 12% { clip-path: inset(0 100% 0 0); } 42%, 78% { clip-path: inset(0); } 92%, 100% { clip-path: inset(0 0 0 100%); } }
+@keyframes demo-type { 0%, 12% { max-width: 0; } 42%, 78% { max-width: 21ch; } 92%, 100% { max-width: 0; } }
 @keyframes demo-caret { 50% { opacity: 0; } }
 .demo-toggle-row { position: relative; z-index: 1; display: flex; width: 100%; align-items: center; gap: .75rem; margin-top: auto; border: 1px solid var(--border); border-radius: var(--radius-md); padding: .75rem; transition: border-color var(--motion-fast), background-color var(--motion-fast); }
 .demo-toggle-row:hover { border-color: var(--accent); background: var(--accent-soft); }
@@ -80,7 +80,7 @@ html[data-motion="full"][data-motion-ambient="on"] .demo-caret { animation: demo
 
 @media (prefers-reduced-motion: reduce) {
   .scroll-fill-base { clip-path: none; }
-  .demo-typing-text { clip-path: none; }
+  .demo-typing-text { max-width: none; }
 }
 
 @media (max-width: 1023px) {

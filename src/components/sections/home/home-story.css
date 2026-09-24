@@ -24,9 +24,9 @@
 .story-app-caption { display: flex; align-items: center; gap: .5rem; margin-bottom: .75rem; color: var(--ink); font-weight: 700; }
 .story-app > p { margin-top: .65rem; color: var(--ink-subtle); }
 .story-rail { position: relative; display: flex; justify-content: space-between; margin: 2rem auto 0; color: var(--ink-subtle); font-family: var(--font-mono); font-size: .62rem; text-transform: uppercase; letter-spacing: .1em; }
-.story-step { position: relative; z-index: 1; display: flex; align-items: center; gap: .4rem; }
-.story-step > span { width: .5rem; height: .5rem; border-radius: 50%; background: var(--border-strong); }
-.story-rail-line { position: absolute; top: .2rem; right: .35rem; left: .35rem; height: 1px; overflow: hidden; background: var(--border); }
+.story-step { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: .45rem; }
+.story-step > span { width: .5rem; height: .5rem; border-radius: 50%; background: currentColor; }
+.story-rail-line { position: absolute; top: .22rem; right: 1rem; left: 1rem; height: 1px; overflow: hidden; background: var(--border); }
 .story-rail-line > span { display: block; width: 100%; height: 100%; background: var(--accent); transform: scaleX(0); transform-origin: left; }
 
 @supports (animation-timeline: view()) {
@@ -61,10 +61,11 @@
     html[data-motion-scroll="on"] .story-step-idea { animation: story-step-idea linear both; animation-timeline: --story; animation-range: contain 0% contain 50%; }
     html[data-motion-scroll="on"] .story-step-prompt { animation: story-step-prompt-state linear both; animation-timeline: --story; animation-range: contain 0% contain 50%; }
     html[data-motion-scroll="on"] .story-step-app { animation: story-step-app-state linear both; animation-timeline: --story; animation-range: contain 0% contain 50%; }
-    html[data-motion-scroll="on"] .story-step > span { animation-timeline: --story; animation-range: contain 0% contain 50%; }
+    /* Shorthand `animation` resets animation-timeline, so the timeline must come after it. */
     html[data-motion-scroll="on"] .story-step-idea > span { animation: story-step-idea linear both; }
     html[data-motion-scroll="on"] .story-step-prompt > span { animation: story-step-prompt-state linear both; }
     html[data-motion-scroll="on"] .story-step-app > span { animation: story-step-app-state linear both; }
+    html[data-motion-scroll="on"] .story-step > span { animation-timeline: --story; animation-range: contain 0% contain 50%; }
   }
 }
 
@@ -85,8 +86,8 @@
 @keyframes story-assemble { from { opacity: 0; transform: translateY(18px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
 @keyframes story-rail-fill { to { transform: scaleX(1); } }
 @keyframes story-step-idea { 0%, 100% { color: var(--accent); } }
-@keyframes story-step-prompt-state { 0%, 100% { color: var(--accent); } }
-@keyframes story-step-app-state { 0%, 100% { color: var(--accent); } }
+@keyframes story-step-prompt-state { 0%, 32% { color: var(--ink-subtle); } 34%, 100% { color: var(--accent); } }
+@keyframes story-step-app-state { 0%, 64% { color: var(--ink-subtle); } 66%, 100% { color: var(--accent); } }
 
 @media (max-width: 1023px) {
   .story-stage { display: grid; gap: 2rem; margin-top: 3rem; }
