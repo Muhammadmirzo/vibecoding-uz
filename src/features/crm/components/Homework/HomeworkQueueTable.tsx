@@ -18,7 +18,7 @@ export function HomeworkQueueTable({ submissions, loading, onOpen }: Props) { re
           {submissions.map((sub) => (
             <div
               key={sub.id}
-              className="bg-bg-elevated border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
+              className="bg-bg-elevated border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
             >
               {/* Info Left */}
               <div className="space-y-2 flex-1">

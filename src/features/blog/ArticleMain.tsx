@@ -4,7 +4,7 @@ import { BottomShareAction } from "./ShareActions";
 
 export function ArticleMain({ post }: { post: BlogPostItem }) {
   return (
-    <main className="lg:col-span-8 bg-bg-elevated border border-border-strong rounded-2xl p-6 md:p-10 shadow-sm">
+    <article className="lg:col-span-8 bg-bg-elevated border border-border-strong rounded-2xl p-6 md:p-10 shadow-sm">
       <ArticleBody contentMd={post.contentMd} />
       <div className="mt-10 pt-6 border-t border-border flex flex-wrap items-center gap-2">
         <span className="text-xs font-mono text-ink-subtle">Teglar:</span>
@@ -19,6 +19,6 @@ export function ArticleMain({ post }: { post: BlogPostItem }) {
         </div>
         <div className="flex items-center gap-2"><BottomShareAction /></div>
       </div>
-    </main>
+    </article>
   );
 }

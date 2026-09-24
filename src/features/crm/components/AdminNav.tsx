@@ -81,7 +81,7 @@ export function AdminNav() {
         </Dialog.Trigger>
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 z-50 bg-ink/60 backdrop-blur-sm lg:hidden" />
-          <Dialog.Content className="fixed inset-y-0 left-0 z-50 flex w-[min(88vw,20rem)] flex-col bg-bg-elevated p-4 shadow-2xl lg:hidden">
+          <Dialog.Content className="fixed inset-y-0 left-0 z-50 flex max-h-[100dvh] w-[min(88vw,20rem)] flex-col overflow-y-auto overscroll-contain bg-bg-elevated p-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-2xl lg:hidden">
             <Dialog.Title className="sr-only">Navigatsiya</Dialog.Title>
             <div className="flex items-center justify-between"><Brand /><Dialog.Close className="grid h-11 w-11 place-items-center rounded-xl text-ink-muted hover:bg-bg-sunken" aria-label="Menyuni yopish"><X className="h-5 w-5" /></Dialog.Close></div>
             <div className="my-4 border-t border-border" />

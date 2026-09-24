@@ -43,7 +43,7 @@ export function TestimonialsExplorer() {
   };
 
   return (
-    <main className="min-h-screen bg-bg px-5 pb-20 pt-28 md:px-8 lg:px-10">
+    <div className="min-h-screen bg-bg px-5 pb-20 pt-28 md:px-8 lg:px-10">
       <div className="mx-auto w-full max-w-[1360px] space-y-12">
         <header className="mx-auto max-w-[800px] space-y-4 text-center">
           <span className="inline-flex items-center gap-2 rounded-md border border-border bg-bg-elevated px-3.5 py-1.5 font-mono text-xs font-bold uppercase tracking-wider text-accent">
@@ -91,7 +91,7 @@ export function TestimonialsExplorer() {
                     className={`inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
                       isActive
                         ? "bg-accent text-white"
-                        : "border border-border bg-bg text-ink hover:bg-bg-deep"
+                        : "border border-border bg-bg text-ink hover:bg-bg-sunken"
                     }`}
                   >
                     {option.value !== "all" ? <Star className="h-3.5 w-3.5 fill-current" aria-hidden="true" /> : null}
@@ -185,6 +185,6 @@ export function TestimonialsExplorer() {
         </section>
         <NextStepCTA />
       </div>
-    </main>
+    </div>
   );
 }

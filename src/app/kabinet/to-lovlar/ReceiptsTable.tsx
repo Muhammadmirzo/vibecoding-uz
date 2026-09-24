@@ -67,13 +67,13 @@ export function ReceiptsTable({ payments }: ReceiptsTableProps) {
                 </td>
                 <td className="whitespace-nowrap py-4 pl-4 text-right">
                   {payment.receiptUrl ? (
-                    <Button asChild variant="outline" size="md" className="text-sm">
+                    <Button asChild variant="outline" size="md" className="min-h-11 text-base">
                       <a href={payment.receiptUrl} target="_blank" rel="noreferrer">
                         Chekni ochish
                       </a>
                     </Button>
                   ) : (
-                    <span className="inline-flex cursor-not-allowed items-center rounded-md bg-bg-sunken-deep px-3 py-2 text-[11px] text-ink-subtle" title="Chek tez orada" aria-disabled="true">
+                    <span className="inline-flex min-h-11 cursor-not-allowed items-center rounded-md bg-bg-sunken-deep px-3 py-2 text-base text-ink-subtle" title="Chek tez orada" aria-disabled="true">
                       Chek tez orada
                     </span>
                   )}

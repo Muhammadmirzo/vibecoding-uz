@@ -42,10 +42,10 @@ export function HeaderShareActions({ title }: { title: string }) {
   const { copied, shareUrl, copyLink } = useShare();
   return (
     <div className="flex items-center gap-2">
-      <button onClick={copyLink} className="btn-secondary h-9 px-3.5 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5" title="Havolani nusxalash">
+      <button onClick={copyLink} className="min-h-11 px-3.5 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 border border-border-strong bg-bg-elevated text-ink hover:bg-bg-sunken" title="Havolani nusxalash">
         {copied ? <Check className="w-3.5 h-3.5 text-success" /> : <Copy className="w-3.5 h-3.5" />}<span>{copied ? "Nusxalandi!" : "Havola"}</span>
       </button>
-      <a href={`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(title)}`} target="_blank" rel="noreferrer" className="btn-secondary h-9 px-3.5 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 text-telegram" title="Telegram'da ulashish">
+      <a href={`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(title)}`} target="_blank" rel="noreferrer" className="min-h-11 px-3.5 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 border border-border-strong bg-bg-elevated text-ink hover:bg-bg-sunken text-telegram" title="Telegram'da ulashish">
         <Send className="w-3.5 h-3.5" /><span>Telegram</span>
       </a>
     </div>
@@ -55,7 +55,7 @@ export function HeaderShareActions({ title }: { title: string }) {
 export function BottomShareAction() {
   const { copied, copyLink } = useShare();
   return (
-    <button onClick={copyLink} className="btn-secondary h-9 px-4 rounded-md text-xs font-semibold inline-flex items-center gap-1.5">
+    <button onClick={copyLink} className="min-h-11 px-4 rounded-md text-xs font-semibold inline-flex items-center gap-1.5 border border-border-strong bg-bg-elevated text-ink hover:bg-bg-sunken">
       {copied ? <Check className="w-3.5 h-3.5 text-success" /> : <Copy className="w-3.5 h-3.5" />}<span>{copied ? "Nusxalandi!" : "Nusxalash"}</span>
     </button>
   );

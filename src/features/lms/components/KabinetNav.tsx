@@ -98,7 +98,7 @@ export function KabinetNav() {
           </Dialog.Trigger>
           <Dialog.Portal>
             <Dialog.Overlay className="fixed inset-0 z-50 bg-ink/60 backdrop-blur-sm" />
-            <Dialog.Content className="fixed inset-y-0 left-0 z-50 w-[min(86vw,320px)] border-r border-border bg-bg-elevated p-5 shadow-2xl">
+            <Dialog.Content className="fixed inset-y-0 left-0 z-50 flex max-h-[100dvh] w-[min(86vw,320px)] flex-col overflow-y-auto overscroll-contain border-r border-border bg-bg-elevated p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-2xl">
               <Dialog.Title className="sr-only">Kabinet menyusini ochish</Dialog.Title>
               <Dialog.Close className="absolute right-3 top-3 grid h-11 w-11 place-items-center rounded-lg text-ink-muted hover:bg-bg-sunken" aria-label="Menyuni yopish">
                 <X className="h-5 w-5" aria-hidden="true" />

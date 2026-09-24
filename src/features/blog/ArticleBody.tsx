@@ -40,7 +40,7 @@ function renderBlock(block: MarkdownBlock) {
       return <ListBlock key={`list-${block.line}`} block={block} />;
     case "code":
       return (
-        <div key={`code-${block.line}`} className="my-6 rounded-xl overflow-hidden bg-[#1E1E1E] text-white p-4 font-mono text-xs border border-border-strong">
+        <div key={`code-${block.line}`} className="my-6 overflow-hidden rounded-xl border border-border-strong bg-ink p-4 font-mono text-xs text-bg">
           {block.language && <div className="text-[11px] text-ink-subtle uppercase pb-2 mb-2 border-b border-white/10 font-bold">{block.language}</div>}
           <pre className="overflow-x-auto whitespace-pre leading-relaxed text-gray-200"><code>{block.text}</code></pre>
         </div>

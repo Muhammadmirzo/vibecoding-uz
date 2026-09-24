@@ -32,7 +32,7 @@ export function PayoutModal({
     <Dialog.Root open={true} onOpenChange={setPayoutModalOpen}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-ink/60 backdrop-blur-sm z-50 animate-in fade-in duration-150" />
-        <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-md bg-bg-elevated border border-border-strong rounded-2xl p-6 md:p-8 shadow-2xl animate-in zoom-in-95 duration-150 text-ink">
+        <Dialog.Content className="fixed inset-x-0 bottom-0 z-50 max-h-[92dvh] w-full overflow-y-auto overscroll-contain rounded-t-2xl bg-bg-elevated p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] text-ink shadow-2xl sm:inset-x-4 sm:bottom-auto sm:top-1/2 sm:max-h-[calc(100dvh-2rem)] sm:-translate-y-1/2 sm:rounded-2xl md:inset-x-auto md:w-full md:max-w-md md:p-8">
           <div className="pb-4 border-b border-border">
             <Dialog.Title className="text-xl font-bold text-ink">
               Referral Bonusini Yechib Olish
@@ -68,7 +68,7 @@ export function PayoutModal({
           ) : (
             <form onSubmit={handlePayoutSubmit} className="space-y-4 pt-4">
               {payoutError && (
-                <div className="p-3 rounded-lg border border-danger bg-bg-sunken text-danger text-xs flex items-center gap-2">
+                <div role="alert" className="p-3 rounded-lg border border-danger bg-bg-sunken text-danger text-xs flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 shrink-0" />
                   <span>{payoutError}</span>
                 </div>
@@ -81,14 +81,14 @@ export function PayoutModal({
                   <button
                     type="button"
                     onClick={() => setPayoutMethod("uzcard_humo")}
-                    className={`min-h-11 rounded-xl border p-3 text-sm flex items-center justify-center gap-1.5 transition-all ${payoutMethod === "uzcard_humo" ? "border-accent bg-accent-soft text-accent shadow-sm" : "border-border bg-bg-elevated text-ink-muted"}`}
+                    className={`min-h-11 rounded-xl border p-3 text-sm flex items-center justify-center gap-1.5 transition-colors ${payoutMethod === "uzcard_humo" ? "border-accent bg-accent-soft text-accent shadow-sm" : "border-border bg-bg-elevated text-ink-muted"}`}
                   >
                     <CreditCard className="w-4 h-4" /> Uzcard / Humo
                   </button>
                   <button
                     type="button"
                     onClick={() => setPayoutMethod("course_balance")}
-                    className={`min-h-11 rounded-xl border p-3 text-sm flex items-center justify-center gap-1.5 transition-all ${payoutMethod === "course_balance" ? "border-accent bg-accent-soft text-accent shadow-sm" : "border-border bg-bg-elevated text-ink-muted"}`}
+                    className={`min-h-11 rounded-xl border p-3 text-sm flex items-center justify-center gap-1.5 transition-colors ${payoutMethod === "course_balance" ? "border-accent bg-accent-soft text-accent shadow-sm" : "border-border bg-bg-elevated text-ink-muted"}`}
                   >
                     <Gift className="w-4 h-4" /> Kurs to'loviga
                   </button>

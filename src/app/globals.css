@@ -16,7 +16,6 @@
     --accent: #0fa3a3;
     --accent-hover: #0b8585;
     --accent-soft: #ddf4f3;
-    --accent-line: #9bd9d6;
     --gold: #e8a317;
     --gold-hover: #c8890c;
     --gold-soft: #fcf1d8;
@@ -39,20 +38,13 @@
     --shadow-md: 0 8px 24px rgb(var(--shadow-color) / 0.09);
     --shadow-lg: 0 20px 48px rgb(var(--shadow-color) / 0.14);
 
-    /* LEGACY ALIAS — remove in W4 */
-    --color-cream: var(--bg); --color-cream-warm: var(--bg-sunken); --color-cream-deep: var(--border);
-    --color-ink: var(--ink); --color-ink-muted: var(--ink-muted); --color-ink-subtle: var(--ink-subtle);
-    --color-accent: var(--accent); --color-accent-hover: var(--accent-hover); --color-accent-soft: var(--accent-soft); --color-accent-line: var(--accent-line);
-    --color-border: var(--border); --color-border-strong: var(--border-strong);
-    --color-success: var(--success); --color-success-soft: var(--success-soft); --color-success-line: var(--success-line);
-    --color-telegram: var(--telegram); --color-telegram-soft: var(--telegram-soft);
   }
 
   .dark {
     --bg: #07111f; --bg-elevated: #0e1b2e; --bg-sunken: #050c16;
     --ink: #eef2f8; --ink-muted: #a9b4c6; --ink-subtle: #7c889c;
     --brand: #5b8cff; --brand-hover: #7aa3ff; --brand-soft: #182a4c;
-    --accent: #2dd4bf; --accent-hover: #67e8d7; --accent-soft: #123b3d; --accent-line: #287b7c;
+    --accent: #2dd4bf; --accent-hover: #67e8d7; --accent-soft: #123b3d;
     --gold: #f5b83d; --gold-hover: #ffca5c; --gold-soft: #403416;
     --border: #1d2b42; --border-strong: #2a3b57;
     --success: #5cd98b; --success-soft: #123a2a; --success-line: #2b7350;
@@ -68,6 +60,7 @@
   h1, h2, h3 { @apply font-display; text-wrap: balance; }
   ::selection { @apply bg-gold-soft text-ink; }
   :focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+  .skip-to-content { @apply fixed left-4 top-4 z-[100] -translate-y-24 rounded-lg bg-ink px-4 py-3 font-semibold text-bg transition-transform focus:translate-y-0; }
 }
 
 @layer utilities {
@@ -81,9 +74,13 @@
 @keyframes typing-caret { 50% { opacity: 0; } }
 @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
+@media (max-width: 768px) {
+  button,
+  a[href] { min-height: 44px; }
+  button { min-width: 44px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
-
-/* LEGACY ALIAS — remove in W4: legacy cream/ink classes remain valid during migration. */

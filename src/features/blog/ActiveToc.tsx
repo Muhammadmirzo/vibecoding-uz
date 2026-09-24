@@ -27,7 +27,7 @@ export function ActiveToc({ toc }: { toc: TocItem[] }) {
       {toc.map((item) => {
         const isActive = activeId === item.id;
         return (
-          <a key={item.id} href={`#${item.id}`} className={`block text-xs py-2 px-3 rounded-lg transition-all leading-snug ${isActive ? "bg-accent-soft text-accent font-bold border-l-2 border-accent" : "text-ink-muted hover:text-ink hover:bg-cream"} ${item.level === 3 ? "ml-3" : ""}`}>
+          <a key={item.id} href={`#${item.id}`} className={`block text-xs py-2 px-3 rounded-lg transition-all leading-snug ${isActive ? "bg-accent-soft text-accent font-bold border-l-2 border-accent" : "text-ink-muted hover:text-ink hover:bg-bg"} ${item.level === 3 ? "ml-3" : ""}`}>
             {item.title}
           </a>
         );

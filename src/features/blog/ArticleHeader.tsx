@@ -8,14 +8,14 @@ export function ArticleBreadcrumb({ title }: { title: string }) {
   return (
     <>
       <nav className="flex items-center gap-2 text-xs font-mono text-ink-subtle">
-        <Link href="/" className="hover:text-accent transition-colors">Bosh sahifa</Link>
+        <Link href="/" className="inline-flex min-h-11 min-w-11 items-center justify-center px-1 hover:text-accent transition-colors">Bosh sahifa</Link>
         <ChevronRight className="w-3.5 h-3.5" />
-        <Link href="/blog" className="hover:text-accent transition-colors">Blog</Link>
+        <Link href="/blog" className="inline-flex min-h-11 min-w-11 items-center justify-center px-1 hover:text-accent transition-colors">Blog</Link>
         <ChevronRight className="w-3.5 h-3.5" />
         <span className="text-ink font-semibold truncate max-w-[240px] md:max-w-md">{title}</span>
       </nav>
       <div>
-        <Link href="/blog" className="inline-flex items-center gap-1.5 text-xs font-mono font-semibold text-ink-muted hover:text-accent transition-colors">
+        <Link href="/blog" className="inline-flex min-h-11 items-center gap-1.5 text-xs font-mono font-semibold text-ink-muted hover:text-accent transition-colors">
           <ArrowLeft className="w-4 h-4" /> Barcha maqolalarga qaytish
         </Link>
       </div>
@@ -27,7 +27,7 @@ export function ArticleHeader({ post }: { post: BlogPostItem }) {
   return (
     <header className="space-y-4 max-w-4xl">
       <div className="flex flex-wrap items-center gap-3">
-        <span className="px-3.5 py-1 rounded-full text-xs font-mono font-bold bg-accent-soft text-accent border border-accent-line">{post.category}</span>
+        <span className="px-3.5 py-1 rounded-full text-xs font-mono font-bold bg-accent-soft text-accent border border-accent">{post.category}</span>
         <div className="flex items-center gap-1.5 text-xs font-mono text-ink-subtle"><Calendar className="w-3.5 h-3.5" /><span>{post.publishedAt}</span></div>
         <div className="flex items-center gap-1.5 text-xs font-mono text-ink-subtle"><Clock className="w-3.5 h-3.5 text-accent" /><span>{post.readTimeMin} daqiqa o'qish</span></div>
       </div>

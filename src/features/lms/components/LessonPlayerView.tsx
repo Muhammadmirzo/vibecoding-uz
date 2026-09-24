@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { ArrowLeft, Check, Copy, FileText, Send, VideoOff } from "lucide-react";
 import { Button } from "@/components/ui";
 import { VideoPlayer } from "@/features/lms/components/VideoPlayer";
@@ -28,6 +28,7 @@ export default function LessonPlayerView({ courseId, lessonId }: { courseId: str
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<Tab>("prompts");
   const [copied, setCopied] = useState(false);
+  const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
   useEffect(() => {
     let active = true;
     fetch(`/api/lms/lessons/${encodeURIComponent(lessonId)}`, { cache: "no-store" })
@@ -43,19 +44,22 @@ export default function LessonPlayerView({ courseId, lessonId }: { courseId: str
   const prompts = textItems(lesson.promptsJson);
   const materials = textItems(lesson.materialsJson);
   const tabs: Array<[Tab, string]> = [["prompts", "Promptlar"], ["konspekt", "Konspekt"], ["materials", "Materiallar"], ["homework", "Uy ishi"]];
+  function handleTabKeyDown(event: KeyboardEvent<HTMLButtonElement>, index: number) { let next: number | undefined; if (event.key === "ArrowRight") next = (index + 1) % tabs.length; if (event.key === "ArrowLeft") next = (index - 1 + tabs.length) % tabs.length; if (event.key === "Home") next = 0; if (event.key === "End") next = tabs.length - 1; if (next === undefined) return; event.preventDefault(); setTab(tabs[next][0]); tabRefs.current[next]?.focus(); }
   const copyPrompt = async (text: string) => { await navigator.clipboard.writeText(text); setCopied(true); window.setTimeout(() => setCopied(false), 1800); };
 
   return <div className="min-h-screen bg-bg text-ink"><KabinetNav /><main className="mx-auto w-full max-w-7xl space-y-6 px-5 pb-28 pt-24 md:px-8 md:pt-28 lg:pl-80 lg:pr-8">
     <div className="flex flex-wrap items-center justify-between gap-3 text-sm"><Link href="/kabinet" className="inline-flex min-h-11 items-center gap-1 font-semibold text-brand"><ArrowLeft className="h-4 w-4" aria-hidden="true" /> Kabinetga qaytish</Link><span className="max-w-full truncate text-ink-muted">{course.title} · {section.title}</span></div>
-    <h1 className="font-display text-2xl font-semibold text-ink md:text-3xl">{lesson.title}</h1>
+    <h1 className="break-words font-display text-2xl font-semibold text-ink md:text-3xl">{lesson.title}</h1>
     <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_300px]">
       <div className="min-w-0 space-y-6">
         {videoUrl ? <VideoPlayer videoUrl={videoUrl} title={lesson.title} /> : <div className="flex aspect-video flex-col items-center justify-center rounded-xl border border-border bg-bg-elevated p-6 text-center"><VideoOff className="mb-3 h-7 w-7 text-ink-muted" aria-hidden="true" /><h2 className="font-semibold text-ink">Video tez orada qo&apos;shiladi</h2><p className="mt-1 text-sm text-ink-muted">Dars matni va materiallari mavjud.</p></div>}
-        <div role="tablist" className="flex gap-1 overflow-x-auto border-b border-border text-sm font-semibold">{tabs.map(([id, label]) => <button key={id} type="button" role="tab" aria-selected={tab === id} onClick={() => setTab(id)} className={`min-h-11 shrink-0 border-b-2 px-4 py-2.5 ${tab === id ? "border-accent text-accent" : "border-transparent text-ink-muted"}`}>{label}</button>)}</div>
-        {tab === "prompts" ? <PromptList prompts={prompts} copied={copied} onCopy={copyPrompt} /> : null}
+        <div role="tablist" aria-label="Dars bo&apos;limlari" className="flex gap-1 overflow-x-auto border-b border-border text-sm font-semibold">{tabs.map(([id, label], index) => <button key={id} id={`lesson-tab-${id}`} ref={(element) => { tabRefs.current[index] = element; }} type="button" role="tab" aria-selected={tab === id} aria-controls={`lesson-panel-${id}`} tabIndex={tab === id ? 0 : -1} onKeyDown={(event) => handleTabKeyDown(event, index)} onClick={() => setTab(id)} className={`min-h-11 shrink-0 border-b-2 px-4 py-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${tab === id ? "border-accent text-accent" : "border-transparent text-ink-muted"}`}>{label}</button>)}</div>
+        <div role="tabpanel" id={`lesson-panel-${tab}`} aria-labelledby={`lesson-tab-${tab}`} tabIndex={0} className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
+         {tab === "prompts" ? <PromptList prompts={prompts} copied={copied} onCopy={copyPrompt} /> : null}
         {tab === "konspekt" ? <TextPanel text={lesson.contentMd || "Konspekt hozircha mavjud emas."} /> : null}
         {tab === "materials" ? <TextList items={materials} /> : null}
         {tab === "homework" ? <HomeworkPanel assignment={section.title} /> : null}
+         </div>
       </div>
       <aside className="rounded-xl border border-border bg-bg-elevated p-5"><h2 className="font-display text-base font-semibold text-ink">Kurs darslari</h2><div className="mt-4 space-y-2">{lessons.map((item) => <Link key={item.id} href={`/kabinet/kurs/${courseId}/dars/${item.id}`} className={`block rounded-lg border p-3 text-sm ${item.id === lesson.id ? "border-accent bg-accent-soft font-semibold text-ink" : "border-border text-ink-muted hover:border-brand"}`}><span className="block">{item.title}</span><span className="font-mono text-xs">{Math.round(item.durationSec / 60)} daq</span></Link>)}</div></aside>
     </div>
@@ -64,7 +68,7 @@ export default function LessonPlayerView({ courseId, lessonId }: { courseId: str
 
 function PromptList({ prompts, copied, onCopy }: { prompts: Array<{ title: string; content: string }>; copied: boolean; onCopy: (text: string) => void }) {
   if (!prompts.length) return <TextPanel text="Bu dars uchun promptlar hozircha mavjud emas." />;
-  return <div className="space-y-4">{prompts.map((prompt, index) => <div key={`${prompt.title}-${index}`} className="space-y-3 rounded-lg border border-border bg-bg-elevated p-4"><div className="flex items-center justify-between gap-3"><span className="text-sm font-semibold text-ink">{prompt.title}</span><Button type="button" variant="outline" size="sm" onClick={() => onCopy(prompt.content)}>{copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}{copied ? "Nusxalandi" : "Nusxalash"}</Button></div><pre className="whitespace-pre-wrap rounded-lg border border-border bg-bg-sunken p-3 font-mono text-sm text-ink-muted">{prompt.content}</pre></div>)}</div>;
+  return <div className="space-y-4">{prompts.map((prompt, index) => <div key={`${prompt.title}-${index}`} className="space-y-3 rounded-lg border border-border bg-bg-elevated p-4"><div className="flex items-center justify-between gap-3"><span className="text-sm font-semibold text-ink">{prompt.title}</span><span className="sr-only" aria-live="polite">{copied ? "Prompt nusxalandi" : ""}</span><Button type="button" variant="outline" size="sm" onClick={() => onCopy(prompt.content)}>{copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}{copied ? "Nusxalandi" : "Nusxalash"}</Button></div><pre className="whitespace-pre-wrap rounded-lg border border-border bg-bg-sunken p-3 font-mono text-sm text-ink-muted">{prompt.content}</pre></div>)}</div>;
 }
 function TextPanel({ text }: { text: string }) { return <div className="whitespace-pre-wrap rounded-xl border border-border bg-bg-elevated p-5 text-base leading-relaxed text-ink-muted">{text}</div>; }
 function TextList({ items }: { items: Array<{ title: string; content: string }> }) { return <div className="space-y-3">{items.length ? items.map((item, index) => <div key={`${item.title}-${index}`} className="rounded-lg border border-border bg-bg-elevated p-4"><h3 className="font-semibold text-ink">{item.title}</h3><p className="mt-2 break-all text-sm text-ink-muted">{item.content}</p></div>) : <TextPanel text="Materiallar hozircha mavjud emas." />}</div>; }

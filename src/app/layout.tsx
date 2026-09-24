@@ -114,6 +114,7 @@ export default async function RootLayout({
   return (
     <html lang="uz" suppressHydrationWarning className={`${onest.variable} ${unbounded.variable} ${instrumentSerif.variable} ${jetBrainsMono.variable}`}>
       <body className="antialiased">
+        <a href="#main" className="skip-to-content">Asosiy kontentga o'tish</a>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} themes={["light", "dark"]}>
           <AuthProvider initialUser={initialUser}>
             <Header />

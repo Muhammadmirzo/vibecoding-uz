@@ -38,7 +38,7 @@ export const SearchModal = React.memo(function SearchModal() {
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs animate-in fade-in-0 duration-150" />
         <Dialog.Content className="fixed left-1/2 top-[15%] z-50 w-full max-w-2xl -translate-x-1/2 px-4 focus:outline-none">
-          <div className="overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-cream)] shadow-[var(--shadow-xl)] flex flex-col">
+          <div className="overflow-hidden rounded-[var(--radius-xl)] border border-border bg-bg-elevated shadow-lg flex flex-col">
             <Dialog.Title className="sr-only">Qidiruv darchasi</Dialog.Title>
             <SearchInput
               query={search.query}
@@ -56,12 +56,12 @@ export const SearchModal = React.memo(function SearchModal() {
               onSelect={search.selectItem}
               onSelectIndex={search.setSelectedIndex}
             />
-            <div className="flex items-center justify-between px-4 py-2.5 bg-[var(--color-cream-warm)] border-t border-[var(--color-border)] text-[11px] text-[var(--color-ink-muted)] font-mono">
+            <div className="flex items-center justify-between px-4 py-2.5 bg-bg-sunken border-t border-border text-[11px] text-ink-muted font-mono">
               <div className="flex items-center gap-3">
-                <span><kbd className="px-1 py-0.5 rounded bg-[var(--color-cream)] border border-[var(--color-border)]">↑</kbd> <kbd className="px-1 py-0.5 rounded bg-[var(--color-cream)] border border-[var(--color-border)]">↓</kbd> tanlash</span>
-                <span><kbd className="px-1 py-0.5 rounded bg-[var(--color-cream)] border border-[var(--color-border)]">↵</kbd> o'tish</span>
+                <span><kbd className="px-1 py-0.5 rounded bg-bg-elevated border border-border">↑</kbd> <kbd className="px-1 py-0.5 rounded bg-bg-elevated border border-border">↓</kbd> tanlash</span>
+                <span><kbd className="px-1 py-0.5 rounded bg-bg-elevated border border-border">↵</kbd> o'tish</span>
               </div>
-              <div><kbd className="px-1 py-0.5 rounded bg-[var(--color-cream)] border border-[var(--color-border)]">ESC</kbd> yopish</div>
+              <div><kbd className="px-1 py-0.5 rounded bg-bg-elevated border border-border">ESC</kbd> yopish</div>
             </div>
           </div>
         </Dialog.Content>

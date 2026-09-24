@@ -21,7 +21,7 @@ export function CredentialsSettingsForm({
         <PasswordField id="confirm-password" label="Yangi parolni tasdiqlang" value={confirmPassword} onChange={setConfirmPassword} />
         <Button type="submit" disabled={passwordLoading} className="w-full">
           {passwordLoading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Lock className="h-4 w-4" aria-hidden="true" />}
-          Parolni yangilash
+          {passwordLoading ? "Yangilanmoqda…" : "Parolni yangilash"}
         </Button>
       </form>
     </section>
@@ -29,9 +29,9 @@ export function CredentialsSettingsForm({
 }
 
 function PasswordField({ id, label, value, onChange }: { id: string; label: string; value: string; onChange: (value: string) => void }) {
-  return <div><Label htmlFor={id}>{label}</Label><Input id={id} type="password" value={value} onChange={(event) => onChange(event.target.value)} required /></div>;
+  return <div><Label htmlFor={id}>{label}</Label><Input id={id} name={id} autoComplete={id === "current-password" ? "current-password" : "new-password"} type="password" value={value} onChange={(event) => onChange(event.target.value)} required /></div>;
 }
 
 function Status({ tone, children }: { tone: "success" | "error"; children: ReactNode }) {
-  return <div role="status" className={`mt-5 flex items-center gap-2 rounded-lg border p-3 text-sm font-semibold ${tone === "success" ? "border-success bg-success-soft text-success" : "border-danger bg-bg-sunken text-danger"}`}>{children}</div>;
+  return <div role={tone === "error" ? "alert" : "status"} aria-live={tone === "error" ? "assertive" : "polite"} className={`mt-5 flex items-center gap-2 rounded-lg border p-3 text-sm font-semibold ${tone === "success" ? "border-success bg-success-soft text-success" : "border-danger bg-bg-sunken text-danger"}`}>{children}</div>;
 }

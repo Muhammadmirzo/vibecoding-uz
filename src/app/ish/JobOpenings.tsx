@@ -50,7 +50,7 @@ export function JobOpenings({
         <div className="rounded-2xl border border-border bg-bg-elevated px-6 py-14 text-center">
           <h3 className="text-lg font-bold text-ink">Bu bo&apos;limda vakansiya yo&apos;q</h3>
           <p className="mt-2 text-sm text-ink-muted">Boshqa bo&apos;limlardagi ochiq imkoniyatlarni ko&apos;ring.</p>
-          <button type="button" onClick={() => onDepartmentChange("Barchasi")} className="btn-secondary mt-5 h-11 rounded-lg px-6 text-sm font-semibold">
+          <button type="button" onClick={() => onDepartmentChange("Barchasi")} className="mt-5 min-h-11 rounded-lg border border-border-strong bg-bg-elevated px-6 text-sm font-semibold text-ink hover:bg-bg-sunken">
             Boshqa bo&apos;limlarni ko&apos;ring
           </button>
         </div>
@@ -64,7 +64,7 @@ export function JobOpenings({
                   <span className="flex items-center gap-1 rounded-full border border-border bg-bg px-2.5 py-0.5 font-mono text-[11px] text-ink-subtle"><Clock className="h-3 w-3 text-accent" />{job.type}</span>
                   <span className="flex items-center gap-1 rounded-full border border-border bg-bg px-2.5 py-0.5 font-mono text-[11px] text-ink-subtle"><MapPin className="h-3 w-3 text-accent" />{job.location}</span>
                 </div>
-                <Link href={`/ish/${job.slug}`} className="block transition-colors group-hover:text-accent">
+                <Link href={`/ish/${job.slug}`} className="flex min-h-11 items-center transition-colors group-hover:text-accent">
                   <h3 className="text-xl font-bold text-ink md:text-2xl">{job.title}</h3>
                 </Link>
                 <p className="line-clamp-2 text-xs leading-relaxed text-ink-muted md:text-sm">{job.descriptionMd}</p>
@@ -74,10 +74,10 @@ export function JobOpenings({
                 <div className="text-center text-xs font-semibold text-ink-muted lg:text-left">
                   <span className="block">{job.title}</span><span className="font-normal">{job.department}</span>
                 </div>
-                <button type="button" onClick={() => onApply(job)} aria-label={`${job.title} — ${job.department} bo‘limiga ariza topshirish`} className="btn-primary inline-flex h-11 items-center justify-center gap-2 rounded-lg px-6 text-xs font-semibold">
+                <button type="button" onClick={() => onApply(job)} aria-label={`${job.title} — ${job.department} bo‘limiga ariza topshirish`} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-gold px-6 text-xs font-semibold text-ink hover:bg-gold-hover">
                   <Send className="h-3.5 w-3.5" /> Ariza topshirish
                 </button>
-                <Link href={`/ish/${job.slug}`} className="btn-secondary inline-flex h-11 w-full items-center justify-center gap-1.5 rounded-lg px-5 text-xs font-semibold">
+                <Link href={`/ish/${job.slug}`} className="inline-flex min-h-11 w-full items-center justify-center gap-1.5 rounded-lg border border-border-strong bg-bg-elevated px-5 text-xs font-semibold text-ink hover:bg-bg-sunken">
                   Batafsil ko&apos;rish <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
               </div>

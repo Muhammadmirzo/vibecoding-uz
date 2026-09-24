@@ -78,7 +78,7 @@ export function ActivityTable({ students, loading, onSelect, onReminder }: Props
                         </div>
                         <div className="w-full h-2 rounded-full bg-bg-sunken overflow-hidden border border-border/50">
                           <div
-                            className="h-full bg-accent rounded-full transition-all duration-500"
+                            className="h-full bg-accent rounded-full transition-[width] duration-500"
                             style={{ width: `${student.lessonProgressPercent}%` }}
                           />
                         </div>

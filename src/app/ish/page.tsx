@@ -62,7 +62,7 @@ export default function JobsPage() {
               Rezyumeingizni yuboring. Biz doim iqtidorli AI muhandislari, mentorlar va marketologlar bilan tanishishdan mamnunmiz.
             </p>
           </div>
-          <button type="button" onClick={() => setActiveModalJob(GENERAL_APPLICATION)} className="btn-secondary inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-lg px-8 text-xs font-semibold">
+          <button type="button" onClick={() => setActiveModalJob(GENERAL_APPLICATION)} className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-lg border border-border-strong bg-bg-elevated px-8 text-xs font-semibold text-ink hover:bg-bg-sunken">
             <Send className="h-4 w-4 text-accent" /> Rezyume Yuborish
           </button>
         </section>

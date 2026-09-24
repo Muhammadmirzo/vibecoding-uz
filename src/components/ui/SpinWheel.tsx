@@ -37,8 +37,8 @@ export function SpinWheel({ terms }: SpinWheelProps) {
   }, [terms, isSpinning]);
 
   return (
-    <div className="max-w-[720px] mx-auto mb-10 p-6 rounded-[var(--radius-xl)] bg-[var(--color-cream-warm)] border border-[var(--color-accent-line)] text-center space-y-4 shadow-[var(--shadow-sm)]">
-      <div className="flex items-center justify-center gap-2 text-xs font-mono font-bold text-[var(--color-accent)] uppercase">
+    <div className="max-w-[720px] mx-auto mb-10 p-6 rounded-[var(--radius-xl)] bg-bg-sunken border border-accent text-center space-y-4 shadow-[var(--shadow-sm)]">
+      <div className="flex items-center justify-center gap-2 text-xs font-mono font-bold text-accent uppercase">
         <Sparkles className="w-4 h-4" /> Interaktiv Tasodifiy Atama (Spin Wheel)
       </div>
 
@@ -46,23 +46,23 @@ export function SpinWheel({ terms }: SpinWheelProps) {
         type="button"
         onClick={handleSpinWheel}
         disabled={isSpinning}
-        className="btn-primary h-11 px-6 rounded-[var(--radius-md)] text-xs font-semibold inline-flex items-center gap-2 transition-transform active:scale-95 disabled:opacity-50"
+        className="min-h-11 rounded-lg bg-gold px-6 text-xs font-semibold text-ink inline-flex items-center gap-2 transition-transform active:scale-95 disabled:opacity-50"
       >
         <RotateCcw className={`w-4 h-4 ${isSpinning ? "animate-spin" : ""}`} />
         <span>{isSpinning ? "Tanlanmoqda..." : "Tasodifiy atamani tanlash"}</span>
       </button>
 
       {randomTerm && (
-        <div className="p-4 rounded-[var(--radius-lg)] bg-[var(--color-cream)] border border-[var(--color-border-strong)] text-left mt-4 space-y-1 animate-in fade-in-50 duration-200">
+        <div className="p-4 rounded-[var(--radius-lg)] bg-bg border border-border-strong text-left mt-4 space-y-1 animate-in fade-in-50 duration-200">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-bold text-[var(--color-ink)]">
+            <span className="text-sm font-bold text-ink">
               {randomTerm.termEn} ({randomTerm.termUz})
             </span>
-            <span className="text-xs font-mono text-[var(--color-accent)]">
+            <span className="text-xs font-mono text-accent">
               {randomTerm.category}
             </span>
           </div>
-          <p className="text-xs text-[var(--color-ink-muted)] leading-relaxed">
+          <p className="text-xs text-ink-muted leading-relaxed">
             {randomTerm.definition}
           </p>
         </div>

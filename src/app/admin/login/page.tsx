@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, Suspense } from "react";
+import React, { useEffect, useRef, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ShieldCheck, Lock, Mail, ArrowRight, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -17,6 +17,8 @@ function AdminLoginForm() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const errorRef = useRef<HTMLDivElement>(null);
+  useEffect(() => { if (error) errorRef.current?.focus(); }, [error]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -121,7 +123,7 @@ function AdminLoginForm() {
         </div>
 
         {error && (
-          <div id="admin-login-error" role="alert" className="flex items-start gap-2 p-3 rounded-lg bg-danger/10 border border-danger/20 text-danger text-xs font-medium">
+          <div ref={errorRef} tabIndex={-1} id="admin-login-error" role="alert" className="flex items-start gap-2 p-3 rounded-lg bg-danger/10 border border-danger/20 text-danger text-xs font-medium">
             <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
             <span>{error}</span>
           </div>
@@ -135,7 +137,7 @@ function AdminLoginForm() {
           {isLoading ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin" />
-              <span>Tekshirilmoqda...</span>
+              <span>Tekshirilmoqda…</span>
             </>
           ) : (
             <>
@@ -155,7 +157,7 @@ export default function AdminLoginPage() {
       <Suspense
         fallback={
           <div className="w-full max-w-md bg-bg-elevated border border-border-strong rounded-xl p-8 text-center text-sm font-mono text-ink-muted">
-            Yuklanmoqda...
+            Yuklanmoqda…
           </div>
         }
       >

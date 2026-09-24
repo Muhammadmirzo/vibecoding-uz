@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function DiagnostikaPage() {
   return (
-    <main className="bg-bg pb-20 pt-28">
+    <div className="bg-bg pb-20 pt-28">
       <Container>
         <div className="mx-auto mb-10 max-w-2xl space-y-4 text-center">
           <Badge variant="gold">2 daqiqa · {QUIZ_QUESTIONS.length} savol · bepul</Badge>
@@ -40,6 +40,6 @@ export default function DiagnostikaPage() {
           </div>
         </div>
       </Container>
-    </main>
+    </div>
   );
 }

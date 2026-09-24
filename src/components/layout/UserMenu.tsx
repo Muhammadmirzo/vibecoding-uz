@@ -20,7 +20,7 @@ export function UserMenu() {
   if (isLoading) return <div className="hidden h-10 w-10 shrink-0 animate-pulse rounded-full bg-bg-sunken md:block" aria-label="Profil yuklanmoqda" />;
   if (!user) {
     return (
-      <button type="button" onClick={() => openAuthModal("login")} className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border bg-bg-sunken text-ink transition-colors hover:bg-bg-sunken md:flex" title="Tizimga kirish" aria-label="Tizimga kirish">
+      <button type="button" onClick={() => openAuthModal("login")} className="hidden size-11 shrink-0 items-center justify-center rounded-full border border-border bg-bg-sunken text-ink transition-colors hover:bg-bg-sunken md:flex" title="Tizimga kirish" aria-label="Tizimga kirish">
         <LogIn className="h-4 w-4 text-accent" aria-hidden="true" />
       </button>
     );
@@ -39,7 +39,7 @@ function AuthenticatedMenu({ user, logout }: { user: User; logout: () => Promise
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
-        <button className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent text-xs font-bold text-white shadow-sm transition-opacity hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 md:flex" title={user.fullName} aria-label="Foydalanuvchi menyusi">
+        <button className="hidden size-11 shrink-0 items-center justify-center rounded-full bg-accent text-xs font-bold text-white shadow-sm transition-opacity hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 md:flex" title={user.fullName} aria-label="Foydalanuvchi menyusi">
           {getUserInitials(user.fullName)}
         </button>
       </DropdownMenu.Trigger>

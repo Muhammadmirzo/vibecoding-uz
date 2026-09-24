@@ -52,7 +52,7 @@ const FAQS = [
 
 export default function BepulDarsPage() {
   return (
-    <main className="bg-bg">
+    <div className="bg-bg">
       <Section eyebrow="Bepul video dars · 30 daqiqa" title="">
         <div className="grid items-start gap-10 lg:grid-cols-2">
           <div className="space-y-6">
@@ -167,6 +167,6 @@ export default function BepulDarsPage() {
           </Button>
         </div>
       </Section>
-    </main>
+    </div>
   );
 }

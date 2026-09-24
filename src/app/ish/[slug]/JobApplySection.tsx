@@ -25,7 +25,7 @@ export function JobApplySection({ job }: { job: JobOpeningItem }) {
             <p className="text-xs text-ink-muted leading-relaxed">
               Hurmatli <strong className="text-ink">{form.fullName}</strong>, ma'lumotlaringiz HR jamoamizga muvaffaqiyatli yetkazildi. Tez orada sizga qo'ng'iroq qilamiz.
             </p>
-            <button onClick={form.resetForAnotherApplication} className="btn-secondary h-10 px-6 rounded-lg text-xs font-semibold">Boshqa ariza topshirish</button>
+            <button onClick={form.resetForAnotherApplication} className="min-h-11 border border-border-strong bg-bg-elevated px-6 rounded-lg text-xs font-semibold text-ink hover:bg-bg-sunken">Boshqa ariza topshirish</button>
           </div>
         ) : (
           <InlineApplyFields form={form} />

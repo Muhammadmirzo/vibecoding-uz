@@ -53,7 +53,7 @@ export default async function CourseDetailPage({ params }: Props) {
   };
 
   return (
-    <main className="bg-bg">
+    <div className="bg-bg">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <Section eyebrow={course.level} title="">
         <div className="grid items-start gap-10 lg:grid-cols-[1fr_380px]">
@@ -208,7 +208,7 @@ export default async function CourseDetailPage({ params }: Props) {
         subtitle="Avval 2 daqiqalik diagnostikadan o'ting yoki bepul darsni ko'ring — keyin qaror qiling."
       />
       <StickyBuyBar price={pricing.price} title={course.title} />
-      <div className="h-16 lg:hidden" aria-hidden="true" />
-    </main>
+      <div className="h-[calc(5rem+env(safe-area-inset-bottom))] lg:hidden" aria-hidden="true" />
+    </div>
   );
 }

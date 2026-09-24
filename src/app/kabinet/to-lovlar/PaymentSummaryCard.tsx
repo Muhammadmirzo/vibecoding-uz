@@ -46,13 +46,14 @@ export function PaymentSummaryCard({
   const [provider, setProvider] = React.useState<PaymentProvider>(firstAvailable);
   const [paying, setPaying] = React.useState(false);
   const [message, setMessage] = React.useState("");
+  const [messageTone, setMessageTone] = React.useState<"status" | "alert">("status");
   const progress = computeInstallmentProgress(paidAmount, coursePrice);
   const outstanding = Math.max(coursePrice - paidAmount, 0);
   const anyProviderAvailable = providers.payme || providers.click;
 
   async function handlePay(): Promise<void> {
     setPaying(true);
-    setMessage("To'lov oynasi tayyorlanmoqda...");
+    setMessageTone("status"); setMessage("To'lov oynasi tayyorlanmoqda…");
     try {
       const response = await fetch("/api/payments/checkout", {
         method: "POST",
@@ -75,7 +76,7 @@ export function PaymentSummaryCard({
       }
       window.location.assign(data.checkoutUrl);
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Tarmoq xatosi yuz berdi");
+      setMessageTone("alert"); setMessage(error instanceof Error ? error.message : "Tarmoq xatosi yuz berdi");
       setPaying(false);
     }
   }
@@ -105,7 +106,7 @@ export function PaymentSummaryCard({
           </div>
           <div className="h-3 overflow-hidden rounded-full bg-bg-sunken" role="progressbar"
             aria-label="To'lov progressi" aria-valuenow={progress.percent} aria-valuemin={0} aria-valuemax={100}>
-            <div className="h-full rounded-full bg-accent transition-all" style={{ width: `${progress.percent}%` }} />
+            <div className="h-full rounded-full bg-accent transition-[width] duration-300" style={{ width: `${progress.percent}%` }} />
           </div>
           <p className="text-xs text-ink-muted">Bo'lib to'lash: {installmentText}</p>
         </div>
@@ -130,7 +131,7 @@ export function PaymentSummaryCard({
           </div>
         </fieldset>
 
-        <div className="mt-4 min-h-5" aria-live="polite" aria-atomic="true">
+        <div className={`mt-4 min-h-5 ${messageTone === "alert" ? "text-danger" : "text-ink"}`} role={messageTone} aria-live={messageTone === "alert" ? "assertive" : "polite"} aria-atomic="true">
           {message && <p className="text-xs text-ink">{message}</p>}
         </div>
         <Button
@@ -141,7 +142,7 @@ export function PaymentSummaryCard({
           className="mt-2 w-full text-base"
         >
           {paying ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <CreditCard className="h-4 w-4" aria-hidden="true" />}
-          {outstanding <= 0 ? "Kurs to'langan" : paying ? "To'lov tizimi ochilmoqda..." : `${formatUzs(outstanding)} to'lash`}
+          {outstanding <= 0 ? "Kurs to'langan" : paying ? "To'lov tizimi ochilmoqda…" : `${formatUzs(outstanding)} to'lash`}
         </Button>
       </section>
 

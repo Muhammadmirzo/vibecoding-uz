@@ -13,7 +13,9 @@ type FieldProps = {
 };
 
 function Field({ label, value, onChange, type = "text", required, disabled }: FieldProps) {
-  return <div><Label htmlFor={label}>{label}</Label><Input id={label} type={type} value={value} onChange={(event) => onChange(event.target.value)} required={required} disabled={disabled} /></div>;
+  const id = `profile-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+  const autoComplete = label === "F.I.SH." ? "name" : label === "Telefon" ? "tel" : label === "Email" ? "email" : label === "Avatar havolasi" ? "url" : undefined;
+  return <div><Label htmlFor={id}>{label}</Label><Input id={id} name={id} autoComplete={autoComplete} type={type} value={value} onChange={(event) => onChange(event.target.value)} required={required} disabled={disabled} /></div>;
 }
 
 export function ProfileSettingsForm(props: SettingsProfileState) {
@@ -48,7 +50,7 @@ export function ProfileSettingsForm(props: SettingsProfileState) {
         <div className="flex justify-end border-t border-border pt-5">
           <Button type="submit" disabled={profileLoading}>
             {profileLoading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Save className="h-4 w-4" aria-hidden="true" />}
-            O&apos;zgarishlarni saqlash
+            {profileLoading ? "Saqlanmoqda…" : "O&apos;zgarishlarni saqlash"}
           </Button>
         </div>
       </form>
@@ -57,5 +59,5 @@ export function ProfileSettingsForm(props: SettingsProfileState) {
 }
 
 function StatusMessage({ tone, children }: { tone: "success" | "error"; children: ReactNode }) {
-  return <div role="status" className={`mt-5 flex items-center gap-2 rounded-lg border p-3 text-sm font-semibold ${tone === "success" ? "border-success bg-success-soft text-success" : "border-danger bg-bg-sunken text-danger"}`}>{children}</div>;
+  return <div role={tone === "error" ? "alert" : "status"} aria-live={tone === "error" ? "assertive" : "polite"} className={`mt-5 flex items-center gap-2 rounded-lg border p-3 text-sm font-semibold ${tone === "success" ? "border-success bg-success-soft text-success" : "border-danger bg-bg-sunken text-danger"}`}>{children}</div>;
 }
