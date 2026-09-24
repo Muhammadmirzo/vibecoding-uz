@@ -34,7 +34,7 @@ const IMAGE_SOURCES = [
 export function contentSecurityPolicy(nonce: string): string {
   return [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' https://telegram.org https://oauth.telegram.org`,
+    `script-src 'self' 'nonce-${nonce}' https://telegram.org https://oauth.telegram.org${process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : ""}`,
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src 'self' https://fonts.gstatic.com data:",
     `img-src ${IMAGE_SOURCES}`,

@@ -53,7 +53,7 @@
 - `npx vitest run` — pass: **63 files, 494 passed, 1 skipped**.
 - `npm run build` — pass: **89 routes generated**.
 - New regression coverage: `src/__tests__/w4b-hardening.test.ts` covers nonce CSP, DB outage envelope, secret redaction/status, and canonical/JSON-LD serialization.
-- Playwright responsive suite was not rerun in this wave; no W3A-owned visual files were changed.
+- Playwright responsive suite was attempted on port 3207; the dev server was terminated by the harness timeout during the 132-test run, so it is not claimed green. The first run exposed a CSP nonce propagation issue; the middleware was corrected afterward and the dev server was stopped with `kill $(lsof -t -i:3207)`.
 
 ## Risks / follow-up
 

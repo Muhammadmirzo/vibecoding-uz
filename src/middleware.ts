@@ -55,6 +55,7 @@ export async function middleware(request: NextRequest) {
   if (!isAdminRoute && !isStudentCabinetRoute) {
     const publicRequestHeaders = new Headers(request.headers);
     publicRequestHeaders.set("x-nonce", nonce);
+    publicRequestHeaders.set("Content-Security-Policy", contentSecurityPolicy(nonce));
     return withSecurityHeaders(NextResponse.next({ request: { headers: publicRequestHeaders } }), nonce);
   }
 
@@ -115,6 +116,7 @@ export async function middleware(request: NextRequest) {
 
   const requestHeaders = new Headers(request.headers || {});
   requestHeaders.set("x-nonce", nonce);
+  requestHeaders.set("Content-Security-Policy", contentSecurityPolicy(nonce));
   requestHeaders.set("x-user-id", session.userId || "");
   requestHeaders.set("x-user-role", session.role || "student");
   requestHeaders.set("x-session-id", session.sessionId || session.userId || "");
