@@ -1,8 +1,20 @@
+import { z } from "zod";
 import { fail, ok } from "@/lib/api/v1/respond";
 import { requireAdmin } from "@/lib/auth/require-auth";
 import { analyticsRangeSchema, analyticsReportSchema } from "@/features/analytics/domain/report-types";
 import { getAnalyticsReport } from "@/features/analytics/server/analytics.service";
 import { drizzleAnalyticsRepository } from "@/features/analytics/server/analytics.repository";
+import { registerV1Route } from "@/lib/api/v1/registry";
+
+registerV1Route({
+  method: "get",
+  path: "/api/v1/admin/analytics/{report}",
+  security: [{ bearerAuth: [], cookieAuth: [] }],
+  tags: ["admin"],
+  summary: "Admin analitika hisoboti (from/to/granularity/metric/compare)",
+  request: { params: z.object({ report: analyticsReportSchema }) },
+  responses: { 200: { description: "Hisobot ma'lumotlari" }, 403: { description: "Faqat admin" } },
+});
 
 type Context = { params: Promise<{ report: string }> };
 

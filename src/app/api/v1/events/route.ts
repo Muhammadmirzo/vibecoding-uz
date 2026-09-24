@@ -10,6 +10,16 @@ import {
   ingestAnalyticsBatch,
   isAnalyticsBot,
 } from "@/features/analytics/server/ingest";
+import { registerV1Route } from "@/lib/api/v1/registry";
+
+registerV1Route({
+  method: "post",
+  path: "/api/v1/events",
+  tags: ["analytics"],
+  summary: "Birinchi tomon analitika hodisalari (batch, anonim tashrifchi cookie)",
+  request: { body: { content: { "application/json": { schema: analyticsBatchSchema } } } },
+  responses: { 200: { description: "Qabul qilindi" }, 403: { description: "CSRF" }, 429: { description: "Juda ko'p so'rov" } },
+});
 
 const MAX_BODY_BYTES = 16 * 1024;
 const VISITOR_COOKIE = "vibe_visitor";

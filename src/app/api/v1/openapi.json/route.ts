@@ -25,6 +25,8 @@ import "@/app/api/v1/homework/route";
 import "@/app/api/v1/push-devices/route";
 import "@/app/api/v1/push-devices/[id]/route";
 import "@/app/api/v1/app/config/route";
+import "@/app/api/v1/events/route";
+import "@/app/api/v1/admin/analytics/[report]/route";
 import "@/app/api/v1/docs/route";
 
 registerV1Route({
