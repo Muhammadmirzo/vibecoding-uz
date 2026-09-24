@@ -1,4 +1,6 @@
 import { eq } from "drizzle-orm";
+import { BRAND } from "@/config/brand";
+import { fetchWithTimeout } from "@/lib/http/fetch";
 import { db } from "@/db";
 import { users } from "@/db/schema";
 import {
@@ -7,6 +9,10 @@ import {
   HomeworkAlertInput,
   MeetReminderInput,
 } from "@/lib/validations";
+
+function escapeHtml(value: string): string {
+  return value.replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character] ?? character);
+}
 
 export async function sendTelegramMessage(
   chatId: string | number,
@@ -20,7 +26,7 @@ export async function sendTelegramMessage(
   }
 
   try {
-    const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+    const res = await fetchWithTimeout("Telegram", `https://api.telegram.org/bot${token}/sendMessage`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -29,7 +35,7 @@ export async function sendTelegramMessage(
         parse_mode: parseMode,
         disable_web_page_preview: false,
       }),
-    });
+    }, 8_000);
 
     const data: unknown = await res.json();
     return {
@@ -53,14 +59,14 @@ export async function sendHomeworkSubmissionAlert(input: HomeworkAlertInput) {
 
   let message = "";
   if (status === "submitted") {
-    message = `📩 <b>Topshiriq qabul qilindi!</b>\n\n"<b>${assignmentTitle}</b>" bo'yicha javobingiz qabul qilindi. Mentor tez orada tekshiradi.`;
+    message = `📩 <b>Topshiriq qabul qilindi!</b>\n\n"<b>${escapeHtml(assignmentTitle)}</b>" bo'yicha javobingiz qabul qilindi. Mentor tez orada tekshiradi.`;
   } else if (status === "approved") {
-    message = `🎉 <b>TABRIKLAYMIZ! TOPSHIRIQ QABUL QILINDI!</b>\n\n📚 <b>Mavzu:</b> ${assignmentTitle}\n⭐️ <b>Baho:</b> ${score ?? "-"}/10\n\n`;
-    if (feedbackMd) message += `💬 <b>Mentor fikri:</b>\n${feedbackMd}\n\n`;
-    message += `🚀 Keyingi amaliy darsingiz ochildi! Kabinetga kiring: https://master-2-jade.vercel.app/kabinet`;
+    message = `🎉 <b>TABRIKLAYMIZ! TOPSHIRIQ QABUL QILINDI!</b>\n\n📚 <b>Mavzu:</b> ${escapeHtml(assignmentTitle)}\n⭐️ <b>Baho:</b> ${score ?? "-"}/10\n\n`;
+    if (feedbackMd) message += `💬 <b>Mentor fikri:</b>\n${escapeHtml(feedbackMd)}\n\n`;
+    message += `🚀 Keyingi amaliy darsingiz ochildi! Kabinetga kiring: ${BRAND.url}/kabinet`;
   } else if (status === "rejected") {
-    message = `⚠️ <b>TOPSHIRIQ QAYTA ISHLASHGA QAYTARILDI</b>\n\n📚 <b>Mavzu:</b> ${assignmentTitle}\n⭐️ <b>Baho:</b> ${score ?? "-"}/10\n\n`;
-    if (feedbackMd) message += `💬 <b>Mentor fikri:</b>\n${feedbackMd}\n\n`;
+    message = `⚠️ <b>TOPSHIRIQ QAYTA ISHLASHGA QAYTARILDI</b>\n\n📚 <b>Mavzu:</b> ${escapeHtml(assignmentTitle)}\n⭐️ <b>Baho:</b> ${score ?? "-"}/10\n\n`;
+    if (feedbackMd) message += `💬 <b>Mentor fikri:</b>\n${escapeHtml(feedbackMd)}\n\n`;
     message += "Iltimos, izohlarni ko'rib chiqib, qayta topshiring.";
   }
 
@@ -74,9 +80,9 @@ export async function sendMeetReminder(input: MeetReminderInput) {
   const message = [
     "⏰ <b>JONLI MEET / VEBINAR ESLATMASI</b>",
     "",
-    `📌 <b>Mavzu:</b> ${title}`,
-    `📅 <b>Boshlanish vaqti:</b> ${dateStr}`,
-    meetingUrl ? `🔗 <b>Ulanish havolasi:</b> ${meetingUrl}` : "",
+    `📌 <b>Mavzu:</b> ${escapeHtml(title)}`,
+    `📅 <b>Boshlanish vaqti:</b> ${escapeHtml(dateStr)}`,
+    meetingUrl ? `🔗 <b>Ulanish havolasi:</b> ${escapeHtml(meetingUrl)}` : "",
     "",
     "Darsga o'z vaqtida qo'shiling!",
   ].filter(Boolean).join("\n");

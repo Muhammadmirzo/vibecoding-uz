@@ -13,6 +13,7 @@ const initialSettings: SettingsState = {
   paymeMerchantId: "", paymeSecretKey: "", clickServiceId: "", clickSecretKey: "", telegramBotToken: "", smsApiKey: "",
   enableGamification: true, enableCommunityForum: true, enableInteractiveQuizzes: true, enableB2BEnterprise: true, enableCardReferrals: true, enableLevelGating: true, enableGuaranteeTrust: true,
   credPhone: "", credEmail: "", oldPassword: "", newPassword: "", confirmPassword: "",
+  integrationStatus: { payme: "sozlanmagan", click: "sozlanmagan", telegram: "sozlanmagan", sms: "sozlanmagan" },
 };
 
 const boolKeys = ["maintenanceMode", "enableAnnouncementBanner", "enableGamification", "enableCommunityForum", "enableInteractiveQuizzes", "enableB2BEnterprise", "enableCardReferrals", "enableLevelGating", "enableGuaranteeTrust"] as const;
@@ -37,6 +38,7 @@ export function useSettings() {
         setSettings((current) => Object.fromEntries(Object.entries(current).map(([key, fallback]) => {
           const value = remote[key];
           if (value === undefined) return [key, fallback];
+          if (key === "integrationStatus" && isRecord(value)) return [key, value];
           if ((boolKeys as readonly string[]).includes(key)) return [key, Boolean(value)];
           if ((numberKeys as readonly string[]).includes(key)) return [key, Number(value)];
           return [key, String(value)];

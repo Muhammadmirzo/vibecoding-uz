@@ -22,7 +22,7 @@ export function CourseCheckoutCard({ price, oldPrice, installment, sessionFormat
 
   const handlePrimaryCta = () => {
     if (ctaState === "login") {
-      openAuthModal("login");
+      openAuthModal("login", "/kabinet/to-lovlar");
     } else if (ctaState === "checkout") {
       router.push("/kabinet/to-lovlar");
     }
@@ -56,7 +56,7 @@ export function CourseCheckoutCard({ price, oldPrice, installment, sessionFormat
           <ArrowRight className="size-4" aria-hidden="true" />
         </Button>
         <p className="text-sm leading-relaxed text-ink-muted">
-          To&apos;lov oynasi shu sahifada ochiladi — hisobingizga kirgan bo'lishingiz kifoya.
+          To&apos;lov oynasi `Kabinet → To&apos;lovlar` bo&apos;limida ochiladi — avval hisobingizga kiring.
         </p>
         <Button href="https://t.me/m/ODAfK_QIMjky" variant="secondary" className="w-full">
           <Send className="size-4 text-accent" aria-hidden="true" /> Telegram orqali maslahat

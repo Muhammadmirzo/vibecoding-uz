@@ -2,6 +2,7 @@ import { withTransactionLock } from "@/db";
 import { ServiceError } from "@/lib/http/errors";
 import type { AuditLogsQuery, SiteSettingsInput } from "@/lib/validations/admin";
 import type { AdminRepository, AuditLogItem, DbExecutor } from "./admin.repository";
+import { siteConfig } from "@/lib/siteConfig";
 
 /**
  * Admin read-only concerns (audit logs) plus site-settings management.
@@ -16,14 +17,10 @@ export const DEFAULT_SETTINGS: Record<string, unknown> = {
   defaultCoursePrice: "2990000.00",
   installmentRate3Months: 0,
   installmentRate6Months: 10,
-  guaranteeRefundDays: 14,
-  guaranteeTextUz: "14 kun davomida o'quv dasturi ma'qul kelmasa, to'lov 100% holatda hech qanday savollarsiz qaytarib beriladi.",
+  guaranteeRefundDays: siteConfig.guaranteeDays,
+  guaranteeTextUz: siteConfig.guaranteeSummary,
   paymeMerchantId: "",
-  paymeSecretKey: "",
   clickServiceId: "",
-  clickSecretKey: "",
-  telegramBotToken: "",
-  smsApiKey: "",
   headerCtaText: "Kurs tanlash",
   headerCtaLink: "/#kurs-tanlash",
   enrollmentUrl: "/kabinet",
@@ -44,10 +41,28 @@ export async function listAuditLogs(repo: AdminRepository, query: AuditLogsQuery
   return repo.listAuditLogs({ action: query.action, search: query.search, limit: query.limit });
 }
 
+const SECRET_SETTING_KEYS = new Set(["paymeSecretKey", "clickSecretKey", "telegramBotToken", "smsApiKey"]);
+
+export type IntegrationStatus = { payme: "sozlangan" | "sozlanmagan"; click: "sozlangan" | "sozlanmagan"; telegram: "sozlangan" | "sozlanmagan"; sms: "sozlangan" | "sozlanmagan" };
+
+export function getIntegrationStatus(): IntegrationStatus {
+  const configured = (values: Array<string | undefined>) => values.every((value) => Boolean(value?.trim()));
+  return {
+    payme: configured([process.env.PAYME_MERCHANT_ID, process.env.PAYME_KEY]) ? "sozlangan" : "sozlanmagan",
+    click: configured([process.env.CLICK_SERVICE_ID, process.env.CLICK_MERCHANT_ID, process.env.CLICK_SECRET_KEY]) ? "sozlangan" : "sozlanmagan",
+    telegram: configured([process.env.TELEGRAM_BOT_TOKEN]) ? "sozlangan" : "sozlanmagan",
+    sms: configured([process.env.ESKIZ_API_KEY]) ? "sozlangan" : "sozlanmagan",
+  };
+}
+
 export async function getSettings(repo: AdminRepository): Promise<Record<string, unknown>> {
   const rows = await repo.getAllSettings();
   const merged: Record<string, unknown> = { ...DEFAULT_SETTINGS };
-  for (const row of rows) merged[row.key] = row.value;
+  for (const row of rows) {
+    if (SECRET_SETTING_KEYS.has(row.key)) continue;
+    merged[row.key] = row.value;
+  }
+  merged.integrationStatus = getIntegrationStatus();
   return merged;
 }
 

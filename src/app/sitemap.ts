@@ -1,9 +1,9 @@
 import type { MetadataRoute } from "next";
 import { siteConfig } from "@/lib/siteConfig";
 import { STATIC_BLOG_POSTS } from "@/features/blog/blogData";
+import { BRAND } from "@/config/brand";
 
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://academy.mirzo.uz";
-const baseUrl = new URL(siteUrl);
+const baseUrl = new URL(BRAND.url);
 
 const staticRoutes: MetadataRoute.Sitemap = [
   "",
@@ -23,7 +23,6 @@ const staticRoutes: MetadataRoute.Sitemap = [
   "/offerta",
 ].map((path, index) => ({
   url: new URL(path, baseUrl).toString(),
-  lastModified: new Date(),
   changeFrequency: index === 0 ? "weekly" : "monthly",
   priority: index === 0 ? 1 : 0.7,
 }));
@@ -31,7 +30,6 @@ const staticRoutes: MetadataRoute.Sitemap = [
 export default function sitemap(): MetadataRoute.Sitemap {
   const courseEntries: MetadataRoute.Sitemap = Object.keys(siteConfig.courses).map((slug) => ({
     url: new URL(`/kurs/${slug}`, baseUrl).toString(),
-    lastModified: new Date(),
     changeFrequency: "weekly",
     priority: 0.9,
   }));

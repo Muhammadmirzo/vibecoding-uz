@@ -1,13 +1,14 @@
 import type { MetadataRoute } from "next";
+import { BRAND } from "@/config/brand";
 
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://academy.mirzo.uz";
+const siteUrl = BRAND.url;
 
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/admin", "/api/", "/kabinet"],
+      disallow: ["/admin", "/api/", "/kabinet", "/design-system"],
     },
     sitemap: new URL("/sitemap.xml", siteUrl).toString(),
     host: siteUrl,

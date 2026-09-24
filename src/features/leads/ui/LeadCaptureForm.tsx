@@ -4,6 +4,7 @@ import * as React from "react";
 import { z } from "zod";
 import { ArrowRight, Loader2, Send } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { fetchWithTimeout } from "@/lib/http/fetch";
 import { FieldError, Input, Label } from "@/components/ui/Form";
 import { SuccessCheck } from "@/features/motion/ui/SuccessCheck";
 import {
@@ -93,7 +94,7 @@ export function LeadCaptureForm({
     setErrors({});
     setLoading(true);
     try {
-      const response = await fetch("/api/quiz", {
+      const response = await fetchWithTimeout("So'rov", "/api/quiz", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -104,10 +105,10 @@ export function LeadCaptureForm({
           quizAnswers: quizAnswers ?? undefined,
           recommendedCourseId: recommendedCourseId ?? undefined,
         }),
-      });
+      }, 10_000);
       if (!response.ok) {
-        const data = (await response.json().catch(() => null)) as { error?: string } | null;
-        setServerError(data?.error ?? "Yuborishda xatolik yuz berdi. Qayta urinib ko'ring.");
+        const data = (await response.json().catch(() => null)) as { error?: string; message?: string } | null;
+        setServerError(data?.message ?? data?.error ?? "So'rov qabul qilinmadi. Ma'lumotlaringiz shu yerde saqlangan; qayta urinib ko'ring.");
         return;
       }
       setDone(true);
@@ -146,9 +147,10 @@ export function LeadCaptureForm({
         <p className="text-sm text-ink-muted">{description}</p>
       </div>
       {serverError && (
-        <p role="alert" className="rounded-md border border-danger/30 bg-danger-soft px-4 py-3 text-sm font-semibold text-danger">
-          {serverError}
-        </p>
+        <div role="alert" className="rounded-md border border-danger/30 bg-danger-soft px-4 py-3 text-sm font-semibold text-danger">
+          <p>{serverError}</p>
+          {revealUrl ? <Button href={revealUrl} variant="telegram" size="sm" className="mt-3">Telegram orqali murojaat qilish</Button> : null}
+        </div>
       )}
       <div>
         <Label htmlFor={`lead-name-${source}`}>Ismingiz</Label>

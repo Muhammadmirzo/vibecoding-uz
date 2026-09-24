@@ -7,6 +7,7 @@ import {
   DripUnlockEmailInput,
 } from "@/lib/validations/email";
 import { BRAND } from "@/config/brand";
+import { fetchWithTimeout } from "@/lib/http/fetch";
 
 export interface SendEmailResult {
   success: boolean;
@@ -26,18 +27,15 @@ export async function sendEmail(input: SendEmailInput): Promise<SendEmailResult>
   const toList = Array.isArray(validated.to) ? validated.to : [validated.to];
 
   if (!apiKey) {
-    console.warn(
-      `[Email Mock] To: ${toList.join(", ")} | From: ${fromEmail} | Subject: "${validated.subject}"`
-    );
-    return {
-      success: true,
-      id: `mock-email-${Date.now()}`,
-      mock: true,
-    };
+    if (process.env.NODE_ENV === "production") {
+      return { success: false, error: "Email xizmati sozlanmagan" };
+    }
+    console.warn(`[Email Mock] To: ${toList.join(", ")} | Subject: "${validated.subject}"`);
+    return { success: true, id: `mock-email-${Date.now()}`, mock: true };
   }
 
   try {
-    const res = await fetch("https://api.resend.com/emails", {
+    const res = await fetchWithTimeout("Email", "https://api.resend.com/emails", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
@@ -51,7 +49,7 @@ export async function sendEmail(input: SendEmailInput): Promise<SendEmailResult>
         text: validated.text,
         reply_to: validated.replyTo,
       }),
-    });
+    }, 8_000);
 
     const data = (await res.json()) as { id?: string; message?: string; name?: string };
 

@@ -3,6 +3,7 @@ import { errorResponse, okResponse } from "@/lib/http/errors";
 import { siteSettingsSchema } from "@/lib/validations";
 import { drizzleAdminRepository } from "@/features/crm/server/admin.repository";
 import { getSettings, updateSettings } from "@/features/crm/server/admin.service";
+import { getClientIp } from "@/lib/security/rateLimit";
 
 const repo = drizzleAdminRepository;
 
@@ -22,9 +23,9 @@ export async function POST(request: Request) {
     const auth = await requireAdmin(request);
     if (!auth.ok) return auth.response;
     const body = siteSettingsSchema.parse(await request.json());
-    const ip = request.headers.get("x-forwarded-for") || "127.0.0.1";
-    const settings = await updateSettings(repo, body, { ip });
-    return okResponse({ success: true, settings });
+    const ip = getClientIp(request);
+    await updateSettings(repo, body, { ip });
+    return okResponse({ success: true, settings: await getSettings(repo) });
   } catch (error) {
     return errorResponse(error);
   }

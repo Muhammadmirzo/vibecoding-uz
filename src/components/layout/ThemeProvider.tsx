@@ -3,6 +3,7 @@
 import * as React from "react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 
+/** `nonce` is required: the CSP blocks next-themes' pre-hydration script without it. */
 export function ThemeProvider({
   children,
   ...props

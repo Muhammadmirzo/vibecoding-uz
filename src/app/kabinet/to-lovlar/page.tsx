@@ -6,6 +6,7 @@ import { Button } from "@/components/ui";
 import { KabinetNav } from "@/features/lms/components/KabinetNav";
 import { KabinetPageHeader, KabinetSkeleton } from "@/features/lms/components/KabinetPage";
 import { siteConfig } from "@/lib/siteConfig";
+import { fetchWithTimeout } from "@/lib/http/fetch";
 import type { PaymentRecord, PaymentsResponse } from "@/features/payments/format";
 import { PaymentSummaryCard } from "./PaymentSummaryCard";
 import { PaymentHistorySection } from "./PaymentHistorySection";
@@ -42,12 +43,13 @@ export default function ToLovlarPage() {
     setLoading(true);
     setError("");
     try {
-      const response = await fetch("/api/me/payments", { cache: "no-store" });
+      const response = await fetchWithTimeout("To'lovlar", "/api/me/payments", { cache: "no-store" }, 10_000);
       const body: unknown = await response.json();
       if (!response.ok) {
-        throw new Error(typeof body === "object" && body !== null && "error" in body && typeof body.error === "string"
-          ? body.error
-          : "To'lovlarni yuklab bo'lmadi");
+        const message = typeof body === "object" && body !== null && "message" in body && typeof body.message === "string"
+          ? body.message
+          : "To'lovlarni yuklab bo'lmadi";
+        throw new Error(message);
       }
       if (!isPaymentsResponse(body)) throw new Error("To'lovlar javobi noto'g'ri");
       setData(body);

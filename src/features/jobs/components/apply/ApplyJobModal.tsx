@@ -32,10 +32,11 @@ export function ApplyJobModal({ isOpen, onClose, job }: ApplyJobModalProps) {
               <div className="w-16 h-16 rounded-full bg-success-soft text-success flex items-center justify-center mx-auto">
                 <CheckCircle2 className="w-9 h-9" />
               </div>
-              <h3 className="text-2xl font-extrabold text-ink">Arizangiz qabul qilindi!</h3>
+              <h3 className="text-2xl font-extrabold text-ink">Arizangiz qabul qilindi</h3>
               <p className="text-xs md:text-sm text-ink-muted max-w-sm mx-auto leading-relaxed">
-                Rahmat, <strong className="text-ink">{form.fullName}</strong>. Bizning HR jamoamiz 24 soat ichida <strong className="text-ink">{form.phone}</strong> raqami yoki Telegram orqali siz bilan bog'lanadi.
+                Rahmat, <strong className="text-ink">{form.fullName}</strong>. Ariza saqlandi. HR jamoasi bilan aloqa jarayoni alohida boshqariladi.
               </p>
+              <p className="font-mono text-[11px] text-ink-subtle">Kvitansiya: {form.receiptId}</p>
               <div className="pt-4">
                 <button onClick={onClose} className="min-h-11 rounded-lg bg-gold px-8 text-xs font-semibold text-ink">Tushunarli</button>
               </div>

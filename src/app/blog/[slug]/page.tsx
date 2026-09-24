@@ -9,12 +9,11 @@ import { RelatedPosts } from "@/features/blog/RelatedPosts";
 import { ShareProvider } from "@/features/blog/ShareActions";
 import { ScrollProgress } from "@/features/motion/ui/ScrollProgress";
 import { NextStepCTA } from "@/components/ui/NextStepCTA";
+import { articleJsonLd, routeMetadata, serializeJsonLd } from "@/lib/seo";
 
 interface Props {
   params: Promise<{ slug: string }>;
 }
-
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://academy.mirzo.uz";
 
 export function generateStaticParams() {
   return STATIC_BLOG_POSTS.map(({ slug }) => ({ slug }));
@@ -26,21 +25,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!post) return { title: "Maqola topilmadi" };
 
   const canonical = `/blog/${post.slug}`;
-  return {
-    title: post.title,
-    description: post.excerpt,
-    alternates: { canonical },
-    openGraph: {
-      type: "article",
-      url: canonical,
-      title: post.title,
-      description: post.excerpt,
-      publishedTime: post.publishedAt,
-      authors: [post.authorName],
-      tags: post.tags,
-      images: [{ url: post.coverUrl, alt: post.title }],
-    },
-  };
+  const metadata = routeMetadata({ title: post.title, description: post.excerpt, path: canonical });
+  return { ...metadata, openGraph: { ...metadata.openGraph, type: "article", publishedTime: post.publishedAt, authors: [post.authorName], tags: post.tags, images: [{ url: post.coverUrl, alt: post.title }] } };
 }
 
 export default async function BlogPostDetailPage({ params }: Props) {
@@ -50,22 +36,13 @@ export default async function BlogPostDetailPage({ params }: Props) {
 
   const toc = extractTocFromMarkdown(post.contentMd);
   const relatedPosts = STATIC_BLOG_POSTS.filter((item) => item.slug !== post.slug).slice(0, 2);
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: post.title,
-    description: post.excerpt,
-    image: post.coverUrl,
-    datePublished: post.publishedAt,
-    author: { "@type": "Person", name: post.authorName },
-    publisher: { "@type": "Organization", name: "Naqsh" },
-    mainEntityOfPage: `${siteUrl}/blog/${post.slug}`,
-  };
+  const jsonLd = articleJsonLd({ title: post.title, description: post.excerpt, image: post.coverUrl, publishedAt: post.publishedAt, author: post.authorName, path: `/blog/${post.slug}` });
 
   return (
     <ShareProvider>
     <div className="pt-28 pb-20 min-h-screen bg-bg text-ink">
-      <ScrollProgress />      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
+      <ScrollProgress />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }} />
       <div className="mx-auto w-full max-w-[1360px] px-5 md:px-8 lg:px-10 space-y-8">
         <ArticleBreadcrumb title={post.title} />
         <ArticleHeader post={post} />

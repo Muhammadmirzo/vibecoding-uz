@@ -9,33 +9,58 @@ export const SECURITY_HEADERS: Record<string, string> = {
   "X-Content-Type-Options": "nosniff",
   "Referrer-Policy": "strict-origin-when-cross-origin",
   "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=()",
-  // CSP is intentionally permissive enough for Next.js runtime chunks,
-  // next/font (Google Fonts) and the Telegram Login widget, while still
-  // blocking object/plugins and constraining frame/script sources.
   "Content-Security-Policy": [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://telegram.org https://oauth.telegram.org",
+    "script-src 'self' 'nonce-runtime' https://telegram.org https://oauth.telegram.org",
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src 'self' https://fonts.gstatic.com data:",
-    "img-src 'self' data: blob: https:",
+    "img-src 'self' data: blob: https://images.unsplash.com https://*.vercel.app",
     "connect-src 'self' https://api.telegram.org",
-    "frame-src https://oauth.telegram.org https://telegram.org",
+    "frame-src https://oauth.telegram.org",
+    "object-src 'none'", "base-uri 'self'", "form-action 'self'", "frame-ancestors 'none'",
+  ].join("; "),
+  // CSP is generated per request with a nonce in middleware.
+};
+
+const IMAGE_SOURCES = [
+  "'self'", "data:", "blob:",
+  "https://images.unsplash.com", "https://academy.mirzo.uz", "https://chatla.uz",
+  "https://edubaza.uz", "https://fastform.uz", "https://imkonday.uz",
+  "https://legalbot.uz", "https://shopspeed.uz", "https://viberesume.uz",
+  "https://*.vercel.app",
+].join(" ");
+
+/** Builds a nonce-based CSP. Script `unsafe-inline` and `unsafe-eval` are forbidden. */
+export function contentSecurityPolicy(nonce: string): string {
+  return [
+    "default-src 'self'",
+    `script-src 'self' 'nonce-${nonce}' https://telegram.org https://oauth.telegram.org${process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : ""}`,
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "font-src 'self' https://fonts.gstatic.com data:",
+    `img-src ${IMAGE_SOURCES}`,
+    "connect-src 'self' https://api.telegram.org",
+    "frame-src https://oauth.telegram.org",
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",
-  ].join("; "),
-};
+    "frame-ancestors 'none'",
+  ].join("; ");
+}
 
 type HeadersLike = { set(name: string, value: string): void };
 
 /** Applies the shared security headers to any headers-like object. */
-export function applySecurityHeaders<T extends HeadersLike>(target: T): T {
+export function applySecurityHeaders<T extends HeadersLike>(target: T, nonce?: string): T {
   for (const [name, value] of Object.entries(SECURITY_HEADERS)) {
     try {
       target.set(name, value);
     } catch {
       // Ignore read-only headers implementations.
     }
+  }
+  if (nonce) {
+    try { target.set("Content-Security-Policy", contentSecurityPolicy(nonce)); }
+    catch { /* Ignore read-only headers implementations. */ }
   }
   return target;
 }

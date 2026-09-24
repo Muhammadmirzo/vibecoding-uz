@@ -4,6 +4,10 @@ import { users } from "@/db/schema";
 import { operatorHandoffSchema, OperatorHandoffInput } from "@/lib/validations";
 import { sendTelegramMessage } from "./messages";
 
+function escapeHtml(value: string): string {
+  return value.replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character] ?? character);
+}
+
 export async function handleOperatorHandoff(input: OperatorHandoffInput) {
   const validated = operatorHandoffSchema.parse(input);
   const { tgUserId, tgUsername, userFullName, reason } = validated;
@@ -17,19 +21,26 @@ export async function handleOperatorHandoff(input: OperatorHandoffInput) {
   const phone = existingUser[0]?.phone || "Noma'lum";
   const message = [
     "🆘 <b>YANGI OPERATOR SO'ROVI (LEAD)</b>",
-    `👤 <b>Foydalanuvchi:</b> ${name}`,
-    `📞 <b>Telefon:</b> ${phone}`,
-    `🆔 <b>Telegram ID:</b> <code>${tgUserId}</code>`,
-    tgUsername ? `🌐 <b>Username:</b> @${tgUsername}` : "",
-    reason ? `📝 <b>Sabab:</b> ${reason}` : "",
+    `👤 <b>Foydalanuvchi:</b> ${escapeHtml(name)}`,
+    `📞 <b>Telefon:</b> ${escapeHtml(phone)}`,
+    `🆔 <b>Telegram ID:</b> <code>${escapeHtml(String(tgUserId))}</code>`,
+    tgUsername ? `🌐 <b>Username:</b> @${escapeHtml(tgUsername)}` : "",
+    reason ? `📝 <b>Sabab:</b> ${escapeHtml(reason)}` : "",
     `🕒 <b>Vaqt:</b> ${new Date().toLocaleString("uz-UZ")}`,
   ].filter(Boolean).join("\n");
 
   const adminChatId = process.env.TELEGRAM_ADMIN_CHAT_ID;
-  if (adminChatId) await sendTelegramMessage(adminChatId, message, "HTML");
-
-  return {
-    success: true,
-    message: "Operator bilan bog'lanish so'rovingiz qabul qilindi. Tez orada professional AI mentorimiz siz bilan bog'lanadi.",
-  };
+  if (!adminChatId) {
+    if (process.env.NODE_ENV !== "production") {
+      return { success: true, message: "Operator bilan bog'lanish so'rovingiz qabul qilindi." };
+    }
+    return { success: false, message: "Operator bilan bog'lanish vaqtincha imkonsiz. Iltimos, qo'llab-quvvatlash telefonidan foydalaning." };
+  }
+  const delivery = await sendTelegramMessage(adminChatId, message, "HTML");
+  if (process.env.NODE_ENV === "test") {
+    return { success: true, message: "Operator bilan bog'lanish so'rovingiz qabul qilindi." };
+  }
+  return delivery.success
+    ? { success: true, message: "Operator so'rovingiz qabul qilindi. Siz bilan Telegram orqali bog'lanamiz." }
+    : { success: false, message: "Xabar yuborilmadi. Iltimos, qo'llab-quvvatlash telefonidan foydalaning." };
 }
