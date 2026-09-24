@@ -32,7 +32,7 @@ export const db = drizzle(client, { schema });
 export function serializeDateParam(value: unknown): unknown {
   return value instanceof Date ? value.toISOString() : value;
 }
-for (const type of ["1184", "1082", "1083", "1114"]) {
+for (const type of [1184, 1082, 1083, 1114]) {
   client.options.serializers[type] = serializeDateParam;
 }
 
