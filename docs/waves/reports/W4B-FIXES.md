@@ -61,3 +61,7 @@
 - Configure and rotate provider credentials in the deployment environment. Historical credentials exposed through the old admin settings surface should be rotated by the owner.
 - Course checkout still redirects to the existing cabinet payment screen after auth; a full cart/intent persistence workflow remains a future enhancement.
 - The admin activity control is now explicitly a local draft signal; a real queued delivery workflow remains future work.
+
+## Orchestrator review (2026-09-24)
+- **Rejected fail-closed rate limiting.** Production threw when Upstash Redis was missing/down; Upstash is NOT configured on Vercel, so login, OTP, leads and the Telegram webhook would all have failed after deploy. Now degrades to per-instance memory limits with a one-time warning (antifragile). Regression test: `src/__tests__/hardening/rate-limit-degrade.test.ts`.
+- **Theme script blocked by CSP.** next-themes' pre-hydration inline script had no nonce → blocked → light flash for dark-mode users. Root layout now reads `x-nonce` and passes it to `ThemeProvider`. Verified on `next start`: every executable `<script>` carries the nonce (only non-executable `application/ld+json` has none).

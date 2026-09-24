@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Onest, Instrument_Serif, JetBrains_Mono, Unbounded } from "next/font/google";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import "./globals.css";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import { Header } from "@/components/layout/Header";
@@ -100,12 +100,14 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const initialUser = await getInitialUser();
+  // Per-request CSP nonce set by middleware; inline scripts need it to run.
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
 
   return (
     <html lang="uz" suppressHydrationWarning className={`${onest.variable} ${unbounded.variable} ${instrumentSerif.variable} ${jetBrainsMono.variable}`}>
       <body className="antialiased">
         <a href="#main" className="skip-to-content">Asosiy kontentga o'tish</a>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} themes={["light", "dark"]}>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} themes={["light", "dark"]} nonce={nonce}>
           <AuthProvider initialUser={initialUser}>
             <Header />
             <main id="main">{children}</main>

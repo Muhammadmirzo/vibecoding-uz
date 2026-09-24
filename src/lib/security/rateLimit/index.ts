@@ -24,15 +24,19 @@ export async function checkRateLimit(
   const windowMs = windowSeconds * 1000;
   const key = `ratelimit:${prefix}:${safeIdentifier}`;
 
-  if (process.env.NODE_ENV === "production" &&
-      (!process.env.UPSTASH_REDIS_REST_URL?.trim() || !process.env.UPSTASH_REDIS_REST_TOKEN?.trim())) {
-    throw new Error("Rate limit service is not configured");
-  }
+  // Antifragile: Redis (shared across instances) is preferred, but a missing or
+  // failing Redis must never take login/OTP/leads/webhooks down — degrade to the
+  // per-instance limiter and say so once in the logs.
   const redisResult = await checkRedisRateLimit(key, limit, windowSeconds, now);
-  if (process.env.NODE_ENV === "production" && !redisResult) {
-    throw new Error("Rate limit service is temporarily unavailable");
-  }
+  if (!redisResult && process.env.NODE_ENV === "production") warnMemoryFallbackOnce();
   return redisResult || checkMemoryRateLimit(key, limit, windowMs, now);
+}
+
+let warnedMemoryFallback = false;
+function warnMemoryFallbackOnce() {
+  if (warnedMemoryFallback) return;
+  warnedMemoryFallback = true;
+  console.warn("[rate-limit] Upstash Redis unavailable or not configured — using per-instance memory limits");
 }
 
 const IPV4 = /^(?:\d{1,3}\.){3}\d{1,3}$/;
