@@ -74,3 +74,10 @@ The home first request is lower despite the layout remaining dynamic. Motion set
 - Mobile simulated LCP still needs a dedicated pass. The next highest-value work is reducing initial home/blog hydration (Roadmap, pointer effects, and global reveal observers) without removing their motion or SSR final state.
 - The service worker intentionally does not provide offline HTML; this is the safe behavior for nonce CSP plus authenticated shell HTML.
 - Public DB-backed reads should continue to use cached repositories and fail-safe fallbacks if future routes introduce them.
+
+## Orchestrator review (2026-09-24)
+- **Reverted per-instance motion settings.** Module-level state + `after()` refresh meant every cold serverless instance served DEFAULT_MOTION first, so an admin "O'chiq" was ignored by some visitors for up to 5 min. Back to the shared Data Cache read (`unstable_cache`, invalidated by `revalidateTag`) bounded by a 300 ms timeout — warm hits are ~1 ms.
+- **Mobile LCP "3.6 s" was a Lantern simulation artefact.** With applied (devtools) throttling the real numbers exposed the actual problem instead: **CLS 0.451** on mobile.
+  - Hero paragraph shift 0.184 — web-font swap (`display: swap`). Fix: Onest + Unbounded `display: "optional"` (next/font size-adjusted fallbacks).
+  - Footer shift 0.267 — root `loading.tsx` skeleton was `min-h-[60vh]`, so the footer painted above the fold and jumped when the page streamed in. Fix: `min-h-[100dvh]`.
+- **After (mobile, devtools throttling):** `/` FCP 1.7 s · LCP 2.1 s · TBT 230 ms · **CLS 0**; `/kurs/vibe-coding-express` FCP 1.7 s · LCP 2.1 s · TBT 210 ms · **CLS 0**. Responsive suite 132/132.

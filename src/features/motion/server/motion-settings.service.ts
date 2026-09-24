@@ -1,12 +1,11 @@
 import { unstable_cache, revalidateTag } from "next/cache";
-import { after } from "next/server";
 import { motionSettingsRepository } from "./motion-settings.repository";
 import { DEFAULT_MOTION, motionSettingsSchema, type MotionSettings } from "../domain/settings";
 
 const MOTION_CACHE_KEY = "motion-settings";
-const REFRESH_INTERVAL_MS = 300_000;
-let currentMotionSettings = DEFAULT_MOTION;
-let lastRefreshAttempt = 0;
+// A warm Data Cache hit returns in ~1 ms; only a cold miss touches the DB.
+// Never let a slow/down DB hold the root layout longer than this.
+const READ_TIMEOUT_MS = 300;
 
 function parseStored(value: unknown): MotionSettings {
   const result = motionSettingsSchema.safeParse(value);
@@ -25,34 +24,31 @@ const readCached = unstable_cache(
   { tags: [MOTION_CACHE_KEY], revalidate: 300 },
 );
 
-/** Refreshes motion settings outside the request's blocking render path. */
+/** Reads the cached settings (DB on cache miss); never throws. */
 export async function refreshMotionSettings(): Promise<MotionSettings> {
   try {
-    currentMotionSettings = await readCached();
+    return await readCached();
   } catch {
-    currentMotionSettings = DEFAULT_MOTION;
+    return DEFAULT_MOTION;
   }
-  lastRefreshAttempt = Date.now();
-  return currentMotionSettings;
 }
 
 /**
- * Returns the last known settings immediately. The shared root layout never
- * waits for the unavailable database; refreshes run in Next's post-response
- * phase and keep the motion controls eventually consistent.
+ * Shared-cache read (consistent across serverless instances — an admin
+ * "off" applies everywhere after revalidateTag), bounded by READ_TIMEOUT_MS.
  */
 export async function getMotionSettings(): Promise<MotionSettings> {
-  if (Date.now() - lastRefreshAttempt >= REFRESH_INTERVAL_MS) {
-    lastRefreshAttempt = Date.now();
-    try {
-      after(() => {
-        void refreshMotionSettings();
-      });
-    } catch {
-      // Unit tests and other non-request callers can refresh explicitly.
-    }
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      refreshMotionSettings(),
+      new Promise<MotionSettings>((resolve) => {
+        timer = setTimeout(() => resolve(DEFAULT_MOTION), READ_TIMEOUT_MS);
+      }),
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
   }
-  return currentMotionSettings;
 }
 
 export async function updateMotionSettings(
@@ -61,8 +57,6 @@ export async function updateMotionSettings(
 ): Promise<MotionSettings> {
   const settings = motionSettingsSchema.parse(input);
   await motionSettingsRepository.write(settings, context);
-  currentMotionSettings = settings;
-  lastRefreshAttempt = Date.now();
   revalidateTag(MOTION_CACHE_KEY);
   return settings;
 }

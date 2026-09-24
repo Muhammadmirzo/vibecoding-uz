@@ -16,14 +16,16 @@ import { getMotionSettings } from "@/features/motion/server/motion-settings";
 const onest = Onest({
   subsets: ["latin", "latin-ext"],
   variable: "--font-sans",
-  display: "swap",
+  // "optional": no late font swap → no layout shift (CLS). Measured 0.45 with
+  // "swap" under mobile throttling. Fallback metrics are size-adjusted by next/font.
+  display: "optional",
 });
 
 const unbounded = Unbounded({
   subsets: ["latin", "latin-ext"],
   weight: ["600", "700"],
   variable: "--font-display",
-  display: "swap",
+  display: "optional",
   preload: true,
 });
 
