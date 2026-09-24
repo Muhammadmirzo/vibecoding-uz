@@ -3,6 +3,7 @@ import { db } from "@/db";
 import { courses, leads } from "@/db/schema";
 import { ServiceError } from "@/lib/http/errors";
 import { recomputeQuizResult, validateQuizAnswers, type ServerQuizResult } from "../domain/validation";
+import { trackServerEvent } from "@/features/analytics/server/track";
 
 /** Legacy error class (kept for compatibility; services now throw {@link ServiceError}). */
 export class QuizError extends Error {
@@ -109,6 +110,11 @@ export async function submitFreeLessonLead(
     quizAnswers: input.quizAnswers || null,
     utm: input.utm || null,
   });
+  void trackServerEvent({
+    type: "lead_created",
+    path: "/bepul-dars",
+    props: { leadId: stored.id, source: "free_lesson" },
+  });
   return { leadId: stored.id };
 }
 
@@ -133,6 +139,12 @@ export async function submitQuizLead(repo: QuizRepository, input: QuizLeadInput)
     },
     recommendedCourseId,
     utm: input.utm ?? null,
+  });
+  void trackServerEvent({ type: "lead_created", path: "/diagnostika", props: { leadId: stored.id, source: "quiz" } });
+  void trackServerEvent({
+    type: "diagnostic_complete",
+    path: "/diagnostika",
+    props: { diagnosticId: stored.id, result: result.recommendedCourse },
   });
   return { leadId: stored.id, result };
 }
