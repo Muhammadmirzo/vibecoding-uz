@@ -4,6 +4,7 @@ import * as React from "react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Surfaces";
+import { CountUp } from "@/features/motion/ui/CountUp";
 import { LeadCaptureForm } from "@/features/leads/ui/LeadCaptureForm";
 import { QUIZ_QUESTIONS, calculateRecommendation, type QuizAnswers } from "../domain";
 import { QuizResultCard } from "./QuizResultCard";
@@ -78,12 +79,10 @@ export function DiagnosticQuiz() {
       {phase !== "result" && (
         <div className="mb-8">
           <div className="mb-2 flex items-center justify-between font-mono text-xs font-semibold text-ink-subtle">
-            <span aria-current="step">
-              {phase === "contact"
+            <span aria-current="step">{phase === "contact"
                 ? `Oxirgi qadam: aloqa ma'lumoti`
-                : `Savol ${stepIndex + 1} / ${totalSteps}`}
-            </span>
-            <span>{progressPercent}% bajarildi</span>
+                : `Savol ${stepIndex + 1} / ${totalSteps}`}</span>
+            <span><CountUp end={progressPercent} suffix="% bajarildi" duration={560} /></span>
           </div>
           <div
             role="progressbar"
@@ -149,7 +148,7 @@ export function DiagnosticQuiz() {
                   <label
                     key={option.label}
                     htmlFor={inputId}
-                    className={`flex w-full cursor-pointer items-start gap-3.5 rounded-lg border p-4 text-left transition-colors focus-within:ring-2 focus-within:ring-gold/40 ${
+                    className={`quiz-option flex w-full cursor-pointer items-start gap-3.5 rounded-lg border p-4 text-left transition-colors focus-within:ring-2 focus-within:ring-gold/40 ${
                       isSelected
                         ? "border-brand bg-brand-soft"
                         : "border-border-strong bg-bg-elevated hover:border-brand"

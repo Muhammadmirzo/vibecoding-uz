@@ -2,6 +2,8 @@ import { ArrowRight, CheckCircle2, Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/Surfaces";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Surfaces";
+import { SuccessCheck } from "@/features/motion/ui/SuccessCheck";
+import { revealProps } from "@/features/motion/ui/Reveal";
 import {
   QUIZ_COURSE_META,
   buildReasoning,
@@ -24,10 +26,10 @@ export function QuizResultCard({ course, answers, leadName }: QuizResultCardProp
 
   return (
     <div className="space-y-6 py-2 text-center">
-      <div className="mx-auto flex size-14 items-center justify-center rounded-full bg-success-soft text-success">
-        <CheckCircle2 className="size-8" aria-hidden="true" />
+      <div {...revealProps(0)} className="mx-auto flex size-14 items-center justify-center">
+        <SuccessCheck size={56} label="Diagnostika natijasi tayyor" />
       </div>
-      <div className="space-y-3">
+      <div {...revealProps(1)} className="space-y-3">
         <Badge variant="gold">
           <Sparkles className="mr-1 size-3.5" aria-hidden="true" /> Diagnostika natijasi
         </Badge>
@@ -41,7 +43,7 @@ export function QuizResultCard({ course, answers, leadName }: QuizResultCardProp
       </div>
 
       {reasons.length > 0 && (
-        <Card className="mx-auto max-w-xl space-y-3 p-5 text-left">
+        <Card className="mx-auto max-w-xl space-y-3 p-5 text-left" {...revealProps(2)}>
           <h3 className="text-sm font-semibold text-ink">Nega aynan shu kurs?</h3>
           <ul className="space-y-2.5">
             {reasons.slice(0, 4).map((reason) => (
@@ -57,7 +59,7 @@ export function QuizResultCard({ course, answers, leadName }: QuizResultCardProp
         </Card>
       )}
 
-      <Card className="mx-auto max-w-xl border-gold/50 bg-gold-soft/40 p-6 text-left">
+      <Card className="mx-auto max-w-xl border-gold/50 bg-gold-soft/40 p-6 text-left" {...revealProps(3)}>
         <p className="text-xs font-semibold uppercase tracking-wide text-ink-subtle">Tavsiya etilgan kurs</p>
         <p className="mt-1 font-display text-xl font-semibold text-ink">{meta.title}</p>
         <p className="mt-2 text-sm text-ink-muted">{meta.tagline}</p>

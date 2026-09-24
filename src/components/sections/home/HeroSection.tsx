@@ -1,5 +1,9 @@
 import { ArrowRight, CirclePlay, MapPin, ShieldCheck, ShoppingBag, Star } from "lucide-react";
 import { Button, Container, GirihPattern, TerminalWindow } from "@/components/ui";
+import { MagneticButton } from "@/features/motion/ui/MagneticButton";
+import { ParallaxCard } from "@/features/motion/ui/ParallaxCard";
+import { TextReveal } from "@/features/motion/ui/TextReveal";
+import { GirihWeave } from "@/features/motion/ui/GirihWeave";
 import { siteConfig } from "@/lib/siteConfig";
 
 const session = [
@@ -14,7 +18,7 @@ const session = [
 
 function AppPreview() {
   return (
-    <div className="absolute right-6 top-full -mt-6 hidden w-60 rounded-lg border border-border-strong bg-bg-elevated p-3 shadow-lg lg:block xl:-right-6 xl:w-64" aria-hidden="true">
+    <div className="w-full rounded-lg border border-border-strong bg-bg-elevated p-3 shadow-lg" aria-hidden="true">
       <div className="mb-3 flex items-center justify-between border-b border-border pb-2">
         <div className="flex items-center gap-2">
           <span className="flex size-7 items-center justify-center rounded-md bg-gold-soft text-brand"><ShoppingBag className="size-3.5" /></span>
@@ -39,16 +43,24 @@ export function HeroSection() {
   return (
     <section className="relative isolate overflow-hidden bg-bg py-16 sm:py-24 lg:py-28">
       <GirihPattern className="absolute inset-0 -z-10 h-full w-full text-brand opacity-[0.06]" aria-hidden="true" />
+      <GirihWeave className="pointer-events-none absolute -right-16 top-1/2 -z-10 hidden h-[420px] w-[420px] -translate-y-1/2 text-brand opacity-[0.12] md:block dark:opacity-[0.16]" />
       <div className="absolute left-1/2 top-8 -z-10 h-72 w-[min(92vw,900px)] -translate-x-1/2 rounded-full bg-accent-soft/55 blur-3xl" aria-hidden="true" />
       <Container className="grid items-center gap-14 lg:grid-cols-[2fr_1fr] lg:gap-12 xl:gap-16">
         <div>
           <p className="mb-5 text-sm font-semibold text-brand">Naqsh — AI bilan mahsulot yaratish maktabi</p>
           <h1 className="max-w-3xl font-display text-[clamp(2.25rem,1.2rem+3.2vw,4rem)] font-semibold leading-[1.05] tracking-[-0.045em] text-ink">
-            G&apos;oyangizni <mark className="relative whitespace-nowrap bg-transparent text-brand"><span className="relative z-10">8 haftada</span><span className="absolute inset-x-0 bottom-0.5 z-0 h-2 -rotate-1 bg-gold/35" aria-hidden="true" /></mark> ilovaga aylantiring
+            <TextReveal text="G'oyangizni" mode="load" baseDelay={0} />{" "}
+            <mark className="relative whitespace-nowrap bg-transparent text-brand">
+              <span className="relative z-10"><TextReveal text="8 haftada" mode="load" baseDelay={55} /></span>
+              <span className="hero-mark-wipe absolute inset-x-0 bottom-0.5 z-0 h-2 -rotate-1 bg-gold/35" aria-hidden="true" />
+            </mark>{" "}
+            <TextReveal text="ilovaga aylantiring" mode="load" baseDelay={165} />
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-relaxed text-ink-muted">AI bilan — kod yozishni bilmasangiz ham. Dasturchi yollash kutilganidek qimmat emas. Siz g&apos;oyangizni, Claude Code yordamida qadam-baqadam ishlaydigan ilovaga aylantirasiz.</p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Button href="/diagnostika" size="lg">Bepul diagnostika — 2 daqiqa <ArrowRight className="size-5" aria-hidden="true" /></Button>
+            <MagneticButton>
+              <Button href="/diagnostika" size="lg">Bepul diagnostika — 2 daqiqa <ArrowRight className="size-5" aria-hidden="true" /></Button>
+            </MagneticButton>
             <Button href="/bepul-dars" size="lg" variant="outline"><CirclePlay className="size-5" aria-hidden="true" />Bepul darsga yozilish</Button>
           </div>
           <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-ink-muted">
@@ -57,9 +69,11 @@ export function HeroSection() {
           </div>
         </div>
         <div className="relative pb-8 lg:pb-10">
-          <TerminalWindow lines={session} />
+          <TerminalWindow lines={session} startDelay={500} />
           <p className="mt-3 text-center lg:text-left font-mono text-xs text-ink-subtle">Bir promptdan tayyor ilovagacha</p>
-          <AppPreview />
+          <ParallaxCard className="absolute right-6 top-full -mt-6 hidden w-60 lg:block xl:-right-6 xl:w-64">
+            <AppPreview />
+          </ParallaxCard>
         </div>
       </Container>
     </section>

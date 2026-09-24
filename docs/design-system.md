@@ -45,6 +45,41 @@ Old `cream`, `ink`, and `accent` CSS variable names are retained as temporary al
 - `Input`, `Textarea`, `Label`, `FieldError` — form primitives; inputs expose visible keyboard focus and semantic error text.
 - `NextStepCTA` — shared funnel close: `/diagnostika` in gold, `/bepul-dars` as the secondary route.
 
+## Motion
+
+Restrained, meaningful motion — "not too much, not too little". Final state is
+always the default; animations apply only under `data-motion` gates, so SSR
+and no-JS render finished content. Only `transform`/`opacity`/`filter`/
+`clip-path` are animated (plus one SVG stroke-draw exception for the girih
+signature). `prefers-reduced-motion: reduce` always wins.
+
+- **Config:** `src/features/motion/domain/settings.ts` (`MotionSettings`,
+  `DEFAULT_MOTION`, `motionSettingsSchema`). Server reader:
+  `src/features/motion/server/motion-settings.ts` (fail-safes to defaults).
+  `<html>` carries `data-motion="off|subtle|full"` + `data-motion-<flag>`
+  via `MotionRoot` in `src/app/layout.tsx`. `subtle` = reveals +
+  micro-interactions only (no ambient/pointer/parallax).
+- **Tokens** (`globals.css` + `tailwind.config.js`): durations `instant` 120,
+  `fast` 200, `base` 320, `slow` 560, `epic` 900 ms (`duration-base` …);
+  easings `out-expo`, `out-quint`, `spring` (`ease-spring`, `linear()` with
+  cubic fallback); distance `--motion-rise: 14px`; stagger `--motion-stagger`.
+- **Primitives** (`src/features/motion/ui/`): `Reveal`/`RevealGroup`/
+  `revealProps` (server, one shared observer in the `RevealRoot` island),
+  `TextReveal` (word mask slide, `load`|`scroll`, SSR text intact),
+  `Marquee` (CSS only, pauses on hover/focus/offscreen/hidden tab),
+  `MagneticButton` (hero CTA only, pointer-fine), `ParallaxCard`,
+  `Spotlight`, `CountUp` (real numbers only), `ScrollProgress` (long pages),
+  `SuccessCheck` (form success draw), `GirihWeave` (hero signature),
+  `useScrolled` (header condense, height never changes — CLS 0).
+- **CSS helpers:** `.card-glow` (1px gradient border), `.link-underline`
+  (gold wipe), `.btn-press` (press scale 0.98), `.site-header.is-scrolled`,
+  `.terminal-line` (stagger via `--tl-delay`), `.hero-mark-wipe`.
+  View Transitions: `@view-transition { navigation: auto }` (MPA progressive
+  enhancement) + named `site-header`/`site-logo` transitions.
+- **Don'ts:** no animation library, no scroll listeners without rAF/passive,
+  no `will-change` except during animation, no `Reveal` above the fold (hero
+  uses CSS load animations), never animate invented numbers.
+
 ## Usage
 
 ```tsx
