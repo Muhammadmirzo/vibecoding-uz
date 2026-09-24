@@ -5,6 +5,7 @@ const mocks = vi.hoisted(() => ({
   markConversationRead: vi.fn(), sendVisitorMessage: vi.fn(), getChatSettings: vi.fn(),
   getDbSession: vi.fn(), getOrCreateVisitorToken: vi.fn(), visitorTokenFromRequest: vi.fn(() => "visitor-token"),
   requireAdmin: vi.fn(), getThread: vi.fn(), listConversations: vi.fn(), postReply: vi.fn(),
+  notifyVisitorMessage: vi.fn(),
 }));
 
 vi.mock("next/server", async (importOriginal) => ({
@@ -32,7 +33,7 @@ vi.mock("@/features/chat/server/visitor-token", () => ({
 }));
 vi.mock("@/lib/auth/require-auth", () => ({ requireAdmin: mocks.requireAdmin, getDbSession: mocks.getDbSession }));
 vi.mock("@/features/chat/server/ai-orchestrator.service", () => ({ orchestrateAiReply: vi.fn() }));
-vi.mock("@/lib/telegram/chat-bridge", () => ({ notifyVisitorMessage: vi.fn() }));
+vi.mock("@/lib/telegram/chat-bridge", () => ({ notifyVisitorMessage: mocks.notifyVisitorMessage }));
 vi.mock("@/features/analytics/server/track", () => ({ trackServerEvent: vi.fn() }));
 
 import { NextRequest } from "next/server";
@@ -55,7 +56,8 @@ function request(url: string, body?: unknown) {
 beforeEach(() => {
   vi.clearAllMocks();
   mocks.checkRateLimit.mockResolvedValue({ success: true, limit: 10, remaining: 9, reset: Date.now() + 1000 });
-  mocks.getChatSettings.mockResolvedValue({ enabled: true });
+  mocks.getChatSettings.mockResolvedValue({ enabled: true, telegramNotify: true });
+  mocks.notifyVisitorMessage.mockResolvedValue({ sent: true });
   mocks.getVisitorConversation.mockResolvedValue(conversation);
   mocks.listMessages.mockResolvedValue([]);
   mocks.sendVisitorMessage.mockResolvedValue({ id: "message", conversationId: uuid, clientId: "client", sender: "visitor", body: "Salom", createdAt: new Date().toISOString(), readAt: null, isDraft: false });
@@ -76,6 +78,16 @@ describe("visitor chat routes", () => {
     expect(response.status).toBe(429);
     expect(response.headers.get("retry-after")).toBe("1");
     expect((await response.json()).error.code).toBe("rate_limited");
+  });
+
+  it("persists a message and notifies Telegram only when enabled", async () => {
+    const response = await POST(request("/api/v1/chat/messages", { clientId: crypto.randomUUID(), body: "Salom" }));
+    expect(response.status).toBe(201);
+    expect(mocks.notifyVisitorMessage).toHaveBeenCalledOnce();
+    mocks.notifyVisitorMessage.mockClear();
+    mocks.getChatSettings.mockResolvedValueOnce({ enabled: true, telegramNotify: false });
+    await POST(request("/api/v1/chat/messages", { clientId: crypto.randomUUID(), body: "Yana salom" }));
+    expect(mocks.notifyVisitorMessage).not.toHaveBeenCalled();
   });
 
   it("accepts a bot honeypot without persisting it", async () => {

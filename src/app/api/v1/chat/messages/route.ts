@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
     after(async () => {
       await Promise.allSettled([
         orchestrateAiReply(conversation.id),
-        notifyVisitorMessage(conversation, message),
+        settings.telegramNotify ? notifyVisitorMessage(conversation, message) : Promise.resolve({ sent: false }),
       ]);
     });
     void trackServerEvent({ type: "chat_message", path: parsed.data.sourcePath, props: { sender: "visitor" } });
