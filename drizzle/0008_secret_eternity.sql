@@ -1,1 +1,0 @@
-CREATE INDEX IF NOT EXISTS "chat_messages_telegram_idx" ON "chat_messages" USING btree ("telegram_message_id");
