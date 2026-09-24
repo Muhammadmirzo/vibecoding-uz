@@ -5,7 +5,9 @@ import { CheckCircle2, CircleAlert, Sparkles, X } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { LoginForm } from "./LoginForm";
 import { OtpForm } from "./OtpForm";
+import { TelegramAuthFlow } from "./TelegramAuthFlow";
 import { TelegramLoginButton } from "./TelegramLoginButton";
+import { BRAND } from "@/config/brand";
 
 export function AuthModal() {
   const { isAuthModalOpen, closeAuthModal, authStep, toastMessage, toastType } = useAuth();
@@ -25,15 +27,15 @@ export function AuthModal() {
             <div className="min-w-0">
               <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-gold-soft px-2.5 py-1 text-xs font-semibold text-gold-hover">
                 <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-                <span>Naqsh platformasi</span>
+                <span>{BRAND.name} platformasi</span>
               </div>
               <Dialog.Title className="font-display text-2xl font-bold tracking-tight text-ink sm:text-3xl">
-                {isOtpStep ? "Kodni tasdiqlash" : "Tizimga kirish"}
+                {isOtpStep ? "Kodni tasdiqlash" : "Kirish yoki ro'yxatdan o'tish"}
               </Dialog.Title>
               <Dialog.Description className="mt-1 text-sm leading-6 text-ink-muted">
                 {isOtpStep
                   ? "Telefoningizga yuborilgan tasdiqlash kodini kiriting."
-                  : "Platformaga kirish uchun telefon raqamingizni kiriting."}
+                  : "Telegram orqali tez kirish yoki ro'yxatdan o'ting. Telefon orqali SMS bilan ham davom etishingiz mumkin."}
               </Dialog.Description>
             </div>
             <Dialog.Close
@@ -65,19 +67,13 @@ export function AuthModal() {
               </div>
             )}
 
-            {isOtpStep ? <OtpForm /> : <LoginForm />}
+            {isOtpStep ? <OtpForm /> : <>
+              <TelegramAuthFlow />
+              <div className="my-5 flex items-center gap-3" aria-hidden="true"><span className="h-px flex-1 bg-border" /><span className="text-xs font-medium text-ink-subtle">yoki telefon bilan</span><span className="h-px flex-1 bg-border" /></div>
+              <LoginForm />
+            </>}
 
-            <div className="mt-5" aria-label="Muqobil kirish usuli">
-              <div className="flex items-center gap-3" aria-hidden="true">
-                <span className="h-px flex-1 bg-border" />
-                <span className="text-xs font-medium text-ink-subtle">yoki</span>
-                <span className="h-px flex-1 bg-border" />
-              </div>
-              <div className="mt-3">
-                <TelegramLoginButton />
-              </div>
-            </div>
-
+            {process.env.NEXT_PUBLIC_TELEGRAM_WIDGET === "1" && <div className="mt-5" aria-label="Telegram kirish widgeti"><TelegramLoginButton /></div>}
             <div className="mt-4 border-t border-border pt-4 text-center">
               <a
                 href="/admin/login"

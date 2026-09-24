@@ -2,7 +2,7 @@
 
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { User, otpSendSchema, otpVerifySchema } from "@/lib/validations/auth";
+import { otpSendSchema, otpVerifySchema, userSchema, type User } from "@/lib/validations/auth";
 
 interface AuthContextType {
   user: User | null;
@@ -23,6 +23,7 @@ interface AuthContextType {
   clearToast: () => void;
   setAuthStep: (step: "login" | "otp") => void;
   setPendingPhone: (phone: string) => void;
+  refreshAuth: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -66,7 +67,10 @@ export function AuthProvider({ children, initialUser = null }: { children: React
   const closeAuthModal = useCallback(() => {
     setIsAuthModalOpen(false);
     clearMessages();
-  }, [clearMessages]);
+    const redirect = loginRedirect.current;
+    loginRedirect.current = null;
+    if (redirect) router.replace(redirect);
+  }, [clearMessages, router]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -77,26 +81,28 @@ export function AuthProvider({ children, initialUser = null }: { children: React
     }
   }, [openAuthModal]);
 
-  useEffect(() => {
-    let mounted = true;
-    async function checkAuth() {
-      try {
-        const response = await fetch("/api/me", { cache: "no-store" });
-        const data: unknown = await response.json();
-        if (!mounted) return;
-        if (response.ok && data && typeof data === "object" && "user" in data) {
-          setUser((data as { user?: User }).user ?? null);
-        } else setUser(null);
-      } catch (error: unknown) {
-        console.error("Failed fast-path /api/me check:", error);
-        if (mounted) setUser(null);
-      } finally {
-        if (mounted) setIsLoading(false);
+  const refreshAuth = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/me", { cache: "no-store" });
+      const data: unknown = await response.json();
+      if (!response.ok || !data || typeof data !== "object" || !("user" in data)) {
+        setUser(null);
+        return;
       }
+      const parsed = userSchema.safeParse(data.user);
+      setUser(parsed.success ? parsed.data : null);
+    } catch (error: unknown) {
+      console.error("Failed fast-path /api/me check:", error);
+      setUser(null);
+    } finally {
+      setIsLoading(false);
     }
-    void checkAuth();
-    return () => { mounted = false; };
   }, []);
+
+  useEffect(() => {
+    void refreshAuth();
+  }, [refreshAuth]);
 
   const login = useCallback(async (rawPhone: string) => {
     clearMessages();
@@ -154,7 +160,11 @@ export function AuthProvider({ children, initialUser = null }: { children: React
       setUser((data as unknown as { user: User }).user);
       setToastMessage("Tizimga muvaffaqiyatli kirdingiz!"); setToastType("success");
       setIsAuthModalOpen(false); setPendingPhone(""); setDevCode(null); setAuthStep("login"); setIsLoading(false);
-      if (loginRedirect.current) router.replace(loginRedirect.current);
+      if (loginRedirect.current) {
+        const redirect = loginRedirect.current;
+        loginRedirect.current = null;
+        router.replace(redirect);
+      }
       return true;
     } catch (caught: unknown) {
       const message = caught instanceof Error ? caught.message : "Kodni tasdiqlashda xatolik";
@@ -173,7 +183,7 @@ export function AuthProvider({ children, initialUser = null }: { children: React
   return <AuthContext.Provider value={{ user, isLoading, error, toastMessage, toastType, devCode,
     isAuthModalOpen, authStep, pendingPhone, login, verifyOtp, logout, openAuthModal, closeAuthModal,
     clearError: () => setError(null), clearToast: () => { setToastMessage(null); setToastType(null); },
-    setAuthStep, setPendingPhone }}>
+    setAuthStep, setPendingPhone, refreshAuth }}>
     {children}
   </AuthContext.Provider>;
 }

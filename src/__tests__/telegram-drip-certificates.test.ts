@@ -13,6 +13,7 @@ import { linkTelegramAccount, handleOperatorHandoff } from "../lib/telegram/bot"
 // Mock DB module for unit testing
 vi.mock("@/db", () => {
   return {
+    withTransactionLock: vi.fn(async (_key: string, fn: (tx: unknown) => Promise<unknown>) => fn({})),
     db: {
       select: vi.fn().mockReturnThis(),
       from: vi.fn().mockReturnThis(),

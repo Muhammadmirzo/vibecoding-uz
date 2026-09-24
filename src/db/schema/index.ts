@@ -1,5 +1,6 @@
 export * from "./enums";
 export * from "./users";
+export * from "./telegram";
 export * from "./courses";
 export * from "./homework";
 export * from "./commercial";

@@ -2,6 +2,7 @@
 
 import { AlertCircle, Loader2, Send } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { TelegramAuthFlow } from "./TelegramAuthFlow";
 import { getBotName, getTelegramErrorMessage, mapTelegramData } from "./telegram-helpers";
 import type { TelegramUser } from "./telegram-helpers";
 
@@ -13,7 +14,7 @@ interface TelegramLoginButtonProps {
   onError?: (message: string) => void;
 }
 
-type Status = "idle" | "loading" | "success" | "error";
+type Status = "idle" | "loading" | "success" | "error" | "phoneRequired";
 
 declare global {
   interface Window {
@@ -54,6 +55,7 @@ export function TelegramLoginButton({ onSuccess, onError }: TelegramLoginButtonP
         body: JSON.stringify(data),
       });
       if (!response.ok) {
+        if (response.status === 422) { setStatus("phoneRequired"); return; }
         let serverMessage: string | null = null;
         try {
           const errorJson = (await response.json()) as { error?: unknown };
@@ -101,6 +103,8 @@ export function TelegramLoginButton({ onSuccess, onError }: TelegramLoginButtonP
       container.replaceChildren();
     };
   }, [botName, handleAuth]);
+
+  if (status === "phoneRequired") return <TelegramAuthFlow />;
 
   if (!botName) {
     return (
