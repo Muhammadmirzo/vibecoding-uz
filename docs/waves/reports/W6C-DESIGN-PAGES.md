@@ -186,8 +186,8 @@ Critical review findings, all fixed:
 - [x] Screenshot review + iteration (dark portfolio hero, prose fonts).
 - [x] Cleanup: before-worktree removed, dev/prod servers stopped (no push,
   no deploy — orchestrator merges). The `e2e/w6c-screenshots.spec.ts` sweep
-  is KEPT (it is not part of the gate; it regenerates the gitignored
-  `w6c-*-<width>-<theme>-<n>.png` review frames).
+  was deleted as cleanup (its 196 gitignored review frames remain on disk);
+  gate coverage lives in responsive/visibility specs.
 - No push, no deploy (orchestrator merges).
 
 **Status: DONE with one honest exception.** Gate green (tsc, 512 vitest,
