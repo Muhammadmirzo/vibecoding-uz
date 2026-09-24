@@ -105,7 +105,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const initialUser = await getInitialUser();
-  const motionSettings = await getMotionSettings();
+  const motionSettings = getMotionSettings();
 
   return (
     <MotionRoot

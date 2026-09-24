@@ -7,13 +7,9 @@ import { DEFAULT_MOTION, parseMotionSettings, type MotionSettings } from "../dom
  * Zod-validated, cached). Until then — and whenever the DB is down —
  * it fail-safes to DEFAULT_MOTION so pages never 500 on motion config.
  */
-export async function getMotionSettings(): Promise<MotionSettings> {
-  try {
-    // W3B hook point: read + parse the stored row here.
-    // const stored = await readSiteSetting("motion");
-    // return parseMotionSettings(stored);
-    return parseMotionSettings(DEFAULT_MOTION);
-  } catch {
-    return DEFAULT_MOTION;
-  }
+export function getMotionSettings(): MotionSettings {
+  // W3B replaces this synchronous default with its cached server reader.
+  // Keeping the default synchronous in W3A prevents motion configuration
+  // from accidentally opting every page into dynamic rendering.
+  return parseMotionSettings(DEFAULT_MOTION);
 }

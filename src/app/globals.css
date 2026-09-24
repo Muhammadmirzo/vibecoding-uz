@@ -205,7 +205,8 @@ html[data-motion="full"][data-motion-ambient="on"] .girih-weave .weave-glow {
   opacity: 1;
   animation: weave-shimmer 7s linear infinite;
 }
-html.is-tab-hidden .girih-weave .weave-glow { animation-play-state: paused; }
+html.is-tab-hidden .girih-weave .weave-glow,
+.girih-weave.is-paused .weave-glow { animation-play-state: paused; }
 
 /* ---------- Terminal transcript (hero choreography) ---------- */
 html[data-motion="full"][data-motion-hero="on"] .terminal-line {

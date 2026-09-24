@@ -29,7 +29,10 @@ export function formatCount(value: number, decimals: number): string {
  */
 export function CountUp({ end, decimals = 0, prefix = "", suffix = "", duration = 900, className }: CountUpProps) {
   const { ref, inView } = useInView<HTMLSpanElement>();
-  const [value, setValue] = React.useState(0);
+  // SSR and no-JS render the truthful final value. The client may replay
+  // from zero once the real number enters view, but it never starts at 0 in
+  // the server HTML.
+  const [value, setValue] = React.useState(end);
   const current = React.useRef(0);
 
   React.useEffect(() => {
@@ -44,7 +47,9 @@ export function CountUp({ end, decimals = 0, prefix = "", suffix = "", duration 
       return;
     }
     let raf = 0;
-    const from = current.current;
+    current.current = 0;
+    setValue(0);
+    const from = 0;
     const t0 = performance.now();
     const tick = (now: number) => {
       const t = Math.min((now - t0) / duration, 1);

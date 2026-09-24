@@ -1,5 +1,5 @@
 import * as React from "react";
-import type { MotionSettings } from "../domain/settings";
+import { resolveMotionFlags, type MotionSettings } from "../domain/settings";
 
 function onOff(value: boolean): "on" | "off" {
   return value ? "on" : "off";
@@ -11,13 +11,14 @@ function onOff(value: boolean): "on" | "off" {
  * `data-motion="off|subtle|full"` + one `data-motion-<flag>` per slice.
  */
 export function motionHtmlAttributes(settings: MotionSettings) {
+  const flags = resolveMotionFlags(settings);
   return {
     "data-motion": settings.level,
-    "data-motion-hero": onOff(settings.heroIntro),
-    "data-motion-scroll": onOff(settings.scrollReveal),
-    "data-motion-pointer": onOff(settings.pointerEffects),
-    "data-motion-ambient": onOff(settings.ambient),
-    "data-motion-page": onOff(settings.pageTransitions),
+    "data-motion-hero": onOff(flags.heroIntro),
+    "data-motion-scroll": onOff(flags.scrollReveal),
+    "data-motion-pointer": onOff(flags.pointerEffects),
+    "data-motion-ambient": onOff(flags.ambient),
+    "data-motion-page": onOff(flags.pageTransitions),
   };
 }
 

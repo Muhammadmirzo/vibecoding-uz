@@ -60,7 +60,7 @@ function onScrollSweep() {
 function armMarquees(scope: ParentNode) {
   if (!marqueeObserver) return;
   const nodes = scope instanceof Document || scope instanceof Element
-    ? scope.querySelectorAll("[data-marquee]")
+    ? scope.querySelectorAll("[data-marquee], .girih-weave")
     : [];
   nodes.forEach((node) => marqueeObserver?.observe(node));
 }
@@ -76,7 +76,7 @@ function armMarquees(scope: ParentNode) {
  * skips); it detaches once everything is visible. ~0.8 kB gz.
  */
 export function RevealRoot() {
-  React.useLayoutEffect(() => {
+  React.useEffect(() => {
     if (prefersReducedMotion() || !motionScrollEnabled()) return;
     const root = document.documentElement;
 
