@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import type * as React from "react";
 import Link from "next/link";
-import { ShieldCheck } from "lucide-react";
+import { Send, ShieldCheck } from "lucide-react";
 import { Container } from "@/components/ui";
 import { NextStepCTA } from "@/components/ui/NextStepCTA";
 import { Seal } from "@/components/pages/PageBits";
-import { ShareCertButton } from "./ShareButton";
 import "@/components/pages/w6c.css";
 
 interface Props {
@@ -68,7 +67,14 @@ export default async function CertificateVerificationPage({ params }: Props) {
           </p>
         </div>
         <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
-          <ShareCertButton code={code} title="Sertifikat Tekshiruvi" />
+          <a
+            href={`https://t.me/share/url?url=${encodeURIComponent(`https://naqsh.uz/shahodatnoma/${code}`)}&text=${encodeURIComponent(`Naqsh sertifikati (${code})`)}`}
+            target="_blank"
+            rel="noreferrer"
+            className="btn-press inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-border bg-bg-elevated px-4 text-sm font-semibold text-ink transition hover:border-brand"
+          >
+            <Send className="size-4" aria-hidden="true" /> Telegramda ulashish
+          </a>
           <a
             href="/kurs/vibe-coding-express"
             className="btn-press inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-brand px-5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-hover hover:shadow-md"
