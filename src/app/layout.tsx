@@ -5,6 +5,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { HeaderVisibility } from "@/components/layout/HeaderVisibility";
 import { AuthProvider } from "@/context/AuthContext";
 import { ClientModals } from "@/components/layout/ClientModals";
 import { userSchema, User } from "@/lib/validations/auth";
@@ -117,7 +118,8 @@ export default async function RootLayout({
             <AnalyticsTracker />
             <Header />
             <main id="main">{children}</main>
-            <Footer />
+            {/* Admin has its own shell: hide the public footer there, like the header. */}
+            <HeaderVisibility><Footer /></HeaderVisibility>
             <ClientModals />
           </AuthProvider>
         </ThemeProvider>
