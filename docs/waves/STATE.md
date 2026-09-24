@@ -13,9 +13,9 @@
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | W0 Plan | orchestrator | ✅ | main | PLAN.md | brand = Naqsh, contracts fixed |
 | W1A Audit | space-bunny-free | ✅ | wave/w1a-audit (32edce9) | reports/W1A-AUDIT.md | read-only, port 3201 |
-| W1B Brand | muse-spark-1.3-contributor-free | 🏃 | wave/w1b-brand | reports/W1B-BRAND.md | port 3202 |
-| W2 Telegram | space-bunny-free | 🏃 | wave/w2-telegram | reports/W2-TELEGRAM.md | port 3203; parallel with W1B — expect small merge conflicts in AuthModal / telegram messages |
-| W3A Motion | muse-spark-1.3 | ⏳ | — | reports/W3A-MOTION.md | |
+| W1B Brand | muse-spark-1.3-contributor-free | ✅ | wave/w1b-brand (f8f8052) | reports/W1B-BRAND.md | logo redrawn by orchestrator; geometry in src/components/brand/logoGeometry.ts; migration 0004 = blog author default |
+| W2 Telegram | space-bunny-free | 🏃 round 3 (PROMPT=w2-telegram-confirm) | wave/w2-telegram (53ba867 ok; anti-phishing confirm pending) | reports/W2-TELEGRAM.md | ON MERGE: its drizzle 0004 clashes with W1B 0004 → drop W2 0004 files, restore journal from main, `npm run db:generate` → 0005; port 3203; parallel with W1B — expect small merge conflicts in AuthModal / telegram messages |
+| W3A Motion | muse-spark-1.3 | 🏃 | wave/w3a-motion | reports/W3A-MOTION.md | |
 | W3B Motion admin | space-bunny | ⏳ | — | reports/W3B-MOTION-ADMIN.md | |
 | W4A Perf | space-bunny | ⏳ | — | reports/W4A-PERF.md | |
 | W4B Audit fixes | muse-spark-1.3 | ⏳ | — | reports/W4B-FIXES.md | |

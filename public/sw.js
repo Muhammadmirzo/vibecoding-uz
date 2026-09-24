@@ -1,5 +1,5 @@
-const CACHE_NAME = "vibecoding-v1";
-const PRECACHE_ASSETS = ["/", "/manifest.json", "/favicon.ico"];
+const CACHE_NAME = "naqsh-v1";
+const PRECACHE_ASSETS = ["/", "/manifest.json", "/icon.svg"];
 
 // 1. Install event: precache essential offline assets
 self.addEventListener("install", (event) => {

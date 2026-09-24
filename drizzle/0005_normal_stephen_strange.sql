@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS "telegram_login_requests" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"nonce_hash" text NOT NULL,
-	"status" text DEFAULT 'pending' NOT NULL CHECK ("status" IN ('pending', 'approved', 'consumed', 'expired')),
+	"status" text DEFAULT 'pending' NOT NULL,
 	"user_id" uuid,
 	"tg_user_id" text,
 	"created_at" timestamp DEFAULT now() NOT NULL,
@@ -18,5 +18,5 @@ DO $$ BEGIN
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
-CREATE INDEX IF NOT EXISTS "telegram_login_requests_status_idx" ON "telegram_login_requests" ("status");
-CREATE INDEX IF NOT EXISTS "telegram_login_requests_expires_idx" ON "telegram_login_requests" ("expires_at");
+--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "telegram_login_requests_tg_pending_idx" ON "telegram_login_requests" USING btree ("tg_user_id","status","expires_at");

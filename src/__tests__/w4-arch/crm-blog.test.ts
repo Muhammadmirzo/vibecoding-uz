@@ -17,7 +17,7 @@ function makePost(overrides: Partial<BlogPostRow> = {}): BlogPostRow {
     excerpt: null,
     contentMd: "Content here",
     coverUrl: null,
-    authorName: "Mirzo Academy Team",
+    authorName: "Naqsh jamoasi",
     category: "Vibe Coding",
     seoTitle: null,
     seoDescription: null,
@@ -33,7 +33,7 @@ const newPostInput = {
   slug: "new-post",
   title: "New Post",
   contentMd: "Long enough content",
-  authorName: "Mirzo Academy Team",
+  authorName: "Naqsh jamoasi",
   category: "Vibe Coding",
   status: "published" as const,
 };

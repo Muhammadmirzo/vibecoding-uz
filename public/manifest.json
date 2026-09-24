@@ -1,11 +1,11 @@
 {
-  "name": "Mirzo Academy — academy.mirzo.uz",
-  "short_name": "Mirzo Academy",
-  "description": "EduBaza (27 000+ o'qituvchi), Chatla (500+ biznes) — AI bilan qurilgan jonli mahsulotlar. Dasturlashsiz, g'oyadan jonli MVPgacha 8 haftada yetib boring.",
+  "name": "Naqsh — AI bilan mahsulot yaratish maktabi",
+  "short_name": "Naqsh",
+  "description": "G'oyangizni ishlaydigan mahsulotga aylantiring — AI bilan, 8 haftada.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#F9F8F6",
-  "theme_color": "#FF5722",
+  "background_color": "#FAF7F0",
+  "theme_color": "#1440A0",
   "orientation": "portrait-primary",
   "icons": [
     {

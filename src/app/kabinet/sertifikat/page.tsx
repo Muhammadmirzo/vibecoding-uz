@@ -7,7 +7,7 @@ import { drizzleCertificatesRepository } from "@/features/certificates/server/ce
 import { getMyCertificate } from "@/features/certificates/server/certificates.service";
 
 export const metadata: Metadata = {
-  title: "Mening Sertifikatim | Mirzo Academy",
+  title: "Mening Sertifikatim | Naqsh",
   description: "Kursni muvaffaqiyatli yakunlaganlik to'g'risidagi rasmiy sertifikat.",
 };
 
@@ -59,7 +59,7 @@ export default async function SertifikatPage() {
             <Award className="w-3.5 h-3.5" /> Rasmiy Sertifikat
           </span>
           <h1 className="text-2xl md:text-3xl font-extrabold text-ink">
-            Mirzo Academy Sertifikati
+            Naqsh sertifikati
           </h1>
           <p className="text-xs text-ink-muted">
             Noyob kodi: <strong className="font-mono text-accent">{certificate.code}</strong>

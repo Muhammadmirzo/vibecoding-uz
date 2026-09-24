@@ -51,7 +51,7 @@ export function renderCertificateTemplate(
     page.drawText(text, { x: (width - textWidth) / 2, y, size, font, color });
   };
 
-  drawCenteredText("MIRZO ACADEMY", height - 85, 14, bold, accentGold);
+  drawCenteredText("NAQSH", height - 85, 14, bold, accentGold);
   drawCenteredText("RASMIY TA'LIM SERTIFIKATI", height - 108, 11, regular, textMuted);
   drawCenteredText("SERTIFIKAT", height - 170, 36, title, borderNavy);
   drawCenteredText(
@@ -95,10 +95,10 @@ export function renderCertificateTemplate(
   });
 
   const rightX = width - 240;
-  page.drawText("Platforma Rahiari:", {
+  page.drawText("Platforma rahbari:", {
     x: rightX, y: 110, size: 10, font: regular, color: textMuted,
   });
-  page.drawText("Mirzo Academy Team", {
+  page.drawText("Naqsh jamoasi", {
     x: rightX, y: 92, size: 12, font: bold, color: darkInk,
   });
   page.drawLine({

@@ -80,7 +80,7 @@ describe("Telegram Bot & LMS Drip & Certificate Generator", () => {
   describe("Certificate Generator", () => {
     it("generates a unique certificate code in correct format", () => {
       const code = generateUniqueCertificateCode();
-      expect(code).toMatch(/^VIBE-\d{4}-[A-Z0-9]{5}$/);
+      expect(code).toMatch(/^NAQSH-\d{4}-[A-Z0-9]{5}$/);
     });
 
     it("generates a valid PDF buffer with student credentials", async () => {
@@ -88,7 +88,7 @@ describe("Telegram Bot & LMS Drip & Certificate Generator", () => {
         holderName: "Alisher Navoiy",
         courseTitle: "AI Vibecoding Masterclass",
         finalScore: 9.8,
-        code: "VIBE-2026-TEST1",
+        code: "NAQSH-2026-TEST1",
       });
 
       expect(Buffer.isBuffer(pdfBuffer)).toBe(true);

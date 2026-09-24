@@ -33,7 +33,7 @@ export const STATIC_JOB_OPENINGS: JobOpeningItem[] = [
     type: "To'liq stavka",
     salary: "15,000,000 - 25,000,000 UZS",
     experience: "2+ yil dasturlash yoki AI vositalari tajribasi",
-    descriptionMd: "Mirzo Academy (academy.mirzo.uz) platformasining asosiy yo'nalishi — Vibe Coding Express talabalariga mentorlik qilish, uy vazifalarini ko'rib chiqish va amaliy MVP loyihalarini yaratishda yo'l-yo'riq ko'rsatish.",
+    descriptionMd: "Naqsh — AI bilan mahsulot yaratish maktabining asosiy yo'nalishi — Vibe Coding Express talabalariga mentorlik qilish, uy vazifalarini ko'rib chiqish va amaliy MVP loyihalarini yaratishda yo'l-yo'riq ko'rsatish.",
     responsibilities: [
       "Vibe Coding Express kohortasi talabalariga haftalik jonli sessiyalar o'tkazish;",
       "Talabalarning Next.js, Drizzle ORM va Cursor/Claude Code asosidagi kodlarini ko'rib chiqish va baholash;",
@@ -95,7 +95,7 @@ export const STATIC_JOB_OPENINGS: JobOpeningItem[] = [
     type: "To'liq stavka",
     salary: "8,000,000 - 14,000,000 UZS + KPI bonuslar",
     experience: "1+ yil Telegram kanallar yoki hamjamiyat boshqaruvi",
-    descriptionMd: "Mirzo Academy Telegram jamoasini faol ushlab turish, vebinarlar tashkillashtirish va yangi talabalar oqimini jalb qilish. Murojaat Telegram orqali qabul qilinadi.",
+    descriptionMd: "Naqsh Telegram jamoasini faol ushlab turish, vebinarlar tashkillashtirish va yangi talabalar oqimini jalb qilish. Murojaat Telegram orqali qabul qilinadi.",
     responsibilities: [
       "Telegram kanali va yopiq talabalar guruhlarida faollikni oshirish, savollarga zudlik bilan javob berish;",
       "Haftalik bepul jonli darslar va 'Build in Public' meetlarini rejalashtirish va olib borish;",

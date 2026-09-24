@@ -1,6 +1,6 @@
 {
-  "id": "598e2af1-90f4-416d-b76b-de5745a410e3",
-  "prevId": "31987b5b-779d-45b8-ac0e-83dc51a03bfa",
+  "id": "84c8cb5b-008e-461a-8efd-200fe8ebaad9",
+  "prevId": "7f029e11-d42a-469a-91fc-51b09fc41f42",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -1572,7 +1572,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "default": "'Mirzo Academy Team'"
+          "default": "'Naqsh jamoasi'"
         },
         "category": {
           "name": "category",

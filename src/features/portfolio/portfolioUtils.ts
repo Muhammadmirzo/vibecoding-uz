@@ -65,7 +65,7 @@ export function generatePlaceholderSvg(title: string, domain: string): string {
     <rect width="1200" height="750" fill="url(#bg)"/>
     <circle cx="600" cy="300" r="80" fill="rgba(255,255,255,0.08)"/>
     <text x="600" y="325" text-anchor="middle" font-family="system-ui,sans-serif" font-size="64" font-weight="bold" fill="rgba(255,255,255,0.5)">${firstLetter}</text>
-    <text x="600" y="440" text-anchor="middle" font-family="monospace" font-size="20" fill="rgba(255,255,255,0.3)">${domain || "vibecoding.uz"}</text>
+    <text x="600" y="440" text-anchor="middle" font-family="monospace" font-size="20" fill="rgba(255,255,255,0.3)">${domain || "naqsh"}</text>
   </svg>`;
 
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;

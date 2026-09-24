@@ -9,6 +9,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { PwaRegister } from "@/components/layout/PwaRegister";
 import { ClientModals } from "@/components/layout/ClientModals";
 import { userSchema, User } from "@/lib/validations/auth";
+import { BRAND } from "@/config/brand";
 
 const onest = Onest({
   subsets: ["latin"],
@@ -37,53 +38,44 @@ const jetBrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://academy.mirzo.uz";
+const siteUrl = BRAND.url;
 const title = "AI bilan mahsulot qurishni o'rganing";
-const description =
-  "Mirzo Academy'da AI va vibe coding yordamida g'oyadan jonli web ilova, bot va MVP yaratishni amaliy mentorlik bilan o'rganing.";
+const description = `${BRAND.name}da AI va vibe coding yordamida g'oyadan jonli web ilova, bot va MVP yaratishni amaliy mentorlik bilan o'rganing.`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
     default: title,
-    template: "%s | Mirzo Academy",
+    template: `%s — ${BRAND.name}`,
   },
   description,
-  keywords: ["Mirzo Academy", "vibecoding kursi", "vibe coding O'zbekiston", "Claude Code kursi", "AI bilan dasturlash"],
+  applicationName: BRAND.name,
+  keywords: ["Naqsh", "naqsh maktabi", "vibe coding O'zbekiston", "Claude Code kursi", "AI bilan dasturlash"],
   alternates: {
     canonical: "/",
   },
   manifest: "/manifest.json",
   icons: {
-    icon: "/favicon.ico",
-    apple: "/icons/icon-192.png",
+    icon: "/icon.svg",
+    apple: "/apple-icon",
   },
   appleWebApp: {
     capable: true,
-    title: "Mirzo Academy",
+    title: BRAND.name,
     statusBarStyle: "default",
   },
   openGraph: {
     title,
     description,
     url: "/",
-    siteName: "Mirzo Academy",
-    locale: "uz_UZ",
+    siteName: BRAND.name,
+    locale: BRAND.locale,
     type: "website",
-    images: [
-      {
-        url: "/images/hero-banner.jpg",
-        width: 1376,
-        height: 768,
-        alt: "Mirzo Academy — AI bilan mahsulot yaratish kurslari",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title,
     description,
-    images: ["/images/hero-banner.jpg"],
   },
 };
 

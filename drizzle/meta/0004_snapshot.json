@@ -1,5 +1,5 @@
 {
-  "id": "31987b5b-779d-45b8-ac0e-83dc51a03bfa",
+  "id": "7f029e11-d42a-469a-91fc-51b09fc41f42",
   "prevId": "2b6a77e0-4f22-40b9-95e7-dc1ea205ad68",
   "version": "7",
   "dialect": "postgresql",
@@ -292,110 +292,6 @@
           "nullsNotDistinct": false,
           "columns": [
             "phone"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.telegram_login_requests": {
-      "name": "telegram_login_requests",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "nonce_hash": {
-          "name": "nonce_hash",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "status": {
-          "name": "status",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'pending'"
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "tg_user_id": {
-          "name": "tg_user_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "expires_at": {
-          "name": "expires_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "approved_at": {
-          "name": "approved_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "consumed_at": {
-          "name": "consumed_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "ip": {
-          "name": "ip",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "user_agent": {
-          "name": "user_agent",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "telegram_login_requests_user_id_users_id_fk": {
-          "name": "telegram_login_requests_user_id_users_id_fk",
-          "tableFrom": "telegram_login_requests",
-          "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "telegram_login_requests_nonce_hash_unique": {
-          "name": "telegram_login_requests_nonce_hash_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "nonce_hash"
           ]
         }
       },
@@ -1544,7 +1440,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "default": "'Mirzo Academy Team'"
+          "default": "'Naqsh jamoasi'"
         },
         "category": {
           "name": "category",

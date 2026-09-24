@@ -5,7 +5,7 @@ import type { SettingsState } from "./types";
 import { siteConfig } from "@/lib/siteConfig";
 
 const initialSettings: SettingsState = {
-  siteTitle: "Mirzo Academy", supportPhone: "+998 71 200 00 00", supportTelegram: "@mirzo_academy_support_bot", maintenanceMode: false,
+  siteTitle: "Naqsh", supportPhone: "+998 71 200 00 00", supportTelegram: "@mirzo_academy_support_bot", maintenanceMode: false,
   headerCtaText: "Kurs tanlash", headerCtaLink: "/#kurs-tanlash", enrollmentUrl: "/kabinet", telegramBotLink: "https://t.me/m/ODAfK_QIMjky",
   announcementBannerText: "Yangi Vibe Coding Express guruhiga qabul boshlandi! Mashg'ulotlar tez orada start oladi.", announcementBannerLink: "/kurs/vibe-coding-express", enableAnnouncementBanner: true,
   defaultCoursePrice: "550000.00", installmentRate3Months: 0, installmentRate6Months: 10, guaranteeRefundDays: siteConfig.guaranteeDays,

@@ -70,7 +70,7 @@ export function registerStartHandler(bot: Telegraf) {
       });
       if (result.success && result.user) {
         return ctx.reply(
-          `🎉 Xush kelibsiz, <b>${escapeHtml(result.user.fullName)}</b>!\n\nHisobingiz ${BRAND.name} platformasiga muvaffaqiyatli ulandi.`,
+          `🎉 Xush kelibsiz, <b>${escapeHtml(result.user.fullName)}</b>!\n\nHisobingiz ${BRAND.name} platformasiga muvaffaqiyatli ulandi.\nBarcha dars yangiliklari va uyga vazifa baholari shu bot orqali boradi.`,
           {
             parse_mode: "HTML",
             ...Markup.inlineKeyboard([[Markup.button.url("Shaxsiy kabinet", `${BRAND.url}/kabinet`)]]),

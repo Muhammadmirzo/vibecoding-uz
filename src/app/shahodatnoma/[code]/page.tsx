@@ -9,7 +9,7 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { code } = await params;
   return {
-    title: `Sertifikat Tekshiruvi ${code} | Mirzo Academy`,
+    title: `Sertifikat Tekshiruvi ${code} | Naqsh`,
     description: "Sertifikatning haqiqiyligini ommaviy tekshirish sahifasi.",
   };
 }
