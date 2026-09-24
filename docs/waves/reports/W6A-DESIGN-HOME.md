@@ -115,3 +115,25 @@ Critical review: hero hierarchy and CTA are immediately legible; dark mode keeps
 - Native scroll-driven animation is Chromium-progressive enhancement; Firefox/Safari users receive the complete static sequence and existing IO reveals, not broken content.
 - Motion `off`, `subtle`, and reduced-motion layouts were explicitly guarded; W6C must preserve those gates.
 - No push or deployment performed.
+
+## Round 2 — Orchestrator review fixes
+
+### Defects corrected
+
+- **Empty/broken sticky story:** the pinned stage now has a persistent section title and explanation, a centered 25vh–88vh stage, and full-width active content. The native `--story` named timeline now covers the complete sticky range without the previous cover-range mismatch. Five 1440px frames at 0%, 25%, 50%, 75%, and 100% show a continuous idea → prompt → app sequence with no empty transition: `e2e/screenshots/w6a-home-1440-{light,dark}-story-{000,025,050,075,100}.png`.
+- **Clipped terminal/card:** the horizontal terminal/card wipe was removed. Individual prompt rows reveal as whole lines with opacity/transform and staggered ranges, so no card edge or word is cut in half. Proven by the 25% and 50% frames above, especially `w6a-home-1440-dark-story-025.png`.
+- **Faded Ilova skeleton:** the story now uses a separate detailed demo preview with real menu rows, cart quantity controls, a Telegram order button, and the unchanged “Demo interfeys · real buyurtma emas” label. It is full opacity at 100%: `w6a-home-1440-{light,dark}-story-100.png` and `w6a-home-390-{light,dark}-story-app.png`.
+- **Inactive story rail:** G'OYA, PROMPT, and ILOVA are tied to the same named timeline; the connecting line fills and the step dots/labels are accent-filled. Proven across the 000/025/050/075/100 frame set.
+- **Doubled gradient heading:** `ScrollFillText` now uses a shared grid cell for both text copies (`display: inline-grid`, both children `grid-area: 1 / 1`), with identical inherited metrics. The final gradient is brand → accent with only a small gold endpoint. Verified at 390, 768, and 1440 in `w6a-home-{390,768,1440}-{light,dark}-fill.png`; bento composition screenshots are `w6a-home-{390,1440}-{light,dark}-bento.png`.
+- **Cut prompt demo letters:** the bento prompt is now one nowrap line, “Vazifani aniq yozing.”, with a separate blinking caret; motion off/reduced motion renders the complete static sentence. Proven by the 390px and 1440px bento frames.
+- **Bento tile 01 gap:** added an honest three-part visual cue (Muammo / Foydalanuvchi / Natija) to balance the icon/title spacing without changing the meaning. Proven by `w6a-home-1440-light-bento.png` and `w6a-home-390-light-bento.png`.
+
+### Round 2 performance and verification
+
+- `npx tsc --noEmit` — pass.
+- `npx vitest run` — pass: **506 tests across 67 files**.
+- `scripts/waves/locked.sh npm run build` — pass, 90 pages; home **2.44 kB route / 125 kB First Load JS** (still within the W6A budget; shared JS remains 102 kB).
+- `scripts/waves/locked.sh env E2E_PORT=3301 npx playwright test e2e/responsive.spec.ts e2e/visibility.spec.ts` — **142 passed**. The first attempt was interrupted by the command timeout while the dev server was compiling; the complete rerun passed.
+- Final locked Lighthouse mobile production run with `--throttling-method=devtools` — performance **79**, FCP **1.7s**, LCP **2.3s**, CLS **0**, TBT 770ms, Speed Index 2.2s. The required LCP ≤2.5s and CLS 0 budgets pass. Raw report: `/tmp/opencode/w6a-round2-lighthouse-final.json` (not committed).
+- Visual review covered light/dark at 390 and 1440, the five-frame 1440 story range, the bento, 390/768/1440 fill states, mobile story states, and the unchanged hero. No horizontal overflow, doubled heading, half-cut prompt card, cut demo letters, empty pinned stage, or faded final app state remained.
+- All changed source files remain under 250 lines. Dev server was stopped by PID; no push or deployment performed.

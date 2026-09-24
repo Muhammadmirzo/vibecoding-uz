@@ -14,8 +14,13 @@ export function BuildStory() {
       <div className="story-track">
         <div className="story-pin">
           <Container className="relative flex h-full flex-col justify-center">
-            <div className="story-kicker"><span /><span>G'oyadan amaliyotgacha</span><span /></div>
-            <h2 id="story-title" className="sr-only">G'oya, prompt va ishlaydigan ilova</h2>
+            <header className="story-heading">
+              <p className="story-kicker">G'oya → Prompt → Ilova</p>
+              <h2 id="story-title">Bir fikrdan ishlatiladigan interfeysgacha.</h2>
+              <p>Avval natijani tasavvur qiling. Keyin uni AI bilan aniq qadamlarga aylantiring.</p>
+            </header>
+
+            <div className="story-stage" aria-live="polite">
 
             <article className="story-layer story-idea">
               <div className="story-idea-mark"><Lightbulb className="size-7" aria-hidden="true" /></div>
@@ -37,13 +42,18 @@ export function BuildStory() {
 
             <article className="story-layer story-app">
               <div className="story-app-caption"><MousePointer2 className="size-4 text-accent" aria-hidden="true" /><span>Ishlaydigan demo qurildi</span></div>
-              <AppPreview />
+              <AppPreview detailed />
               <p className="text-center font-mono text-xs text-ink-subtle">Prompt → tarkib → tekshiruv → ilova</p>
             </article>
 
-            <ol className="story-rail" aria-label="Asosiy uch qadam">
-              <li><span />G'oya</li><li><span />Prompt</li><li><span />Ilova</li>
-            </ol>
+            </div>
+
+            <nav className="story-rail" aria-label="Asosiy uch qadam">
+              <span className="story-rail-line" aria-hidden="true"><span /></span>
+              <span className="story-step story-step-idea"><span />G'oya</span>
+              <span className="story-step story-step-prompt"><span />Prompt</span>
+              <span className="story-step story-step-app"><span />Ilova</span>
+            </nav>
           </Container>
         </div>
       </div>

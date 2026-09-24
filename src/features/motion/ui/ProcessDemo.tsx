@@ -15,7 +15,10 @@ export function ProcessDemo({ kind }: ProcessDemoProps) {
     return (
       <div className="demo-prompt" aria-label="AI prompt namunasi">
         <Sparkles className="size-4 shrink-0 text-accent" aria-hidden="true" />
-        <span className="demo-typing">Vazifani aniq yozing, natijani tekshiring, keyingi qadamni tanlang.</span>
+        <span className="demo-typing">
+          <span className="demo-typing-text">Vazifani aniq yozing.</span>
+          <span className="demo-caret" aria-hidden="true" />
+        </span>
         <Send className="size-4 shrink-0 text-ink-subtle" aria-hidden="true" />
       </div>
     );

@@ -10,6 +10,9 @@
 .bento-card:hover { border-color: var(--border-strong); box-shadow: var(--shadow-md); }
 .bento-index { position: absolute; top: 1.25rem; right: 1.25rem; color: var(--ink-subtle); font-family: var(--font-mono); font-size: .68rem; }
 .bento-icon { width: 2.5rem; height: 2.5rem; color: var(--accent); stroke-width: 1.4; }
+.bento-facts { position: relative; z-index: 1; display: flex; align-items: center; gap: .55rem; margin-top: 1.8rem; }
+.bento-facts span { display: flex; align-items: center; gap: .4rem; border: 1px solid var(--border); border-radius: 999px; background: var(--bg-sunken); padding: .42rem .65rem; color: var(--ink-muted); font-size: .66rem; }
+.bento-facts b { color: var(--brand); font-family: var(--font-mono); font-size: .58rem; }
 html.motion-armed[data-motion-scroll="on"] [data-reveal].is-visible .bento-icon * { animation: bento-icon-draw var(--motion-slow) var(--motion-ease-out) both; }
 @keyframes bento-icon-draw { from { opacity: 0; stroke-dasharray: 32; stroke-dashoffset: 32; transform: scale(.82); } to { opacity: 1; stroke-dasharray: 32; stroke-dashoffset: 0; transform: scale(1); } }
 .bento-card h3 { position: relative; z-index: 1; max-width: 30rem; font-size: clamp(1.35rem, 2vw, 1.8rem); font-weight: 700; letter-spacing: -.03em; }
@@ -17,9 +20,13 @@ html.motion-armed[data-motion-scroll="on"] [data-reveal].is-visible .bento-icon 
 .tilt-card { height: 100%; transform-style: preserve-3d; }
 
 .demo-prompt { position: relative; z-index: 1; display: flex; align-items: center; gap: .65rem; margin-top: auto; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--bg-sunken); padding: .85rem; color: var(--ink-muted); font-family: var(--font-mono); font-size: .68rem; }
-.demo-typing { display: -webkit-box; overflow: hidden; white-space: normal; }
-html[data-motion="full"][data-motion-ambient="on"] .demo-typing { animation: demo-type 6s steps(42, end) infinite; }
-@keyframes demo-type { 0%, 12% { clip-path: inset(0 100% 0 0); } 42%, 76% { clip-path: inset(0 0 0 0); } 92%, 100% { clip-path: inset(0 0 0 100%); } }
+.demo-typing { display: flex; min-width: 0; flex: 1; align-items: center; overflow: hidden; white-space: nowrap; }
+.demo-typing-text { overflow: hidden; text-overflow: clip; }
+.demo-caret { width: 1px; height: 1em; flex: none; margin-left: 2px; background: var(--accent); }
+html[data-motion="full"][data-motion-ambient="on"] .demo-typing-text { animation: demo-type 6s steps(37, end) infinite; }
+html[data-motion="full"][data-motion-ambient="on"] .demo-caret { animation: demo-caret 800ms steps(2, jump-none) infinite; }
+@keyframes demo-type { 0%, 12% { clip-path: inset(0 100% 0 0); } 42%, 78% { clip-path: inset(0); } 92%, 100% { clip-path: inset(0 0 0 100%); } }
+@keyframes demo-caret { 50% { opacity: 0; } }
 .demo-toggle-row { position: relative; z-index: 1; display: flex; width: 100%; align-items: center; gap: .75rem; margin-top: auto; border: 1px solid var(--border); border-radius: var(--radius-md); padding: .75rem; transition: border-color var(--motion-fast), background-color var(--motion-fast); }
 .demo-toggle-row:hover { border-color: var(--accent); background: var(--accent-soft); }
 .demo-toggle { position: relative; width: 2.6rem; height: 1.5rem; flex: none; border-radius: 999px; background: var(--border-strong); transition: transform var(--motion-fast) var(--motion-ease-out), background-color var(--motion-fast); }
@@ -27,8 +34,9 @@ html[data-motion="full"][data-motion-ambient="on"] .demo-typing { animation: dem
 .demo-toggle.is-on { background: var(--accent); }.demo-toggle.is-on span { transform: translateX(1.1rem); }
 .demo-toggle-row strong,.demo-toggle-row small { display: block; }.demo-toggle-row strong { font-size: .75rem; color: var(--ink); }.demo-toggle-row small { font-size: .65rem; color: var(--ink-muted); }
 
-.scroll-fill-text { position: relative; display: inline; color: var(--ink-subtle); }
-.scroll-fill-base { position: absolute; inset: 0; color: transparent; background: linear-gradient(110deg, var(--brand), var(--accent) 48%, var(--gold)); background-clip: text; -webkit-background-clip: text; clip-path: inset(0 100% 0 0); }
+.scroll-fill-text { display: inline-grid; color: var(--ink-subtle); }
+.scroll-fill-text > span { grid-area: 1 / 1; min-width: 0; }
+.scroll-fill-base { color: transparent; background: linear-gradient(105deg, var(--brand) 0%, var(--brand-hover) 38%, var(--accent) 88%, var(--gold) 100%); background-clip: text; -webkit-background-clip: text; clip-path: inset(0 100% 0 0); }
 .roadmap-map { view-timeline-name: --roadmap; }
 .roadmap-path { position: absolute; left: 0; top: 0; width: 100%; height: 180px; overflow: visible; }
 .roadmap-path-base,.roadmap-path-progress { fill: none; stroke-width: 2; vector-effect: non-scaling-stroke; }
@@ -70,6 +78,11 @@ html[data-motion="full"][data-motion-ambient="on"] .demo-typing { animation: dem
 @keyframes roadmap-card { from { border-color: var(--border); transform: translateY(18px); } 55% { border-color: var(--gold); } to { border-color: var(--border-strong); transform: translateY(0); } }
 @keyframes girih-wipe { from { clip-path: polygon(0 0,100% 0,100% 0,94% 0,94% 0,82% 0,82% 0,62% 0,62% 0,38% 0,38% 0,18% 0,18% 0,6% 0,6% 0,0 0); } to { clip-path: polygon(0 0,100% 0,100% 28%,94% 42%,94% 76%,82% 76%,82% 100%,62% 100%,62% 66%,38% 66%,38% 100%,18% 100%,18% 76%,6% 76%,6% 42%,0 28%); } }
 
+@media (prefers-reduced-motion: reduce) {
+  .scroll-fill-base { clip-path: none; }
+  .demo-typing-text { clip-path: none; }
+}
+
 @media (max-width: 1023px) {
   .bento-tile,.bento-wide { grid-column: span 6; }
   .roadmap-path { display: none; }
@@ -79,5 +92,7 @@ html[data-motion="full"][data-motion-ambient="on"] .demo-typing { animation: dem
 @media (max-width: 639px) {
   .hero-proof { right: .5rem; }.hero-orbit { inset: -12px; }
   .bento-tile,.bento-wide { grid-column: 1 / -1; min-height: 310px; }
+  .bento-facts { flex-wrap: wrap; margin-top: 1.25rem; }
+  .bento-facts span { padding: .38rem .55rem; }
   .roadmap-grid { grid-template-columns: 1fr; }
 }

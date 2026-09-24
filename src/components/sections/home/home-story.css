@@ -3,78 +3,108 @@
 .story-section { position: relative; }
 .story-track { min-height: 0; }
 .story-pin { padding: 5rem 0; }
-.story-kicker { display: flex; align-items: center; gap: .75rem; margin-bottom: 2.5rem; color: var(--brand); font-family: var(--font-mono); font-size: .68rem; letter-spacing: .14em; text-transform: uppercase; }
-.story-kicker > span:first-child,.story-kicker > span:last-child { height: 1px; flex: 1; background: var(--border); }
+.story-heading { text-align: center; }
+.story-kicker { color: var(--brand); font-family: var(--font-mono); font-size: .68rem; letter-spacing: .14em; text-transform: uppercase; }
+.story-heading h2 { max-width: 58rem; margin: .8rem auto 0; font-size: clamp(1.8rem, 4vw, 3.8rem); font-weight: 700; letter-spacing: -.04em; }
+.story-heading > p:last-child { max-width: 46rem; margin: 1rem auto 0; color: var(--ink-muted); }
+.story-stage { position: relative; min-height: 62vh; }
 .story-layer { position: relative; }
 .story-idea { border-left: 1px solid var(--border-strong); padding: .5rem 0 .5rem 1.5rem; }
 .story-idea-mark { display: grid; width: 3.5rem; height: 3.5rem; margin-bottom: 2rem; place-items: center; border-radius: 50%; background: var(--gold-soft); color: var(--gold); }
 .story-idea h3 { max-width: 48rem; margin-top: .75rem; font-size: clamp(1.8rem, 5vw, 3.7rem); font-weight: 700; line-height: 1.12; letter-spacing: -.04em; color: var(--ink); }
 .story-idea > p:last-child { margin-top: 1rem; color: var(--ink-muted); font-size: 1.05rem; }
-.story-prompt { margin-top: 2rem; }
 .story-window { overflow: hidden; border: 1px solid var(--terminal-border); border-radius: var(--radius-lg); background: var(--terminal-bg); box-shadow: var(--shadow-lg); color: var(--terminal-ink); }
 .story-window-bar { display: flex; align-items: center; gap: .45rem; border-bottom: 1px solid var(--terminal-border); padding: .75rem 1rem; }
 .story-window > div:last-child { padding: clamp(1.25rem, 4vw, 2rem); }
 .story-build-line { display: grid; grid-template-columns: 1.5rem 1fr; color: var(--terminal-ink); }
 .story-build-line > span { color: var(--terminal-muted); }
 .story-build-check { display: flex; align-items: center; gap: .5rem; border-top: 1px solid var(--terminal-border); padding-top: 1rem; color: var(--accent); }
-.story-app { margin-top: 2rem; display: flex; flex-direction: column; align-items: center; }
-.story-app .app-preview { max-width: 620px; }
+.story-app { display: flex; flex-direction: column; align-items: center; }
+.story-app .app-preview { max-width: 760px; }
 .story-app-caption { display: flex; align-items: center; gap: .5rem; margin-bottom: .75rem; color: var(--ink); font-weight: 700; }
-.story-rail { display: flex; justify-content: space-between; gap: .5rem; margin-top: 3rem; color: var(--ink-subtle); font-family: var(--font-mono); font-size: .62rem; text-transform: uppercase; letter-spacing: .1em; }
-.story-rail li { display: flex; align-items: center; gap: .4rem; }.story-rail li > span { width: .4rem; height: .4rem; border-radius: 50%; background: var(--border-strong); }
+.story-app > p { margin-top: .65rem; color: var(--ink-subtle); }
+.story-rail { position: relative; display: flex; justify-content: space-between; margin: 2rem auto 0; color: var(--ink-subtle); font-family: var(--font-mono); font-size: .62rem; text-transform: uppercase; letter-spacing: .1em; }
+.story-step { position: relative; z-index: 1; display: flex; align-items: center; gap: .4rem; }
+.story-step > span { width: .5rem; height: .5rem; border-radius: 50%; background: var(--border-strong); }
+.story-rail-line { position: absolute; top: .2rem; right: .35rem; left: .35rem; height: 1px; overflow: hidden; background: var(--border); }
+.story-rail-line > span { display: block; width: 100%; height: 100%; background: var(--accent); transform: scaleX(0); transform-origin: left; }
 
 @supports (animation-timeline: view()) {
   @media (min-width: 1024px) {
     html[data-motion-scroll="on"] .story-track { height: 150vh; view-timeline-name: --story; view-timeline-axis: block; }
     html[data-motion-scroll="on"] .story-pin { position: sticky; top: 0; height: 100vh; overflow: hidden; padding: 0; }
     html[data-motion-scroll="on"] .story-pin > div { display: block; }
-    html[data-motion-scroll="on"] .story-kicker { position: absolute; top: max(5rem, 9vh); right: 0; left: 0; }
-    html[data-motion-scroll="on"] .story-layer { position: absolute; top: 50%; right: clamp(1rem, 5vw, 5rem); left: clamp(1rem, 5vw, 5rem); transform: translateY(-50%); }
-    html[data-motion-scroll="on"] .story-idea { margin: 0; padding: 1rem 0 1rem clamp(1rem, 3vw, 3rem); }
+    html[data-motion-scroll="on"] .story-heading { position: absolute; top: 11vh; right: 0; left: 0; }
+    html[data-motion-scroll="on"] .story-heading h2 { font-size: clamp(2.2rem, 3.3vw, 3.5rem); }
+    html[data-motion-scroll="on"] .story-stage { position: absolute; top: 25vh; right: clamp(1rem, 5vw, 5rem); bottom: 12vh; left: clamp(1rem, 5vw, 5rem); min-height: 0; }
+    html[data-motion-scroll="on"] .story-layer { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; transform: translateY(0); }
+    html[data-motion-scroll="on"] .story-idea { margin: 0 auto; width: min(100%, 960px); padding: 1rem 0 1rem clamp(1rem, 3vw, 3rem); }
     html[data-motion-scroll="on"] .story-idea-mark { margin-bottom: 1.25rem; }
-    html[data-motion-scroll="on"] .story-idea h3 { max-width: 58rem; font-size: clamp(2.4rem, 4vw, 4.7rem); }
-    html[data-motion-scroll="on"] .story-prompt { margin: 0 auto; max-width: 880px; }
-    html[data-motion-scroll="on"] .story-app { margin: 0 auto; max-width: 800px; }
-    html[data-motion-scroll="on"] .story-rail { position: absolute; right: clamp(1rem, 5vw, 5rem); bottom: max(2rem, 6vh); left: clamp(1rem, 5vw, 5rem); margin: 0; }
+    html[data-motion-scroll="on"] .story-idea h3 { font-size: clamp(2.4rem, 4vw, 4.7rem); }
+    html[data-motion-scroll="on"] .story-prompt { margin: 0 auto; width: min(100%, 880px); }
+    html[data-motion-scroll="on"] .story-app { margin: 0 auto; width: min(100%, 800px); }
+    html[data-motion-scroll="on"] .story-rail { position: absolute; right: clamp(1rem, 5vw, 5rem); bottom: 4vh; left: clamp(1rem, 5vw, 5rem); margin: 0; }
 
-    html[data-motion-scroll="on"] .story-idea { animation: story-idea linear both; animation-timeline: --story; animation-range: cover 0% cover 100%; }
-    html[data-motion-scroll="on"] .story-prompt { animation: story-prompt linear both; animation-timeline: --story; animation-range: cover 0% cover 100%; }
-    html[data-motion-scroll="on"] .story-window { animation: story-window linear both; animation-timeline: --story; animation-range: cover 0% cover 100%; }
+    html[data-motion-scroll="on"] .story-idea { animation: story-idea linear both; animation-timeline: --story; animation-range: contain 0% contain 50%; }
+    html[data-motion-scroll="on"] .story-prompt { animation: story-prompt linear both; animation-timeline: --story; animation-range: contain 0% contain 50%; }
     html[data-motion-scroll="on"] .story-build-line,.story-build-check { animation: story-build linear both; animation-timeline: --story; }
-    html[data-motion-scroll="on"] .story-build-1 { animation-range: 20% 42%; }
-    html[data-motion-scroll="on"] .story-build-2 { animation-range: 32% 53%; }
-    html[data-motion-scroll="on"] .story-build-3 { animation-range: 44% 65%; }
-    html[data-motion-scroll="on"] .story-build-check { animation-range: 56% 76%; }
-    html[data-motion-scroll="on"] .story-app { animation: story-app linear both; animation-timeline: --story; animation-range: cover 0% cover 100%; }
+    html[data-motion-scroll="on"] .story-build-1 { animation-range: contain 11% contain 17%; }
+    html[data-motion-scroll="on"] .story-build-2 { animation-range: contain 15% contain 21.5%; }
+    html[data-motion-scroll="on"] .story-build-3 { animation-range: contain 19% contain 25.5%; }
+    html[data-motion-scroll="on"] .story-build-check { animation-range: contain 23% contain 30%; }
+    html[data-motion-scroll="on"] .story-app { animation: story-app linear both; animation-timeline: --story; animation-range: contain 0% contain 50%; }
     html[data-motion-scroll="on"] .story-app .app-preview-layer { animation: story-assemble linear both; animation-timeline: --story; }
-    html[data-motion-scroll="on"] .story-app .app-layer-menu { animation-range: 64% 79%; }
-    html[data-motion-scroll="on"] .story-app .app-layer-order { animation-range: 70% 86%; }
-    html[data-motion-scroll="on"] .story-app .app-layer-chat { animation-range: 76% 94%; }
+    html[data-motion-scroll="on"] .story-app .app-layer-menu { animation-range: contain 30% contain 38%; }
+    html[data-motion-scroll="on"] .story-app .app-layer-order { animation-range: contain 34% contain 43%; }
+    html[data-motion-scroll="on"] .story-app .app-layer-chat { animation-range: contain 38% contain 47%; }
+    html[data-motion-scroll="on"] .story-rail-line > span { animation: story-rail-fill linear both; animation-timeline: --story; animation-range: contain 0% contain 50%; }
+    html[data-motion-scroll="on"] .story-step-idea { animation: story-step-idea linear both; animation-timeline: --story; animation-range: contain 0% contain 50%; }
+    html[data-motion-scroll="on"] .story-step-prompt { animation: story-step-prompt-state linear both; animation-timeline: --story; animation-range: contain 0% contain 50%; }
+    html[data-motion-scroll="on"] .story-step-app { animation: story-step-app-state linear both; animation-timeline: --story; animation-range: contain 0% contain 50%; }
+    html[data-motion-scroll="on"] .story-step > span { animation-timeline: --story; animation-range: contain 0% contain 50%; }
+    html[data-motion-scroll="on"] .story-step-idea > span { animation: story-step-idea linear both; }
+    html[data-motion-scroll="on"] .story-step-prompt > span { animation: story-step-prompt-state linear both; }
+    html[data-motion-scroll="on"] .story-step-app > span { animation: story-step-app-state linear both; }
   }
 }
 
 @keyframes story-idea {
-  0%, 17% { opacity: 1; transform: translateY(-50%) translateX(0); }
-  34%, 100% { opacity: 0; transform: translateY(-50%) translateX(-3%); }
+  0%, 18% { opacity: 1; transform: translateX(0); }
+  24%, 100% { opacity: 0; transform: translateX(-3%); }
 }
 @keyframes story-prompt {
-  0%, 23% { opacity: 0; transform: translateY(-46%) scale(.98); }
-  35%, 56% { opacity: 1; transform: translateY(-50%) scale(1); }
-  68%, 100% { opacity: 0; transform: translateY(-54%) scale(.99); }
+  0%, 22% { opacity: 0; transform: translateY(3%) scale(.985); }
+  25%, 55% { opacity: 1; transform: translateY(0) scale(1); }
+  66%, 100% { opacity: 0; transform: translateY(-3%) scale(.99); }
 }
-@keyframes story-window { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0); } }
-@keyframes story-build { from { opacity: 0; clip-path: inset(0 100% 0 0); } to { opacity: 1; clip-path: inset(0); } }
+@keyframes story-build { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
 @keyframes story-app {
-  0%, 61% { opacity: 0; transform: translateY(-44%) scale(.97); }
-  74%, 100% { opacity: 1; transform: translateY(-50%) scale(1); }
+  0%, 58% { opacity: 0; transform: translateY(4%) scale(.97); }
+  70%, 100% { opacity: 1; transform: translateY(0) scale(1); }
 }
 @keyframes story-assemble { from { opacity: 0; transform: translateY(18px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes story-rail-fill { to { transform: scaleX(1); } }
+@keyframes story-step-idea { 0%, 100% { color: var(--accent); } }
+@keyframes story-step-prompt-state { 0%, 100% { color: var(--accent); } }
+@keyframes story-step-app-state { 0%, 100% { color: var(--accent); } }
+
+@media (max-width: 1023px) {
+  .story-stage { display: grid; gap: 2rem; margin-top: 3rem; }
+  .story-layer + .story-layer { margin-top: 0; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   .story-track { height: auto !important; }
   .story-pin { position: static !important; height: auto !important; overflow: visible !important; padding: 5rem 0; }
   .story-pin > div { display: flex !important; }
-  .story-layer { position: relative !important; inset: auto !important; transform: none !important; margin-top: 2rem; }
-  .story-idea { margin-top: 0; }
-  .story-layer,.story-window,.story-build-line,.story-build-check,.story-app .app-preview-layer { animation: none !important; }
+  .story-layer { position: relative !important; inset: auto !important; transform: none !important; }
+  .story-layer,.story-build-line,.story-build-check,.story-app .app-preview-layer,.story-rail,.story-step { animation: none !important; }
+  .story-step > span { background: var(--accent); }
+  .story-rail-line > span { transform: scaleX(1); }
 }
+
+[data-motion="off"] .story-layer,
+[data-motion="off"] .story-build-line,
+[data-motion="off"] .story-build-check,
+[data-motion="off"] .story-app .app-preview-layer,
+[data-motion="off"] .story-step { animation: none !important; opacity: 1 !important; transform: none !important; }

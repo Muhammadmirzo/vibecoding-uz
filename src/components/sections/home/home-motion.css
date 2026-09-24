@@ -44,6 +44,24 @@ html:not([data-motion="full"]) .hero-orbit, html.is-tab-hidden .hero-orbit { ani
 .app-preview-note { border-top: 1px solid var(--border); padding: .6rem 1rem; color: var(--ink-subtle); font-size: .65rem; }
 .app-preview-compact .app-preview-body { min-height: 190px; }
 .app-preview-compact .app-layer-menu { min-height: 155px; }
+.app-preview-detailed { max-width: 760px; }
+.app-preview-detailed .app-preview-bar strong { font-size: .8rem; }
+.app-demo-badge { border-radius: 999px; background: var(--success-soft); padding: .3rem .55rem; color: var(--success); font-family: var(--font-mono); font-size: .58rem; font-weight: 700; }
+.app-detail-body { display: grid; grid-template-columns: 1.2fr .8fr; align-items: stretch; min-height: 300px; }
+.app-detail-menu,.app-detail-cart { position: relative; inset: auto !important; display: flex; min-height: 260px; flex-direction: column; gap: .7rem; padding: 1.1rem; }
+.app-detail-menu-head { display: flex; align-items: baseline; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: .65rem; }
+.app-detail-menu-head strong { font-size: .9rem; }.app-detail-menu-head small { color: var(--ink-subtle); font-size: .62rem; }
+.app-menu-item { display: flex; align-items: center; justify-content: space-between; border-radius: var(--radius-sm); background: var(--bg-sunken); padding: .7rem .8rem; font-size: .75rem; }
+.app-menu-item small { color: var(--ink-muted); font-family: var(--font-mono); font-size: .62rem; }
+.app-cart-line { display: flex; align-items: center; justify-content: space-between; font-size: .75rem; }
+.app-quantity { display: flex; align-items: center; gap: .45rem; font-family: var(--font-mono); }.app-quantity svg { width: .7rem; height: .7rem; }
+.app-detail-cart button { display: flex; align-items: center; justify-content: center; gap: .45rem; margin-top: auto; border-radius: var(--radius-sm); background: var(--telegram); padding: .8rem; color: var(--terminal-ink); font-size: .7rem; font-weight: 700; }
+
+@media (max-width: 639px) {
+  .app-detail-body { grid-template-columns: 1fr; }
+  .app-detail-menu { min-height: 0; }
+  .app-detail-cart { min-height: 190px; }
+}
 
 .tool-strip { position: relative; overflow: hidden; }
 .tool-veil { position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(to bottom, var(--bg-sunken), transparent 15%, transparent 85%, var(--bg-sunken)); }

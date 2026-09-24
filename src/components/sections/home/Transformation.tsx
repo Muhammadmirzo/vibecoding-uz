@@ -32,6 +32,9 @@ export function Transformation() {
             <Spotlight className="h-full"><Tilt className="h-full">
               <article className="bento-card h-full">
                 <div className="bento-index">01</div><Icon className="bento-icon" aria-hidden="true" />
+                <div className="bento-facts" aria-label="Aniqlashtiriladigan uch element">
+                  <span><b>01</b>Muammo</span><span><b>02</b>Foydalanuvchi</span><span><b>03</b>Natija</span>
+                </div>
                 <div className="mt-auto"><h3>Avval muammoni kichraytiramiz.</h3><p>Vazifa, kim uchun va muvaffaqiyat nimani anglatishi — prompt yozilishidan oldin aniq bo'ladi.</p></div>
               </article>
             </Tilt></Spotlight>
