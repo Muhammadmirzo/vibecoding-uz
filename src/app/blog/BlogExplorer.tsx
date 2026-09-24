@@ -29,6 +29,17 @@ export function BlogExplorer({ posts }: { posts: BlogPostSummary[] }) {
     setSelectedCategory("Barchasi");
   };
 
+  const applyFilter = (apply: () => void) => {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const root = document.documentElement;
+    const vt = (document as Document & { startViewTransition?: (cb: () => void) => void }).startViewTransition;
+    if (!reduce && root.dataset.motion === "full" && typeof vt === "function") {
+      vt.bind(document)(apply);
+    } else {
+      apply();
+    }
+  };
+
   return (
     <>
       <BlogFilters
@@ -36,8 +47,8 @@ export function BlogExplorer({ posts }: { posts: BlogPostSummary[] }) {
         selectedCategory={selectedCategory}
         categories={BLOG_CATEGORIES}
         onQueryChange={setSearchQuery}
-        onClearQuery={() => setSearchQuery("")}
-        onCategorySelect={setSelectedCategory}
+        onClearQuery={() => applyFilter(() => setSearchQuery(""))}
+        onCategorySelect={(category) => applyFilter(() => setSelectedCategory(category))}
       />
 
       <div className="flex items-center justify-between border-b border-border pb-3 font-mono text-xs text-ink-muted">
@@ -56,7 +67,7 @@ export function BlogExplorer({ posts }: { posts: BlogPostSummary[] }) {
           <p className="text-xs text-ink-muted">
             {searchQuery ? `"${searchQuery}" so'rovi bo'yicha hech qanday maqola topilmadi.` : "Bu kategoriyada hozircha maqola yo'q."} Qidiruv so&apos;zini o&apos;zgartirib ko&apos;ring.
           </p>
-          <Button type="button" onClick={resetFilters} variant="outline" size="sm">Filtrlarni tozalash</Button>
+          <Button type="button" onClick={() => applyFilter(resetFilters)} variant="outline" size="sm">Filtrlarni tozalash</Button>
         </div>
       )}
     </>

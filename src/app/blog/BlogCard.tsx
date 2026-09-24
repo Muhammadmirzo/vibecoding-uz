@@ -6,14 +6,14 @@ import type { BlogPostSummary } from "@/features/blog/blogData";
 
 export const BlogCard = React.memo(function BlogCard({ post, priority = false }: { post: BlogPostSummary; priority?: boolean }) {
   return (
-    <article className="group flex flex-col overflow-hidden rounded-2xl border border-border-strong bg-bg-elevated transition-all duration-200 hover:-translate-y-0.5 hover:border-accent/50 hover:shadow-md">
+    <article className="group w6c-cover flex flex-col overflow-hidden rounded-2xl border border-border-strong bg-bg-elevated transition-all duration-200 hover:-translate-y-0.5 hover:border-accent hover:shadow-md" style={{ "--w6c-vt": `post-${post.id}` } as React.CSSProperties}>
       <div className="relative h-48 w-full overflow-hidden bg-bg-sunken">
         <Image src={post.coverUrl} alt="" fill priority={priority} sizes="(max-width: 767px) calc(100vw - 40px), (max-width: 1023px) 50vw, 33vw" className="object-cover transition-transform duration-300 group-hover:scale-105" />
         <div className="absolute left-3 top-3">
-          <span className="rounded-full border border-border bg-bg/90 px-3 py-1 font-mono text-[11px] font-bold text-accent backdrop-blur-md">{post.category}</span>
+          <span className="rounded-full border border-border bg-[color-mix(in_srgb,var(--bg)_88%,transparent)] px-3 py-1 font-mono text-[11px] font-bold text-accent backdrop-blur-md">{post.category}</span>
         </div>
         <div className="absolute bottom-3 right-3">
-          <span className="flex items-center gap-1 rounded-full bg-bg/90 px-2.5 py-0.5 font-mono text-[11px] text-ink-muted backdrop-blur-md">
+          <span className="flex items-center gap-1 rounded-full bg-[color-mix(in_srgb,var(--bg)_88%,transparent)] px-2.5 py-0.5 font-mono text-[11px] text-ink-muted backdrop-blur-md">
             <Clock className="h-3 w-3 text-accent" /> {post.readTimeMin} daqiqa
           </span>
         </div>
