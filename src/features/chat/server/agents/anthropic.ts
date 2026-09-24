@@ -1,16 +1,41 @@
 import Anthropic from "@anthropic-ai/sdk";
-import type { ChatAgentContext, ChatAgentProvider } from "./index";
+import type { ChatAgentContext, ChatAgentProvider, ChatAgentResult } from "./index";
+
+const PERSON_REQUEST = /\b(odam|inson|admin|operator|mentor|human|person)\b/i;
 
 export class AnthropicChatAgent implements ChatAgentProvider {
   readonly id = "anthropic";
   constructor(private readonly apiKey: string | undefined, private readonly model: string) {}
-  async generateReply(ctx: ChatAgentContext): Promise<{ text: string; handoff: boolean }> {
-    if (!this.apiKey) return { text: "", handoff: true };
+
+  async generateReply(ctx: ChatAgentContext): Promise<ChatAgentResult> {
+    if (!this.apiKey) return { text: "", handoff: true, error: "missing_api_key" };
+    const latest = ctx.history.at(-1)?.body || "";
+    if (PERSON_REQUEST.test(latest)) return { text: "", handoff: true };
     try {
       const client = new Anthropic({ apiKey: this.apiKey, timeout: 8_000, maxRetries: 1 });
-      const response = await client.messages.create({ model: this.model, max_tokens: 600, system: `You are Naqsh support. Answer only from SITE FACTS. Never invent prices, dates, discounts or guarantees. Keep answers short and friendly in the visitor's language. If facts are insufficient or the visitor asks for a person, set handoff true.\n\n${ctx.persona}\n\nSITE FACTS:\n${ctx.siteFacts}`, messages: ctx.history.slice(-20).map((m) => ({ role: m.sender === "admin" || m.sender === "ai" ? "assistant" as const : "user" as const, content: m.body })) });
-      const text = response.content.find((part) => part.type === "text")?.text || "";
-      return { text: text.trim(), handoff: /human|operator|insan|odam|admin/i.test(text) };
-    } catch { return { text: "", handoff: true }; }
+      const response = await client.messages.create({
+        model: this.model,
+        max_tokens: 600,
+        system: [
+          "You are Naqsh support. Answer only from SITE FACTS.",
+          "Never invent prices, dates, discounts, guarantees, or claims.",
+          "Answer in the visitor's language, Uzbek Latin by default.",
+          "Keep it short, friendly and actionable.",
+          "If facts are insufficient, return exactly [HANDOFF] and nothing else.",
+          "If the visitor asks for a person, return exactly [HANDOFF] and nothing else.",
+          `Persona: ${ctx.persona}`,
+          `SITE FACTS:\n${ctx.siteFacts}`,
+        ].join("\n"),
+        messages: ctx.history.slice(-20).map((message) => ({
+          role: message.sender === "admin" || message.sender === "ai" ? "assistant" as const : "user" as const,
+          content: message.body,
+        })),
+      });
+      const text = response.content.find((part) => part.type === "text")?.text?.trim() || "";
+      if (!text || text === "[HANDOFF]") return { text: "", handoff: true };
+      return { text, handoff: false };
+    } catch (error) {
+      return { text: "", handoff: true, error: error instanceof Error ? error.message : "provider_error" };
+    }
   }
 }

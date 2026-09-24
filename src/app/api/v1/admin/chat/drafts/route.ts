@@ -2,23 +2,16 @@ import { type NextRequest } from "next/server";
 import { requireAdmin } from "@/lib/auth/require-auth";
 import { ok, fail } from "@/lib/api/v1/respond";
 import { getClientIp } from "@/lib/security/rateLimit";
-import { adminReplySchema } from "@/features/chat/contracts";
-import { postReply } from "@/features/chat/server/chat.service";
+import { draftApprovalSchema } from "@/features/chat/contracts";
+import { approveDraft } from "@/features/chat/server/chat.service";
 
 export async function POST(request: NextRequest) {
   const auth = await requireAdmin(request);
   if (!auth.ok) return fail(auth.response);
-  const parsed = adminReplySchema.safeParse(await request.json().catch(() => null));
+  const parsed = draftApprovalSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return fail(parsed.error);
   try {
-    const message = await postReply(
-      auth.session.userId,
-      parsed.data.conversationId,
-      parsed.data.body,
-      parsed.data.clientId,
-      getClientIp(request),
-    );
-    return ok({ message });
+    return ok({ message: await approveDraft(auth.session.userId, parsed.data.conversationId, parsed.data.draftId, getClientIp(request)) });
   } catch (error) {
     return fail(error);
   }
