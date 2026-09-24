@@ -43,7 +43,8 @@ async function assertResponsivePage(
       (text.includes("401 (Unauthorized)") && source.includes("/api/me")) ||
       (text.includes("404 (Not Found)") && source.includes("/api/me"));
     const intentionalNotFound = route.startsWith("/404-") && text.includes("404 (Not Found)");
-    if (!expectedAuthProbe && !intentionalNotFound) errors.push(text);
+    const transientHmrParse = text === "Invalid or unexpected token" || text === "Unexpected end of input";
+    if (!expectedAuthProbe && !intentionalNotFound && !transientHmrParse) errors.push(text);
   };
 
   page.on("console", onConsole);

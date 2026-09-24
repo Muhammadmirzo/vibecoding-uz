@@ -57,7 +57,7 @@
   * { @apply border-border; }
   html { scroll-behavior: smooth; }
   body { @apply bg-bg font-sans text-ink antialiased; font-size: 17px; line-height: 1.65; transition: background-color 180ms ease, color 180ms ease; }
-  h1, h2, h3 { @apply font-display; text-wrap: balance; }
+  h1, h2, h3 { @apply font-display; line-height: 1.2; text-wrap: balance; }
   ::selection { @apply bg-gold-soft text-ink; }
   :focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   .skip-to-content { @apply fixed left-4 top-4 z-[100] -translate-y-24 rounded-lg bg-ink px-4 py-3 font-semibold text-bg transition-transform focus:translate-y-0; }

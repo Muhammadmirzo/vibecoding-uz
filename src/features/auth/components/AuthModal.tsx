@@ -20,7 +20,7 @@ export function AuthModal() {
     >
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-50 bg-ink/60 backdrop-blur-sm data-[state=open]:animate-fade-up data-[state=closed]:opacity-0" />
-        <Dialog.Content className="fixed inset-x-4 top-1/2 z-50 flex max-h-[calc(100dvh-2rem)] w-auto -translate-y-1/2 flex-col overflow-hidden rounded-xl border border-border bg-bg-elevated p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-[max(1.25rem,env(safe-area-inset-top))] shadow-lg outline-none sm:inset-x-auto sm:left-1/2 sm:w-[calc(100%-3rem)] sm:max-w-md sm:p-7 sm:pb-[max(1.75rem,env(safe-area-inset-bottom))] sm:pt-[max(1.75rem,env(safe-area-inset-top))]">
+        <Dialog.Content className="fixed inset-x-4 top-1/2 z-50 flex max-h-[calc(100dvh-2rem)] w-auto -translate-y-1/2 flex-col overflow-hidden rounded-xl border border-border bg-bg-elevated p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-[max(1.25rem,env(safe-area-inset-top))] shadow-lg outline-none sm:inset-x-auto sm:left-1/2 sm:w-[calc(100%-3rem)] sm:-translate-x-1/2 sm:max-w-md sm:p-7 sm:pb-[max(1.75rem,env(safe-area-inset-bottom))] sm:pt-[max(1.75rem,env(safe-area-inset-top))]">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
               <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-gold-soft px-2.5 py-1 text-xs font-semibold text-gold-hover">

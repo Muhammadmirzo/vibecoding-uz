@@ -15,13 +15,12 @@ export function getUserInitials(name: string) {
 const menuLinkClass = "flex cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-ink hover:bg-bg-sunken focus:outline-none";
 
 export function UserMenu() {
-  const { user, isLoading, openAuthModal, logout } = useAuth();
+  const { user, openAuthModal, logout } = useAuth();
 
-  if (isLoading) return <div className="hidden h-10 w-10 shrink-0 animate-pulse rounded-full bg-bg-sunken md:block" aria-label="Profil yuklanmoqda" />;
   if (!user) {
     return (
-      <button type="button" onClick={() => openAuthModal("login")} className="hidden size-11 shrink-0 items-center justify-center rounded-full border border-border bg-bg-sunken text-ink transition-colors hover:bg-bg-sunken md:flex" title="Tizimga kirish" aria-label="Tizimga kirish">
-        <LogIn className="h-4 w-4 text-accent" aria-hidden="true" />
+      <button type="button" onClick={() => openAuthModal("login")} className="hidden min-h-11 items-center gap-2 rounded-lg border border-border-strong bg-bg-elevated px-3.5 text-sm font-semibold text-ink transition-colors hover:border-brand/40 hover:bg-brand-soft hover:text-brand md:flex">
+        <LogIn className="size-4 text-accent" aria-hidden="true" />Kirish
       </button>
     );
   }

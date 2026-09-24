@@ -38,12 +38,12 @@ export function CourseCheckoutCard({ price, oldPrice, installment, sessionFormat
         <p className="font-mono text-xs font-semibold text-accent">Bo&apos;lib to&apos;lash: {installment}</p>
       </div>
       <div className="space-y-3 border-t border-border pt-4">
-        <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-accent">
+        <h3 className="text-sm font-semibold text-ink">
           Narxga nima kiradi?
         </h3>
         <ul className="space-y-2.5">
           {[sessionFormat, "Telegram bot orqali uy vazifalari tekshiruvi", "Mentordan shaxsiy fikr-mulohaza", "Bitiruv sertifikati", guaranteeText].map((item) => (
-            <li key={item} className="flex items-start gap-2.5 text-xs font-medium text-ink">
+            <li key={item} className="flex items-start gap-2.5 text-sm font-medium text-ink">
               <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
               {item}
             </li>
@@ -55,7 +55,7 @@ export function CourseCheckoutCard({ price, oldPrice, installment, sessionFormat
           {ctaState === "login" ? "Kursga o'tish uchun kiring" : "Kursni band qilish"}
           <ArrowRight className="size-4" aria-hidden="true" />
         </Button>
-        <p className="text-[11px] leading-relaxed text-ink-muted">
+        <p className="text-sm leading-relaxed text-ink-muted">
           To&apos;lov oynasi shu sahifada ochiladi — hisobingizga kirgan bo'lishingiz kifoya.
         </p>
         <Button href="https://t.me/m/ODAfK_QIMjky" variant="secondary" className="w-full">
@@ -70,7 +70,7 @@ export function CourseCheckoutCard({ price, oldPrice, installment, sessionFormat
       <p className="rounded-md border border-border bg-bg-sunken px-3 py-2 text-center font-mono text-xs text-ink-muted">
         To&apos;lov: Payme · Click · bo&apos;lib to&apos;lash
       </p>
-      <p className="flex items-center gap-2 border-t border-border pt-3 text-[11px] text-ink-muted">
+      <p className="flex items-center gap-2 border-t border-border pt-3 text-sm text-ink-muted">
         <ShieldCheck className="size-4 shrink-0 text-accent" aria-hidden="true" />
         Click va Payme orqali xavfsiz to&apos;lov
       </p>

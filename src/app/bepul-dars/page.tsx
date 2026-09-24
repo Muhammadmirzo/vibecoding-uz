@@ -4,7 +4,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Badge } from "@/components/ui/Surfaces";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Surfaces";
-import { Container, Eyebrow, Heading, Section } from "@/components/ui/Layout";
+import { Eyebrow, Heading, Section } from "@/components/ui/Layout";
 import { BepulDarsLeadSection } from "./LeadSection";
 
 export const metadata: Metadata = {
@@ -59,9 +59,9 @@ export default function BepulDarsPage() {
             <Badge variant="gold">
               <PlayCircle className="mr-1 size-3.5" aria-hidden="true" /> Bepul video dars
             </Badge>
-            <h1 className="font-display text-3xl font-semibold leading-tight text-ink sm:text-5xl">
+            <Heading as="h1" className="text-[clamp(2.25rem,1.6rem+2.4vw,3.5rem)]">
               AI bilan 30 daqiqada haqiqiy loyiha qurish metodi
-            </h1>
+            </Heading>
             <p className="text-lg text-ink-muted">
               Dasturchisiz, faqat AI agentlariga to'g'ri topshiriq berib mahsulot
               yaratish uslubini jonli misolda ko'ring.
@@ -90,7 +90,7 @@ export default function BepulDarsPage() {
       </Section>
 
       <Section pattern={false} className="bg-bg-sunken">
-        <Container className="grid gap-10 lg:grid-cols-2">
+        <div className="grid gap-10 lg:grid-cols-2">
           <div>
             <Eyebrow className="mb-4">Dars rejasi</Eyebrow>
             <Heading>30 daqiqada nimalarni ko'rasiz</Heading>
@@ -131,11 +131,11 @@ export default function BepulDarsPage() {
               </ul>
             </div>
           </div>
-        </Container>
+        </div>
       </Section>
 
       <Section eyebrow="Mentor" title="Darsni kim o'tadi?">
-        <Card className="flex flex-col items-start gap-5 sm:flex-row sm:items-center">
+        <Card className="mt-8 flex flex-col items-start gap-5 sm:flex-row sm:items-center">
           <span className="flex size-14 shrink-0 items-center justify-center rounded-full bg-brand-soft font-display text-xl font-semibold text-brand" aria-hidden="true">
             <User className="size-7" />
           </span>

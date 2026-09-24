@@ -6,7 +6,7 @@ import { BlogPostItem } from "@/features/blog/blogData";
 
 export const BlogCard = React.memo(function BlogCard({ post }: { post: BlogPostItem }) {
   return (
-    <article className="group flex flex-col overflow-hidden rounded-2xl border border-border-strong bg-bg-elevated transition-all duration-200 hover:border-border hover:shadow-lg">
+    <article className="group flex flex-col overflow-hidden rounded-2xl border border-border-strong bg-bg-elevated transition-all duration-200 hover:-translate-y-0.5 hover:border-accent/50 hover:shadow-md">
       <div className="relative h-48 w-full overflow-hidden bg-bg-sunken">
         <Image src={post.coverUrl} alt="" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover transition-transform duration-300 group-hover:scale-105" />
         <div className="absolute left-3 top-3">
@@ -24,9 +24,9 @@ export const BlogCard = React.memo(function BlogCard({ post }: { post: BlogPostI
             <Calendar className="h-3.5 w-3.5" /> <span>{post.publishedAt}</span>
           </div>
           <Link href={`/blog/${post.slug}`} prefetch={true} className="flex min-h-11 items-center transition-colors group-hover:text-accent">
-            <h2 className="line-clamp-2 text-lg font-bold leading-snug text-ink md:text-xl">{post.title}</h2>
+            <h2 className="line-clamp-2 text-lg font-bold leading-snug text-ink transition-colors group-hover:text-brand md:text-xl">{post.title}</h2>
           </Link>
-          <p className="line-clamp-3 text-xs leading-relaxed text-ink-muted md:text-sm">{post.excerpt}</p>
+          <p className="line-clamp-3 text-sm leading-relaxed text-ink-muted">{post.excerpt}</p>
         </div>
         <div className="flex items-center justify-between border-t border-border pt-4">
           <div className="flex items-center gap-2.5">

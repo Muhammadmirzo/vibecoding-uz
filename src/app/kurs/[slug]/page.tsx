@@ -67,9 +67,9 @@ export default async function CourseDetailPage({ params }: Props) {
                 <Calendar className="size-4 text-accent" aria-hidden="true" /> Keyingi guruh: {siteConfig.nextCohortShortDate}
               </span>
             </div>
-            <h1 className="font-display text-3xl font-semibold leading-tight text-ink sm:text-5xl">
+            <Heading as="h1" className="text-[clamp(2.25rem,1.6rem+2.4vw,3.5rem)]">
               {course.title}
-            </h1>
+            </Heading>
             <p className="text-lg text-ink-muted">{course.subtitle}</p>
             <p className="text-ink-muted">{course.description}</p>
             <Card className="space-y-3">
@@ -98,7 +98,7 @@ export default async function CourseDetailPage({ params }: Props) {
       </Section>
 
       <Section pattern={false} className="bg-bg-sunken">
-        <Container className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-2">
           <Card className="space-y-4">
             <Eyebrow>Kim uchun</Eyebrow>
             <Heading className="text-2xl">Bu kurs sizga mos, agar...</Heading>
@@ -121,18 +121,20 @@ export default async function CourseDetailPage({ params }: Props) {
               ))}
             </ul>
           </Card>
-        </Container>
+        </div>
       </Section>
 
       <Section eyebrow="Bosqichma-bosqich reja" title="Haftalik yo'l xaritasi">
         <ol className="relative mt-10 space-y-0 border-l-2 border-brand/20">
           {course.roadmap.map((week) => (
-            <li key={week.week} className="relative pb-8 pl-8 last:pb-0">
+            <li key={week.week} className="relative pb-7 pl-8 last:pb-0 md:grid md:grid-cols-[112px_minmax(0,1fr)_minmax(180px,240px)] md:items-start md:gap-6 md:pb-6">
               <span className="absolute -left-[9px] top-1 size-4 rounded-full border-2 border-brand bg-bg" aria-hidden="true" />
               <p className="font-mono text-xs font-semibold text-brand">{week.week}</p>
-              <h3 className="mt-1 font-display text-lg font-semibold text-ink">{week.title}</h3>
-              <p className="mt-1 text-sm text-ink-muted">{week.outcome}</p>
-              <p className="mt-2 inline-block rounded-md bg-brand-soft px-3 py-1 text-xs font-semibold text-brand">
+              <div>
+                <h3 className="font-display text-lg font-semibold text-ink">{week.title}</h3>
+                <p className="mt-1 text-sm text-ink-muted">{week.outcome}</p>
+              </div>
+              <p className="mt-2 inline-block rounded-md bg-brand-soft px-3 py-1 text-xs font-semibold text-brand md:mt-0 md:justify-self-end md:text-right">
                 Amaliy natija: {week.project}
               </p>
             </li>
@@ -155,7 +157,7 @@ export default async function CourseDetailPage({ params }: Props) {
       </Section>
 
       <Section eyebrow="Mentor" title="Kimdan o'rganasiz?">
-        <Card className="flex flex-col items-start gap-5 sm:flex-row sm:items-center">
+        <Card className="mt-8 flex flex-col items-start gap-5 sm:flex-row sm:items-center">
           <span className="flex size-14 shrink-0 items-center justify-center rounded-full bg-brand-soft text-brand" aria-hidden="true">
             <User className="size-7" />
           </span>
@@ -167,7 +169,8 @@ export default async function CourseDetailPage({ params }: Props) {
             </p>
           </div>
         </Card>
-        <div className="mt-10 overflow-x-auto rounded-xl border border-border">
+        <h3 className="mb-4 mt-12 font-display text-xl font-semibold text-ink">Qaysi yo&apos;l sizga to&apos;g&apos;ri keladi?</h3>
+        <div className="overflow-x-auto rounded-xl border border-border">
           <table className="w-full min-w-[560px] border-collapse bg-bg-elevated text-left text-sm">
             <caption className="sr-only">VibeCoding, an'anaviy bootcamp va YouTube solishtiruvi</caption>
             <thead>
