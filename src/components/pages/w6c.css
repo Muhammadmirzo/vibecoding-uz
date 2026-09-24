@@ -19,9 +19,10 @@
   background-size: 5px 5px;
   mask-image: linear-gradient(to bottom, black, transparent 70%);
 }
-.w6c-hero-dark { background: var(--ink); color: var(--bg); }
-.w6c-hero-dark .w6c-lede { opacity: .8; }
-.w6c-hero-dark .w6c-hero-mesh { opacity: .5; }
+.w6c-hero-dark { background: var(--terminal-bg); color: var(--terminal-ink); }
+.w6c-hero-dark .w6c-dark-title { color: var(--terminal-ink); }
+.w6c-hero-dark .w6c-lede { opacity: .78; }
+.w6c-hero-dark .w6c-hero-mesh { opacity: .35; }
 
 /* Above-fold load entrance: staggered fade + 14px rise, gated. */
 html[data-motion="full"][data-motion-hero="on"] .w6c-load {

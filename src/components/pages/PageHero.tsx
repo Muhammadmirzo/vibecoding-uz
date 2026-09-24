@@ -58,7 +58,7 @@ export function PageHero({
           <div className={cn("grid items-center gap-10", aside && "lg:grid-cols-[1.2fr_.8fr]")}>
             <div>
               {eyebrow && <p className="w6c-load font-mono text-xs font-semibold uppercase tracking-[0.14em] text-gold" style={{ "--i": 0 } as React.CSSProperties}>{eyebrow}</p>}
-              <h1 className="w6c-load mt-3 max-w-4xl text-balance font-display text-[clamp(2.1rem,1.2rem+3.4vw,3.6rem)] font-semibold leading-[1.1] tracking-[-0.04em] text-bg" style={{ "--i": 1 } as React.CSSProperties}>
+              <h1 className="w6c-load w6c-dark-title mt-3 max-w-4xl text-balance font-display text-[clamp(2.1rem,1.2rem+3.4vw,3.6rem)] font-semibold leading-[1.1] tracking-[-0.04em]" style={{ "--i": 1 } as React.CSSProperties}>
                 {title}
               </h1>
               {lede && <p className="w6c-load w6c-lede mt-5 max-w-2xl text-lg leading-relaxed" style={{ "--i": 2 } as React.CSSProperties}>{lede}</p>}
