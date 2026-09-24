@@ -38,6 +38,8 @@ export const serverAnalyticsEventSchema = z.discriminatedUnion("type", [
   serverVariant("lesson_complete"),
   serverVariant("homework_submit"),
   serverVariant("diagnostic_complete"),
+  serverVariant("chat_open"),
+  serverVariant("chat_message"),
 ]);
 
 export type ServerAnalyticsEvent = z.input<typeof serverAnalyticsEventSchema>;

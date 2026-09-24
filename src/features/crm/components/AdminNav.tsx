@@ -1,7 +1,7 @@
 "use client";
 
 import * as Dialog from "@radix-ui/react-dialog";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -13,6 +13,7 @@ import {
   GraduationCap,
   LayoutDashboard,
   Menu,
+  MessageCircle,
   Send,
   Settings,
   ShieldCheck,
@@ -34,6 +35,7 @@ const navItems: NavItem[] = [
   { href: "/admin/students", label: "Talabalar", icon: Users },
   { href: "/admin/users", label: "Foydalanuvchilar", icon: Users },
   { href: "/admin/analytics", label: "Analitika", icon: BarChart3 },
+  { href: "/admin/chat", label: "Chat inbox", icon: MessageCircle },
   { href: "/admin/settings", label: "Sozlamalar", icon: Settings },
 ];
 
@@ -46,7 +48,7 @@ function Brand() {
   );
 }
 
-function Navigation({ pathname, onNavigate }: { pathname: string; onNavigate?: () => void }) {
+function Navigation({ pathname, unread, onNavigate }: { pathname: string; unread: number; onNavigate?: () => void }) {
   return (
     <nav aria-label="Admin bo'limlari" className="space-y-1">
       {navItems.map((item) => {
@@ -55,7 +57,8 @@ function Navigation({ pathname, onNavigate }: { pathname: string; onNavigate?: (
         return (
           <Link key={item.href} href={item.href} onClick={onNavigate} aria-current={active ? "page" : undefined} className={`flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${active ? "bg-brand-soft text-brand" : "text-ink-muted hover:bg-bg-sunken hover:text-ink"}`}>
             <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
-            <span>{item.label}</span>
+            <span className="min-w-0 flex-1">{item.label}</span>
+            {item.href === "/admin/chat" && unread > 0 ? <span className="grid min-h-5 min-w-5 place-items-center rounded-full bg-gold px-1 text-xs font-bold text-ink">{unread > 99 ? "99+" : unread}</span> : null}
           </Link>
         );
       })}
@@ -66,12 +69,28 @@ function Navigation({ pathname, onNavigate }: { pathname: string; onNavigate?: (
 export function AdminNav() {
   const pathname = usePathname();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [unread, setUnread] = useState(0);
+  useEffect(() => {
+    let active = true;
+    const load = async () => {
+      try {
+        const response = await fetch("/api/v1/admin/chat/conversations?status=all");
+        const payload: unknown = await response.json();
+        if (!active || !response.ok || !payload || typeof payload !== "object" || !("data" in payload)) return;
+        const data = (payload as { data: { conversations?: Array<{ unreadForAdmin?: number }> } }).data;
+        setUnread((data.conversations || []).reduce((sum, row) => sum + (row.unreadForAdmin || 0), 0));
+      } catch { /* navigation remains usable if chat is degraded */ }
+    };
+    void load();
+    const timer = window.setInterval(() => void load(), 60_000);
+    return () => { active = false; window.clearInterval(timer); };
+  }, []);
   return (
     <>
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-72 flex-col border-r border-border bg-bg-elevated px-4 py-5 lg:flex">
         <Brand />
         <div className="my-5 border-t border-border" />
-        <div className="flex-1 overflow-y-auto"><Navigation pathname={pathname} /></div>
+        <div className="flex-1 overflow-y-auto"><Navigation pathname={pathname} unread={unread} /></div>
         <Link href="/" className="mt-4 flex min-h-11 items-center gap-2 rounded-xl border border-border px-3 text-sm font-medium text-ink-muted transition-colors hover:bg-bg-sunken hover:text-ink"><ArrowLeft className="h-4 w-4" />Saytga qaytish</Link>
       </aside>
 
@@ -85,7 +104,7 @@ export function AdminNav() {
             <Dialog.Title className="sr-only">Navigatsiya</Dialog.Title>
             <div className="flex items-center justify-between"><Brand /><Dialog.Close className="grid h-11 w-11 place-items-center rounded-xl text-ink-muted hover:bg-bg-sunken" aria-label="Menyuni yopish"><X className="h-5 w-5" /></Dialog.Close></div>
             <div className="my-4 border-t border-border" />
-            <div className="flex-1 overflow-y-auto"><Navigation pathname={pathname} onNavigate={() => setDrawerOpen(false)} /></div>
+            <div className="flex-1 overflow-y-auto"><Navigation pathname={pathname} unread={unread} onNavigate={() => setDrawerOpen(false)} /></div>
             <Dialog.Close asChild><Link href="/" className="mt-4 flex min-h-11 items-center gap-2 rounded-xl border border-border px-3 text-sm font-medium text-ink-muted"><ArrowLeft className="h-4 w-4" />Saytga qaytish</Link></Dialog.Close>
           </Dialog.Content>
         </Dialog.Portal>

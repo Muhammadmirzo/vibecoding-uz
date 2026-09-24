@@ -13,6 +13,7 @@ import { BRAND } from "@/config/brand";
 import { MotionRoot } from "@/features/motion/ui/MotionRoot";
 import { RevealRoot } from "@/features/motion/ui/RevealRoot";
 import { getMotionSettings } from "@/features/motion/server/motion-settings";
+import { ChatLauncher } from "@/features/chat/ui/ChatLauncher";
 import { AnalyticsTracker } from "@/features/analytics/client/AnalyticsTracker";
 
 const onest = Onest({
@@ -121,6 +122,7 @@ export default async function RootLayout({
             {/* Admin has its own shell: hide the public footer there, like the header. */}
             <HeaderVisibility><Footer /></HeaderVisibility>
             <ClientModals />
+            <ChatLauncher />
           </AuthProvider>
         </ThemeProvider>
       </body>
