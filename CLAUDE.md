@@ -14,6 +14,12 @@
 
 ---
 
+## 📍 Current Status
+
+**New session? Read [docs/HANDOFF_2026-09-24.md](docs/HANDOFF_2026-09-24.md) §0 first** — live state, blockers (Supabase DB down), Telegram bot (@Boyakagabot), and next steps. Owner speaks Uzbek — reply in Uzbek.
+
+---
+
 ## 🚀 Deployment & Environment (quick facts, verified 2026-09-09)
 
 - Vercel canonical project: `master-2` — link with `vercel link --yes --project master-2`, pull env with `vercel env pull .env`. Do NOT link to `vibecoding-uz` (deleted duplicate).
