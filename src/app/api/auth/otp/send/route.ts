@@ -56,6 +56,9 @@ export async function POST(request: Request) {
       ...(process.env.NODE_ENV === "development" ? { devCode: code } : {}),
     });
   } catch (error) {
+    if (error instanceof Error && /rate limit service/i.test(error.message)) {
+      return NextResponse.json({ error: "SMS xizmatida vaqtincha uzilish yuz berdi. Iltimos, keyinroq qayta urinib ko'ring." }, { status: 503 });
+    }
     return errorResponse(error);
   }
 }

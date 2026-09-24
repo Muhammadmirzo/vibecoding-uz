@@ -26,7 +26,8 @@ export async function POST(req: NextRequest) {
   if (!paymeKey) {
     return NextResponse.json(createPaymeErrorResponse(0, PAYME_ERRORS.AUTH_ERROR), { status: 503 });
   }
-  const rl = await checkRateLimit(`payme:${getClientIp(req)}`, PRESETS.WEBHOOK);
+  try {
+    const rl = await checkRateLimit(`payme:${getClientIp(req)}`, PRESETS.WEBHOOK);
   if (!rl.success) {
     return NextResponse.json(createPaymeErrorResponse(0, PAYME_ERRORS.AUTH_ERROR), { status: 429 });
   }
@@ -66,6 +67,10 @@ export async function POST(req: NextRequest) {
   if (method === "CancelTransaction") return toResult(await cancelTransaction(repo, providerTxnId, params.reason));
   if (method === "CheckTransaction") return toResult(await checkTransaction(repo, providerTxnId));
   return fail();
+  } catch (error) {
+    console.error("Payme webhook failed:", error);
+    return NextResponse.json(createPaymeErrorResponse(0, PAYME_ERRORS.CANNOT_PERFORM), { status: 503 });
+  }
 }
 
 function codeFor(code: number) {

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { applyJobSchema } from "@/lib/validations";
 import { applyForJob, drizzleJobApplicationsRepository, JobApplyError } from "@/features/jobs/server/apply.service";
 import { checkRateLimit, getClientIp, createRateLimitResponse, PRESETS } from "@/lib/security/rateLimit";
+import { errorResponse } from "@/lib/http/errors";
 
 export async function POST(request: Request) {
   try {
@@ -31,14 +32,15 @@ export async function POST(request: Request) {
         experience: parsed.data.experience,
         coverLetter: parsed.data.coverLetter,
       },
-      request.headers.get("x-forwarded-for") || "127.0.0.1",
+      ip,
     );
 
     return NextResponse.json(
       {
         success: true,
-        message: "Arizangiz muvaffaqiyatli qabul qilindi! Tez orada siz bilan bog'lanamiz.",
+        message: "Arizangiz qabul qilindi va texnik jihatdan saqlandi. HR jamoasi alohida xabar berish jarayonini boshqaradi.",
         leadId,
+        status: "received",
       },
       { status: 201 },
     );
@@ -47,7 +49,6 @@ export async function POST(request: Request) {
       const status = error.code === "DUPLICATE" ? 409 : 400;
       return NextResponse.json({ error: error.message }, { status });
     }
-    console.error("POST /api/ish/apply error:", error);
-    return NextResponse.json({ error: "Ariza yuborishda xatolik yuz berdi. Iltimos qayta urinib ko'ring." }, { status: 500 });
+    return errorResponse(error);
   }
 }

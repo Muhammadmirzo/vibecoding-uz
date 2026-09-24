@@ -64,20 +64,25 @@ export function registerAccountHandlers(bot: Telegraf) {
         return ctx.reply("Bu Telegram akkaunti boshqa telefon raqamiga bog'langan. Avval saytdagi telefon orqali kirib, Telegram akkauntini almashtiring.");
       }
       if (!(error instanceof ServiceError) || error.code !== "INVALID_TOKEN") {
-        return ctx.reply("Texnik xatolik yuz berdi. Birozdan keyin qayta urinib ko'ring.");
+        return ctx.reply("Texnik xizmat vaqtincha ishlamayapti. Ma'lumotlaringizni o'zgartirmasdan birozdan keyin qayta urinib ko'ring.");
       }
     }
 
-    const result = await linkTelegramAccount({
-      tgUserId: ctx.from.id.toString(),
-      tgUsername: ctx.from.username,
-      phone,
-    });
-    if (result.success && result.user) {
-      return ctx.reply(
-        `✅ Rahmat, <b>${escapeHtml(result.user.fullName)}</b>!\n\nHisobingiz muvaffaqiyatli ulandi. Endi darslar va vazifalar xabarnomalari shu yerga keladi.`,
-        { parse_mode: "HTML", ...mainKeyboard },
-      );
+    try {
+      const result = await linkTelegramAccount({
+        tgUserId: ctx.from.id.toString(),
+        tgUsername: ctx.from.username,
+        phone,
+      });
+      if (result.success && result.user) {
+        return ctx.reply(
+          `✅ Rahmat, <b>${escapeHtml(result.user.fullName)}</b>!\n\nHisobingiz muvaffaqiyatli ulandi. Endi darslar va vazifalar xabarnomalari shu yerga keladi.`,
+          { parse_mode: "HTML", ...mainKeyboard },
+        );
+      }
+    } catch (error) {
+      console.error("Telegram account link failed:", error);
+      return ctx.reply("Texnik xizmat vaqtincha ishlamayapti. Ma'lumotlaringizni o'zgartirmasdan birozdan keyin qayta urinib ko'ring.");
     }
 
     return ctx.reply(

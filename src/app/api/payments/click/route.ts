@@ -14,28 +14,33 @@ function protocolError(note: string, status = 400) {
 export async function POST(req: NextRequest) {
   const secretKey = process.env.CLICK_SECRET_KEY?.trim();
   const serviceId = process.env.CLICK_SERVICE_ID?.trim();
-  if (!secretKey || !serviceId) return protocolError("Payment provider is not configured", 503);
+  if (!secretKey || !serviceId) return protocolError("To'lov tizimi vaqtincha sozlanmagan", 503);
 
-  const rl = await checkRateLimit(`click:${getClientIp(req)}`, PRESETS.WEBHOOK);
-  if (!rl.success) return protocolError("Too many requests", 429);
+  try {
+    const rl = await checkRateLimit(`click:${getClientIp(req)}`, PRESETS.WEBHOOK);
+  if (!rl.success) return protocolError("Juda ko'p urinish, qayta urinib ko'ring", 429);
 
   const formData = await req.formData().catch(() => null);
-  if (!formData) return protocolError("Invalid form payload");
+  if (!formData) return protocolError("So'rov ma'lumotlari noto'g'ri", 400);
   const raw: Record<string, unknown> = {};
   for (const [key, value] of formData.entries()) raw[key] = typeof value === "string" ? value : undefined;
 
   const parsed = clickWebhookSchema.safeParse(raw);
-  if (!parsed.success) return protocolError("Missing or invalid signed fields");
+  if (!parsed.success) return protocolError("Tekshirilgan maydonlar yetishmaydi yoki noto'g'ri", 400);
   const data = parsed.data;
-  if (data.service_id !== serviceId) return protocolError("Unexpected service id", 401);
+  if (data.service_id !== serviceId) return protocolError("Xizmat identifikatori mos emas", 401);
 
   const expectedSign = computeClickSign(
     data.click_trans_id, data.service_id, secretKey, data.merchant_trans_id,
     data.merchant_prepare_id, data.amount, data.action, data.sign_time,
   );
-  if (!verifyClickSign(data.sign_string, expectedSign)) return protocolError("SIGN CHECK FAILED", 401);
+  if (!verifyClickSign(data.sign_string, expectedSign)) return protocolError("To'lov imzosi tekshirilmadi", 401);
 
   const outcome = await handleClickWebhook(repo, data, () => createMerchantPrepareId());
   if (!outcome.ok) return protocolError(outcome.note, outcome.status);
   return NextResponse.json(outcome.body);
+  } catch (error) {
+    console.error("Click webhook failed:", error);
+    return protocolError("To'lov xizmati vaqtincha ishlamayapti. Qayta urinib ko'ring", 503);
+  }
 }

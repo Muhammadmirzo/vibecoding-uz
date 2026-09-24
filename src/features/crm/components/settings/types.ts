@@ -35,6 +35,12 @@ export type SettingsState = {
   oldPassword: string;
   newPassword: string;
   confirmPassword: string;
+  integrationStatus: {
+    payme: "sozlangan" | "sozlanmagan";
+    click: "sozlangan" | "sozlanmagan";
+    telegram: "sozlangan" | "sozlanmagan";
+    sms: "sozlangan" | "sozlanmagan";
+  };
 };
 
 export type SettingsActions = {

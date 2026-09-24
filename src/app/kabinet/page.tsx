@@ -6,6 +6,7 @@ import { BookOpen, CirclePlay, CreditCard, Gift, Settings } from "lucide-react";
 import { Button } from "@/components/ui";
 import { KabinetNav } from "@/features/lms/components/KabinetNav";
 import { KabinetPageHeader, KabinetSkeleton, KabinetState } from "@/features/lms/components/KabinetPage";
+import { fetchWithTimeout } from "@/lib/http/fetch";
 
 type DashboardUser = { fullName: string | null };
 type Payment = { enrollmentId: string | null; status: string };
@@ -18,15 +19,16 @@ export default function KabinetDashboardPage() {
 
   useEffect(() => {
     let active = true;
+    const controller = new AbortController();
     Promise.all([
-      fetch("/api/me", { cache: "no-store" }).then(async (res) => {
-        const data: { user?: DashboardUser; error?: string } = await res.json();
-        if (!res.ok) throw new Error(data.error || "Foydalanuvchi ma'lumotini yuklab bo'lmadi");
+      fetchWithTimeout("Kabinet", "/api/me", { cache: "no-store", signal: controller.signal }, 10_000).then(async (res) => {
+        const data: { user?: DashboardUser; error?: string; message?: string } = await res.json();
+        if (!res.ok) throw new Error(data.message || data.error || "Texnik xizmat vaqtincha ishlamayapti");
         return data.user || null;
       }),
-      fetch("/api/me/payments", { cache: "no-store" }).then(async (res) => {
-        const data: { payments?: Payment[]; error?: string } = await res.json();
-        if (!res.ok) throw new Error(data.error || "Ma'lumotni yuklab bo'lmadi");
+      fetchWithTimeout("Kabinet", "/api/me/payments", { cache: "no-store", signal: controller.signal }, 10_000).then(async (res) => {
+        const data: { payments?: Payment[]; error?: string; message?: string } = await res.json();
+        if (!res.ok) throw new Error(data.message || data.error || "Texnik xizmat vaqtincha ishlamayapti");
         return data.payments || [];
       }),
     ])
@@ -36,7 +38,7 @@ export default function KabinetDashboardPage() {
       .catch((error: unknown) => {
         if (active) setState({ loading: false, error: error instanceof Error ? error.message : "Xatolik yuz berdi", payments: [], user: null });
       });
-    return () => { active = false; };
+    return () => { active = false; controller.abort(); };
   }, []);
 
   const hasEnrollment = state.payments.some((payment) => payment.status === "paid" && payment.enrollmentId);
@@ -51,7 +53,12 @@ export default function KabinetDashboardPage() {
         />
 
         {state.loading ? <KabinetSkeleton label="Kabinet ma&apos;lumotlari yuklanmoqda" /> : null}
-        {!state.loading && state.error ? <KabinetState tone="error" title="Kabinetni yuklab bo&apos;lmadi" description={state.error} /> : null}
+        {!state.loading && state.error ? (
+          <div className="space-y-4">
+            <KabinetState tone="error" title="Texnik xizmat vaqtincha ishlamayapti" description={state.error} />
+            <div className="text-center"><Button onClick={() => window.location.reload()}>Qayta urinish</Button></div>
+          </div>
+        ) : null}
         {!state.loading && !state.error && !hasEnrollment ? (
           <KabinetState
             title="Faol kurs a&apos;zoligingiz yo&apos;q"

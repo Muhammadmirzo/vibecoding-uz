@@ -30,14 +30,9 @@ export const siteSettingsSchema = z.object({
   defaultCoursePrice: z.string().min(1, { message: "Standart kurs narxi kiritilishi shart" }),
   installmentRate3Months: z.number().min(0).default(0),
   installmentRate6Months: z.number().min(0).default(10),
-  guaranteeRefundDays: z.number().min(1).default(14),
-  guaranteeTextUz: z.string().min(10, { message: "Kafolat matni kiritilishi shart" }),
+  // Guarantee policy and provider secrets are canonical configuration, not DB settings.
   paymeMerchantId: z.string().optional().nullable(),
-  paymeSecretKey: z.string().optional().nullable(),
   clickServiceId: z.string().optional().nullable(),
-  clickSecretKey: z.string().optional().nullable(),
-  telegramBotToken: z.string().optional().nullable(),
-  smsApiKey: z.string().optional().nullable(),
 
   // Dynamic CTA, URLs & Announcement Banner
   headerCtaText: z.string().default("Kurs tanlash"),
