@@ -1,5 +1,3 @@
-"use client";
-
 import { Card } from "@/components/ui/Surfaces";
 import { LeadCaptureForm } from "@/features/leads/ui/LeadCaptureForm";
 

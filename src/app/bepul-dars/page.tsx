@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Check, Clock, PlayCircle, ShieldCheck, User, X } from "lucide-react";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/Accordion";
+import { FaqDisclosure } from "@/components/ui/FaqDisclosure";
 import { Badge } from "@/components/ui/Surfaces";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Surfaces";
@@ -150,14 +150,7 @@ export default function BepulDarsPage() {
       </Section>
 
       <Section pattern={false} className="bg-bg-sunken" eyebrow="Savol-javob" title="Ko'p so'raladigan savollar">
-        <Accordion type="single" collapsible className="mx-auto mt-8 max-w-3xl rounded-xl border border-border bg-bg-elevated px-6">
-          {FAQS.map((faq, index) => (
-            <AccordionItem key={faq.question} value={`faq-${index}`}>
-              <AccordionTrigger>{faq.question}</AccordionTrigger>
-              <AccordionContent>{faq.answer}</AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
+        <FaqDisclosure items={FAQS} />
         <div className="mx-auto mt-10 flex max-w-3xl flex-col justify-center gap-3 sm:flex-row">
           <Button href="/diagnostika" size="lg">
             Avval diagnostikadan o'tish

@@ -18,9 +18,22 @@ const nextConfig = {
     ],
   },
   experimental: {
+    optimizePackageImports: ['lucide-react'],
     serverActions: {
       bodySizeLimit: '2mb',
     },
+  },
+  async headers() {
+    return [
+      {
+        source: '/manifest.json',
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=0, must-revalidate' }],
+      },
+      {
+        source: '/icons/:path*',
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
+      },
+    ];
   },
   // Security headers (Content-Security-Policy, X-Frame-Options, Strict-Transport-Security) and nonce-based CSP are applied centrally in middleware.
 };

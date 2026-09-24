@@ -1,86 +1,58 @@
-const CACHE_NAME = "naqsh-v1";
-const PRECACHE_ASSETS = ["/", "/manifest.json", "/icon.svg"];
+const CACHE_NAME = "naqsh-v1-assets";
+const PRECACHE_ASSETS = ["/manifest.json", "/icon.svg"];
 
-// 1. Install event: precache essential offline assets
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches
-      .open(CACHE_NAME)
+    caches.open(CACHE_NAME)
       .then((cache) => cache.addAll(PRECACHE_ASSETS))
-      .then(() => self.skipWaiting())
+      .then(() => self.skipWaiting()),
   );
 });
 
-// 2. Activate event: purge outdated cache instances
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches
-      .keys()
-      .then((cacheNames) =>
-        Promise.all(
-          cacheNames.map((cache) => {
-            if (cache !== CACHE_NAME) {
-              return caches.delete(cache);
-            }
-          })
-        )
-      )
-      .then(() => self.clients.claim())
+    caches.keys()
+      .then((cacheNames) => Promise.all(
+        cacheNames
+          .filter((cache) => cache !== CACHE_NAME)
+          .map((cache) => caches.delete(cache)),
+      ))
+      .then(() => self.clients.claim()),
   );
 });
 
-// 3. Fetch event: network first strategy for API & HTML pages with fallback to cache
 self.addEventListener("fetch", (event) => {
-  // Skip non-GET requests and cross-origin requests
-  if (event.request.method !== "GET" || !event.request.url.startsWith(self.location.origin)) {
+  const request = event.request;
+  const url = new URL(request.url);
+
+  // HTML stays network-only because the app has authenticated server UI and a
+  // per-request CSP nonce. Never return a stale page or another user's markup.
+  if (request.mode === "navigate" || url.pathname.startsWith("/api/")) {
     return;
   }
 
-  const url = new URL(event.request.url);
-
-  // Strategy for API routes: Network only with quick failure fallback
-  if (url.pathname.startsWith("/api/")) {
-    event.respondWith(
-      fetch(event.request).catch(() =>
-        caches.match(event.request).then((res) => res || new Response(JSON.stringify({ error: "Offline" }), { status: 503 }))
-      )
-    );
-    return;
-  }
-
-  // Strategy for Static Assets (_next/static, images, icons): Cache First, fallback to Network
   if (
-    url.pathname.startsWith("/_next/static/") ||
-    url.pathname.startsWith("/icons/") ||
-    url.pathname.match(/\.(png|jpg|jpeg|svg|gif|webp|woff2?|css|js)$/i)
+    request.method !== "GET" ||
+    !url.origin.startsWith(self.location.origin) ||
+    !(
+      url.pathname.startsWith("/_next/static/") ||
+      url.pathname.startsWith("/icons/") ||
+      url.pathname.match(/\.(?:png|jpg|jpeg|svg|gif|webp|avif|woff2?|css|js)$/i)
+    )
   ) {
-    event.respondWith(
-      caches.match(event.request).then((cachedResponse) => {
-        if (cachedResponse) {
-          return cachedResponse;
-        }
-        return fetch(event.request).then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200) {
-            const responseToCache = networkResponse.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache));
-          }
-          return networkResponse;
-        });
-      })
-    );
     return;
   }
 
-  // Strategy for Pages: Network First, fallback to Cache
   event.respondWith(
-    fetch(event.request)
-      .then((networkResponse) => {
-        if (networkResponse && networkResponse.status === 200) {
+    caches.match(request).then((cachedResponse) => {
+      if (cachedResponse) return cachedResponse;
+      return fetch(request).then((networkResponse) => {
+        if (networkResponse.status === 200) {
           const responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache));
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, responseToCache));
         }
         return networkResponse;
-      })
-      .catch(() => caches.match(event.request).then((cached) => cached || caches.match("/")))
+      });
+    }),
   );
 });

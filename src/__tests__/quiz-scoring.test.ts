@@ -4,9 +4,9 @@ import {
   buildReasoning,
   calculateRecommendation,
   calculateScores,
-  quizAnswersSchema,
   recommendationSummary,
 } from "../features/quiz/domain";
+import { quizAnswersSchema } from "../features/quiz/domain/validation";
 
 describe("quiz domain scoring", () => {
   it("recommends vibe-coding-express when express answers dominate", () => {

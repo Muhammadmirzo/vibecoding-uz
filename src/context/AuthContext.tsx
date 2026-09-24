@@ -43,7 +43,7 @@ export function AuthProvider({ children, initialUser = null }: { children: React
   const router = useRouter();
   const loginRedirect = useRef<string | null>(null);
   const [user, setUser] = useState<User | null>(initialUser);
-  const [isLoading, setIsLoading] = useState(!initialUser);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [toastType, setToastType] = useState<"success" | "error" | null>(null);
@@ -74,6 +74,18 @@ export function AuthProvider({ children, initialUser = null }: { children: React
   }, [clearMessages, router]);
 
   useEffect(() => {
+    const openCourseCheckout = () => {
+      if (user) {
+        router.push("/kabinet/to-lovlar");
+      } else {
+        openAuthModal("login", "/kabinet/to-lovlar");
+      }
+    };
+    window.addEventListener("open-course-checkout", openCourseCheckout);
+    return () => window.removeEventListener("open-course-checkout", openCourseCheckout);
+  }, [openAuthModal, router, user]);
+
+  useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const redirect = params.get("redirect");
     if (params.get("auth") === "1" && isInternalRedirect(redirect)) {
@@ -102,8 +114,8 @@ export function AuthProvider({ children, initialUser = null }: { children: React
   }, []);
 
   useEffect(() => {
-    void refreshAuth();
-  }, [refreshAuth]);
+    if (initialUser) void refreshAuth();
+  }, [initialUser, refreshAuth]);
 
   const login = useCallback(async (rawPhone: string) => {
     clearMessages();

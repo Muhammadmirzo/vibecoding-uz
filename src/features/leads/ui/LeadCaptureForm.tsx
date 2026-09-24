@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { z } from "zod";
 import { ArrowRight, Loader2, Send } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { fetchWithTimeout } from "@/lib/http/fetch";
@@ -12,29 +11,6 @@ import {
   isValidTelegramUsername,
   isValidUzbekPhone,
 } from "./phoneMask";
-
-const leadFormSchema = z
-  .object({
-    name: z.string().min(2, "Ismingizni kiriting (kamida 2 belgi)."),
-    phone: z.string().optional().default(""),
-    telegram: z.string().optional().default(""),
-  })
-  .superRefine((value, ctx) => {
-    if (!isValidUzbekPhone(value.phone)) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["phone"],
-        message: "Telefonni to'liq kiriting: +998 XX XXX-XX-XX.",
-      });
-    }
-    if (value.telegram.trim() !== "" && !isValidTelegramUsername(value.telegram)) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["telegram"],
-        message: "Telegram username @ bilan boshlansin (@username).",
-      });
-    }
-  });
 
 export type LeadSource = "quiz" | "free_lesson" | "xizmatlar" | "meetlar" | "resurslar";
 
@@ -81,13 +57,19 @@ export function LeadCaptureForm({
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setServerError(null);
-    const parsed = leadFormSchema.safeParse({ name: name.trim(), phone, telegram: telegram.trim() });
-    if (!parsed.success) {
-      const fieldErrors: typeof errors = {};
-      for (const issue of parsed.error.issues) {
-        const key = issue.path[0] as keyof typeof errors;
-        if (key && !fieldErrors[key]) fieldErrors[key] = issue.message;
-      }
+    const cleanName = name.trim();
+    const cleanTelegram = telegram.trim();
+    const fieldErrors: typeof errors = {};
+    if (cleanName.length < 2) {
+      fieldErrors.name = "Ismingizni kiriting (kamida 2 belgi).";
+    }
+    if (!isValidUzbekPhone(phone)) {
+      fieldErrors.phone = "Telefonni to'liq kiriting: +998 XX XXX-XX-XX.";
+    }
+    if (cleanTelegram !== "" && !isValidTelegramUsername(cleanTelegram)) {
+      fieldErrors.telegram = "Telegram username @ bilan boshlansin (@username).";
+    }
+    if (Object.keys(fieldErrors).length > 0) {
       setErrors(fieldErrors);
       return;
     }
@@ -98,9 +80,9 @@ export function LeadCaptureForm({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: parsed.data.name,
-          phone: parsed.data.phone,
-          telegram: parsed.data.telegram || undefined,
+          name: cleanName,
+          phone,
+          telegram: cleanTelegram || undefined,
           source,
           quizAnswers: quizAnswers ?? undefined,
           recommendedCourseId: recommendedCourseId ?? undefined,
@@ -112,7 +94,7 @@ export function LeadCaptureForm({
         return;
       }
       setDone(true);
-      onSuccess?.(parsed.data.name);
+      onSuccess?.(cleanName);
       if (redirectUrl) window.location.href = redirectUrl;
     } catch {
       setServerError("Tarmoqda xatolik yuz berdi. Qayta urinib ko'ring.");

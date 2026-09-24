@@ -5,19 +5,19 @@ vi.mock("next/cache", () => ({ unstable_cache: (fn: () => unknown) => fn, revali
 vi.mock( "@/features/motion/server/motion-settings.repository", () => ({ motionSettingsRepository: { read, write } }));
 
 import { DEFAULT_MOTION } from "@/features/motion/domain/settings";
-import { getMotionSettings, parseStored } from  "@/features/motion/server/motion-settings.service";
+import { parseStored, refreshMotionSettings } from  "@/features/motion/server/motion-settings.service";
 
 describe("motion settings service", () => {
   beforeEach(() => { read.mockReset(); write.mockReset(); });
   it("returns valid stored settings", async () => {
     read.mockResolvedValue({ level: "subtle", heroIntro: false, scrollReveal: true, pointerEffects: true, ambient: true, pageTransitions: true });
-    await expect(getMotionSettings()).resolves.toMatchObject({ level: "subtle", heroIntro: false });
+    await expect(refreshMotionSettings()).resolves.toMatchObject({ level: "subtle", heroIntro: false });
   });
   it("drops invalid stored JSON to defaults", () => {
     expect(parseStored({ level: "subtle", extra: true })).toEqual(DEFAULT_MOTION);
   });
   it("returns defaults when the database throws", async () => {
     read.mockRejectedValue(new Error("database offline"));
-    await expect(getMotionSettings()).resolves.toEqual(DEFAULT_MOTION);
+    await expect(refreshMotionSettings()).resolves.toEqual(DEFAULT_MOTION);
   });
 });

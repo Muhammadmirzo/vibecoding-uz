@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { DiagnosticQuiz } from "@/features/quiz/DiagnosticQuiz";
-import { QUIZ_QUESTIONS } from "@/features/quiz/domain";
+import { QUIZ_QUESTIONS } from "@/features/quiz/domain/questions";
 import { Badge } from "@/components/ui/Surfaces";
 import { Button } from "@/components/ui/Button";
 import { Container, Eyebrow, Heading } from "@/components/ui/Layout";

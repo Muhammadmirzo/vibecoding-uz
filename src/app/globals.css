@@ -69,11 +69,13 @@
   .animate-fade-up { animation: fade-up 500ms cubic-bezier(.16,1,.3,1) both; }
   .animate-typing-caret { animation: typing-caret 1s steps(2, jump-none) infinite; }
   .animate-marquee { animation: marquee 28s linear infinite; }
+  .faq-answer { animation: faq-reveal var(--motion-base, 320ms) var(--motion-ease-out, ease-out) both; }
 }
 
 @keyframes fade-up { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes typing-caret { 50% { opacity: 0; } }
 @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@keyframes faq-reveal { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
 
 /* Naqsh logo — subtle stroke-draw on first paint (W1B brand, motion-system safe). */
 @keyframes naqsh-draw { to { stroke-dashoffset: 0; } }
@@ -346,6 +348,12 @@ html[data-motion="full"][data-motion-pointer="on"] .brand-link:hover .naqsh-mark
   background: linear-gradient(90deg, var(--brand), var(--accent), var(--gold));
   transform: scaleX(0);
   transform-origin: 0 50%;
+  animation: scroll-progress linear both;
+  animation-timeline: scroll(root block);
+}
+@keyframes scroll-progress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
 }
 html[data-motion="off"] .scroll-progress { display: none; }
 

@@ -1,36 +1,10 @@
-"use client";
-
-import * as React from "react";
-import Link from "next/link";
-import { ArrowRight, BookOpen, Search, Sparkles } from "lucide-react";
-import { BLOG_CATEGORIES, STATIC_BLOG_POSTS } from "@/features/blog/blogData";
-import { BlogCard } from "./BlogCard";
-import { BlogFilters } from "./BlogFilters";
+import { ArrowRight, BookOpen, Sparkles } from "lucide-react";
+import { STATIC_BLOG_POST_SUMMARIES } from "@/features/blog/blogData";
 import { NextStepCTA } from "@/components/ui/NextStepCTA";
-import { Button } from "@/components/ui";
+import { Button } from "@/components/ui/Button";
+import { BlogExplorer } from "./BlogExplorer";
 
 export default function BlogListPage() {
-  const [searchQuery, setSearchQuery] = React.useState("");
-  const [selectedCategory, setSelectedCategory] = React.useState("Barchasi");
-
-  const filteredPosts = React.useMemo(() => {
-    const query = searchQuery.trim().toLowerCase();
-    return STATIC_BLOG_POSTS.filter((post) => {
-      const matchesCategory = selectedCategory === "Barchasi" || post.category === selectedCategory;
-      const matchesSearch = !query ||
-        post.title.toLowerCase().includes(query) ||
-        post.excerpt.toLowerCase().includes(query) ||
-        post.category.toLowerCase().includes(query) ||
-        post.tags.some((tag) => tag.toLowerCase().includes(query));
-      return matchesCategory && matchesSearch;
-    });
-  }, [searchQuery, selectedCategory]);
-
-  const resetFilters = () => {
-    setSearchQuery("");
-    setSelectedCategory("Barchasi");
-  };
-
   return (
     <div className="min-h-screen bg-bg pb-20 pt-28 text-ink">
       <div className="mx-auto w-full max-w-container space-y-8 px-5 sm:px-8">
@@ -46,34 +20,7 @@ export default function BlogListPage() {
           </p>
         </header>
 
-        <BlogFilters
-          query={searchQuery}
-          selectedCategory={selectedCategory}
-          categories={BLOG_CATEGORIES}
-          onQueryChange={setSearchQuery}
-          onClearQuery={() => setSearchQuery("")}
-          onCategorySelect={setSelectedCategory}
-        />
-
-        <div className="flex items-center justify-between border-b border-border pb-3 font-mono text-xs text-ink-muted">
-          <span>Jami topildi: <strong className="text-accent">{filteredPosts.length} ta maqola</strong></span>
-          {selectedCategory !== "Barchasi" && <span>Kategoriya: <span className="font-semibold text-ink">{selectedCategory}</span></span>}
-        </div>
-
-        {filteredPosts.length > 0 ? (
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {filteredPosts.map((post) => <BlogCard key={post.id} post={post} />)}
-          </div>
-        ) : (
-          <div className="mx-auto max-w-lg space-y-4 rounded-2xl border border-border bg-bg-elevated px-6 py-16 text-center">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-accent-soft text-accent"><Search className="h-6 w-6" /></div>
-            <h2 className="text-lg font-bold text-ink">Maqola topilmadi</h2>
-            <p className="text-xs text-ink-muted">
-              {searchQuery ? `"${searchQuery}" so'rovi bo'yicha hech qanday maqola topilmadi.` : "Bu kategoriyada hozircha maqola yo'q."} Qidiruv so&apos;zini o&apos;zgartirib ko&apos;ring.
-            </p>
-            <Button type="button" onClick={resetFilters} variant="outline" size="sm">Filtrlarni tozalash</Button>
-          </div>
-        )}
+        <BlogExplorer posts={STATIC_BLOG_POST_SUMMARIES} />
 
         <section className="flex flex-col items-center justify-between gap-8 rounded-2xl border border-border bg-bg-elevated p-8 shadow-sm md:flex-row md:p-12">
           <div className="max-w-xl space-y-3 text-center md:text-left">

@@ -1,13 +1,22 @@
 "use client";
 
 import * as React from "react";
+import dynamic from "next/dynamic";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Surfaces";
-import { CountUp } from "@/features/motion/ui/CountUp";
-import { LeadCaptureForm } from "@/features/leads/ui/LeadCaptureForm";
-import { QUIZ_QUESTIONS, calculateRecommendation, type QuizAnswers } from "../domain";
-import { QuizResultCard } from "./QuizResultCard";
+import { QUIZ_QUESTIONS } from "../domain/questions";
+import { calculateRecommendation, type QuizAnswers } from "../domain/scoring";
+
+const LeadCaptureForm = dynamic(
+  () => import("@/features/leads/ui/LeadCaptureForm").then((mod) => mod.LeadCaptureForm),
+  { ssr: false },
+);
+
+const QuizResultCard = dynamic(
+  () => import("./QuizResultCard").then((mod) => mod.QuizResultCard),
+  { ssr: false },
+);
 
 type Phase = "quiz" | "contact" | "result";
 
@@ -82,7 +91,7 @@ export function DiagnosticQuiz() {
             <span aria-current="step">{phase === "contact"
                 ? `Oxirgi qadam: aloqa ma'lumoti`
                 : `Savol ${stepIndex + 1} / ${totalSteps}`}</span>
-            <span><CountUp end={progressPercent} suffix="% bajarildi" duration={560} /></span>
+            <span>{progressPercent}% bajarildi</span>
           </div>
           <div
             role="progressbar"

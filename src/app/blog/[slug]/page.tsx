@@ -47,7 +47,7 @@ export default async function BlogPostDetailPage({ params }: Props) {
         <ArticleBreadcrumb title={post.title} />
         <ArticleHeader post={post} />
         <div className="w-full h-64 md:h-[420px] rounded-2xl overflow-hidden border border-border-strong relative shadow-md">
-          <Image src={post.coverUrl} alt={post.title} fill sizes="(max-width: 768px) 100vw, 1200px" className="object-cover" priority />
+          <Image src={post.coverUrl} alt={post.title} fill sizes="(max-width: 768px) calc(100vw - 40px), 1200px" className="object-cover" priority />
         </div>
         <div className="grid lg:grid-cols-12 gap-10 items-start pt-6">
           <ArticleMain post={post} />
