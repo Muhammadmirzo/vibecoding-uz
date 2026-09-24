@@ -1,7 +1,8 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-// Regression: in production a missing/failing Upstash Redis must degrade to the
-// per-instance limiter instead of throwing (throwing took login/OTP/leads down).
+// Regression: in production missing/failing shared backends (Upstash Redis,
+// Postgres) must degrade to the per-instance limiter instead of throwing
+// (throwing took login/OTP/leads down).
 describe("checkRateLimit without Redis in production", () => {
   afterEach(() => {
     vi.unstubAllEnvs();
@@ -12,6 +13,7 @@ describe("checkRateLimit without Redis in production", () => {
     vi.stubEnv("NODE_ENV", "production");
     vi.stubEnv("UPSTASH_REDIS_REST_URL", "");
     vi.stubEnv("UPSTASH_REDIS_REST_TOKEN", "");
+    vi.stubEnv("DATABASE_URL", "");
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     const { checkRateLimit } = await import("@/lib/security/rateLimit");
 

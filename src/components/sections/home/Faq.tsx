@@ -12,7 +12,7 @@ const faqs = [
 
 export function Faq() {
   return (
-    <Section pattern={false} className="bg-bg-sunken">
+    <Section pattern={false} className="faq-section bg-bg-sunken">
       <Container>
         <div className="max-w-2xl">
           <p className="mb-4 text-sm font-semibold text-brand">Savol-javob</p>

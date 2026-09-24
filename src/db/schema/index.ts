@@ -8,4 +8,5 @@ export * from "./crm";
 export * from "./content";
 export * from "./payouts";
 export * from "./operations";
+export * from "./security";
 export * from "./analytics";

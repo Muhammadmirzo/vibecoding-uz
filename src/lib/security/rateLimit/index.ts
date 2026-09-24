@@ -1,14 +1,28 @@
 import { NextResponse } from "next/server";
 import { checkMemoryRateLimit } from "./memoryLimiter";
 import { checkRedisRateLimit } from "./redisLimiter";
+import { checkPostgresRateLimit } from "./postgresLimiter";
 import type { RateLimitConfig, RateLimitResult } from "./presets";
 
 export { PRESETS } from "./presets";
 export type { RateLimitConfig, RateLimitResult } from "./presets";
 
 /**
- * Checks rate limit using Upstash Redis when configured, with an in-memory
- * sliding-window fallback.
+ * SHA-256 hashes an identifier (IP, phone) before it becomes a storage key,
+ * so no backend — Redis, Postgres or memory — ever stores a raw identifier.
+ * Web Crypto works in Node and Edge runtimes.
+ */
+export async function hashRateLimitIdentifier(raw: string): Promise<string> {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(`rl-v1:${raw}`));
+  return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("").slice(0, 32);
+}
+
+/**
+ * Checks rate limit with shared backends first: Upstash Redis when
+ * configured, then Postgres, with a per-instance memory fallback.
+ * Never throws: when every backend is down the memory limiter still
+ * answers (fail-open for reads/low-risk writes; auth endpoints keep the
+ * pre-W10 memory behaviour instead of going down).
  */
 export async function checkRateLimit(
   identifier: string | null | undefined,
@@ -22,21 +36,22 @@ export async function checkRateLimit(
   const prefix = config?.prefix || "rl";
   const now = Date.now();
   const windowMs = windowSeconds * 1000;
-  const key = `ratelimit:${prefix}:${safeIdentifier}`;
+  const key = `ratelimit:${prefix}:${await hashRateLimitIdentifier(safeIdentifier)}`;
 
-  // Antifragile: Redis (shared across instances) is preferred, but a missing or
-  // failing Redis must never take login/OTP/leads/webhooks down — degrade to the
-  // per-instance limiter and say so once in the logs.
-  const redisResult = await checkRedisRateLimit(key, limit, windowSeconds, now);
-  if (!redisResult && process.env.NODE_ENV === "production") warnMemoryFallbackOnce();
-  return redisResult || checkMemoryRateLimit(key, limit, windowMs, now);
+  // Antifragile: shared backends are preferred, but a missing or failing
+  // backend must never take login/OTP/leads/webhooks down — degrade down
+  // the chain and say so once in the logs.
+  const sharedResult = (await checkRedisRateLimit(key, limit, windowSeconds, now))
+    ?? (process.env.NODE_ENV === "test" ? null : await checkPostgresRateLimit(key, limit, windowSeconds, now));
+  if (!sharedResult && process.env.NODE_ENV === "production") warnSharedFallbackOnce();
+  return sharedResult || checkMemoryRateLimit(key, limit, windowMs, now);
 }
 
-let warnedMemoryFallback = false;
-function warnMemoryFallbackOnce() {
-  if (warnedMemoryFallback) return;
-  warnedMemoryFallback = true;
-  console.warn("[rate-limit] Upstash Redis unavailable or not configured — using per-instance memory limits");
+let warnedSharedFallback = false;
+function warnSharedFallbackOnce() {
+  if (warnedSharedFallback) return;
+  warnedSharedFallback = true;
+  console.warn("[rate-limit] Upstash Redis and Postgres unavailable or not configured — using per-instance memory limits");
 }
 
 const IPV4 = /^(?:\d{1,3}\.){3}\d{1,3}$/;
