@@ -1,3 +1,4 @@
+import { PgDialect } from "drizzle-orm/pg-core";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 const { mockDbExecute } = vi.hoisted(() => ({ mockDbExecute: vi.fn() }));
@@ -152,5 +153,10 @@ describe("W10 fallback order (Upstash → Postgres → memory)", () => {
     expect(hashed).toMatch(/^[0-9a-f]{32}$/);
     await expect(checkRateLimit("1.2.3.4", { limit: 1, windowSeconds: 60, prefix: "w10-hash" })).resolves.toMatchObject({ success: true });
     await expect(checkRateLimit("1.2.3.4", { limit: 1, windowSeconds: 60, prefix: "w10-hash" })).resolves.toMatchObject({ success: false });
+  });
+  it("sends only primitive params — postgres-js rejects raw Date objects in production", () => {
+    const { params } = new PgDialect().sqlToQuery(buildCheckQuery("k", new Date(60_000)));
+    expect(params.some((param) => param instanceof Date)).toBe(false);
+    expect(params).toContain(new Date(60_000).toISOString());
   });
 });

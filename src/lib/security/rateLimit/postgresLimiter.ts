@@ -59,9 +59,11 @@ export function windowStartMs(now: number, windowMs: number): number {
   return Math.floor(now / windowMs) * windowMs;
 }
 
+// postgres-js cannot serialize a Date in an untyped raw param (ERR_INVALID_ARG_TYPE in
+// production), so timestamps travel as ISO strings with an explicit cast.
 export function buildCheckQuery(key: string, windowStart: Date): SQL<unknown> {
   return sql`INSERT INTO rate_limit_buckets ("key", window_start, "count")
-    VALUES (${key}, ${windowStart}, 1)
+    VALUES (${key}, ${windowStart.toISOString()}::timestamptz, 1)
     ON CONFLICT ("key") DO UPDATE SET
       "count" = CASE WHEN rate_limit_buckets.window_start < EXCLUDED.window_start THEN 1 ELSE rate_limit_buckets."count" + 1 END,
       window_start = CASE WHEN rate_limit_buckets.window_start < EXCLUDED.window_start THEN EXCLUDED.window_start ELSE rate_limit_buckets.window_start END
@@ -119,7 +121,7 @@ export async function cleanupRateLimitBuckets(
   if (!process.env.DATABASE_URL) return;
   try {
     const cutoff = cleanupCutoff(Date.now(), maxAgeSeconds);
-    await runQuery(sql`DELETE FROM rate_limit_buckets WHERE window_start < ${cutoff}`);
+    await runQuery(sql`DELETE FROM rate_limit_buckets WHERE window_start < ${cutoff.toISOString()}::timestamptz`);
   } catch (error) {
     console.warn("[rate-limit] bucket cleanup failed (ignored):", error);
   }
