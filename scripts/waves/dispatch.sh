@@ -11,8 +11,9 @@ set -u
 wave=$1; model=$2; base=${3:-main}
 root=/home/mirzo/.zcode/workspace/vibecoding-uz
 wt=/home/mirzo/.zcode/workspace/vibecoding-uz-wt/$wave
-prompt=$root/docs/waves/prompts/$wave.md
-log=$root/.orchestra/logs/$wave.log
+# PROMPT=<name> reuses the wave worktree with a follow-up prompt (e.g. review fixes).
+prompt=$root/docs/waves/prompts/${PROMPT:-$wave}.md
+log=$root/.orchestra/logs/${PROMPT:-$wave}.log
 mkdir -p "$root/.orchestra/logs" "$(dirname "$wt")"
 [ -f "$prompt" ] || { echo "no prompt $prompt"; exit 2; }
 if [ ! -d "$wt" ]; then
