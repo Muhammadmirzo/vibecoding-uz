@@ -70,8 +70,8 @@ Shared by all: **103 kB → 103 kB (±0)**.
 | `/kurs/[slug]` | 123 kB | 124 kB | +1 ✓ |
 | `/diagnostika` | 120 kB | 121 kB | +1 ✓ |
 | `/bepul-dars` | 119 kB | 119 kB | 0 ✓ |
-| `/xizmatlar` (via services) | — | — | server-only |
-| `/portfolio` | 133 kB | 135 kB | +2 ✓ |
+| `/xizmatlar` | 127 kB | 128 kB | +1 ✓ |
+| `/portfolio` | 133 kB | 126 kB | −7 ✓ |
 | `/blog` | 129 kB | 130 kB | +1 ✓ |
 | `/blog/[slug]` | 113 kB | 114 kB | +1 ✓ |
 | `/resurslar` | 127 kB | 128 kB | +1 ✓ |
@@ -81,8 +81,8 @@ Shared by all: **103 kB → 103 kB (±0)**.
 | `/maxfiylik` | 124 kB | 107 kB | −17 ✓ |
 | `/offerta` | 124 kB | 107 kB | −17 ✓ |
 | `/pul-qaytarish` | 124 kB | 107 kB | −17 ✓ |
-| `/shahodatnoma/[code]` | 106 kB | TBD (zero-JS pass) | budget ≤ +3 |
-| `/kabinet` | 141 kB | 142 kB | +1 ✓ |
+| `/shahodatnoma/[code]` | 106 kB | 107 kB | +1 ✓ |
+| `/kabinet` | 141 kB | 141 kB | 0 ✓ |
 | `/_not-found` | 103 kB | 103 kB | 0 ✓ |
 
 Two diet fixes after the first after-build: `CohortCountdown` no longer
@@ -95,6 +95,14 @@ in Server Components. Also fixed dead `var()`-opacity Tailwind classes
 found in scope (`bg-ink/40`, `bg-bg/90`, `text-bg/75`, …) with
 `color-mix()` equivalents — Tailwind 3.4 silently drops opacity
 modifiers on `var()` colors (verified in built CSS).
+
+**Barrel-import rule (applies repo-wide):** server components must import
+UI primitives from their files (`@/components/ui/Layout`, `.../Button`,
+`.../Surfaces`), never from the `@/components/ui` barrel. The barrel's
+`export *` re-exports client modules (Accordion, SearchModal, …) and
+defeats React Flight tree-shaking: one barrel import pulled the whole
+client Accordion (+19 kB) into `/shahodatnoma`. Verified via the route's
+`page_client-reference-manifest.js` and chunk inspection; fixed to 107 kB.
 
 ## Verification (TBD)
 
