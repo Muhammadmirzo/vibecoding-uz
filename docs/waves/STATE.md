@@ -27,7 +27,7 @@ Parallel agents allowed (max 2) — heavy commands serialized with `scripts/wave
 
 | Wave | Model | Status | Branch | Report | Notes |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| W6A Design + motion: HOME | muse-spark-1.3 | 🏃 | wave/w6a-design-home | reports/W6A-DESIGN-HOME.md | scroll-driven storytelling, bento, micro-interactions; port 3301 |
+| W6A Design + motion: HOME | space-bunny-free (muse rate-limited) | 🏃 | wave/w6a-design-home | reports/W6A-DESIGN-HOME.md | scroll-driven storytelling, bento, micro-interactions; port 3301 |
 | W6B Portfolio management | space-bunny-free | 🏃 | wave/w6b-portfolio | reports/W6B-PORTFOLIO.md | featured rank, ownership, admin CRUD; new migration (orchestrator applies); port 3302 |
 | W6C Design rollout: all pages | muse-spark-1.3 | ⏳ after W6A approved | — | reports/W6C-DESIGN-PAGES.md | reuse W6A primitives |
 | W7 Chat centre (visitor ↔ admin ↔ AI agent) | space-bunny | ⏳ owner approval | — | reports/W7-CHAT.md | |
