@@ -7,7 +7,7 @@ import { trackServerEvent } from "@/features/analytics/server/track";
 import { messagesQuerySchema, sendMessageSchema } from "@/features/chat/contracts";
 import { orchestrateAiReply } from "@/features/chat/server/ai-orchestrator.service";
 import { getVisitorConversation, listMessages, markConversationRead, sendVisitorMessage } from "@/features/chat/server/chat.service";
-import { getChatSettings } from "@/features/chat/server/settings.service";
+import { getChatSettings, publicChatSettings } from "@/features/chat/server/settings.service";
 import { getOrCreateVisitorToken, visitorTokenFromRequest } from "@/features/chat/server/visitor-token";
 import { notifyVisitorMessage } from "@/lib/telegram/chat-bridge";
 import { registerV1Route } from "@/lib/api/v1/registry";
@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
       ]);
     });
     void trackServerEvent({ type: "chat_message", path: parsed.data.sourcePath, props: { conversationId: conversation.id, messageLength: parsed.data.body.length } });
-    return created({ message, conversation, settings });
+    return created({ message, conversation, settings: publicChatSettings(settings) });
   } catch (error) {
     if (error && typeof error === "object" && "code" in error && error.code === "42P01") {
       return fail(new ServiceError("database_unavailable", "Chat vaqtincha texnik xizmatga murojaat qilmoqda. Xabaringizni saqlab qoling.", 503));

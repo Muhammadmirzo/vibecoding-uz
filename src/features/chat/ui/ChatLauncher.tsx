@@ -4,6 +4,7 @@ import * as React from "react";
 import type { ChatConversationDto } from "../contracts";
 
 const Panel = React.lazy(() => import("./ChatPanel"));
+const CHAT_SEEN_KEY = "naqsh-chat-seen";
 
 export function ChatLauncher() {
   const [open, setOpen] = React.useState(false);
@@ -49,6 +50,12 @@ export function ChatLauncher() {
 
   React.useEffect(() => {
     if (!mounted || window.location.pathname.startsWith("/admin")) return;
+    // Only visitors who have opened the chat before poll for unread replies —
+    // everyone else costs zero requests (and gets no chat cookie).
+    if (open) { try { localStorage.setItem(CHAT_SEEN_KEY, "1"); } catch { /* storage blocked */ } }
+    let seen = false;
+    try { seen = localStorage.getItem(CHAT_SEEN_KEY) === "1"; } catch { /* storage blocked */ }
+    if (!seen && !open) return;
     let active = true;
     const check = async () => {
       try {

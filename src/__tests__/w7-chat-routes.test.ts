@@ -26,7 +26,7 @@ vi.mock("@/features/chat/server/chat.service", () => ({
   listConversations: mocks.listConversations,
   postReply: mocks.postReply,
 }));
-vi.mock("@/features/chat/server/settings.service", () => ({ getChatSettings: mocks.getChatSettings }));
+vi.mock("@/features/chat/server/settings.service", async (importOriginal) => ({ ...(await importOriginal<typeof import("@/features/chat/server/settings.service")>()), getChatSettings: mocks.getChatSettings }));
 vi.mock("@/features/chat/server/visitor-token", () => ({
   visitorTokenFromRequest: mocks.visitorTokenFromRequest,
   getOrCreateVisitorToken: mocks.getOrCreateVisitorToken,

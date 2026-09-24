@@ -12,3 +12,7 @@ export async function getOrCreateVisitorToken(): Promise<{ token: string; isNew:
   return { token, isNew: true };
 }
 export function visitorTokenFromRequest(request: Request): string | null { return request.headers.get("x-visitor-token") || null; }
+/** Reads the visitor token without minting one (read-only endpoints). */
+export async function readVisitorToken(): Promise<string | null> {
+  return (await cookies()).get(CHAT_COOKIE)?.value || null;
+}
