@@ -71,6 +71,15 @@ export async function listPortfolios(
   return { portfolios: items, total: items.length };
 }
 
+/** Audit is best-effort: the write already succeeded, so a failed audit insert must not turn it into a 500. */
+async function auditSafely(repo: PortfolioRepository, input: Parameters<PortfolioRepository["audit"]>[0]): Promise<void> {
+  try {
+    await repo.audit(input);
+  } catch (error) {
+    console.error("[portfolio] audit log write failed", error);
+  }
+}
+
 function assertFeaturedCapacity(repo: PortfolioRepository, currentId?: string): Promise<void> {
   return repo.listFeatured().then((featured) => {
     const active = featured.filter((item) => item.id !== currentId);
@@ -91,7 +100,7 @@ export async function createPortfolio(repo: PortfolioRepository, input: Portfoli
     sortOrder: await repo.nextSortOrder(),
     publishedAt: input.status === "published" ? new Date(input.publishedAt ?? Date.now()) : null,
   });
-  await repo.audit({ userId: actor.userId, action: "portfolio.create", entityId: row.id, details: { title: row.title, ownership: row.ownership, status: row.status } });
+  await auditSafely(repo, { userId: actor.userId, action: "portfolio.create", entityId: row.id, details: { title: row.title, ownership: row.ownership, status: row.status } });
   return row;
 }
 
@@ -110,13 +119,13 @@ export async function updatePortfolio(repo: PortfolioRepository, id: string, pat
     publishedAt: status === "published" ? new Date(patch.publishedAt ?? current.publishedAt ?? Date.now()) : null,
   });
   if (!updated) throw new ServiceError("NOT_FOUND", "Loyiha topilmadi", 404);
-  await repo.audit({ userId: actor.userId, action: "portfolio.update", entityId: id, details: patch });
+  await auditSafely(repo, { userId: actor.userId, action: "portfolio.update", entityId: id, details: patch });
   return updated;
 }
 
 export async function deletePortfolio(repo: PortfolioRepository, id: string, actor: AuditActor): Promise<PortfolioRow> {
   const deleted = await repo.remove(id);
   if (!deleted) throw new ServiceError("NOT_FOUND", "Loyiha topilmadi", 404);
-  await repo.audit({ userId: actor.userId, action: "portfolio.delete", entityId: id, details: { title: deleted.title } });
+  await auditSafely(repo, { userId: actor.userId, action: "portfolio.delete", entityId: id, details: { title: deleted.title } });
   return deleted;
 }

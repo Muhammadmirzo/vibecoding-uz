@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { z } from "zod";
-import { PORTFOLIO_DATA, type PortfolioItem } from "@/features/portfolio/portfolioData";
+import type { PortfolioItem } from "@/features/portfolio/portfolioData";
 import { portfolioListResponseSchema, portfolioSchema, portfolioWriteResponseSchema, type PortfolioUpdateInput } from "@/lib/validations/portfolio";
 import type { PortfolioFormData } from "./types";
 
@@ -35,7 +35,7 @@ async function requestJson(input: RequestInfo | URL, init?: RequestInit) {
 }
 
 export function usePortfolio() {
-  const [items, setItems] = React.useState<PortfolioItem[]>(PORTFOLIO_DATA);
+  const [items, setItems] = React.useState<PortfolioItem[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [editingItem, setEditingItem] = React.useState<PortfolioItem | null>(null);
@@ -91,7 +91,9 @@ export function usePortfolio() {
   const move = async (item: PortfolioItem, direction: -1 | 1) => {
     const index = items.findIndex((entry) => entry.id === item.id); const target = items[index + direction];
     if (!target) return;
-    try { await Promise.all([patch(item, { sortOrder: Math.max(0, target.sortOrder - 1) }), patch(target, { sortOrder: item.sortOrder + 1 })]); showToast("Tartib yangilandi"); }
+    // Swap positions; equal sortOrders (legacy rows) would make a swap a no-op, so push the item past its neighbour.
+    const itemOrder = target.sortOrder === item.sortOrder ? Math.max(0, target.sortOrder + direction) : target.sortOrder;
+    try { await patch(item, { sortOrder: itemOrder }); await patch(target, { sortOrder: item.sortOrder }); showToast("Tartib yangilandi"); }
     catch (error) { showToast(error instanceof Error ? error.message : "Tartibni yanglab bo'lmadi"); }
   };
   const setQuickField = async (item: PortfolioItem, body: PortfolioUpdateInput, message: string) => {
