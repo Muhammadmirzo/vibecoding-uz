@@ -50,6 +50,13 @@
       "when": 1790249718512,
       "tag": "0006_familiar_naoko",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1790253579555,
+      "tag": "0007_free_odin",
+      "breakpoints": true
     }
   ]
 }
