@@ -17,14 +17,14 @@ export function BuildStory() {
             <div className="story-kicker"><span /><span>G'oyadan amaliyotgacha</span><span /></div>
             <h2 id="story-title" className="sr-only">G'oya, prompt va ishlaydigan ilova</h2>
 
-            <article className="story-layer story-idea" data-reveal>
+            <article className="story-layer story-idea">
               <div className="story-idea-mark"><Lightbulb className="size-7" aria-hidden="true" /></div>
               <p className="font-mono text-sm text-brand">01 / G'OYA</p>
               <h3>“Kechqurun non buyurtma qilish oson bo'lsin.”</h3>
               <p>Avval natija va muammo aniq. Texnologiya — keyin.</p>
             </article>
 
-            <article className="story-layer story-prompt" data-reveal>
+            <article className="story-layer story-prompt">
               <div className="story-window">
                 <div className="story-window-bar"><span className="size-2 rounded-full bg-danger" /><span className="size-2 rounded-full bg-gold" /><span className="size-2 rounded-full bg-accent" /><span className="ml-auto font-mono text-[10px] text-ink-subtle">claude · build</span></div>
                 <div className="space-y-3 font-mono text-xs sm:text-sm">
@@ -35,7 +35,7 @@ export function BuildStory() {
               </div>
             </article>
 
-            <article className="story-layer story-app" data-reveal>
+            <article className="story-layer story-app">
               <div className="story-app-caption"><MousePointer2 className="size-4 text-accent" aria-hidden="true" /><span>Ishlaydigan demo qurildi</span></div>
               <AppPreview />
               <p className="text-center font-mono text-xs text-ink-subtle">Prompt → tarkib → tekshiruv → ilova</p>

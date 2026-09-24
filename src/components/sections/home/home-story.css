@@ -25,31 +25,31 @@
 
 @supports (animation-timeline: view()) {
   @media (min-width: 1024px) {
-    html[data-motion="full"][data-motion-scroll="on"] .story-track { height: 150vh; view-timeline-name: --story; view-timeline-axis: block; }
-    html[data-motion="full"][data-motion-scroll="on"] .story-pin { position: sticky; top: 0; height: 100vh; overflow: hidden; padding: 0; }
-    html[data-motion="full"][data-motion-scroll="on"] .story-pin > div { display: block; }
-    html[data-motion="full"][data-motion-scroll="on"] .story-kicker { position: absolute; top: max(5rem, 9vh); right: 0; left: 0; }
-    html[data-motion="full"][data-motion-scroll="on"] .story-layer { position: absolute; top: 50%; right: clamp(1rem, 5vw, 5rem); left: clamp(1rem, 5vw, 5rem); transform: translateY(-50%); }
-    html[data-motion="full"][data-motion-scroll="on"] .story-idea { margin: 0; padding: 1rem 0 1rem clamp(1rem, 3vw, 3rem); }
-    html[data-motion="full"][data-motion-scroll="on"] .story-idea-mark { margin-bottom: 1.25rem; }
-    html[data-motion="full"][data-motion-scroll="on"] .story-idea h3 { max-width: 58rem; font-size: clamp(2.4rem, 4vw, 4.7rem); }
-    html[data-motion="full"][data-motion-scroll="on"] .story-prompt { margin: 0 auto; max-width: 880px; }
-    html[data-motion="full"][data-motion-scroll="on"] .story-app { margin: 0 auto; max-width: 800px; }
-    html[data-motion="full"][data-motion-scroll="on"] .story-rail { position: absolute; right: clamp(1rem, 5vw, 5rem); bottom: max(2rem, 6vh); left: clamp(1rem, 5vw, 5rem); margin: 0; }
+    html[data-motion-scroll="on"] .story-track { height: 150vh; view-timeline-name: --story; view-timeline-axis: block; }
+    html[data-motion-scroll="on"] .story-pin { position: sticky; top: 0; height: 100vh; overflow: hidden; padding: 0; }
+    html[data-motion-scroll="on"] .story-pin > div { display: block; }
+    html[data-motion-scroll="on"] .story-kicker { position: absolute; top: max(5rem, 9vh); right: 0; left: 0; }
+    html[data-motion-scroll="on"] .story-layer { position: absolute; top: 50%; right: clamp(1rem, 5vw, 5rem); left: clamp(1rem, 5vw, 5rem); transform: translateY(-50%); }
+    html[data-motion-scroll="on"] .story-idea { margin: 0; padding: 1rem 0 1rem clamp(1rem, 3vw, 3rem); }
+    html[data-motion-scroll="on"] .story-idea-mark { margin-bottom: 1.25rem; }
+    html[data-motion-scroll="on"] .story-idea h3 { max-width: 58rem; font-size: clamp(2.4rem, 4vw, 4.7rem); }
+    html[data-motion-scroll="on"] .story-prompt { margin: 0 auto; max-width: 880px; }
+    html[data-motion-scroll="on"] .story-app { margin: 0 auto; max-width: 800px; }
+    html[data-motion-scroll="on"] .story-rail { position: absolute; right: clamp(1rem, 5vw, 5rem); bottom: max(2rem, 6vh); left: clamp(1rem, 5vw, 5rem); margin: 0; }
 
-    html[data-motion="full"][data-motion-scroll="on"] .story-idea { animation: story-idea linear both; animation-timeline: --story; animation-range: cover 0% cover 100%; }
-    html[data-motion="full"][data-motion-scroll="on"] .story-prompt { animation: story-prompt linear both; animation-timeline: --story; animation-range: cover 0% cover 100%; }
-    html[data-motion="full"][data-motion-scroll="on"] .story-window { animation: story-window linear both; animation-timeline: --story; animation-range: cover 0% cover 100%; }
-    html[data-motion="full"][data-motion-scroll="on"] .story-build-line,.story-build-check { animation: story-build linear both; animation-timeline: --story; }
-    html[data-motion="full"][data-motion-scroll="on"] .story-build-1 { animation-range: 20% 42%; }
-    html[data-motion="full"][data-motion-scroll="on"] .story-build-2 { animation-range: 32% 53%; }
-    html[data-motion="full"][data-motion-scroll="on"] .story-build-3 { animation-range: 44% 65%; }
-    html[data-motion="full"][data-motion-scroll="on"] .story-build-check { animation-range: 56% 76%; }
-    html[data-motion="full"][data-motion-scroll="on"] .story-app { animation: story-app linear both; animation-timeline: --story; animation-range: cover 0% cover 100%; }
-    html[data-motion="full"][data-motion-scroll="on"] .story-app .app-preview-layer { animation: story-assemble linear both; animation-timeline: --story; }
-    html[data-motion="full"][data-motion-scroll="on"] .story-app .app-layer-menu { animation-range: 64% 79%; }
-    html[data-motion="full"][data-motion-scroll="on"] .story-app .app-layer-order { animation-range: 70% 86%; }
-    html[data-motion="full"][data-motion-scroll="on"] .story-app .app-layer-chat { animation-range: 76% 94%; }
+    html[data-motion-scroll="on"] .story-idea { animation: story-idea linear both; animation-timeline: --story; animation-range: cover 0% cover 100%; }
+    html[data-motion-scroll="on"] .story-prompt { animation: story-prompt linear both; animation-timeline: --story; animation-range: cover 0% cover 100%; }
+    html[data-motion-scroll="on"] .story-window { animation: story-window linear both; animation-timeline: --story; animation-range: cover 0% cover 100%; }
+    html[data-motion-scroll="on"] .story-build-line,.story-build-check { animation: story-build linear both; animation-timeline: --story; }
+    html[data-motion-scroll="on"] .story-build-1 { animation-range: 20% 42%; }
+    html[data-motion-scroll="on"] .story-build-2 { animation-range: 32% 53%; }
+    html[data-motion-scroll="on"] .story-build-3 { animation-range: 44% 65%; }
+    html[data-motion-scroll="on"] .story-build-check { animation-range: 56% 76%; }
+    html[data-motion-scroll="on"] .story-app { animation: story-app linear both; animation-timeline: --story; animation-range: cover 0% cover 100%; }
+    html[data-motion-scroll="on"] .story-app .app-preview-layer { animation: story-assemble linear both; animation-timeline: --story; }
+    html[data-motion-scroll="on"] .story-app .app-layer-menu { animation-range: 64% 79%; }
+    html[data-motion-scroll="on"] .story-app .app-layer-order { animation-range: 70% 86%; }
+    html[data-motion-scroll="on"] .story-app .app-layer-chat { animation-range: 76% 94%; }
   }
 }
 
@@ -71,5 +71,10 @@
 @keyframes story-assemble { from { opacity: 0; transform: translateY(18px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
 @media (prefers-reduced-motion: reduce) {
+  .story-track { height: auto !important; }
+  .story-pin { position: static !important; height: auto !important; overflow: visible !important; padding: 5rem 0; }
+  .story-pin > div { display: flex !important; }
+  .story-layer { position: relative !important; inset: auto !important; transform: none !important; margin-top: 2rem; }
+  .story-idea { margin-top: 0; }
   .story-layer,.story-window,.story-build-line,.story-build-check,.story-app .app-preview-layer { animation: none !important; }
 }

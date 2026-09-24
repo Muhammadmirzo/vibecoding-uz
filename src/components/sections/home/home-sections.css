@@ -10,6 +10,8 @@
 .bento-card:hover { border-color: var(--border-strong); box-shadow: var(--shadow-md); }
 .bento-index { position: absolute; top: 1.25rem; right: 1.25rem; color: var(--ink-subtle); font-family: var(--font-mono); font-size: .68rem; }
 .bento-icon { width: 2.5rem; height: 2.5rem; color: var(--accent); stroke-width: 1.4; }
+html.motion-armed[data-motion-scroll="on"] [data-reveal].is-visible .bento-icon * { animation: bento-icon-draw var(--motion-slow) var(--motion-ease-out) both; }
+@keyframes bento-icon-draw { from { opacity: 0; stroke-dasharray: 32; stroke-dashoffset: 32; transform: scale(.82); } to { opacity: 1; stroke-dasharray: 32; stroke-dashoffset: 0; transform: scale(1); } }
 .bento-card h3 { position: relative; z-index: 1; max-width: 30rem; font-size: clamp(1.35rem, 2vw, 1.8rem); font-weight: 700; letter-spacing: -.03em; }
 .bento-card p { position: relative; z-index: 1; max-width: 36rem; margin-top: .85rem; color: var(--ink-muted); }
 .tilt-card { height: 100%; transform-style: preserve-3d; }
@@ -57,11 +59,11 @@ html[data-motion="full"][data-motion-ambient="on"] .demo-typing { animation: dem
 }
 
 @supports (animation-timeline: view()) {
-  html[data-motion="full"][data-motion-scroll="on"] .roadmap-path-progress { animation: roadmap-draw linear both; animation-timeline: --roadmap; animation-range: cover 0% cover 100%; }
-  html[data-motion="full"][data-motion-scroll="on"] .scroll-fill-base { animation: scroll-fill linear both; animation-timeline: view(); animation-range: entry 20% cover 45%; }
-  html[data-motion="full"][data-motion-scroll="on"] .roadmap-step { view-timeline-name: --step; view-timeline-axis: block; }
-  html[data-motion="full"][data-motion-scroll="on"] .roadmap-card { animation: roadmap-card linear both; animation-timeline: --step; animation-range: entry 0% cover 28%; }
-  html[data-motion="full"][data-motion-scroll="on"] .girih-transition::before { animation: girih-wipe var(--motion-slow) var(--motion-ease-out) both; animation-timeline: view(); animation-range: entry 0% cover 18%; }
+  html[data-motion-scroll="on"] .roadmap-path-progress { animation: roadmap-draw linear both; animation-timeline: --roadmap; animation-range: cover 0% cover 100%; }
+  html[data-motion-scroll="on"] .scroll-fill-base { animation: scroll-fill linear both; animation-timeline: view(); animation-range: entry 20% cover 45%; }
+  html[data-motion-scroll="on"] .roadmap-step { view-timeline-name: --step; view-timeline-axis: block; }
+  html[data-motion-scroll="on"] .roadmap-card { animation: roadmap-card linear both; animation-timeline: --step; animation-range: entry 0% cover 28%; }
+  html[data-motion-scroll="on"] .girih-transition::before { animation: girih-wipe var(--motion-slow) var(--motion-ease-out) both; animation-timeline: view(); animation-range: entry 0% cover 18%; }
 }
 @keyframes roadmap-draw { to { stroke-dashoffset: 0; } }
 @keyframes scroll-fill { to { clip-path: inset(0 0 0 0); } }
