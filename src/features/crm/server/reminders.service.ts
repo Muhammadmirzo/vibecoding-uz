@@ -1,4 +1,5 @@
 import type { ReminderRunInput } from "@/lib/validations/cron";
+import { BRAND } from "@/config/brand";
 import type {
   DripEnrollment, DripLesson, ReminderDetails, RemindersRepository,
 } from "./reminders.repository";
@@ -96,11 +97,11 @@ async function processInactivity(
   const users = await repo.findInactiveUsers(threshold);
   for (const user of users) {
     details.inactivityNudges.push(user.fullName);
-    const nudgeMessage = `Salom ${user.fullName}! Mirzo Academy platformasida darslaringiz kutmoqda. Bilimingizni oshirishda davom eting! 🚀 https://vibecoding.uz/kabinet`;
+    const nudgeMessage = `Salom ${user.fullName}! ${BRAND.name} platformasida darslaringiz kutmoqda. Bilimingizni oshirishda davom eting! 🚀 ${BRAND.url}/kabinet`;
     if (user.tgUserId) {
       await notifier.sendTelegram(
         user.tgUserId,
-        `👋 <b>Sizni sog'indik, ${user.fullName}!</b>\n\nMirzo Academy platformasidagi darslaringiz sizni kutmoqda. Bilim olishda to'xtab qolmang! 🚀`,
+        `👋 <b>Sizni sog'indik, ${user.fullName}!</b>\n\n${BRAND.name} platformasidagi darslaringiz sizni kutmoqda. Bilim olishda to'xtab qolmang! 🚀`,
       );
     } else if (user.phone) {
       await notifier.sendSms({ phone: user.phone, message: nudgeMessage });

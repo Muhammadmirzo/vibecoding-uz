@@ -37,7 +37,7 @@ export default function JobsPage() {
             <Briefcase className="h-4 w-4" /> Karyera va Hamkorlik
           </span>
           <h1 className="text-3xl font-extrabold tracking-tight text-ink md:text-5xl">
-            Mirzo Academy jamoasiga <span className="font-display">qo'shiling</span>
+            Naqsh jamoasiga <span className="font-display">qo'shiling</span>
           </h1>
           <p className="text-sm leading-relaxed text-ink-muted md:text-base">
             Biz O&apos;zbekistonda yangi avlod dasturchilari va tadbirkorlarini AI vositalari orqali tarbiyalayapmiz. Biz bilan birga ta&apos;lim va texnologiya sohasini o&apos;zgartiring.

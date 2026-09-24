@@ -2,8 +2,8 @@ import type { ReactNode } from "react";
 import { AdminNav } from "@/features/crm/components/AdminNav";
 
 export const metadata = {
-  title: "Boshqaruv markazi | Mirzo Academy",
-  description: "Mirzo Academy platformasi uchun CRM va boshqaruv markazi",
+  title: "Boshqaruv markazi | Naqsh",
+  description: "Naqsh platformasi uchun CRM va boshqaruv markazi",
 };
 
 export default function AdminLayout({ children }: { children: ReactNode }) {

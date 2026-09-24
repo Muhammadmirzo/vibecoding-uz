@@ -36,7 +36,7 @@ export default function BlogListPage() {
       <div className="mx-auto w-full max-w-container space-y-8 px-5 sm:px-8">
         <header className="mx-auto max-w-[760px] space-y-4 text-center">
           <span className="inline-flex items-center gap-2 rounded-md border border-border bg-bg-elevated px-3.5 py-1.5 text-xs font-semibold text-accent">
-            <BookOpen className="h-4 w-4" /> Mirzo Academy maqolalari
+            <BookOpen className="h-4 w-4" /> Naqsh maqolalari
           </span>
           <h1 className="text-balance font-display text-[clamp(2rem,1.25rem+2.2vw,3.25rem)] font-semibold leading-[1.12] tracking-[-0.04em] text-ink">
             AI va Vibe Coding bo&apos;yicha zamonaviy bilimlar

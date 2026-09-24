@@ -1,7 +1,7 @@
 import { NotificationManager } from "@/features/crm/components/NotificationManager";
 
 export const metadata = {
-  title: "Xabarnomalar | Vibecoding Admin",
+  title: "Xabarnomalar | Naqsh",
   description: "Telegram bot, email va SMS orqali bildirishnomalar yuborish paneli",
 };
 

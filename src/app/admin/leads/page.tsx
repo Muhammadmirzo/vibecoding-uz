@@ -1,7 +1,7 @@
 import { LeadsKanban } from "@/features/crm/components/LeadsKanban";
 
 export const metadata = {
-  title: "CRM Leads Kanban | Vibecoding Admin",
+  title: "CRM Leads Kanban | Naqsh",
 };
 
 export default function AdminLeadsPage() {

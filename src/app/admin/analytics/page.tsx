@@ -1,7 +1,7 @@
 import { AnalyticsDashboard } from "@/features/crm/components/AnalyticsDashboard";
 
 export const metadata = {
-  title: "Platforma Analitikasi | Vibecoding Admin",
+  title: "Platforma Analitikasi | Naqsh",
 };
 
 export default function AdminAnalyticsPage() {

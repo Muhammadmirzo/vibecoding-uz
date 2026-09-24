@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 32 32" fill="none" role="img" aria-label="Naqsh">
+  <title>Naqsh</title>
+  <path d="M16 3.27 L28.73 16 L16 28.73 L3.27 16 Z" stroke="currentColor" stroke-width="2.5" stroke-linejoin="miter"/>
+  <g stroke="currentColor" stroke-width="2.5" stroke-linejoin="miter" stroke-linecap="butt">
+    <polyline points="14.52,7 25,7 25,10.02"/>
+    <polyline points="25,14.52 25,25 21.98,25"/>
+    <polyline points="17.48,25 7,25 7,21.98"/>
+    <polyline points="7,17.48 7,7 10.02,7"/>
+  </g>
+  <g stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="11.75,12.75 15,16 11.75,19.25"/>
+    <line x1="16.75" y1="19.25" x2="20.25" y2="19.25"/>
+  </g>
+</svg>

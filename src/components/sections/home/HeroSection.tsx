@@ -42,7 +42,7 @@ export function HeroSection() {
       <div className="absolute left-1/2 top-8 -z-10 h-72 w-[min(92vw,900px)] -translate-x-1/2 rounded-full bg-accent-soft/55 blur-3xl" aria-hidden="true" />
       <Container className="grid items-center gap-14 lg:grid-cols-[2fr_1fr] lg:gap-12 xl:gap-16">
         <div>
-          <p className="mb-5 text-sm font-semibold text-brand">AI bilan mahsulot qurish</p>
+          <p className="mb-5 text-sm font-semibold text-brand">Naqsh — AI bilan mahsulot yaratish maktabi</p>
           <h1 className="max-w-3xl font-display text-[clamp(2.25rem,1.2rem+3.2vw,4rem)] font-semibold leading-[1.05] tracking-[-0.045em] text-ink">
             G&apos;oyangizni <mark className="relative whitespace-nowrap bg-transparent text-brand"><span className="relative z-10">8 haftada</span><span className="absolute inset-x-0 bottom-0.5 z-0 h-2 -rotate-1 bg-gold/35" aria-hidden="true" /></mark> ilovaga aylantiring
           </h1>

@@ -8,7 +8,7 @@ export interface CertificateTemplateData {
   certCode: string;
 }
 
-/** Generates a unique certificate code (e.g., VIBE-2026-7A9K2). */
+/** Generates a unique certificate code (e.g., NAQSH-2026-7A9K2). */
 export function generateUniqueCertificateCode(): string {
   const year = new Date().getFullYear();
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -16,7 +16,7 @@ export function generateUniqueCertificateCode(): string {
   for (let index = 0; index < 5; index++) {
     randomStr += chars.charAt(Math.floor(Math.random() * chars.length));
   }
-  return `VIBE-${year}-${randomStr}`;
+  return `NAQSH-${year}-${randomStr}`;
 }
 
 export function prepareCertificateTemplate(input: GenerateCertificateInput): CertificateTemplateData {

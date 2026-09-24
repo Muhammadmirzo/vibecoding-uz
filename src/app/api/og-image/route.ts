@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
       signal: controller.signal,
       headers: {
         "User-Agent":
-          "Mozilla/5.0 (compatible; VibeCodingBot/1.0; +https://vibecoding.uz)",
+          "Mozilla/5.0 (compatible; NaqshBot/1.0)",
         Accept: "text/html",
       },
     });

@@ -68,7 +68,7 @@ function AdminLoginForm() {
       <div className="text-center space-y-2">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-bg-sunken border border-border text-xs font-mono font-bold text-accent uppercase">
           <ShieldCheck className="w-4 h-4 text-accent" />
-          <span>Mirzo Academy Admin Portal</span>
+          <span>Naqsh admin paneli</span>
         </div>
         <h1 className="text-2xl font-extrabold text-ink tracking-tight">
           Admin Panelga Kirish

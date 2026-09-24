@@ -75,6 +75,24 @@
 @keyframes typing-caret { 50% { opacity: 0; } }
 @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
+/* Naqsh logo — subtle stroke-draw on first paint (W1B brand, motion-system safe). */
+@keyframes naqsh-draw { to { stroke-dashoffset: 0; } }
+@keyframes naqsh-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: no-preference) {
+  html:not([data-motion="off"]) .naqsh-logo-animated .naqsh-mark-square {
+    stroke-dasharray: 14 14; /* each corner stroke is ~13.5 units long */
+    stroke-dashoffset: 14;
+    animation: naqsh-draw 1.1s cubic-bezier(.16,1,.3,1) forwards;
+  }
+  html:not([data-motion="off"]) .naqsh-logo-animated .naqsh-mark-diamond,
+  html:not([data-motion="off"]) .naqsh-logo-animated .naqsh-mark-caret {
+    opacity: 0;
+    animation: naqsh-fade-in 600ms ease-out forwards;
+  }
+  html:not([data-motion="off"]) .naqsh-logo-animated .naqsh-mark-diamond { animation-delay: 450ms; }
+  html:not([data-motion="off"]) .naqsh-logo-animated .naqsh-mark-caret { animation-delay: 800ms; }
+}
+
 @media (max-width: 768px) {
   button,
   a[href] { min-height: 44px; }

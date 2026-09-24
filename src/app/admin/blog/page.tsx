@@ -1,7 +1,7 @@
 import { BlogManager } from "@/features/crm/components/BlogManager";
 
 export const metadata = {
-  title: "Blog CMS | Vibecoding Admin",
+  title: "Blog CMS | Naqsh",
   description: "Blog maqolalarini boshqarish va tahrirlash paneli",
 };
 

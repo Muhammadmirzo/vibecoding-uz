@@ -1,7 +1,7 @@
 import { CohortManager } from "@/features/crm/components/CohortManager";
 
 export const metadata = {
-  title: "Guruhlar va Qabul | Vibecoding Admin",
+  title: "Guruhlar va Qabul | Naqsh",
 };
 
 export default function AdminCohortsPage() {

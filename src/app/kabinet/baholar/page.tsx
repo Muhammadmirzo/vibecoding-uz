@@ -4,7 +4,7 @@ import { KabinetNav } from "@/features/lms/components/KabinetNav";
 import { KabinetPageHeader, KabinetState } from "@/features/lms/components/KabinetPage";
 
 export const metadata: Metadata = {
-  title: "Baholar | Mirzo Academy",
+  title: "Baholar | Naqsh",
   description: "Talabaning topshiriqlari va mentor baholari.",
 };
 

@@ -1,4 +1,4 @@
-# Vibecoding MCP Server
+# Naqsh MCP Server
 
 Stdio MCP server exposing platform operations to external AI agents.
 `index.ts` is a thin bootstrap (auth check → stdio); each tool lives in
