@@ -10,11 +10,14 @@ import { SecurityTab } from "./settings/SecurityTab";
 import { MotionSettingsTab } from "./settings/MotionSettingsTab";
 import { useSettings } from "./settings/useSettings";
 import type { SettingsTab } from "./settings/types";
+import { isClosed } from "@/lib/features/closed";
 
 const tabs: Array<{ id: SettingsTab; label: string; icon: typeof Globe }> = [
   { id: "general", label: "Platforma", icon: Globe }, { id: "pricing", label: "Narxlar", icon: CreditCard },
   { id: "guarantee", label: "Kafolat", icon: ShieldCheck }, { id: "integrations", label: "Kalitlar", icon: Key },
-  { id: "features", label: "Funksiyalar", icon: CheckCircle }, { id: "motion", label: "Animatsiyalar", icon: Sparkles }, { id: "security", label: "Xavfsizlik", icon: Lock },
+  // W10: Funksiyalar tabidagi kalitlar hech narsani boshqarmedi — registr ochilmaguncha yashirilgan.
+  ...(!isClosed("adminFeatureFlags") ? [{ id: "features", label: "Funksiyalar", icon: CheckCircle }] as const : []),
+  { id: "motion", label: "Animatsiyalar", icon: Sparkles }, { id: "security", label: "Xavfsizlik", icon: Lock },
 ];
 
 export function SettingsManager() {
