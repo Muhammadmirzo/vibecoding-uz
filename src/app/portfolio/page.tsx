@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { PortfolioGallery } from "./PortfolioGallery";
+import { getPublicPortfolios } from "@/features/portfolio/server/portfolio.service";
 
 export const metadata: Metadata = {
-  title: "Portfolio — Vibe Coding loyihalari | Naqsh",
-  description:
-    "Sun'iy intellekt yordamida qurilgan jonli loyihalar va ularning ochiq raqamlarini ko'rib chiqing.",
+  title: "Portfolio — AI bilan qurilgan loyihalar | Naqsh",
+  description: "Tekshirilgan asosiy loyihalar, talabalar va mijozlar loyihalarini ko'rib chiqing.",
 };
 
-export default function PortfolioPage() {
-  return <PortfolioGallery />;
+export default async function PortfolioPage() {
+  const { portfolios } = await getPublicPortfolios();
+  return <PortfolioGallery items={portfolios} />;
 }

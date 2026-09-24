@@ -1,15 +1,38 @@
 "use client";
 
 import * as React from "react";
+import { z } from "zod";
 import { PORTFOLIO_DATA, type PortfolioItem } from "@/features/portfolio/portfolioData";
-import { portfolioSchema } from "@/lib/validations/portfolio";
-import { resolvePortfolioImageUrl } from "@/features/portfolio/portfolioUtils";
+import { portfolioListResponseSchema, portfolioSchema, portfolioWriteResponseSchema, type PortfolioUpdateInput } from "@/lib/validations/portfolio";
 import type { PortfolioFormData } from "./types";
 
 const initialForm: PortfolioFormData = {
   title: "", slug: "", url: "https://", domain: "", category: "Startup MVP", description: "",
-  imageUrl: "", userCount: "", badgeText: "Shu metod bilan qurilgan", isFeatured: true, sortOrder: 1,
+  imageUrl: "", coverUrl: "", liveUrl: "", repoUrl: "", userCount: "", badgeText: "Naqsh metodi bilan qurilgan",
+  isFeatured: false, featuredRank: null, sortOrder: 1, ownership: "owner", status: "draft",
+  techStack: "", highlights: "", publishedAt: "",
 };
+const errorBodySchema = z.object({ message: z.string().optional(), error: z.string().optional() }).passthrough();
+
+function fromItem(item: PortfolioItem): PortfolioFormData {
+  return {
+    title: item.title, slug: item.slug, url: item.url, domain: item.domain, category: item.category as PortfolioFormData["category"],
+    description: item.description, imageUrl: item.imageUrl, coverUrl: item.coverUrl, liveUrl: item.liveUrl, repoUrl: item.repoUrl,
+    userCount: item.userCount || "", badgeText: item.badgeText, isFeatured: item.isFeatured, featuredRank: item.featuredRank,
+    sortOrder: item.sortOrder, ownership: item.ownership, status: item.status, techStack: item.techStack.join(", "),
+    highlights: item.highlights.join("\n"), publishedAt: item.publishedAt?.slice(0, 16) || "",
+  };
+}
+
+async function requestJson(input: RequestInfo | URL, init?: RequestInit) {
+  const response = await fetch(input, init);
+  const body: unknown = await response.json();
+  if (!response.ok) {
+    const parsed = errorBodySchema.safeParse(body);
+    throw new Error(parsed.success ? (parsed.data.message || parsed.data.error) : "Amalni bajarishda xatolik yuz berdi");
+  }
+  return body;
+}
 
 export function usePortfolio() {
   const [items, setItems] = React.useState<PortfolioItem[]>(PORTFOLIO_DATA);
@@ -20,47 +43,61 @@ export function usePortfolio() {
   const [toastMessage, setToastMessage] = React.useState<string | null>(null);
   const [formErrors, setFormErrors] = React.useState<Record<string, string>>({});
   const [formData, setFormData] = React.useState<PortfolioFormData>(initialForm);
+  const showToast = (message: string) => { setToastMessage(message); window.setTimeout(() => setToastMessage(null), 3500); };
 
-  const showToast = (message: string) => {
-    setToastMessage(message);
-    setTimeout(() => setToastMessage(null), 3000);
-  };
-
-  React.useEffect(() => {
-    fetch("/api/portfolio").then((res) => res.json()).then((data) => {
-      if (data.success && Array.isArray(data.portfolios) && data.portfolios.length > 0) setItems(data.portfolios);
-    }).catch((err) => console.error("Error fetching portfolios:", err)).finally(() => setIsLoading(false));
+  const load = React.useCallback(async () => {
+    const body = await requestJson("/api/portfolio?scope=admin");
+    const parsed = portfolioListResponseSchema.parse(body);
+    setItems(parsed.portfolios.map((item) => ({ ...item, publishedAt: item.publishedAt ?? null })));
   }, []);
 
+  React.useEffect(() => { load().catch((error: unknown) => showToast(error instanceof Error ? error.message : "Loyihalarni yuklab bo'lmadi")).finally(() => setIsLoading(false)); }, [load]);
+
   const openAdd = () => { setEditingItem(null); setFormData({ ...initialForm, sortOrder: items.length + 1 }); setFormErrors({}); setIsDialogOpen(true); };
-  const openEdit = (item: PortfolioItem) => {
-    setEditingItem(item);
-    setFormData({ title: item.title, slug: item.slug, url: item.url, domain: item.domain, category: item.category, description: item.description, imageUrl: resolvePortfolioImageUrl(item), userCount: item.userCount || "", badgeText: item.badgeText, isFeatured: item.isFeatured, sortOrder: item.sortOrder });
-    setFormErrors({}); setIsDialogOpen(true);
-  };
+  const openEdit = (item: PortfolioItem) => { setEditingItem(item); setFormData(fromItem(item)); setFormErrors({}); setIsDialogOpen(true); };
+
   const submit = async (event: React.FormEvent) => {
     event.preventDefault(); setFormErrors({});
-    const validated = portfolioSchema.safeParse(formData);
+    const { publishedAt, techStack, highlights, ...formValues } = formData;
+    const candidate = { ...formValues, imageUrl: formData.coverUrl, liveUrl: formData.liveUrl || formData.url, publishedAt: publishedAt ? new Date(publishedAt).toISOString() : null, techStack: techStack.split(",").map((v) => v.trim()).filter(Boolean), highlights: highlights.split("\n").map((v) => v.trim()).filter(Boolean) };
+    const validated = portfolioSchema.safeParse(candidate);
     if (!validated.success) {
-      const errors: Record<string, string> = {};
       const fields = validated.error.flatten().fieldErrors;
-      (Object.keys(fields) as Array<keyof typeof fields>).forEach((key) => { const value = fields[key]; if (value?.[0]) errors[key] = value[0]; });
-      setFormErrors(errors); return;
+      setFormErrors(Object.fromEntries(Object.entries(fields).map(([key, value]) => [key, value?.[0] || "Qiymat noto'g'ri"])));
+      return;
     }
     setIsSubmitting(true);
     try {
-      const response = await fetch(editingItem ? `/api/portfolio/${editingItem.id}` : "/api/portfolio", { method: editingItem ? "PATCH" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(validated.data) });
-      const data = await response.json();
-      const item: PortfolioItem = data.portfolio || (editingItem ? { ...editingItem, ...validated.data } : { ...validated.data, id: `portfolio-${Date.now()}` });
-      setItems((current) => editingItem ? current.map((entry) => entry.id === editingItem.id ? item : entry) : [item, ...current]);
-      showToast(editingItem ? "Portfolio loyihasi yangilandi!" : "Yangi portfolio loyihasi qo'shildi!"); setIsDialogOpen(false);
-    } catch (err) { console.error(err); showToast("Xatolik yuz berdi"); } finally { setIsSubmitting(false); }
+      const body = await requestJson(editingItem ? `/api/portfolio/${editingItem.id}` : "/api/portfolio", { method: editingItem ? "PATCH" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(validated.data) });
+      portfolioWriteResponseSchema.parse(body);
+      await load(); setIsDialogOpen(false); showToast(editingItem ? "Loyiha yangilandi" : "Yangi loyiha qo'shildi");
+    } catch (error) { showToast(error instanceof Error ? error.message : "Xatolik yuz berdi"); }
+    finally { setIsSubmitting(false); }
   };
-  const remove = async (id: string, title: string) => {
-    if (!confirm(`Haqiqatan ham "${title}" portfoliosini o'chirmoqchimisiz?`)) return;
-    try { await fetch(`/api/portfolio/${id}`, { method: "DELETE" }); setItems((current) => current.filter((entry) => entry.id !== id)); showToast("Portfolio o'chirildi"); }
-    catch (err) { console.error(err); setItems((current) => current.filter((entry) => entry.id !== id)); showToast("Portfolio o'chirildi"); }
+
+  const patch = async (item: PortfolioItem, body: PortfolioUpdateInput) => {
+    const response = await requestJson(`/api/portfolio/${item.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    portfolioWriteResponseSchema.parse(response); await load();
   };
-  const toggleFeatured = async (item: PortfolioItem) => { const next = !item.isFeatured; setItems((current) => current.map((entry) => entry.id === item.id ? { ...entry, isFeatured: next } : entry)); try { await fetch(`/api/portfolio/${item.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ isFeatured: next }) }); showToast("Status yangilandi!"); } catch (err) { console.error(err); } };
-  return { items, isLoading, isDialogOpen, editingItem, isSubmitting, toastMessage, formErrors, formData, setFormData, setIsDialogOpen, showToast, openAdd, openEdit, submit, remove, toggleFeatured };
+  const remove = async (item: PortfolioItem) => {
+    if (!window.confirm(`Haqiqatan ham "${item.title}" loyihasini o'chirmoqchimisiz?`)) return;
+    try { await requestJson(`/api/portfolio/${item.id}`, { method: "DELETE" }); await load(); showToast("Loyiha o'chirildi"); }
+    catch (error) { showToast(error instanceof Error ? error.message : "Xatolik yuz berdi"); }
+  };
+  const toggleFeatured = async (item: PortfolioItem) => {
+    try { await patch(item, { isFeatured: !item.isFeatured, featuredRank: !item.isFeatured ? items.filter((entry) => entry.isFeatured).length + 1 : null }); showToast("Asosiy loyihalar holati yangilandi"); }
+    catch (error) { showToast(error instanceof Error ? error.message : "Xatolik yuz berdi"); }
+  };
+  const move = async (item: PortfolioItem, direction: -1 | 1) => {
+    const index = items.findIndex((entry) => entry.id === item.id); const target = items[index + direction];
+    if (!target) return;
+    try { await Promise.all([patch(item, { sortOrder: Math.max(0, target.sortOrder - 1) }), patch(target, { sortOrder: item.sortOrder + 1 })]); showToast("Tartib yangilandi"); }
+    catch (error) { showToast(error instanceof Error ? error.message : "Tartibni yanglab bo'lmadi"); }
+  };
+  const setQuickField = async (item: PortfolioItem, body: PortfolioUpdateInput, message: string) => {
+    try { await patch(item, body); showToast(message); }
+    catch (error) { showToast(error instanceof Error ? error.message : "Xatolik yuz berdi"); await load(); }
+  };
+
+  return { items, isLoading, isDialogOpen, editingItem, isSubmitting, toastMessage, formErrors, formData, setFormData, setIsDialogOpen, showToast, openAdd, openEdit, submit, remove, toggleFeatured, move, setQuickField };
 }

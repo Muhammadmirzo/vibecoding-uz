@@ -37,13 +37,11 @@ export async function fetchOgImage(websiteUrl: string): Promise<string | null> {
 export function resolvePortfolioImageUrl(item: {
   url: string;
   imageUrl?: string | null;
+  coverUrl?: string | null;
 }): string {
-  if (
-    item.imageUrl &&
-    item.imageUrl.trim() !== "" &&
-    item.imageUrl.startsWith("http")
-  ) {
-    return item.imageUrl;
+  const candidate = item.coverUrl || item.imageUrl;
+  if (candidate && candidate.trim() !== "" && candidate.startsWith("http")) {
+    return candidate;
   }
   // Broken local path or empty — return empty, card will show fallback
   return "";
@@ -58,14 +56,14 @@ export function generatePlaceholderSvg(title: string, domain: string): string {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="750" viewBox="0 0 1200 750">
     <defs>
       <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#1a1a2e"/>
-        <stop offset="100%" stop-color="#16213e"/>
+        <stop offset="0%" stop-color="currentColor" stop-opacity="0.12"/>
+        <stop offset="100%" stop-color="currentColor" stop-opacity="0.06"/>
       </linearGradient>
     </defs>
     <rect width="1200" height="750" fill="url(#bg)"/>
-    <circle cx="600" cy="300" r="80" fill="rgba(255,255,255,0.08)"/>
-    <text x="600" y="325" text-anchor="middle" font-family="system-ui,sans-serif" font-size="64" font-weight="bold" fill="rgba(255,255,255,0.5)">${firstLetter}</text>
-    <text x="600" y="440" text-anchor="middle" font-family="monospace" font-size="20" fill="rgba(255,255,255,0.3)">${domain || "naqsh"}</text>
+    <circle cx="600" cy="300" r="80" fill="currentColor" fill-opacity="0.08"/>
+    <text x="600" y="325" text-anchor="middle" font-family="system-ui,sans-serif" font-size="64" font-weight="bold" fill="currentColor" fill-opacity="0.5">${firstLetter}</text>
+    <text x="600" y="440" text-anchor="middle" font-family="monospace" font-size="20" fill="currentColor" fill-opacity="0.3">${domain || "naqsh"}</text>
   </svg>`;
 
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;
