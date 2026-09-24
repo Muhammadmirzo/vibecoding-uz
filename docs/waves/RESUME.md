@@ -30,7 +30,7 @@ Then read `docs/waves/STATE.md` → "Phase 2" table (source of truth).
 - W7 chat centre, W8 analytics + MCP, W9 mobile API — ONLY after owner approval (see STATE "Waiting on the owner").
 
 ## 5. Open questions to ask the owner (if still unanswered)
-1. Which portfolio projects are really theirs (only Clash Nexus is verified)?
+1. ~~Which portfolio projects are theirs~~ — answered: only Clash Nexus for now (Bozor bot later).
 2. Approve W7 / W8 / W9?
 3. Approve cuts: /ekspertlar, /testimoniyalar, /ish, SpinWheel, unbuilt feature flags?
 4. Admin password reset ("parolni yangila") — reset via `scripts/create-admin.ts` with a generated password; never read or print existing secrets.

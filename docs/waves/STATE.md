@@ -34,7 +34,7 @@ Parallel agents allowed (max 2) — heavy commands serialized with `scripts/wave
 | W8 First-party analytics + world-class MCP | — | ⏳ owner approval | — | reports/W8-MCP.md | tracking first, then MCP (OAuth, analytics tools, charts) |
 | W9 Mobile-ready API (/api/v1, OpenAPI, token auth) | — | ⏳ owner approval | — | reports/W9-MOBILE-API.md | |
 
-Waiting on the owner: which portfolio projects are really theirs · approve waves W7–W9 · approve cuts (/ekspertlar, /testimoniyalar, /ish, SpinWheel, unbuilt feature flags) · admin password reset (say "parolni yangila").
+Owner decided 2026-09-24: portfolio = ONLY Clash Nexus for now (Bozor bot not ready yet — add later via /admin/portfolio; other static entries stay hidden/demo). Waiting on the owner: approve waves W7–W9 · approve cuts (/ekspertlar, /testimoniyalar, /ish, SpinWheel, unbuilt feature flags) · admin password reset (say "parolni yangila").
 Done outside waves 2026-09-24: DB restored + migrations 0000–0005 recorded/applied; reveal-blur/Times-font fix + e2e/visibility.spec.ts (0366972).
 
 ⚠️ **Machine has 7.6 GB RAM: run heavy commands one at a time** — Phase 2 runs 2 agents but every build/playwright/lighthouse goes through `scripts/waves/locked.sh`.
