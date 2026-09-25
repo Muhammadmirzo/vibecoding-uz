@@ -13,7 +13,7 @@ export function StickyBuyBar({ price, title }: { price: string; title: string })
           onClick={() => window.dispatchEvent(new CustomEvent("open-course-checkout"))}
           className="btn-press inline-flex min-h-11 shrink-0 items-center rounded-full bg-gold px-4 text-sm font-semibold text-on-gold shadow-sm"
         >
-          Band qilish
+          Yozilish
         </button>
       </div>
     </div>

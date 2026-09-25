@@ -26,8 +26,8 @@ export const SearchInput = React.memo(function SearchInput({
         value={query}
         onChange={(event) => onChange(event.target.value)}
         onKeyDown={onKeyDown}
-        placeholder="Kurslar, lug'at, resurslar va vebinarlardan qidirish..."
-        className="w-full bg-transparent text-base font-medium text-ink placeholder-ink-muted focus:outline-none"
+        placeholder="Kurslar, lug'at, resurslar va vebinarlardan qidirish…"
+        className="w-full bg-transparent text-base font-medium text-ink placeholder-ink-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-gold"
         autoFocus
       />
       {loading ? (

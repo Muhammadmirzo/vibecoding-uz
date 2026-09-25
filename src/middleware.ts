@@ -6,6 +6,11 @@ import {
 } from "@/lib/auth/session";
 import { contentSecurityPolicy, SECURITY_HEADERS } from "@/lib/security/headers";
 import { isClosedRoute } from "@/lib/features/closed";
+import { COURSE_SLUGS } from "@/features/courses/content";
+import { STATIC_BLOG_POSTS } from "@/features/blog/blogData";
+
+const BLOG_SLUGS = new Set(STATIC_BLOG_POSTS.map((post) => post.slug));
+const COURSE_SLUG_SET = new Set(COURSE_SLUGS);
 
 const ADMIN_ROLES = ["superadmin", "admin", "manager"];
 const ALL_AUTHENTICATED_ROLES = ["superadmin", "admin", "manager", "mentor", "student"];
@@ -55,6 +60,35 @@ export async function middleware(request: NextRequest) {
   // Layout'dagi notFound() statik prerenderda 200 qaytargani uchun
   // real 404 shu yerda kafolatlanadi.
   if (isClosedRoute(pathname)) {
+    return withSecurityHeaders(
+      new NextResponse("Bu sahifa topilmadi", {
+        status: 404,
+        headers: { "content-type": "text/plain; charset=utf-8" },
+      }),
+      nonce,
+    );
+  }
+
+  // /kurs/[slug] and /blog/[slug] are static (generateStaticParams + dynamicParams
+  // = false, fixed slug lists). Without this check, an unknown slug still gets a
+  // real HTTP 200: root loading.tsx wraps every route in a Suspense boundary, so
+  // Next streams that skeleton's 200 status before notFound() resolves further
+  // down. Guaranteeing a real 404 here (before React rendering starts) is the
+  // same pattern used above for closed routes. See docs I-SEO.md for the
+  // empirical trace (dynamicParams=false and notFound() in generateMetadata were
+  // tried first and both still returned 200 under streaming).
+  const kursSlugMatch = pathname.match(/^\/kurs\/([^/]+)$/);
+  if (kursSlugMatch && !COURSE_SLUG_SET.has(kursSlugMatch[1])) {
+    return withSecurityHeaders(
+      new NextResponse("Bu sahifa topilmadi", {
+        status: 404,
+        headers: { "content-type": "text/plain; charset=utf-8" },
+      }),
+      nonce,
+    );
+  }
+  const blogSlugMatch = pathname.match(/^\/blog\/([^/]+)$/);
+  if (blogSlugMatch && !BLOG_SLUGS.has(blogSlugMatch[1])) {
     return withSecurityHeaders(
       new NextResponse("Bu sahifa topilmadi", {
         status: 404,

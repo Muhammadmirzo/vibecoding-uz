@@ -1,12 +1,12 @@
-import type { Metadata } from "next";
 import { LeadCaptureForm } from "@/features/leads/ui/LeadCaptureForm";
 import { Container } from "@/components/ui/Layout";
 import { Card } from "@/components/ui/Surfaces";
 import { NextStepCTA } from "@/components/ui/NextStepCTA";
 import { PageHero } from "@/components/pages/PageHero";
 import { Reveal, RevealGroup } from "@/features/motion/ui/Reveal";
+import { routeMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Bepul AI resurslar", description: "Tadbirkor, marketolog va o‘qituvchilar uchun AI promptlari hamda amaliy qo‘llanmalar." };
+export const metadata = routeMetadata({ title: "Bepul AI resurslar", description: "Tadbirkor, marketolog va o‘qituvchilar uchun AI promptlari hamda amaliy qo‘llanmalar.", path: "/resurslar" });
 
 const resources = [
   { title: "Tadbirkorlar", count: "Promptlar va MVP checklist" },

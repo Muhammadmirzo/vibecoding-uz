@@ -1,0 +1,37 @@
+# Naqsh
+
+> Naqsh — AI bilan mahsulot yaratish maktabi. O'zbek tilida, dasturlash tajribasisiz odamlarga
+> AI vositalari (Claude Code, prompt engineering) yordamida ilova, Telegram bot va MVP qurishni
+> 8 haftalik jonli guruhlarda o'rgatadi. Mentor Mirzo tomonidan boshqariladi.
+
+## Kurslar (Courses)
+- Vibe Coding Express — 550 000 so'm (yoki 183 334 so'm/oy x 3 oy) — /kurs/vibe-coding-express
+- AI asoslari — 550 000 so'm (yoki 275 000 so'm/oy x 2 oy) — /kurs/ai-asoslari
+- Valyuta: UZS. 7 kunlik 100% pul qaytarish kafolati — /pul-qaytarish
+
+## Lead magnets
+- Bepul dars — /bepul-dars
+- Diagnostika (mos kelish testi) — /diagnostika
+
+## Content
+- Blog — /blog
+- Atamalar lug'ati (AI/vibe coding terms) — /atamalar
+- Portfolio (real student/founder projects) — /portfolio
+
+## Contact
+- Telegram bot: @Boyakagabot
+- Xizmatlar (agency services — AI automation, Telegram bots, MVP): /xizmatlar
+
+---
+
+# Naqsh (English)
+
+> Naqsh is an Uzbek-language online school teaching non-programmers to build real apps,
+> Telegram bots, and MVPs with AI tools (Claude Code, prompt engineering) through 8-week
+> live cohorts with mentor review. Also offers done-for-you AI automation/build services.
+
+- Courses: Vibe Coding Express, AI Asoslari — priced in UZS, see /kurs/<slug>
+- Free lesson: /bepul-dars · Fit-check quiz: /diagnostika
+- Blog: /blog · Glossary: /atamalar · Student projects: /portfolio
+- Guarantee: 7-day full refund — /pul-qaytarish
+- Telegram: @Boyakagabot

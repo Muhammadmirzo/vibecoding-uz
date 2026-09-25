@@ -20,7 +20,7 @@ import { gradeSubmissionRecord, type GradedSubmission, type GradeSubmissionInput
 export const TOOL_DEF: McpToolDef = {
   name: "grade_homework",
   description:
-    "WRITE: grade a homework submission (score 0-100, feedback required, mentorId required). Requires authToken.",
+    "WRITE: grade a homework submission (score 0-100, feedback required, mentorId required). Writes an audit_logs row (actor 'mcp') in the same transaction. Requires authToken.",
   inputSchema: {
     type: "object",
     properties: withAuthProperty({

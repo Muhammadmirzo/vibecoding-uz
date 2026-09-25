@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { DiagnosticQuiz } from "@/features/quiz/DiagnosticQuiz";
 import { QUIZ_QUESTIONS } from "@/features/quiz/domain/questions";
 import { Badge } from "@/components/ui/Surfaces";
@@ -6,12 +5,14 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Surfaces";
 import { Container, Eyebrow } from "@/components/ui/Layout";
 import { Reveal } from "@/features/motion/ui/Reveal";
+import { routeMetadata } from "@/lib/seo";
 import "@/components/pages/w6c.css";
 
-export const metadata: Metadata = {
+export const metadata = routeMetadata({
   title: "Bepul diagnostika — sizga mos kursni 2 daqiqada aniqlang",
   description: `${QUIZ_QUESTIONS.length} ta tezkor savolga javob bering va maqsadingizga mos AI kurs tavsiyasini oling.`,
-};
+  path: "/diagnostika",
+});
 
 export default function DiagnostikaPage() {
   return (

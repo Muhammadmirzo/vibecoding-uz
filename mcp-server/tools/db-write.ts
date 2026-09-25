@@ -1,24 +1,17 @@
 /**
- * Write-path Drizzle queries for the MCP tools (grade_homework,
- * broadcast_notification). Loaded lazily so tests with injected deps
- * never touch a database.
+ * Write-path Drizzle queries for the MCP tools (grade_homework here,
+ * broadcast_notification in db-write-broadcast.ts). The DB module is
+ * loaded lazily so tests with injected deps never touch a database.
+ * Every write + its audit_logs row run in ONE transaction (same advisory
+ * lock key as the admin reviewSubmission service), so a failed audit
+ * insert rolls the write back.
  */
-import { count, eq, inArray } from "drizzle-orm";
-import {
-  broadcastNotifications,
-  cohorts,
-  enrollments,
-  homeworkReviews,
-  homeworkSubmissions,
-  leads,
-  users,
-} from "../../src/db/schema";
+import { eq } from "drizzle-orm";
+import { homeworkReviews, homeworkSubmissions } from "../../src/db/schema";
+import { recordMcpAudit, type DbExecutor } from "./db-audit";
 
-type DbClient = Awaited<ReturnType<typeof loadDb>>;
-
-async function loadDb() {
-  const mod = await import("../../src/db");
-  return mod.db;
+async function loadDbModule() {
+  return import("../../src/db");
 }
 
 // --- grade_homework ---------------------------------------------------------
@@ -50,10 +43,17 @@ export interface GradedSubmission {
   reviewedAt: string;
 }
 
-/** Returns null when the submission does not exist. */
+/** Returns null when the submission does not exist (nothing is written). */
 export async function gradeSubmissionRecord(input: GradeSubmissionInput): Promise<GradedSubmission | null> {
-  const db: DbClient = await loadDb();
-  const [existing] = await db
+  const { withTransactionLock } = await loadDbModule();
+  return withTransactionLock(`homework-review:${input.submissionId}`, async (tx) => {
+    if (!tx) throw new Error("transaction_unavailable");
+    return gradeInTransaction(tx, input);
+  });
+}
+
+async function gradeInTransaction(ex: DbExecutor, input: GradeSubmissionInput): Promise<GradedSubmission | null> {
+  const [existing] = await ex
     .select({ id: homeworkSubmissions.id })
     .from(homeworkSubmissions)
     .where(eq(homeworkSubmissions.id, input.submissionId))
@@ -61,42 +61,47 @@ export async function gradeSubmissionRecord(input: GradeSubmissionInput): Promis
   if (existing === undefined) return null;
 
   const submissionStatus = SUBMISSION_STATUS[input.resultStatus];
-  await db
+  await ex
     .update(homeworkSubmissions)
     .set({ status: submissionStatus })
     .where(eq(homeworkSubmissions.id, input.submissionId));
 
-  const [prior] = await db
+  const [prior] = await ex
     .select({ id: homeworkReviews.id })
     .from(homeworkReviews)
     .where(eq(homeworkReviews.submissionId, input.submissionId))
     .limit(1);
-  const scoreText = input.score.toFixed(2);
-  const reviewedAt =
+  const review = {
+    mentorId: input.mentorId,
+    criteriaResults: [],
+    score: input.score.toFixed(2),
+    feedbackMd: input.feedback,
+  };
+  const rows =
     prior === undefined
-      ? await db
+      ? await ex
           .insert(homeworkReviews)
-          .values({
-            submissionId: input.submissionId,
-            mentorId: input.mentorId,
-            criteriaResults: [],
-            score: scoreText,
-            feedbackMd: input.feedback,
-          })
+          .values({ submissionId: input.submissionId, ...review })
           .returning({ reviewedAt: homeworkReviews.reviewedAt })
-          .then((rows) => rows[0]?.reviewedAt ?? new Date())
-      : await db
+      : await ex
           .update(homeworkReviews)
-          .set({
-            mentorId: input.mentorId,
-            criteriaResults: [],
-            score: scoreText,
-            feedbackMd: input.feedback,
-            reviewedAt: new Date(),
-          })
+          .set({ ...review, reviewedAt: new Date() })
           .where(eq(homeworkReviews.submissionId, input.submissionId))
-          .returning({ reviewedAt: homeworkReviews.reviewedAt })
-          .then((rows) => rows[0]?.reviewedAt ?? new Date());
+          .returning({ reviewedAt: homeworkReviews.reviewedAt });
+  const reviewedAt = rows[0]?.reviewedAt ?? new Date();
+
+  await recordMcpAudit(ex, {
+    action: "homework.review",
+    entityType: "homework_submission",
+    entityId: input.submissionId,
+    details: {
+      status: input.resultStatus,
+      submissionStatus,
+      score: input.score,
+      mentorId: input.mentorId,
+      reviewUpdated: prior !== undefined,
+    },
+  });
 
   return {
     submissionId: input.submissionId,
@@ -108,107 +113,4 @@ export async function gradeSubmissionRecord(input: GradeSubmissionInput): Promis
   };
 }
 
-// --- broadcast_notification --------------------------------------------------
-
-export interface BroadcastInput {
-  title: string;
-  channel: string;
-  targetAudience: string;
-  messageBody: string;
-  cohortId?: string;
-}
-
-export interface QueuedBroadcast {
-  id: string;
-  title: string;
-  channel: string;
-  targetAudience: string;
-  recipientsCount: number;
-  status: string;
-  createdAt: string;
-}
-
-async function countAudience(db: DbClient, audience: string, cohortId: string | undefined): Promise<number> {
-  if (audience === "all_users") {
-    const rows = await db.select({ n: count() }).from(users);
-    return rows[0]?.n ?? 0;
-  }
-  if (audience === "active_students") {
-    const rows = await db
-      .select({ n: count() })
-      .from(enrollments)
-      .where(eq(enrollments.status, "active"));
-    return rows[0]?.n ?? 0;
-  }
-  if (audience === "leads_new" || audience === "leads_consultation") {
-    const status = audience === "leads_new" ? "new" : "consultation";
-    const rows = await db.select({ n: count() }).from(leads).where(eq(leads.status, status));
-    return rows[0]?.n ?? 0;
-  }
-  if (audience === "cohort_students") {
-    if (cohortId === undefined) throw new Error("cohort_required");
-    const [cohort] = await db
-      .select({ id: cohorts.id })
-      .from(cohorts)
-      .where(eq(cohorts.id, cohortId))
-      .limit(1);
-    if (cohort === undefined) throw new Error("cohort_not_found");
-    const rows = await db
-      .select({ n: count() })
-      .from(enrollments)
-      .where(eq(enrollments.cohortId, cohortId));
-    return rows[0]?.n ?? 0;
-  }
-  if (audience === "pending_homework") {
-    const rows = await db
-      .selectDistinct({ userId: homeworkSubmissions.userId })
-      .from(homeworkSubmissions)
-      .where(inArray(homeworkSubmissions.status, ["submitted", "reviewing"]));
-    return rows.length;
-  }
-  return 0;
-}
-
-export function isCohortAudience(audience: string): boolean {
-  return audience === "cohort_students";
-}
-
-/**
- * Records the broadcast as a queued row and returns the real recipient
- * count. It does NOT send anything: no sender worker exists yet, so the
- * status stays "queued" and sentAt stays null. Never reports fake delivery.
- */
-export async function queueBroadcastRecord(input: BroadcastInput): Promise<QueuedBroadcast> {
-  const db: DbClient = await loadDb();
-  const recipientsCount = await countAudience(db, input.targetAudience, input.cohortId);
-  const [row] = await db
-    .insert(broadcastNotifications)
-    .values({
-      title: input.title,
-      channel: input.channel,
-      targetAudience: input.targetAudience,
-      cohortId: input.cohortId,
-      messageBody: input.messageBody,
-      status: "queued",
-      recipientsCount,
-    })
-    .returning({
-      id: broadcastNotifications.id,
-      title: broadcastNotifications.title,
-      channel: broadcastNotifications.channel,
-      targetAudience: broadcastNotifications.targetAudience,
-      recipientsCount: broadcastNotifications.recipientsCount,
-      status: broadcastNotifications.status,
-      createdAt: broadcastNotifications.createdAt,
-    });
-  if (row === undefined) throw new Error("broadcast_insert_failed");
-  return {
-    id: row.id,
-    title: row.title,
-    channel: row.channel,
-    targetAudience: row.targetAudience,
-    recipientsCount: row.recipientsCount,
-    status: row.status,
-    createdAt: row.createdAt.toISOString(),
-  };
-}
+export * from "./db-write-broadcast";

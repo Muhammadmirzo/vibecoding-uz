@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
 import { NextStepCTA } from "@/components/ui/NextStepCTA";
 import { LegalLayout } from "@/components/pages/PageBits";
+import { routeMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Ommaviy oferta", description: "Naqsh ta’lim xizmatlari bo‘yicha ommaviy oferta shartnomasi." };
+export const metadata = routeMetadata({ title: "Ommaviy oferta", description: "Naqsh ta’lim xizmatlari bo‘yicha ommaviy oferta shartnomasi.", path: "/offerta" });
 
 const sections = [
   { id: "mavzu", title: "1. Shartnoma mavzusi", text: "Naqsh platformasi va ta’lim oluvchi o‘rtasidagi rasmiy shartnoma. Ijrochi qo‘llanma, video darslar va maslahat xizmatlarini taqdim etadi." },

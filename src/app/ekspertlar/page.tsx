@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { BadgeCheck, Wrench } from "lucide-react";
 import { Container } from "@/components/ui/Layout";
 import { Card } from "@/components/ui/Surfaces";
@@ -6,8 +5,9 @@ import { NextStepCTA } from "@/components/ui/NextStepCTA";
 import { PageHero } from "@/components/pages/PageHero";
 import { RevealGroup } from "@/features/motion/ui/Reveal";
 import { Tilt } from "@/features/motion/ui/Tilt";
+import { routeMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Ekspertlar va bitiruvchilar", description: "Naqsh mentorlik yo‘nalishlari va namuna profillari haqida." };
+export const metadata = routeMetadata({ title: "Ekspertlar va bitiruvchilar", description: "Naqsh mentorlik yo‘nalishlari va namuna profillari haqida.", path: "/ekspertlar" });
 
 const experts = [
   { name: "Namuna profil 1", role: "SaaS va botlar yo‘nalishi", skills: ["Claude Code", "Next.js", "Telegram Bot API"] },

@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { Calendar } from "lucide-react";
 import { LeadCaptureForm } from "@/features/leads/ui/LeadCaptureForm";
 import { Container } from "@/components/ui/Layout";
@@ -6,8 +5,9 @@ import { Card } from "@/components/ui/Surfaces";
 import { NextStepCTA } from "@/components/ui/NextStepCTA";
 import { PageHero } from "@/components/pages/PageHero";
 import { Reveal, RevealGroup } from "@/features/motion/ui/Reveal";
+import { routeMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Jonli meetlar va yozuvlar", description: "Naqsh jonli sessiyalari va ochiq AI yozuvlari." };
+export const metadata = routeMetadata({ title: "Jonli meetlar va yozuvlar", description: "Naqsh jonli sessiyalari va ochiq AI yozuvlari.", path: "/meetlar" });
 
 const meets = [
   { title: "Claude Code bilan Telegram bot yaratish", date: "18-Oktyabr, 2026 · 20:00", live: true, text: "Jonli sessiyada bot loyihasini bosqichma-bosqich quramiz." },

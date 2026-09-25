@@ -7,6 +7,8 @@ This document serves as your **authoritative architectural map**, **token-sparin
 
 > 🎭 **MULTI-AGENT MODE**: if the task should be orchestrated across subagents (strategy, security, review, design audit, research, git) — load [ZAHAR_ORCHESTRATION.md](ZAHAR_ORCHESTRATION.md) and act as ZAHAR-ORKESTRATOR per its protocol.
 
+> 🧰 **SKILLS**: marketing/CRO/SEO/UI expert playbooks for any agent — [docs/skills/ALL_SKILLS.md](docs/skills/ALL_SKILLS.md). Read its table of contents, then only the 1–3 sections your task needs.
+
 ---
 
 ## 🛑 STRICT RULES FOR AI AGENTS

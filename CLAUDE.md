@@ -10,11 +10,14 @@
 2. **[docs/context/index.md](docs/context/index.md)**: Comprehensive repository & module map pointer, architecture overview, domain models, API specifications, and operational procedures.
 3. **[WEBSITE_AUDIT_SPEC.md](WEBSITE_AUDIT_SPEC.md)**: Verified audit status, tokenization rules, and known open issues.
 5. **[docs/CODER_AGENT_RULES.md](docs/CODER_AGENT_RULES.md)**: Mandatory rules for every coder agent (architecture, design tokens, responsive, security, process safety, definition of done).
+6. **[.claude/skills/README.md](.claude/skills/README.md)**: Installed skills (marketing/CRO/SEO, frontend-design, React best practices, UI audit). Marketing skills share context from [.agents/product-marketing.md](.agents/product-marketing.md).
 4. **[ZAHAR_ORCHESTRATION.md](ZAHAR_ORCHESTRATION.md)**: Multi-agent orchestration protocol (ZAHAR) — orchestrator rules, subagent roles, model matrix, dispatch templates, verification cycle. Also available as the `/zahar` command.
 
 ---
 
 ## 📍 Current Status
+
+**Newest work (2026-09-25): [docs/HANDOFF_2026-09-25-growth.md](docs/HANDOFF_2026-09-25-growth.md) — PR #2 verification checklist + remaining tasks. Start there.**
 
 **Owner says "boshla" or "davom et" → immediately follow [docs/waves/RESUME.md](docs/waves/RESUME.md) (no questions first). Live state: [docs/waves/STATE.md](docs/waves/STATE.md) → "Phase 2".**
 

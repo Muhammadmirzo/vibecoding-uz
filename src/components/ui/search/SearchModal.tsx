@@ -37,7 +37,7 @@ export const SearchModal = React.memo(function SearchModal() {
     <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs animate-in fade-in-0 duration-150" />
-        <Dialog.Content className="fixed left-1/2 top-[15%] z-50 w-full max-w-2xl -translate-x-1/2 px-4 focus:outline-none">
+        <Dialog.Content className="fixed left-1/2 top-[15%] z-50 w-full max-w-2xl -translate-x-1/2 px-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold overscroll-contain">
           <div className="overflow-hidden rounded-[var(--radius-xl)] border border-border bg-bg-elevated shadow-lg flex flex-col">
             <Dialog.Title className="sr-only">Qidiruv darchasi</Dialog.Title>
             <SearchInput

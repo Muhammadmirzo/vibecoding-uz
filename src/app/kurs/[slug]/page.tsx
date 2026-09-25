@@ -13,7 +13,7 @@ import { Reveal, RevealGroup } from "@/features/motion/ui/Reveal";
 import { ScrollFillText } from "@/features/motion/ui/ScrollFillText";
 import { getPublicPortfolios } from "@/features/portfolio/server/portfolio.service";
 import { siteConfig } from "@/lib/siteConfig";
-import { courseJsonLd, routeMetadata, serializeJsonLd } from "@/lib/seo";
+import { breadcrumbJsonLd, courseJsonLd, faqPageJsonLd, routeMetadata, serializeJsonLd } from "@/lib/seo";
 import { COMPARISON_ROWS, COURSES, COURSE_SLUGS, getCoursePricing } from "@/features/courses/content";
 import { CourseCheckoutCard } from "../CourseCheckoutCard";
 import { StickyBuyBar } from "./StickyBuyBar";
@@ -27,10 +27,20 @@ export async function generateStaticParams() {
   return COURSE_SLUGS.map((slug) => ({ slug }));
 }
 
+// COURSE_SLUGS is a fixed, static list (src/features/courses/content.ts) — any
+// slug outside it is a genuine 404, not a not-yet-built page. Without this,
+// Next pre-renders the root loading.tsx skeleton (HTTP 200) before notFound()
+// resolves, so unknown /kurs/<slug> served a soft 404.
+export const dynamicParams = false;
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const course = COURSES[slug];
-  if (!course) return { title: "Kurs topilmadi" };
+  // Calling notFound() here (metadata resolution), rather than only in the page
+  // body below, lets Next resolve the 404 before it starts streaming the root
+  // loading.tsx skeleton — that ordering is what gives unknown slugs a real
+  // HTTP 404 instead of a 200 soft-404. Verified empirically: see I-SEO.md.
+  if (!course) notFound();
   return routeMetadata({ title: `${course.title} — ${course.subtitle}`, description: course.description, path: `/kurs/${slug}` });
 }
 
@@ -42,11 +52,18 @@ export default async function CourseDetailPage({ params }: Props) {
   const projects = (await getPublicPortfolios()).portfolios.slice(0, 3);
 
   const jsonLd = courseJsonLd({ name: course.title, description: course.description, price: pricing.price, path: `/kurs/${slug}`, startDate: siteConfig.nextCohortDate });
+  const faqJsonLd = faqPageJsonLd(course.faqs);
+  const breadcrumb = breadcrumbJsonLd([
+    { name: "Bosh sahifa", path: "/" },
+    { name: course.title, path: `/kurs/${slug}` },
+  ]);
 
   return (
     <div className="bg-bg">
       <ScrollProgress />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumb) }} />
       <PageHero
         eyebrow={course.level}
         title={course.title}

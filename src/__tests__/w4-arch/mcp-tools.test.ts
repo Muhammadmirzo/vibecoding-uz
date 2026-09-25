@@ -31,7 +31,7 @@ function payload(result: McpToolResult): Record<string, unknown> {
 }
 
 describe("mcp tool registry", () => {
-  it("exposes all seven tools and dispatches unknown names as errors", async () => {
+  it("exposes all thirteen tools and dispatches unknown names as errors", async () => {
     const names = listToolDefs().map((d) => d.name).sort();
     expect(names).toEqual(
       [
@@ -42,6 +42,12 @@ describe("mcp tool registry", () => {
         "get_student_activity",
         "grade_homework",
         "query_leads_pipeline",
+        "get_analytics_overview",
+        "get_traffic_sources",
+        "get_conversion_funnel",
+        "get_landing_page_performance",
+        "get_sales_report",
+        "get_student_progress_report",
       ].sort()
     );
     const unknown = await dispatchTool("nope", authed({}));
