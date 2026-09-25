@@ -33,7 +33,7 @@ export function ConversationList({
       </div>
       <div className="max-h-[34rem] overflow-y-auto p-2 lg:max-h-[680px]" aria-busy={loading}>
         {rows.map((row) => <button key={row.id} type="button" onClick={() => onSelect(row.id)} className={`mb-1 w-full rounded-xl border p-3 text-left transition-colors ${selectedId === row.id ? "border-brand/30 bg-brand-soft" : "border-transparent hover:bg-bg-sunken"}`}>
-          <div className="flex items-center justify-between gap-2"><strong className="truncate text-base text-ink">{row.displayName}</strong>{row.unreadForAdmin > 0 ? <span className="grid min-h-5 min-w-5 place-items-center rounded-full bg-gold px-1 text-xs font-bold text-ink">{row.unreadForAdmin}</span> : null}</div>
+          <div className="flex items-center justify-between gap-2"><strong className="truncate text-base text-ink">{row.displayName}</strong>{row.unreadForAdmin > 0 ? <span className="grid min-h-5 min-w-5 place-items-center rounded-full bg-gold px-1 text-xs font-bold text-on-gold">{row.unreadForAdmin}</span> : null}</div>
           <p className="mt-1 truncate text-sm text-ink-muted">{row.sourcePath}</p>
           <div className="mt-2 flex items-center justify-between text-xs text-ink-subtle"><span>{row.status === "pending" ? "Javob kutilmoqda" : row.status === "closed" ? "Yopilgan" : "Ochiq"}</span><time>{new Date(row.lastMessageAt).toLocaleString("uz-UZ", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}</time></div>
         </button>)}

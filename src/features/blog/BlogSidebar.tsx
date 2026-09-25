@@ -20,7 +20,7 @@ export function BlogSidebar({ toc }: { toc: TocItem[] }) {
           <p className="text-xs text-ink-muted leading-relaxed">O'z g'oyangizdan ishlaydigan MVPgacha. Claude Code va Cursor bilan professional loyihalar qurishni o'rganing.</p>
         </div>
         <Link href="/kurs/vibe-coding-express" className="block">
-          <button className="min-h-11 bg-gold px-4 rounded-lg text-xs font-semibold text-ink inline-flex items-center justify-center gap-2 w-full hover:bg-gold-hover">
+          <button className="min-h-11 bg-gold px-4 rounded-full text-xs font-semibold text-on-gold inline-flex items-center justify-center gap-2 w-full hover:bg-gold-hover">
             <span>Kurs Dasturi bilan tanishish</span><ArrowRight className="w-4 h-4" />
           </button>
         </Link>

@@ -6,18 +6,18 @@ import { Reveal, RevealGroup } from "@/features/motion/ui/Reveal";
 export function ServicesProcessAndFaq() {
   const page = siteConfig.servicesPage;
   return <>
-    <section className="w6c-wipe bg-brand py-20 text-white sm:py-28">
+    <section className="w6c-wipe bg-brand-surface py-20 text-on-brand-surface sm:py-28">
       <Container>
         <Reveal>
-          <Eyebrow className="text-gold">Xavfsiz boshlash</Eyebrow>
-          <Heading className="mt-3 max-w-2xl text-white">Qaror oldidan ko&apos;ramiz.</Heading>
+          <Eyebrow className="mb-4 text-gold">Xavfsiz boshlash</Eyebrow>
+          <Heading className="mt-3 max-w-2xl text-on-brand-surface">Qaror oldidan ko&apos;ramiz.</Heading>
         </Reveal>
         <RevealGroup className="mt-12 grid gap-4 md:grid-cols-3">
           {page.process.map((step, index) => (
             <article key={step.title} className="rounded-xl border border-white/20 bg-white/10 p-6 transition hover:-translate-y-1 hover:border-gold">
               <span className="font-mono text-sm font-bold text-gold">0{index + 1}</span>
               <h3 className="mt-10 text-xl font-bold">{step.title}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-white/75">{step.description}</p>
+              <p className="mt-3 text-sm leading-relaxed text-on-brand-surface/75">{step.description}</p>
             </article>
           ))}
         </RevealGroup>

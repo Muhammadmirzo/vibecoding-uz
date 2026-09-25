@@ -9,19 +9,27 @@
     --bg-sunken: #f1ece1;
     --ink: #0e1a2b;
     --ink-muted: #4a5568;
-    --ink-subtle: #7a8494;
+    --ink-subtle: #5c6675;
     --brand: #1440a0;
     --brand-hover: #0f3380;
     --brand-soft: #e6ecf8;
+    /* Fixed brand surface: deep navy in BOTH themes, so a full-bleed brand
+       section (bg-brand-surface) always carries light text at safe contrast,
+       unlike --brand itself, which turns light blue in dark mode. */
+    --brand-surface: #0d1f4d;
+    --on-brand-surface: #ffffff;
     --accent: #0fa3a3;
     --accent-hover: #0b8585;
     --accent-soft: #ddf4f3;
     --gold: #e8a317;
     --gold-hover: #c8890c;
     --gold-soft: #fcf1d8;
+    /* Fixed on-gold: always a dark navy, so gold CTAs stay readable in both
+       themes even though --ink itself flips to a light color in dark mode. */
+    --on-gold: #14213d;
     --border: #e4ddcf;
     --border-strong: #cfc6b4;
-    --success: #15803d;
+    --success: #0f6b31;
     --success-soft: #e3f3e8;
     --success-line: #a7d4b2;
     --danger: #b42318;
@@ -29,6 +37,10 @@
     --telegram: #229ed9;
     --telegram-hover: #1688bd;
     --telegram-soft: #e2f5fc;
+    /* Fixed solid-fill telegram button: --telegram itself is too light for
+       white text at AA contrast, so solid CTAs use this deeper fill instead. */
+    --telegram-solid: #1678b0;
+    --on-telegram: #ffffff;
     --terminal-bg: #0e1a2b;
     --terminal-ink: #eef2f8;
     --terminal-muted: #a9b4c6;
@@ -49,7 +61,9 @@
     --ink: #eef2f8; --ink-muted: #a9b4c6; --ink-subtle: #7c889c;
     --brand: #5b8cff; --brand-hover: #7aa3ff; --brand-soft: #182a4c;
     --accent: #2dd4bf; --accent-hover: #67e8d7; --accent-soft: #123b3d;
-    --gold: #f5b83d; --gold-hover: #ffca5c; --gold-soft: #403416;
+    /* Hover deepens gold in both themes (never lightens — a lighter chip
+       reads as disabled, and it flattened contrast against --on-gold). */
+    --gold: #f5b83d; --gold-hover: #dba62b; --gold-soft: #403416;
     --border: #1d2b42; --border-strong: #2a3b57;
     --success: #5cd98b; --success-soft: #123a2a; --success-line: #2b7350;
     --danger: #ff8b80; --danger-soft: #421c24; --telegram: #63c4ef; --telegram-hover: #8ad7f5; --telegram-soft: #12374c;

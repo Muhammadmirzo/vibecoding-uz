@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Button } from "@/components/ui/Button";
 import { Brand } from "./Brand";
 import { DesktopNav } from "./DesktopNav";
 import { SiteBanner } from "./SiteBanner";
@@ -16,13 +16,9 @@ export function Header() {
         <Brand />
         <DesktopNav />
         <div className="ml-auto flex items-center gap-1.5">
-          <Link
-            href="/diagnostika"
-            data-track="header_diagnostic"
-            className="btn-press hidden min-h-11 items-center rounded-lg bg-gold px-4 text-sm font-semibold text-ink shadow-sm transition-colors hover:bg-gold-hover sm:inline-flex"
-          >
+          <Button href="/diagnostika" data-track="header_diagnostic" size="sm" className="hidden sm:inline-flex">
             Bepul diagnostika
-          </Link>
+          </Button>
           <HeaderControls />
         </div>
       </HeaderShell>

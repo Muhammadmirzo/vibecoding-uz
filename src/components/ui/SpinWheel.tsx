@@ -46,7 +46,7 @@ export function SpinWheel({ terms }: SpinWheelProps) {
         type="button"
         onClick={handleSpinWheel}
         disabled={isSpinning}
-        className="min-h-11 rounded-lg bg-gold px-6 text-xs font-semibold text-ink inline-flex items-center gap-2 transition-transform active:scale-95 disabled:opacity-50"
+        className="min-h-11 rounded-full bg-gold px-6 text-xs font-semibold text-on-gold inline-flex items-center gap-2 transition-transform active:scale-95 disabled:opacity-50"
       >
         <RotateCcw className={`w-4 h-4 ${isSpinning ? "animate-spin" : ""}`} />
         <span>{isSpinning ? "Tanlanmoqda..." : "Tasodifiy atamani tanlash"}</span>

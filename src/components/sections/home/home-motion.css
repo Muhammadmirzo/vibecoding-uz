@@ -62,7 +62,7 @@ html:not([data-motion="full"]) .hero-orbit, html.is-tab-hidden .hero-orbit { ani
 .app-menu-item small { color: var(--ink-muted); font-family: var(--font-mono); font-size: .62rem; }
 .app-cart-line { display: flex; align-items: center; justify-content: space-between; font-size: .75rem; }
 .app-quantity { display: flex; align-items: center; gap: .45rem; font-family: var(--font-mono); }.app-quantity svg { width: .7rem; height: .7rem; }
-.app-detail-cart button { display: flex; align-items: center; justify-content: center; gap: .45rem; margin-top: auto; border-radius: var(--radius-sm); background: var(--telegram); padding: .8rem; color: var(--terminal-ink); font-size: .7rem; font-weight: 700; }
+.app-detail-cart button { display: flex; align-items: center; justify-content: center; gap: .45rem; margin-top: auto; border-radius: var(--radius-sm); background: var(--telegram-solid); padding: .8rem; color: var(--on-telegram); font-size: .7rem; font-weight: 700; }
 
 @media (max-width: 639px) {
   .app-detail-body { grid-template-columns: 1fr; }

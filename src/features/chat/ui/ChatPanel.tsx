@@ -178,7 +178,7 @@ export default function ChatPanel({
           <div className="mb-2 flex items-center justify-between text-xs text-ink-muted"><span>Ovoz o&apos;chirilgan</span><span className="inline-flex items-center gap-1"><VolumeX className="size-3" /> Xavfsiz chat</span></div>
           <div className="flex items-end gap-2">
             <textarea ref={composerRef} value={body} onChange={(event) => setBody(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); sendMessage(); } }} rows={2} maxLength={2000} placeholder="Xabaringizni yozing…" aria-label="Chat xabari" className="min-h-11 min-w-0 flex-1 resize-none rounded-xl border border-border bg-bg px-3 py-3 text-base outline-none focus:border-brand focus:ring-2 focus:ring-brand-soft" />
-            <button type="button" disabled={!body.trim()} onClick={() => sendMessage()} aria-label="Xabarni yuborish" className="btn-press grid size-11 shrink-0 place-items-center rounded-xl bg-gold text-ink disabled:opacity-50"><Send className="size-5" /></button>
+            <button type="button" disabled={!body.trim()} onClick={() => sendMessage()} aria-label="Xabarni yuborish" className="btn-press grid size-11 shrink-0 place-items-center rounded-xl bg-gold text-on-gold disabled:opacity-50"><Send className="size-5" /></button>
           </div>
         </div> : null}
       </section>

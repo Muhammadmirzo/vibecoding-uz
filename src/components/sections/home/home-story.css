@@ -34,7 +34,12 @@
 
 @supports (animation-timeline: view()) {
   @media (min-width: 1024px) {
-    html[data-motion-scroll="on"] .story-track { height: 150vh; view-timeline-name: --story; view-timeline-axis: block; }
+    /* 300vh (not 150vh): each of the 3 steps (idea/prompt/app) previously got
+       only ~50vh of scroll before the track ended, so the whole story played
+       out in well under 400px of scrolling. Doubling the track gives each
+       step a comfortable scroll distance; the animation-range percentages
+       below are relative to this track, so they don't need to change. */
+    html[data-motion-scroll="on"] .story-track { height: 300vh; view-timeline-name: --story; view-timeline-axis: block; }
     html[data-motion-scroll="on"] .story-pin { position: sticky; top: 0; height: 100vh; overflow: hidden; padding: 0; }
     /* Heading, stage and rail stack in one column so they can never overlap, whatever the viewport height. */
     html[data-motion-scroll="on"] .story-pin > div { display: flex; flex-direction: column; justify-content: flex-start; padding-top: calc(4rem + 3vh); padding-bottom: 3vh; }
@@ -107,8 +112,19 @@
   .story-rail-line > span { transform: scaleX(1); }
 }
 
+/* html[data-motion="off"] only disabled the animations above, but the pin/
+   sticky layout rules are keyed on [data-motion-scroll="on"] alone, so with
+   scroll-motion still "on" the three layers stayed absolutely stacked with
+   no animation to ever separate them — they simply overlapped. Force the
+   same stacked (non-pinned) layout the reduced-motion block uses. */
+[data-motion="off"] .story-track { height: auto !important; }
+[data-motion="off"] .story-pin { position: static !important; height: auto !important; overflow: visible !important; padding: 5rem 0 !important; }
+[data-motion="off"] .story-pin > div { display: flex !important; }
+[data-motion="off"] .story-layer { position: relative !important; inset: auto !important; transform: none !important; }
 [data-motion="off"] .story-layer,
 [data-motion="off"] .story-build-line,
 [data-motion="off"] .story-build-check,
 [data-motion="off"] .story-app .app-preview-layer,
 [data-motion="off"] .story-step { animation: none !important; opacity: 1 !important; transform: none !important; }
+[data-motion="off"] .story-step > span { background: var(--accent); }
+[data-motion="off"] .story-rail-line > span { transform: scaleX(1); }

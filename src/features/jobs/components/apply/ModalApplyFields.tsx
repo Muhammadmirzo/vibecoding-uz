@@ -102,7 +102,7 @@ export function ModalApplyFields({ form }: { form: ApplyFormState }) {
         />
       </div>
       <div className="pt-2">
-        <button type="submit" disabled={form.loading} className="min-h-12 rounded-lg bg-gold text-xs font-semibold text-ink inline-flex items-center justify-center gap-2 w-full disabled:opacity-50">
+        <button type="submit" disabled={form.loading} className="min-h-12 rounded-full bg-gold text-xs font-semibold text-on-gold inline-flex items-center justify-center gap-2 w-full disabled:opacity-50">
           {form.loading ? <><Loader2 className="w-4 h-4 animate-spin" /><span>Ariza yuborilmoqda...</span></> : <><Send className="w-4 h-4" /><span>Arizani topshirish</span></>}
         </button>
       </div>
