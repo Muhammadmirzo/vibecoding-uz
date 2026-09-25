@@ -9,6 +9,7 @@ Read this file, `docs/redesign/MASTER_PLAN.md` and `docs/design-system.md` befor
 1. Read the task fully. Know your **scope** (which folders you may edit). Never edit outside it — write "out of scope" notes in your report instead.
 2. Read the existing code you will change **before** changing it. Match its style.
 3. Check `docs/redesign/reports/` for notes other agents left for you.
+4. Load the `naqsh-lessons` skill (`.claude/skills/naqsh-lessons/SKILL.md`): past mistakes + which expert skill to load for your task.
 
 ## 2. Architecture (backend)
 Each feature lives in `src/features/<feature>/`:

@@ -1,6 +1,6 @@
 # ZAHAR ORKESTRATSIYA TIZIMI — Multi-Agent Specification
 
-> Versiya: 1.1 (2026-09-09). Bu fayl ZAHAR tizimining yagona manbasi (single source of truth).
+> Versiya: 1.2 (2026-09-25). Bu fayl ZAHAR tizimining yagona manbasi (single source of truth).
 > Har bir AI agent (ZCode, Claude Code, Cursor, Codex, DeepSeek) bu faylni o'qib Orkestrator roliga kiradi.
 > Boshqalar uchun ko'rsatkichlar: AGENTS.md, CLAUDE.md, .cursorrules, WEBSITE_AUDIT_SPEC.md.
 
@@ -28,46 +28,49 @@ Asosiy qoidalar (Buzilmaydigan):
 
 ---
 
-## 2. MODEL TAQSIMOTI MATRITSASI (Haqiqiy Mavjud Modellar — 2026-09-09 yangilandi)
+## 2. MODEL TAQSIMOTI MATRITSASI (2026-09-25 yangilandi — Claude Code + opencode)
 
-Orkestrator — eng kuchli modelda ishlaydi. Subagent modellari vazifa xususiyatiga qarab tanlangan
-(mantiqiy chuqurlik / tezlik / narx / vizyon qobiliyati).
+Orkestrator — Claude Opus 5.5 (Claude Code). U faqat rejalaydi, dispatch qiladi, diff'ni review qiladi va
+gate'larni (tsc + vitest + build) o'zi ishga tushiradi. Kodni opencode'dagi bepul modellar yozadi.
 
-MAVJUD MODELLAR RO'YXATI:
-  1. Claude Opus 4.6 (Thinking) — eng kuchli, chuqur fikrlash va arxitektura modeli
-  2. Gemini 3.1 Pro — yuqori darajadagi strategik tahlil va xavfsizlik auditi modeli
-  3. Gemini 3.8 Flash (High) — tezkor va sifatli kod auditi va dizayn tekshiruvi modeli
-  4. Gemini 3.7 Flash — o'rtacha tezlik/sifat balansli tadqiqot modeli
-  5. Gemini 3.6 Flash (High) — yengil mexanik operatsiyalar va log yuritish modeli
+MAVJUD MODELLAR:
+  1. Claude Opus 5.5 — Orkestrator: arxitektura, review, verifikatsiya, yakuniy qaror
+  2. opencode/muse-spark-1.3-contributor-free#medium — asosiy quruvchi (eng kuchli bepul model)
+  3. opencode/space-bunny-free#medium — ikkinchi quruvchi, parallel ish va mexanik vazifalar
+  4. opencode/muse-spark-1.2-contributor-free — faqat zaxira (1.3 ishlamasa)
+  TAQIQLANGAN: nemotron-3-ultra (sifat past). big-pickle, mimo, ling, nemotron-lightning — asosiy ishga qo'yilmaydi.
 
-Antigravity invoke_subagent Model parametri moslashuvi:
-  'inherit' = Claude Opus 4.6 (ota agentdan meros)
-  'pro'     = Gemini 3.1 Pro
-  'flash'   = Gemini 3.8 Flash (High) yoki Gemini 3.7 Flash
-  'flash_lite' = Gemini 3.6 Flash (High)
+Dispatch: `.orchestra/run.sh <nom> <model> <prompt-fayl>` (log: `.orchestra/logs/<nom>.log`).
+RAM 7.6 GB: bir vaqtda maksimal 3 agent; og'ir buyruqlar (build, vitest, playwright) faqat
+`scripts/waves/locked.sh` orqali. Yangi agent qo'shishdan oldin `free -h`.
 
-| Agent | Roli | Haqiqiy Model | invoke_subagent param | Negadir bu model |
-| :--- | :--- | :--- | :--- | :--- |
-| ZAHAR-ORKESTRATOR | Rejalash, taqsimlash, verifikatsiya, arxitektura qarorlari | Gemini 3.1 Pro (Thinking) | N/A (asosiy agent) | Chuqur mantiqiy fikrlash (Thinking), arxitektura rejalashtirish va yuqori darajadagi orkestratsiya |
-| ZAHAR-STRATEGY | Mahsulot strategiyasi, RICE, retention funnel, monetizatsiya | Gemini 3.1 Pro | 'pro' | Chuqur strategik va bozor tahlili uchun kuchli mantiq |
-| ZAHAR-SHIELD | Payme/Click webhook xavfsizligi, anti-fraud, SMS rate-limit, JWT | Gemini 3.1 Pro | 'pro' | Xavfsizlik auditi va adversarial tafakkur uchun pro-tier |
-| ZAHAR-DB | Migratsiya review, destructive SQL guard, RLS siyosat | Gemini 3.1 Pro | 'pro' | Ma'lumotlar bazasi sxemasi chuqur fikrlash talab qiladi |
-| REVIEWER | tsc + vitest + Zod sifat audit, swallow-exception ovlash | Gemini 3.8 Flash (High) | 'flash' | Tez, sifatli, takroriy code review uchun optimal |
-| DIZAYNER | UI token audit, 3 tema mosligi, responsive overlap tekshiruvi | Gemini 3.8 Flash (High) | 'flash' | Vizual tekshiruv va CSS audit uchun tezkor model |
-| RESEARCHER | Kodbaza struktura audit (read-only), modul chegaralari | Gemini 3.7 Flash | 'flash' | Fayllar daraxtini o'qish va qidirish uchun arzon uzun kontekst |
-| FILE-GIT | Git sinxron, branch'lar, audit_log.txt yuritish | Gemini 3.6 Flash (High) | 'flash_lite' | Deterministik git operatsiyalari uchun yengil model |
-| ZAHAR-TESTER | E2E-QA va Responsive Smoke (Playwright) | Gemini 3.8 Flash (High) | 'flash' | Test ijrosi va retry uchun tezkor model |
-| ZAHAR-LEDGER | Da'vo-isbot mosligi, hujjat drift audit | Gemini 3.7 Flash | 'flash' | Grep sweep va moslik tekshiruvlari uchun arzon model |
-| ZAHAR-PERF | Bundle hajmi, Core Web Vitals, cache siyosati | Gemini 3.7 Flash | 'flash' | Performance metrikalarini yig'ish uchun arzon model |
-| ZAHAR-LANG | O'zbek til sifati, terminologiya, kontent QA | Gemini 3.6 Flash (High) | 'flash_lite' | Matn tahlili uchun yengil model |
-| ZAHAR-SEO | Meta/OG taglar, sitemap, structured data | Gemini 3.6 Flash (High) | 'flash_lite' | SEO tekshiruv uchun yengil model |
-| ZAHAR-ACCESS | WCAG AA kontrast, aria attr, klaviatura nav | Gemini 3.7 Flash | 'flash' | Accessibility tekshiruvi uchun o'rtacha model |
-| ZAHAR-SUPPORT | Telegram Bot va CRM oqimlari test | Gemini 3.7 Flash | 'flash' | Bot oqimlari smoke test uchun arzon model |
-| ZAHAR-COST | Token va Infra xarajat nazorati | Gemini 3.6 Flash (High) | 'flash_lite' | Hisobot va statistika uchun eng yengil model |
-| ZAHAR-FUNNEL | Konversiya, sotuv voronkasi, A/B hooklar va offerlar | Gemini 3.1 Pro (Thinking) | 'pro' | Chuqur xaridor psixologiyasi va konversiya strategiyasi |
-| ZAHAR-DEMO | Interaktiv sinovlar, Prompt Playground, vaqt/xarajat kalkulyatori | Gemini 3.8 Flash (High) | 'flash' | Tezkor interaktiv komponentlar va real keyslar qurish |
-| ZAHAR-BOT | Telegram sotuv boti, diagnostika va lead qizdirish | Gemini 3.7 Flash | 'flash' | Doimiy xabarlar oqimi va tezkor javoblar balansi |
-| ZAHAR-CONTENT | Talaba keyslari, virallik va ijtimoiy tarmoqlar posti | Gemini 3.6 Flash (High) | 'flash_lite' | Katta hajmli matn va kontent generatsiyasi uchun yengil model |
+DARAJALAR:
+  A (chuqur) — muse-spark-1.3 yozadi, Orkestrator har bir diff'ni satrma-satr review qiladi (majburiy).
+  B (standart) — muse-spark-1.3 yoki space-bunny; Orkestrator gate + xulosa review.
+  C (mexanik) — space-bunny; Orkestrator faqat gate natijasini tekshiradi.
+
+| Agent | Roli | Model | Daraja |
+| :--- | :--- | :--- | :--- |
+| ZAHAR-ORKESTRATOR | Rejalash, taqsimlash, verifikatsiya, arxitektura qarorlari | Claude Opus 5.5 | — |
+| ZAHAR-STRATEGY | Mahsulot strategiyasi, RICE, retention funnel, monetizatsiya | muse-spark-1.3 → Opus 5.5 review | A |
+| ZAHAR-SHIELD | Payme/Click webhook xavfsizligi, anti-fraud, SMS rate-limit, JWT | muse-spark-1.3 → Opus 5.5 review | A |
+| ZAHAR-DB | Migratsiya review, destructive SQL guard, RLS siyosat | muse-spark-1.3 → Opus 5.5 review | A |
+| REVIEWER | tsc + vitest + Zod sifat audit, swallow-exception ovlash | muse-spark-1.3 / space-bunny | B |
+| DIZAYNER | UI token audit, 3 tema mosligi, responsive overlap tekshiruvi | muse-spark-1.3 / space-bunny | B |
+| RESEARCHER | Kodbaza struktura audit (read-only), modul chegaralari | muse-spark-1.3 / space-bunny | B |
+| FILE-GIT | Git sinxron, branch'lar, audit_log.txt yuritish | space-bunny | C |
+| ZAHAR-TESTER | E2E-QA va Responsive Smoke (Playwright) | muse-spark-1.3 / space-bunny | B |
+| ZAHAR-LEDGER | Da'vo-isbot mosligi, hujjat drift audit | muse-spark-1.3 / space-bunny | B |
+| ZAHAR-PERF | Bundle hajmi, Core Web Vitals, cache siyosati | muse-spark-1.3 / space-bunny | B |
+| ZAHAR-LANG | O'zbek til sifati, terminologiya, kontent QA | space-bunny | C |
+| ZAHAR-SEO | Meta/OG taglar, sitemap, structured data | space-bunny | C |
+| ZAHAR-ACCESS | WCAG AA kontrast, aria attr, klaviatura nav | muse-spark-1.3 / space-bunny | B |
+| ZAHAR-SUPPORT | Telegram Bot va CRM oqimlari test | muse-spark-1.3 / space-bunny | B |
+| ZAHAR-COST | Token va Infra xarajat nazorati | space-bunny | C |
+| ZAHAR-FUNNEL | Konversiya, sotuv voronkasi, A/B hooklar va offerlar | muse-spark-1.3 → Opus 5.5 review | A |
+| ZAHAR-DEMO | Interaktiv sinovlar, Prompt Playground, vaqt/xarajat kalkulyatori | muse-spark-1.3 / space-bunny | B |
+| ZAHAR-BOT | Telegram sotuv boti, diagnostika va lead qizdirish | muse-spark-1.3 / space-bunny | B |
+| ZAHAR-CONTENT | Talaba keyslari, virallik va ijtimoiy tarmoqlar posti | space-bunny | C |
 
 ---
 
@@ -80,7 +83,9 @@ UMUMIY PREAMBULA (har bir subagent promptiga qo'shiladi):
 "Repo: vibecoding-uz (Next.js 15 App Router + TS strict + Tailwind token tizimi + Drizzle ORM + Supabase).
 Qoidalar: `any` taqiqlangan; input'lar Zod orqali (src/lib/validations/); hardcoded hex/rgb taqiqlangan
 (istisnolar: WEBSITE_AUDIT_SPEC.md 3-QISM); Edge runtime routelarda faqat Web API; dinamik route params —
-Promise. Token tejash: faqat o'z vazifa papkangizni o'qing, butun repo sweep qilmang."
+Promise. Token tejash: faqat o'z vazifa papkangizni o'qing, butun repo sweep qilmang.
+Skill'lar: ishni boshlashdan oldin `naqsh-lessons` skill'ini yuklang va undagi jadvaldan vazifangizga mos
+ekspert skill'larni (skill tool) chaqiring; "done" deyishdan oldin `verification-before-completion`."
 
 SUBAGENT 1 — ZAHAR-STRATEGY (Bosh Mahsulot va Strategiya Maslahatchisi)
 Rol: Mahsulot strategiyasi, B2C/B2B monetizatsiya, referral cashback tizimi, raqobatchilar tahlili.
@@ -177,14 +182,14 @@ Nima uchun P0: 135 unit test o'tishi real oqim ishlayotganini anglatmaydi (audit
 build buzgan holda yozilgan edi). Playwright allaqachon repoda bor (e2e/, playwright.config.ts).
 Vazifa: `npx playwright test` oqimlarini ishga tushirish (quiz funnel, auth, LMS dars oqimi, webhook sandbox),
 xatolarni flaky/real deb ajratish, 4 breakpoint viewport smoke (mobil/planshet/noutbuk/desktop).
-Model: Gemini 3.8 Flash (High) (ijro + retry) — murakkab triage 2 strike qoidasi bo'yicha Orkestratorga ko'tariladi.
+Model: muse-spark-1.3 (ijro + retry) — murakkab triage 2 strike qoidasi bo'yicha Orkestratorga ko'tariladi.
 ZCode mapping: general-purpose agent.
 
 AGENT 8 — ZAHAR-DB (Data Guardian)
 Nima uchun P0: live Supabase ma'lumotlari — bitta yomon migratsiya pul va o'quvchi ma'lumotiga tegadi.
 Vazifa: drizzle migratsiya review (`db:generate` chiqiqini audit), destructive SQL guard (DROP/TRUNCATE/DELETE
 without WHERE), migratsiyadan oldin data snapshot/backup tavsiyasi, RLS siyosatlar tekshiruvi.
-Model: Gemini 3.1 Pro — sxema dizayni chuqur fikrlash, arzon modelga topshirilmaydi (Model siyosati 1-qoida).
+Model: muse-spark-1.3 + Opus 5.5 review — sxema dizayni chuqur fikrlash, arzon modelga topshirilmaydi (Model siyosati 1-qoida).
 ZCode mapping: general-purpose agent.
 
 AGENT 9 — ZAHAR-LEDGER (Xotira va Hujjat Guardian)
@@ -193,7 +198,7 @@ Nima uchun P0: eng katta ikki tarixiy muammo — tekshirilmagan "bajarildi" da'v
 Vazifa: (a) har push'dan oldin da'vo-isbot mosligini tekshirish (har "done" uchun buyruq chiqishi bo'lishi shart),
 (b) hujjatlar drift audit: AGENTS.md/CLAUDE.md/skills/WEBSITE_AUDIT_SPEC.md koddagi real holatga mosligi,
 o'lik yo'llar grep, (c) LEDGER yuritish va yangi xatoni doimiy check'ga aylantirish.
-Model: Gemini 3.7 Flash (sweep) — da'vo-isbot bahosi murakkab bo'lsa Orkestratorga ko'tariladi.
+Model: space-bunny (sweep) — da'vo-isbot bahosi murakkab bo'lsa Orkestratorga ko'tariladi.
 ZCode mapping: general-purpose agent.
 
 ### MUHIM (P1) — o'sish va sifat uchun kuchli qo'shimcha. P0 barqarorlashgach quriladi.
@@ -201,53 +206,53 @@ ZCode mapping: general-purpose agent.
 AGENT 10 — ZAHAR-PERF (Performance & Core Web Vitals)
 Vazifa: bundle hajmi nazorati (build First Load JS), LCP/CLS asosiy sahifalarda, rasm optimizatsiyasi,
 cache siyosati. Ta'lim funnel'ida tezlik = konversiya.
-Model: Gemini 3.7 Flash. ZCode mapping: general-purpose agent.
+Model: space-bunny. ZCode mapping: general-purpose agent.
 
 AGENT 11 — ZAHAR-LANG (O'zbek Til Sifati va Kontent QA)
 Vazifa: lotin/kirill aralashuvi, apostrof bir xilligi (' vs ʻ), terminologiya lug'ati mosligi (/atamalar),
 blog/LMS matn sifati. Mahsulot to'liq o'zbek tilida — kontent sifati brend sifati.
-Model: Gemini 3.6 Flash (High). ZCode mapping: general-purpose agent.
+Model: space-bunny. ZCode mapping: general-purpose agent.
 
 AGENT 12 — ZAHAR-SEO (Growth Texnik)
 Vazifa: meta/OG taglar, sitemap, robots, structured data (Course, FAQ schema.org), blog SEO audit.
-Model: Gemini 3.6 Flash (High). ZCode mapping: general-purpose agent.
+Model: space-bunny. ZCode mapping: general-purpose agent.
 
 ### MEDIUM (P2) — maxsus ehtiyoj paydo bo'lganda quriladi.
 
 AGENT 13 — ZAHAR-ACCESS (Accessibility Auditor)
 Vazifa: WCAG AA kontrast (3 tema), aria attr, klaviatura navigatsiyasi. Radix allaqachon asos beradi.
-Model: Gemini 3.7 Flash. ZCode mapping: general-purpose agent.
+Model: space-bunny. ZCode mapping: general-purpose agent.
 
 AGENT 14 — ZAHAR-SUPPORT (Telegram Bot va CRM Oqimlari)
 Vazifa: Telegraf bot reply oqimlari test, notification dispatcher audit, CRM workflow smoke.
-Model: Gemini 3.7 Flash. ZCode mapping: general-purpose agent.
+Model: space-bunny. ZCode mapping: general-purpose agent.
 
 AGENT 15 — ZAHAR-COST (Token va Infra Xarajat Nazorati)
 Vazifa: dispatch hisobotlaridan token/model ishlatilish jadvali, qimmat model ortiqcha ishlatilgan joylarni
 aniqlash (LEKIN Model siyosati 1-qoidasiga zid bo'lgan tavsiya berish taqiqlanadi), Vercel usage smoke.
-Model: Gemini 3.6 Flash (High). ZCode mapping: general-purpose agent.
+Model: space-bunny. ZCode mapping: general-purpose agent.
 
 ### DAROMAD VA SOTUV QALQONI (P0/Revenue) — Biznes va konversiya o'sishi uchun 2026-09-09 da qo'shildi.
 
 AGENT 16 — ZAHAR-FUNNEL (Konversiya va Sotuv Voronkasi Agenti)
 Vazifa: Landing page bloklari konversiyasini tahlil qilish, A/B hooklar va sotuv offerlarini shakllantirish,
 friction pointlarni qisqartirish.
-Model: Gemini 3.1 Pro (Thinking) — xaridor psixologiyasi va konversiya chuqur tahlil talab qiladi.
+Model: muse-spark-1.3 + Opus 5.5 review — xaridor psixologiyasi va konversiya chuqur tahlil talab qiladi.
 ZCode mapping: general-purpose agent.
 
 AGENT 17 — ZAHAR-DEMO (Interaktiv Sinov va Keyslar Agenti)
 Vazifa: Saytda interaktiv Prompt Playground, Vibe Coding kalkulyatorlari va "Qanday qurilgan?" keyslarini yaratish.
-Model: Gemini 3.8 Flash (High) — tezkor kod generatsiyasi va komponentlar qurilishi.
+Model: muse-spark-1.3 — tezkor kod generatsiyasi va komponentlar qurilishi.
 ZCode mapping: general-purpose agent.
 
 AGENT 18 — ZAHAR-BOT (Telegram Sotuv va Lead Qizdirish Agenti)
 Vazifa: Telegram bot orqali diagnostika, leadlarni saralash, kurs tavsiyasi va to'lov eslatmalarini yuborish.
-Model: Gemini 3.7 Flash — uzluksiz xabarlar oqimi va tezkor avtomatizatsiya.
+Model: space-bunny — uzluksiz xabarlar oqimi va tezkor avtomatizatsiya.
 ZCode mapping: general-purpose agent.
 
 AGENT 19 — ZAHAR-CONTENT (Keyslar va Virallik Agenti)
 Vazifa: Talabalar loyihalari asosida Telegram/Instagram va Blog uchun virallik potentsialiga ega postlar generatsiya qilish.
-Model: Gemini 3.6 Flash (High) — katta hajmdagi kontent generatsiyasi uchun yengil va tezkor.
+Model: space-bunny — katta hajmdagi kontent generatsiyasi uchun yengil va tezkor.
 ZCode mapping: general-purpose agent.
 
 ---
@@ -278,11 +283,11 @@ LEDGER'ga kirmagan xato "yopildi" deb hisoblanmaydi. FILE-GIT har push'da audit_
 1-QOIDA (chuqur fikrlash qalqoni): arxitektura qarorlari, sxema dizayni, xavfsizlik dizayni, murakkab debug
 triage, kritik code review, migratsiya review — HECH QACHON arzon modelga topshirilmaydi, token tejayman deb ham.
 Token tejash hajm/kontekst tejash hisoblanadi, sifat hisobiga EMAS. Shu bo'limdagi agentlar: ORKESTRATOR
-(Gemini 3.1 Pro Thinking), ZAHAR-DB (Gemini 3.1 Pro), ZAHAR-SHIELD (Gemini 3.1 Pro) — ularning modeli pasaytirilmaydi.
+(Claude Opus 5.5), ZAHAR-DB (muse-spark-1.3 + Opus 5.5 review), ZAHAR-SHIELD (muse-spark-1.3 + Opus 5.5 review) — ularning modeli pasaytirilmaydi.
 2-QOIDA (arzon model domeni): mexanik buyruq ijrosi, grep sweep, takroriy test run, audit log yozish,
-format/token tekshiruvlari — arzon modellarda (Gemini 3.8 Flash / Gemini 3.7 Flash / Gemini 3.6 Flash).
+format/token tekshiruvlari — arzon modellarda (space-bunny, keyin muse-spark-1.3).
 3-QOIDA (2-strike escalation): arzon model vazifada 2 marta ortiq qaytsa (retry) yoki ishonchsiz/noaniq javob
-bersa — vazifa DARHOL bir ustki modelga (Orkestrator yoki Gemini 3.1 Pro) ko'tariladi.
+bersa — vazifa DARHOL bir ustki darajaga ko'tariladi (space-bunny → muse-spark-1.3 → Orkestrator o'zi).
 Qayta urinishlar o'rniga escalation — bu ham token, ham sifat tejash.
 4-QOIDA (minimal kontekst dispatch): har subagent prompt'i faqat o'z vazifasi uchun zarur fayl/faktlarni oladi;
 butun repo sweep taqiqlangan (RESEARCHER bundan mustasno — uning vazifasi shu). Natijalar file dump emas,
