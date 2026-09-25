@@ -15,7 +15,7 @@ PR: https://github.com/Muhammadmirzo/vibecoding-uz/pull/2 — branch `claude/rel
 | wave/ui | Button'da ko'rinadigan fokus halqasi (avval klaviatura fokus ko'rinmas edi), Search fokus, `…`, drawer/chat/search'da `overscroll-contain`, `transition-all` olib tashlandi | tsc ✅, vitest 616/616 ✅ |
 | wave/funnel | Telefonda header CTA "Diagnostika" ko'rinadi; kafolatdan "100%" olindi (shartlar bor edi); bosh sahifa FAQ'dan xizmat savollari olindi; hero'ga haqiqiy `CohortCountdown`; "Kursni band qilish" → "Kursga yozilish" | tsc ✅, vitest ✅ |
 | wave/mcp | 6 ta read-only MCP analitika vositasi (`get_analytics_overview`, `get_traffic_sources`, `get_conversion_funnel`, `get_landing_page_performance`, `get_sales_report`, `get_student_progress_report`); `grade_homework` va `broadcast_notification` endi `audit_logs`ga yozadi (bitta tranzaksiyada); eski `mcp.json`/`mcp-config.json` (o'lik `/api/mcp/sse`) o'chirildi; README yangilandi | tsc ✅, vitest 635/635 ✅ (haqiqiy lokal Postgres'da) |
-| wave/seo | canonical (routeMetadata) 11 sahifada, /atamalar va /blog metadata, FAQPage + BreadcrumbList JSON-LD, /admin va /kabinet noindex, robots.ts'da AI botlar, `public/llms.txt`, soft-404 tuzatish (middleware) | §2 ga qarang |
+| wave/seo | canonical (routeMetadata) 11 sahifada, /atamalar (yangi layout.tsx) va /blog metadata, FAQPage + BreadcrumbList JSON-LD, /admin va yangi /kabinet/layout.tsx'da noindex, robots.ts'da AI botlar, `public/llms.txt`, soft-404: `src/middleware.ts` noma'lum `/kurs/<slug>` va `/blog/<slug>`ni statik slug ro'yxatlariga (`COURSE_SLUGS`, `STATIC_BLOG_POSTS`) qarab 404 qiladi | agent: tsc ✅, vitest ✅, build ✅, standalone server'da curl 404/200 ✅. Merge'dan keyin: tsc ✅, vitest 641/641 ✅ (build qayta ishga tushirilmagan) |
 
 Audit hisobotlari (xulosalari shu faylda; to'liq matn sessiya scratchpad'ida qoldi, repoda yo'q).
 
@@ -28,7 +28,7 @@ Egasi aytdi: tekshiruvni bepul agentlar bajaradi. Tartib bilan, har biri o'tishi
 - [ ] **T1. Gate.** Branch'da: `npm ci && npx tsc --noEmit && npx vitest run && npm run build`. Hammasi yashil bo'lishi shart.
   - vitest haqiqiy DB bilan: `DATABASE_URL` lokal Postgres (§5) yoki `.env`. DB bo'lmasa DB testlari skip bo'ladi — bu normal.
   - `sms-session-rate.test.ts` qayta ishga tushirishda 429 berishi mumkin (§3 T14) — `rate_limit_buckets`ni tozalab qayta ishga tushir, kod xatosi emas.
-- [ ] **T2. Soft-404.** `npm run build && npx next start -p 3301` → `curl -s -o /dev/null -w "%{http_code}" localhost:3301/kurs/nope` = **404**, `/blog/nope` = **404**, `/kurs/vibe-coding-express` = **200**, bitta haqiqiy blog slug = **200**. Googlebot UA bilan ham (`-A "Googlebot"`). `src/middleware.ts` diff'ini o'qi: DB yiqilganda sayt yiqilmasligi (fail-open) shart.
+- [ ] **T2. Soft-404.** `npm run build && PORT=3301 node .next/standalone/server.js` (`next start` `output: standalone` bilan noto'g'ri ishlaydi) → `curl -s -o /dev/null -w "%{http_code}" localhost:3301/kurs/nope` = **404**, `/blog/nope` = **404**, `/kurs/vibe-coding-express` = **200**, bitta haqiqiy blog slug = **200**. Googlebot UA bilan ham (`-A "Googlebot"`). Diqqat: blog DB'dan emas, faqat `STATIC_BLOG_POSTS`dan o'qiydi — yangi post qo'shilsa o'sha ro'yxatga qo'shiladi, middleware avtomatik taniydi. Agar kelajakda blog DB'ga o'tsa, middleware tekshiruvini olib tashlash SHART (aks holda yangi postlar 404).
 - [ ] **T3. SEO tekshiruv.** Ko'rish: `curl localhost:3301/robots.txt`, `/llms.txt`, `/sitemap.xml`; `/kurs/vibe-coding-express` HTML'ida `application/ld+json` ichida `Course`, `FAQPage`, `BreadcrumbList`; har public sahifada `<link rel="canonical">`; `/admin/login` va `/kabinet`da `noindex`.
 - [ ] **T4. Responsive + e2e.** `npx playwright test e2e/responsive.spec.ts e2e/visibility.spec.ts e2e/funnel.spec.ts` (`E2E_PORT` bilan). Funnel testida matn "Kursga yozilish" va "7 kunlik pul qaytarish kafolati" ga o'zgargan.
 - [ ] **T5. Vizual.** Skill: `docs/skills/ALL_SKILLS.md` → `webapp-testing`. Skrinshot 375, 390, 768, 1440 — light + dark: bosh sahifa (header'da "Diagnostika" tugmasi 375px'da sig'adimi, hero'dagi countdown layout shift bermayaptimi), /kurs/vibe-coding-express (StickyBuyBar "Yozilish"), Tab tugmasi bilan fokus halqasi ko'rinishi. 0 console error.
@@ -50,6 +50,7 @@ Har task uchun: o'qiladigan skill bo'limi `docs/skills/ALL_SKILLS.md` ichida. Qo
 - [ ] **T12. Narxni Intl bilan formatlash.** `siteConfig.courses[*].price` string → raqam + `new Intl.NumberFormat("uz-UZ")` helper; barcha ishlatilgan joylar va testlar. Skill: `web-design-guidelines`.
 - [ ] **T13. Analitika tracking rejasi.** Mavjud `data-track` atributlari va `src/features/analytics` hodisalarini `analytics` skill bo'yicha tekshir: funnel har qadami (diagnostika start/finish, lead, signup, checkout, payment) o'lchanadimi? Yo'qlarini qo'sh. Hisobot: `docs/reports/TRACKING-PLAN.md`.
 - [ ] **T14. Flaky test.** `src/__tests__/hardening/sms-session-rate.test.ts` qat'iy telefon raqamlari + doimiy `rate_limit_buckets` → ketma-ket ishga tushirishda 429. Testda tasodifiy raqam ishlat yoki test boshida o'z bucket'larini tozala. Testni o'chirma/skip qilma.
+- [ ] **T16. Chiroyli 404.** Middleware 404'lari (yopiq route'lar + noma'lum slug) oddiy matn "Bu sahifa topilmadi" qaytaradi. Brendlangan `not-found` sahifasini 404 status bilan ko'rsatish (masalan `NextResponse.rewrite(new URL("/404-sahifa", request.url), { status: 404 })` — Next 15'da status saqlanishini curl bilan tekshir). Skill: `cro` (404'da ham keyingi qadam CTA).
 - [ ] **T15. Revenue aniqligi.** `src/features/analytics/server/*` summalarni `::int`ga cast qiladi → so'm kasri yo'qoladi, ~2.1 mlrd so'mdan oshsa overflow. `::bigint` yoki numeric → JS'da xavfsiz o'giring; haqiqiy DB'da test.
 
 ### B. Egasining qarori kerak (so'ramasdan qilma — avval egasidan so'ra)
@@ -71,6 +72,8 @@ Natija: `docs/growth/<nom>.md`, o'zbekcha, faqat haqiqiy faktlar, egasi ko'rib c
 - [ ] **G5. A/B test rejasi** — diagnostika natijasini kontakt formasidan oldin qisman ko'rsatish; qaytgan tashrifchiga "Sotib olish" birinchi. Skill: `ab-testing`. Faqat reja; trafik yetarli bo'lganda ishga tushadi.
 
 ---
+
+- Eslatma: `/testimoniyalar` yopiq route (W10) — unga qo'shilgan canonical zararsiz. Ba'zi eski sarlavhalarda "| Naqsh" ikki marta chiqadi (layout template ham qo'shadi) — kichik tuzatish, T9 bilan birga qilsa bo'ladi.
 
 ## 4. Bepul agentlar uchun model tavsiyasi
 | Task turi | Model darajasi |
