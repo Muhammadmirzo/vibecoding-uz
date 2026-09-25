@@ -1,8 +1,4 @@
 import { registerV1Route } from "@/lib/api/v1/registry";
-// Keep MCP admin contracts in the central v1 registry when the docs route is loaded.
-import "@/app/api/v1/mcp/pats/route";
-import "@/app/api/v1/mcp/pats/[id]/route";
-import "@/app/api/v1/mcp/clients/route";
 
 registerV1Route({
   method: "get",

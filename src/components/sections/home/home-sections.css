@@ -5,9 +5,9 @@
 .bento-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 1rem; }
 .bento-tile { grid-column: span 5; min-height: 340px; }
 .bento-wide { grid-column: span 7; }
-.bento-card { position: relative; display: flex; min-height: 100%; flex-direction: column; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--bg-elevated); padding: clamp(1.25rem, 3vw, 2rem); box-shadow: var(--shadow-sm); transition: border-color var(--motion-base) var(--motion-ease-out), box-shadow var(--motion-base) var(--motion-ease-out), transform var(--motion-base) var(--motion-ease-out); }
+.bento-card { position: relative; display: flex; min-height: 100%; flex-direction: column; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--bg-elevated); padding: clamp(1.25rem, 3vw, 2rem); box-shadow: var(--shadow-sm); transition: border-color var(--motion-fast) var(--motion-ease-out), box-shadow var(--motion-fast) var(--motion-ease-out), transform var(--motion-fast) var(--motion-ease-out); }
 .bento-card::after { content: ""; position: absolute; right: -5rem; bottom: -6rem; width: 14rem; height: 14rem; border: 1px solid var(--border); border-radius: 50%; box-shadow: 0 0 0 1.5rem color-mix(in srgb, var(--border) 35%, transparent), 0 0 0 3rem color-mix(in srgb, var(--border) 18%, transparent); pointer-events: none; }
-.bento-card:hover { border-color: var(--border-strong); box-shadow: var(--shadow-md); }
+.bento-card:hover { border-color: var(--border-strong); box-shadow: var(--shadow-md); transform: translateY(-2px); }
 .bento-index { position: absolute; top: 1.25rem; right: 1.25rem; color: var(--ink-subtle); font-family: var(--font-mono); font-size: .68rem; }
 .bento-icon { width: 2.5rem; height: 2.5rem; color: var(--accent); stroke-width: 1.4; }
 .bento-facts { position: relative; z-index: 1; display: flex; align-items: center; gap: .55rem; margin-top: 1.8rem; }
@@ -21,11 +21,15 @@ html.motion-armed[data-motion-scroll="on"] [data-reveal].is-visible .bento-icon 
 
 .demo-prompt { position: relative; z-index: 1; display: flex; align-items: center; gap: .65rem; margin-top: auto; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--bg-sunken); padding: .85rem; color: var(--ink-muted); font-family: var(--font-mono); font-size: .68rem; }
 .demo-typing { display: flex; min-width: 0; flex: 1; align-items: center; overflow: hidden; white-space: nowrap; }
-.demo-typing-text { display: inline-block; max-width: 21ch; overflow: hidden; text-overflow: clip; }
-.demo-caret { width: 1px; height: 1em; flex: none; margin-left: 2px; background: var(--accent); }
-html[data-motion="full"][data-motion-ambient="on"] .demo-typing-text { animation: demo-type 6s steps(21, end) infinite; }
+/* Fixed-size box, revealed with clip-path (paint-only) instead of animating
+   max-width (layout every frame). The caret lives inside this same box so
+   it reveals together with the text, not as a separate flex sibling whose
+   position used to depend on the parent's animated width. */
+.demo-typing-text { display: inline-block; width: 21ch; max-width: 21ch; overflow: hidden; text-overflow: clip; clip-path: inset(0 0 0 0); }
+.demo-caret { display: inline-block; width: 1px; height: 1em; margin-left: 2px; vertical-align: -0.15em; background: var(--accent); }
+html[data-motion="full"][data-motion-ambient="on"] .demo-typing-text { animation: demo-type 6s linear infinite; }
 html[data-motion="full"][data-motion-ambient="on"] .demo-caret { animation: demo-caret 800ms steps(2, jump-none) infinite; }
-@keyframes demo-type { 0%, 12% { max-width: 0; } 42%, 78% { max-width: 21ch; } 92%, 100% { max-width: 0; } }
+@keyframes demo-type { 0%, 12% { clip-path: inset(0 100% 0 0); } 42%, 78% { clip-path: inset(0 0 0 0); } 92%, 100% { clip-path: inset(0 100% 0 0); } }
 @keyframes demo-caret { 50% { opacity: 0; } }
 .demo-toggle-row { position: relative; z-index: 1; display: flex; width: 100%; align-items: center; gap: .75rem; margin-top: auto; border: 1px solid var(--border); border-radius: var(--radius-md); padding: .75rem; transition: border-color var(--motion-fast), background-color var(--motion-fast); }
 .demo-toggle-row:hover { border-color: var(--accent); background: var(--accent-soft); }
@@ -34,26 +38,37 @@ html[data-motion="full"][data-motion-ambient="on"] .demo-caret { animation: demo
 .demo-toggle.is-on { background: var(--accent); }.demo-toggle.is-on span { transform: translateX(1.1rem); }
 .demo-toggle-row strong,.demo-toggle-row small { display: block; }.demo-toggle-row strong { font-size: .75rem; color: var(--ink); }.demo-toggle-row small { font-size: .65rem; color: var(--ink-muted); }
 
-.scroll-fill-text { display: inline-grid; color: var(--ink-subtle); }
+.scroll-fill-text { display: inline-grid; color: var(--ink); }
 .scroll-fill-text > span { grid-area: 1 / 1; min-width: 0; }
 .scroll-fill-base { color: transparent; background: linear-gradient(105deg, var(--brand) 0%, var(--brand-hover) 38%, var(--accent) 88%, var(--gold) 100%); background-clip: text; -webkit-background-clip: text; clip-path: inset(0 100% 0 0); }
-.roadmap-map { view-timeline-name: --roadmap; }
-.roadmap-path { position: absolute; left: 0; top: 0; width: 100%; height: 180px; overflow: visible; }
+/* `position: relative` is required here: without it the absolutely
+   positioned `.roadmap-path` picked the section's own positioning context
+   (the Section wrapper starts at the very top of the section) and drew the
+   wavy line over the heading instead of behind the cards below it. */
+.roadmap-map { position: relative; view-timeline-name: --roadmap; }
+.roadmap-path { position: absolute; z-index: -1; left: 0; top: 0; width: 100%; height: 180px; overflow: visible; }
 .roadmap-path-base,.roadmap-path-progress { fill: none; stroke-width: 2; vector-effect: non-scaling-stroke; }
 .roadmap-path-base { stroke: var(--border-strong); }
 .roadmap-path-progress { stroke: var(--gold); stroke-dasharray: 1; stroke-dashoffset: 1; }
 .roadmap-grid { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
 .roadmap-step { position: relative; padding-top: 148px; }
-.roadmap-dot { position: absolute; top: 72px; left: 12%; display: grid; width: 1.5rem; height: 1.5rem; place-items: center; border: 1px solid var(--border-strong); border-radius: 50%; background: var(--bg-sunken); }
+/* The curve + staggered cards already read as a path; free-floating dots never lined up with it. */
+.roadmap-dot { display: none !important; position: absolute; top: 72px; left: 12%; display: grid; width: 1.5rem; height: 1.5rem; place-items: center; border: 1px solid var(--border-strong); border-radius: 50%; background: var(--bg-sunken); }
 .roadmap-dot span { width: .5rem; height: .5rem; border-radius: 50%; background: var(--border-strong); }
-.roadmap-card { height: 100%; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--bg-elevated); padding: 1.25rem; box-shadow: var(--shadow-sm); transition: transform var(--motion-base) var(--motion-ease-out), box-shadow var(--motion-base) var(--motion-ease-out), border-color var(--motion-base) var(--motion-ease-out); }
-.roadmap-card:hover { transform: translateY(-4px); border-color: var(--gold); box-shadow: var(--shadow-md); }
+.roadmap-card { height: 100%; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--bg-elevated); padding: 1.25rem; box-shadow: var(--shadow-sm); transition: transform var(--motion-fast) var(--motion-ease-out), box-shadow var(--motion-fast) var(--motion-ease-out), border-color var(--motion-fast) var(--motion-ease-out); }
+.roadmap-card:hover { transform: translateY(-2px); border-color: var(--gold); box-shadow: var(--shadow-md); }
 .roadmap-card h3 { margin-top: 1.5rem; font-size: 1.05rem; font-weight: 700; letter-spacing: -.025em; }
 .roadmap-card p { margin-top: .7rem; color: var(--ink-muted); font-size: .9rem; }
 .roadmap-output { border-radius: 999px; background: var(--accent-soft); padding: .25rem .5rem; color: var(--accent); font-size: .6rem; font-weight: 700; }
 
-.girih-transition::before { content: ""; position: absolute; z-index: 0; top: 0; right: 0; left: 0; height: 72px; pointer-events: none; background: var(--accent-soft); clip-path: polygon(0 0,100% 0,100% 28%,94% 42%,94% 76%,82% 76%,82% 100%,62% 100%,62% 66%,38% 66%,38% 100%,18% 100%,18% 76%,6% 76%,6% 42%,0 28%); }
-.mentor-section > div { position: relative; }.comparison-section table { border-collapse: separate; border-spacing: 0; }.comparison-section tbody tr { transition: background-color var(--motion-fast); }.comparison-section tbody tr:hover { background: var(--bg-sunken); }.faq-section .group { transition: background-color var(--motion-fast); }.faq-section .group:hover { background: var(--bg-elevated); }
+/* Clean section-transition edge: a soft 1px gradient line, not the earlier
+   zigzag "skyline" clip-path (read as a rendering glitch). Static — no
+   layout shift, no per-frame paint. */
+.girih-transition::before { content: ""; position: absolute; z-index: 0; top: 0; right: 0; left: 0; height: 1px; pointer-events: none; background: linear-gradient(90deg, transparent, var(--border-strong) 20%, var(--border-strong) 80%, transparent); }
+.mentor-section > div { position: relative; }
+/* Compact monogram avatar (72-96px), replacing the old empty "M" tile. */
+.mentor-avatar { display: grid; flex: none; width: 4.5rem; height: 4.5rem; place-items: center; border-radius: 50%; background: linear-gradient(135deg, var(--brand), var(--accent)); font-family: var(--font-display), var(--font-sans), system-ui, sans-serif; font-size: 1.6rem; font-weight: 700; color: var(--on-brand-surface); }
+@media (min-width: 640px) { .mentor-avatar { width: 6rem; height: 6rem; font-size: 2rem; } }.comparison-section table { border-collapse: separate; border-spacing: 0; }.comparison-section tbody tr { transition: background-color var(--motion-fast); }.comparison-section tbody tr:hover { background: var(--bg-sunken); }.faq-section .group { transition: background-color var(--motion-fast); }.faq-section .group:hover { background: var(--bg-elevated); }
 .faq-section .faq-answer { display: grid; grid-template-rows: 1fr; transition: grid-template-rows var(--motion-base) var(--motion-ease-out); }
 .faq-section .faq-answer > div { min-height: 0; overflow: hidden; }
 .faq-section details:not([open]) .faq-answer { grid-template-rows: 0fr; }
@@ -70,24 +85,34 @@ html[data-motion="full"][data-motion-ambient="on"] .demo-caret { animation: demo
   html[data-motion-scroll="on"] .roadmap-path-progress { animation: roadmap-draw linear both; animation-timeline: --roadmap; animation-range: cover 0% cover 100%; }
   html[data-motion-scroll="on"] .scroll-fill-base { animation: scroll-fill linear both; animation-timeline: view(); animation-range: entry 20% cover 45%; }
   html[data-motion-scroll="on"] .roadmap-step { view-timeline-name: --step; view-timeline-axis: block; }
-  html[data-motion-scroll="on"] .roadmap-card { animation: roadmap-card linear both; animation-timeline: --step; animation-range: entry 0% cover 28%; }
-  html[data-motion-scroll="on"] .girih-transition::before { animation: girih-wipe var(--motion-slow) var(--motion-ease-out) both; animation-timeline: view(); animation-range: entry 0% cover 18%; }
+  html[data-motion-scroll="on"] .roadmap-card { animation: roadmap-card-rise linear both; animation-timeline: --step; animation-range: entry 0% cover 28%; }
+  html[data-motion-scroll="on"] .roadmap-card::after { animation: roadmap-card-glow linear both; animation-timeline: --step; animation-range: entry 0% cover 28%; }
 }
 @keyframes roadmap-draw { to { stroke-dashoffset: 0; } }
 @keyframes scroll-fill { to { clip-path: inset(0 0 0 0); } }
-@keyframes roadmap-card { from { border-color: var(--border); transform: translateY(18px); } 55% { border-color: var(--gold); } to { border-color: var(--border-strong); transform: translateY(0); } }
-@keyframes girih-wipe { from { clip-path: polygon(0 0,100% 0,100% 0,94% 0,94% 0,82% 0,82% 0,62% 0,62% 0,38% 0,38% 0,18% 0,18% 0,6% 0,6% 0,0 0); } to { clip-path: polygon(0 0,100% 0,100% 28%,94% 42%,94% 76%,82% 76%,82% 100%,62% 100%,62% 66%,38% 66%,38% 100%,18% 100%,18% 76%,6% 76%,6% 42%,0 28%); } }
+/* The gold highlight lives on a pseudo-element so the card border itself
+   never repaints mid-scroll: only opacity of ::after is animated
+   (composited, no layout/paint on the card). */
+.roadmap-card { position: relative; }
+.roadmap-card::after { content: ""; position: absolute; inset: -1px; z-index: -1; border: 1px solid var(--gold); border-radius: inherit; opacity: 0; pointer-events: none; }
+@keyframes roadmap-card-rise { from { transform: translateY(18px); } to { transform: translateY(0); } }
+@keyframes roadmap-card-glow { 0% { opacity: 0; } 55% { opacity: 1; } 100% { opacity: 0; } }
 
 @media (prefers-reduced-motion: reduce) {
   .scroll-fill-base { clip-path: none; }
-  .demo-typing-text { max-width: none; }
+  .demo-typing-text { clip-path: none; }
 }
 
 @media (max-width: 1023px) {
   .bento-tile,.bento-wide { grid-column: span 6; }
   .roadmap-path { display: none; }
   .roadmap-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .roadmap-step,.roadmap-step:nth-child(even) { padding: 0; }.roadmap-step .roadmap-dot,.roadmap-step:nth-child(even) .roadmap-dot,.roadmap-step:nth-child(even) .roadmap-card { display: none; }
+  /* Reset the desktop path stagger: below 1024px the connecting path is
+     hidden, so every one of the 4 week cards must render in order — only
+     the (now orphaned) dots are hidden here. A stray `display: none` on
+     even cards used to drop weeks 3-4 and 7-8 on mobile; fixed. */
+  .roadmap-step,.roadmap-step:nth-child(even) { padding: 0; margin-top: 0; }
+  .roadmap-step .roadmap-dot { display: none; }
 }
 @media (max-width: 639px) {
   .hero-proof { right: .5rem; }.hero-orbit { inset: -12px; }

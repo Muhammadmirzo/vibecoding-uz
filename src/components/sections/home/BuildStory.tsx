@@ -31,7 +31,7 @@ export function BuildStory() {
 
             <article className="story-layer story-prompt">
               <div className="story-window">
-                <div className="story-window-bar"><span className="size-2 rounded-full bg-danger" /><span className="size-2 rounded-full bg-gold" /><span className="size-2 rounded-full bg-accent" /><span className="ml-auto font-mono text-[10px] text-ink-subtle">claude · build</span></div>
+                <div className="story-window-bar"><span className="size-2 rounded-full bg-danger" /><span className="size-2 rounded-full bg-gold" /><span className="size-2 rounded-full bg-accent" /><span className="ml-auto font-mono text-[10px] text-terminal-muted">claude · build</span></div>
                 <div className="space-y-3 font-mono text-xs sm:text-sm">
                   <p className="flex gap-2 text-accent"><Braces className="mt-0.5 size-4 shrink-0" aria-hidden="true" />Prompt</p>
                   {promptLines.map((line, index) => <p key={line} className={`story-build-line story-build-${index + 1}`}><span>{index + 1}</span>{line}</p>)}

@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { ok } from "@/lib/api/v1/respond";
 import { v1 } from "@/lib/api/v1/with-v1";
 import { registerV1Route } from "@/lib/api/v1/registry";
@@ -13,7 +14,7 @@ registerV1Route({
   tags: ["auth"],
   summary: "Mobil sessiyani yopish (bitta yoki barcha qurilma)",
   request: { body: { content: { "application/json": { schema: logoutRequestSchema } } } },
-  responses: { 200: { description: "Chiqildi" } },
+  responses: { 200: { description: "Chiqildi", content: { "application/json": { schema: z.object({ success: z.literal(true) }) } } } },
 });
 
 export async function POST(request: Request) {

@@ -13,7 +13,9 @@
     "db:seed": "tsx src/db/seed.ts",
     "admin:create": "tsx scripts/create-admin.ts",
     "mcp:start": "tsx mcp-server/index.ts",
-    "test": "vitest run"
+    "test": "vitest run",
+    "lessons:check": "node scripts/lessons-check.mjs",
+    "prepare": "git config core.hooksPath .githooks || true"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.27.3",

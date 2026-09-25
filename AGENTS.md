@@ -5,7 +5,7 @@
 Welcome AI Agent (Claude Code, Cursor, DeepSeek, Z.ai, OpenRouter, AGY)!
 This document serves as your **authoritative architectural map**, **token-sparing context rulebook**, and **engineering guidelines document**.
 
-> 🎭 **MULTI-AGENT MODE**: if the task should be orchestrated across subagents (strategy, security, review, design audit, research, git) — load [ZAHAR_ORCHESTRATION.md](ZAHAR_ORCHESTRATION.md) and act as ZAHAR-ORKESTRATOR per its protocol.
+> 🎭 **MULTI-AGENT MODE**: if the task should be orchestrated across subagents (strategy, security, review, design audit, research, git) — load [SARBON_ORCHESTRATION.md](SARBON_ORCHESTRATION.md) and act as SARBON-ORKESTRATOR per its protocol.
 
 ---
 

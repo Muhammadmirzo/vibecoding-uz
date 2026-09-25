@@ -4,7 +4,12 @@ import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "./utils";
 
-const buttonVariants = cva("btn-press inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap font-semibold transition-all duration-200 focus-visible:outline-none active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50", { variants: { variant: { primary: "bg-gold text-ink shadow-sm hover:-translate-y-0.5 hover:bg-gold-hover hover:shadow-md", secondary: "bg-brand text-white shadow-sm hover:-translate-y-0.5 hover:bg-brand-hover hover:shadow-md", outline: "border border-border-strong bg-transparent text-ink hover:border-brand hover:bg-brand-soft", ghost: "text-ink-muted hover:bg-bg-sunken hover:text-ink", telegram: "bg-telegram text-white hover:bg-telegram-hover" }, size: { sm: "rounded-md px-3 text-sm", md: "rounded-lg px-5", lg: "rounded-xl px-6 text-base" } }, defaultVariants: { variant: "primary", size: "md" } });
+// One CTA shape sitewide: rounded-full pill, fixed heights per size (sm 40 / md 44 / lg 52px).
+// `secondary` is kept as an alias of the outline treatment — there is only one
+// secondary look across the site. `onBrand` is for buttons placed on a dark/
+// brand surface (e.g. bg-brand-surface sections), where the ink-toned outline
+// would disappear.
+const buttonVariants = cva("btn-press inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full font-semibold transition-all duration-200 focus-visible:outline-none active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50", { variants: { variant: { primary: "bg-gold text-on-gold shadow-sm hover:-translate-y-0.5 hover:bg-gold-hover hover:shadow-md", secondary: "border border-border-strong bg-transparent text-ink hover:-translate-y-0.5 hover:border-brand hover:bg-brand-soft", outline: "border border-border-strong bg-transparent text-ink hover:-translate-y-0.5 hover:border-brand hover:bg-brand-soft", onBrand: "border border-white/40 bg-transparent text-on-brand-surface hover:-translate-y-0.5 hover:border-white hover:bg-white/10", ghost: "text-ink-muted hover:bg-bg-sunken hover:text-ink", telegram: "bg-telegram-solid text-on-telegram hover:bg-telegram-hover" }, size: { sm: "min-h-10 px-4 text-sm", md: "min-h-11 px-5", lg: "min-h-[52px] px-7 text-base" } }, defaultVariants: { variant: "primary", size: "md" } });
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> { asChild?: boolean; href?: string; }
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ className, variant, size, asChild = false, href, ...props }, ref) => {

@@ -7,7 +7,8 @@
 .story-kicker { color: var(--brand); font-family: var(--font-mono); font-size: .68rem; letter-spacing: .14em; text-transform: uppercase; }
 .story-heading h2 { max-width: 58rem; margin: .8rem auto 0; font-size: clamp(1.8rem, 4vw, 3.8rem); font-weight: 700; letter-spacing: -.04em; }
 .story-heading > p:last-child { max-width: 46rem; margin: 1rem auto 0; color: var(--ink-muted); }
-.story-stage { position: relative; min-height: 62vh; }
+/* Stacked (mobile, Safari/Firefox without scroll timelines, reduced motion): clear gaps between steps. */
+.story-stage { position: relative; display: grid; gap: 2rem; margin-top: 3rem; }
 .story-layer { position: relative; }
 .story-idea { border-left: 1px solid var(--border-strong); padding: .5rem 0 .5rem 1.5rem; }
 .story-idea-mark { display: grid; width: 3.5rem; height: 3.5rem; margin-bottom: 2rem; place-items: center; border-radius: 50%; background: var(--gold-soft); color: var(--gold); }
@@ -23,7 +24,9 @@
 .story-app .app-preview { max-width: 760px; }
 .story-app-caption { display: flex; align-items: center; gap: .5rem; margin-bottom: .75rem; color: var(--ink); font-weight: 700; }
 .story-app > p { margin-top: .65rem; color: var(--ink-subtle); }
-.story-rail { position: relative; display: flex; justify-content: space-between; margin: 2rem auto 0; color: var(--ink-subtle); font-family: var(--font-mono); font-size: .62rem; text-transform: uppercase; letter-spacing: .1em; }
+/* Full width always: the parent is a flex column, where `margin: auto` alone would shrink the rail
+   to its content and glue the three labels together ("G'OYAPROMPTILOVA"). */
+.story-rail { position: relative; display: flex; justify-content: space-between; width: 100%; margin: 2rem auto 0; color: var(--ink-subtle); font-family: var(--font-mono); font-size: .62rem; text-transform: uppercase; letter-spacing: .1em; }
 .story-step { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: .45rem; }
 .story-step > span { width: .5rem; height: .5rem; border-radius: 50%; background: currentColor; }
 .story-rail-line { position: absolute; top: .22rem; right: 1rem; left: 1rem; height: 1px; overflow: hidden; background: var(--border); }
@@ -31,19 +34,29 @@
 
 @supports (animation-timeline: view()) {
   @media (min-width: 1024px) {
-    html[data-motion-scroll="on"] .story-track { height: 150vh; view-timeline-name: --story; view-timeline-axis: block; }
+    /* 300vh (not 150vh): each of the 3 steps (idea/prompt/app) previously got
+       only ~50vh of scroll before the track ended, so the whole story played
+       out in well under 400px of scrolling. Doubling the track gives each
+       step a comfortable scroll distance; the animation-range percentages
+       below are relative to this track, so they don't need to change. */
+    html[data-motion-scroll="on"] .story-track { height: 300vh; view-timeline-name: --story; view-timeline-axis: block; }
     html[data-motion-scroll="on"] .story-pin { position: sticky; top: 0; height: 100vh; overflow: hidden; padding: 0; }
-    html[data-motion-scroll="on"] .story-pin > div { display: block; }
-    html[data-motion-scroll="on"] .story-heading { position: absolute; top: 11vh; right: 0; left: 0; }
-    html[data-motion-scroll="on"] .story-heading h2 { font-size: clamp(2.2rem, 3.3vw, 3.5rem); }
-    html[data-motion-scroll="on"] .story-stage { position: absolute; top: 25vh; right: clamp(1rem, 5vw, 5rem); bottom: 12vh; left: clamp(1rem, 5vw, 5rem); min-height: 0; }
+    /* Heading, stage and rail stack in one column so they can never overlap, whatever the viewport height. */
+    html[data-motion-scroll="on"] .story-pin > div { display: flex; flex-direction: column; justify-content: flex-start; padding-top: calc(4rem + 3vh); padding-bottom: 3vh; }
+    html[data-motion-scroll="on"] .story-heading { flex: none; }
+    html[data-motion-scroll="on"] .story-heading h2 { margin-top: .5rem; font-size: clamp(1.9rem, min(3.3vw, 5.5vh), 3.5rem); }
+    html[data-motion-scroll="on"] .story-heading > p:last-child { margin-top: .6rem; }
+    html[data-motion-scroll="on"] .story-stage { display: block; flex: 1; width: 100%; min-height: 0; margin-top: 3vh; }
     html[data-motion-scroll="on"] .story-layer { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; transform: translateY(0); }
     html[data-motion-scroll="on"] .story-idea { margin: 0 auto; width: min(100%, 960px); padding: 1rem 0 1rem clamp(1rem, 3vw, 3rem); }
     html[data-motion-scroll="on"] .story-idea-mark { margin-bottom: 1.25rem; }
     html[data-motion-scroll="on"] .story-idea h3 { font-size: clamp(2.4rem, 4vw, 4.7rem); }
     html[data-motion-scroll="on"] .story-prompt { margin: 0 auto; width: min(100%, 880px); }
     html[data-motion-scroll="on"] .story-app { margin: 0 auto; width: min(100%, 800px); }
-    html[data-motion-scroll="on"] .story-rail { position: absolute; right: clamp(1rem, 5vw, 5rem); bottom: 4vh; left: clamp(1rem, 5vw, 5rem); margin: 0; }
+    html[data-motion-scroll="on"] .story-rail { flex: none; width: 100%; margin: 2.5vh 0 0; }
+    html[data-motion-scroll="on"] .story-app .app-detail-body,
+    html[data-motion-scroll="on"] .story-app .app-detail-menu,
+    html[data-motion-scroll="on"] .story-app .app-detail-cart { min-height: 0; }
 
     html[data-motion-scroll="on"] .story-idea { animation: story-idea linear both; animation-timeline: --story; animation-range: contain 0% contain 50%; }
     html[data-motion-scroll="on"] .story-prompt { animation: story-prompt linear both; animation-timeline: --story; animation-range: contain 0% contain 50%; }
@@ -89,11 +102,6 @@
 @keyframes story-step-prompt-state { 0%, 32% { color: var(--ink-subtle); } 34%, 100% { color: var(--accent); } }
 @keyframes story-step-app-state { 0%, 64% { color: var(--ink-subtle); } 66%, 100% { color: var(--accent); } }
 
-@media (max-width: 1023px) {
-  .story-stage { display: grid; gap: 2rem; margin-top: 3rem; }
-  .story-layer + .story-layer { margin-top: 0; }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .story-track { height: auto !important; }
   .story-pin { position: static !important; height: auto !important; overflow: visible !important; padding: 5rem 0; }
@@ -104,8 +112,19 @@
   .story-rail-line > span { transform: scaleX(1); }
 }
 
+/* html[data-motion="off"] only disabled the animations above, but the pin/
+   sticky layout rules are keyed on [data-motion-scroll="on"] alone, so with
+   scroll-motion still "on" the three layers stayed absolutely stacked with
+   no animation to ever separate them — they simply overlapped. Force the
+   same stacked (non-pinned) layout the reduced-motion block uses. */
+[data-motion="off"] .story-track { height: auto !important; }
+[data-motion="off"] .story-pin { position: static !important; height: auto !important; overflow: visible !important; padding: 5rem 0 !important; }
+[data-motion="off"] .story-pin > div { display: flex !important; }
+[data-motion="off"] .story-layer { position: relative !important; inset: auto !important; transform: none !important; }
 [data-motion="off"] .story-layer,
 [data-motion="off"] .story-build-line,
 [data-motion="off"] .story-build-check,
 [data-motion="off"] .story-app .app-preview-layer,
 [data-motion="off"] .story-step { animation: none !important; opacity: 1 !important; transform: none !important; }
+[data-motion="off"] .story-step > span { background: var(--accent); }
+[data-motion="off"] .story-rail-line > span { transform: scaleX(1); }

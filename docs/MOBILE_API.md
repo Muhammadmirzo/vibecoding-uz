@@ -7,6 +7,42 @@ mashina o'qyidigani: `/api/v1/openapi.json` (OpenAPI 3.1, Zod kontraktlardan gen
 Expo / React Native tavsiya etiladi. Quyida Swift (URLSession + Keychain) va
 Kotlin (OkHttp + EncryptedSharedPreferences) uchun ham ko'rsatmalar bor.
 
+## 0. 5 daqiqalik quickstart
+
+```bash
+BASE=https://master-2-jade.vercel.app/api/v1
+
+# 1) Login — access (15 daq) + refresh (30 kun) token olasiz
+curl -s -X POST $BASE/auth/token -H 'Content-Type: application/json' -d '{
+  "phone":"+998901234567","password":"MaxfiyParol123",
+  "deviceId":"iphone-15-A1","deviceName":"iPhone 15","platform":"ios","appVersion":"1.0.0"
+}' | tee /tmp/token.json
+ACCESS=$(jq -r .data.accessToken /tmp/token.json)
+REFRESH=$(jq -r .data.refreshToken /tmp/token.json)
+
+# 2) O'zingizni tekshiring
+curl -s $BASE/me -H "Authorization: Bearer $ACCESS"
+
+# 3) Access muddati tugaganda — refresh (bir martalik, eskisi o'ladi)
+curl -s -X POST $BASE/auth/refresh -H 'Content-Type: application/json' \
+  -d "{\"refreshToken\":\"$REFRESH\"}" | tee /tmp/refresh.json
+ACCESS=$(jq -r .data.accessToken /tmp/refresh.json)
+REFRESH=$(jq -r .data.refreshToken /tmp/refresh.json)
+
+# 4) Chiqish — joriy qurilma sessiyasini yopadi
+curl -s -X POST $BASE/auth/logout -H "Authorization: Bearer $ACCESS" \
+  -H 'Content-Type: application/json' -d "{\"refreshToken\":\"$REFRESH\"}"
+```
+
+**Typed TS client 30 soniyada** (yangi dependency shart emas — `npx` bilan bir martalik ishga tushiriladi):
+
+```bash
+npx openapi-typescript $BASE/openapi.json -o api.d.ts
+```
+
+Natijada `api.d.ts` har bir endpointning so'rov/javob turlarini beradi — `fetch`, `openapi-fetch`
+yoki o'zingizning HTTP klientingiz bilan ishlating. Kontrakt o'zgarsa — shu buyruqni qayta ishga tushiring.
+
 ## 1. Javob formati
 
 Muvaffaqiyat (200/201): `{ "data": {...}, "meta"?: { "nextCursor"?, "total"? } }`

@@ -24,7 +24,8 @@ describe("Production High-Load Defensive Hardening - Database", () => {
     await expect(withRetry(fn, { retries: 3, delayMs: 10 })).rejects.toThrow("syntax error");
   });
 
-  it("should execute withTransactionLock sequentially under concurrent calls", async (context) => {
+  // Integration test: needs a real Postgres. CI has no DATABASE_URL, so it is skipped there.
+  it.skipIf(!process.env.DATABASE_URL)("should execute withTransactionLock sequentially under concurrent calls", async (context) => {
     const executionOrder: number[] = [];
     const task1 = withTransactionLock("test_lock_key", async () => {
       executionOrder.push(1);

@@ -38,7 +38,7 @@ export function ApplyJobModal({ isOpen, onClose, job }: ApplyJobModalProps) {
               </p>
               <p className="font-mono text-[11px] text-ink-subtle">Kvitansiya: {form.receiptId}</p>
               <div className="pt-4">
-                <button onClick={onClose} className="min-h-11 rounded-lg bg-gold px-8 text-xs font-semibold text-ink">Tushunarli</button>
+                <button onClick={onClose} className="min-h-11 rounded-full bg-gold px-8 text-xs font-semibold text-on-gold">Tushunarli</button>
               </div>
             </div>
           ) : (

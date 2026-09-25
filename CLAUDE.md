@@ -10,7 +10,7 @@
 2. **[docs/context/index.md](docs/context/index.md)**: Comprehensive repository & module map pointer, architecture overview, domain models, API specifications, and operational procedures.
 3. **[WEBSITE_AUDIT_SPEC.md](WEBSITE_AUDIT_SPEC.md)**: Verified audit status, tokenization rules, and known open issues.
 5. **[docs/CODER_AGENT_RULES.md](docs/CODER_AGENT_RULES.md)**: Mandatory rules for every coder agent (architecture, design tokens, responsive, security, process safety, definition of done).
-4. **[ZAHAR_ORCHESTRATION.md](ZAHAR_ORCHESTRATION.md)**: Multi-agent orchestration protocol (ZAHAR) — orchestrator rules, subagent roles, model matrix, dispatch templates, verification cycle. Also available as the `/zahar` command.
+4. **[SARBON_ORCHESTRATION.md](SARBON_ORCHESTRATION.md)**: Multi-agent orchestration protocol (SARBON) — orchestrator rules, subagent roles, model matrix, dispatch templates, verification cycle. Also available as the `/sarbon` command.
 
 ---
 

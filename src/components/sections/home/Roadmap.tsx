@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { Container, Section } from "@/components/ui";
+import { Container, Eyebrow, Section } from "@/components/ui";
 
 const stages = [
   { weeks: "1–2", title: "Muammoni aniqlashtirish", copy: "Kim uchun, qanday vazifa va natijani nimadan ko'ramiz — yozma xaritalasiz.", output: "Aniq mahsulot briefi" },
@@ -13,7 +13,7 @@ export function Roadmap() {
     <Section pattern={false} className="roadmap-section bg-bg-sunken py-24 sm:py-32">
       <Container>
         <div className="max-w-3xl">
-          <p className="mb-4 font-mono text-sm text-brand">8 haftalik yo'l / har bosqichda natija</p>
+          <Eyebrow className="mb-4 text-brand">8 haftalik yo&apos;l / har bosqichda natija</Eyebrow>
           <h2 className="font-display text-[clamp(2rem,1.2rem+3vw,3.4rem)] font-semibold leading-[1.08] tracking-[-0.045em] text-ink">Kurs haritasi — chalkash emas, ko'rinadigan.</h2>
           <p className="mt-5 max-w-2xl text-lg text-ink-muted">Bir bosqich tugagach keyingisiga o'tasiz. Har qadamda nimani qilishingiz va nima qo'lga olayotganiz aniq.</p>
         </div>

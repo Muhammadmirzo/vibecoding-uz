@@ -79,6 +79,9 @@ export async function orchestrateAiReply(conversationId: string) {
     return;
   }
 
+  // No key configured = AI simply not set up: stay silent. The admin already
+  // gets the regular "new message" Telegram alert, so no extra noise.
+  if (!process.env.ANTHROPIC_API_KEY) return;
   const provider = new AnthropicChatAgent(process.env.ANTHROPIC_API_KEY, settings.aiModel);
   const result = await provider.generateReply({
     history: thread.messages.map((message) => ({ sender: message.sender, body: message.body })),

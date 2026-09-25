@@ -74,7 +74,7 @@ export function JobOpenings({
                 <div className="text-center text-xs font-semibold text-ink-muted lg:text-left">
                   <span className="block">{job.title}</span><span className="font-normal">{job.department}</span>
                 </div>
-                <button type="button" onClick={() => onApply(job)} aria-label={`${job.title} — ${job.department} bo‘limiga ariza topshirish`} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-gold px-6 text-xs font-semibold text-ink hover:bg-gold-hover">
+                <button type="button" onClick={() => onApply(job)} aria-label={`${job.title} — ${job.department} bo‘limiga ariza topshirish`} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-gold px-6 text-xs font-semibold text-on-gold hover:bg-gold-hover">
                   <Send className="h-3.5 w-3.5" /> Ariza topshirish
                 </button>
                 <Link href={`/ish/${job.slug}`} className="inline-flex min-h-11 w-full items-center justify-center gap-1.5 rounded-lg border border-border-strong bg-bg-elevated px-5 text-xs font-semibold text-ink hover:bg-bg-sunken">

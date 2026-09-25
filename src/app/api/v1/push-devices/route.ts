@@ -12,7 +12,7 @@ registerV1Route({
   tags: ["devices"],
   summary: "Push qurilmani ro'yxatga olish (Expo/FCM/APNs)",
   request: { body: { content: { "application/json": { schema: pushRegisterSchema } } } },
-  responses: { 201: { description: "Ro'yxatga olindi" } },
+  responses: { 201: { description: "Ro'yxatga olindi", content: { "application/json": { schema: z.object({ id: z.string().uuid() }) } } } },
 });
 
 export async function POST(request: Request) {

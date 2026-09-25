@@ -109,6 +109,25 @@ describe("visitor chat routes", () => {
   });
 });
 
+describe("v1 envelope headers (regression: chat/admin-chat routes used to bypass v1()/v1Admin())", () => {
+  it("stamps X-Request-Id / X-Api-Version / Content-Language on visitor chat responses", async () => {
+    const response = await GET(request("/api/v1/chat/messages"));
+    expect(response.headers.get("X-Api-Version")).toBe("v1");
+    expect(response.headers.get("X-Request-Id")).toBeTruthy();
+    expect(response.headers.get("Content-Language")).toBe("uz");
+  });
+
+  it("stamps the same headers on admin chat responses, including error responses", async () => {
+    mocks.requireAdmin.mockResolvedValueOnce({ ok: false, response: Response.json({ error: "no" }, { status: 403 }) });
+    const forbidden = await ADMIN_GET(request("/api/v1/admin/chat/conversations"));
+    expect(forbidden.status).toBe(403);
+    expect(forbidden.headers.get("X-Api-Version")).toBe("v1");
+    mocks.getThread.mockResolvedValueOnce({ conversation, messages: [] });
+    const ok = await ADMIN_GET(request(`/api/v1/admin/chat/conversations?id=${uuid}`));
+    expect(ok.headers.get("X-Api-Version")).toBe("v1");
+  });
+});
+
 describe("admin chat routes", () => {
   it("rejects unauthenticated and forbidden requests", async () => {
     mocks.requireAdmin.mockResolvedValueOnce({ ok: false, response: Response.json({ error: "no" }, { status: 401 }) });

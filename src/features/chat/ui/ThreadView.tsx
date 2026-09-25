@@ -86,7 +86,7 @@ export function ThreadView({
       </details>
 
       <div className="flex-1 space-y-3 overflow-y-auto bg-bg p-4" aria-live="polite">
-        {messages.map((message) => message.isDraft ? <div key={message.id} className="rounded-xl border border-dashed border-brand/40 bg-brand-soft p-3"><div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase text-brand"><Bot className="size-4" />AI qoralamasi</div><p className="whitespace-pre-wrap text-base text-ink">{message.body}</p><button type="button" onClick={() => void approve(message)} className="btn-press mt-3 inline-flex min-h-11 items-center gap-2 rounded-lg bg-gold px-4 text-sm font-semibold text-ink"><Send className="size-4" />Yuborish</button></div> : <ChatMessageBubble key={message.id} message={message} />)}
+        {messages.map((message) => message.isDraft ? <div key={message.id} className="rounded-xl border border-dashed border-brand/40 bg-brand-soft p-3"><div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase text-brand"><Bot className="size-4" />AI qoralamasi</div><p className="whitespace-pre-wrap text-base text-ink">{message.body}</p><button type="button" onClick={() => void approve(message)} className="btn-press mt-3 inline-flex min-h-11 items-center gap-2 rounded-full bg-gold px-4 text-sm font-semibold text-on-gold"><Send className="size-4" />Yuborish</button></div> : <ChatMessageBubble key={message.id} message={message} viewer="admin" />)}
       </div>
 
       <footer className="border-t border-border bg-bg-elevated p-3">

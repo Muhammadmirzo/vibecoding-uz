@@ -62,6 +62,8 @@ export const chatMessageSchema = z.object({
   createdAt: z.string().datetime(),
   readAt: z.string().datetime().nullable(),
   isDraft: z.boolean(),
+  // Short quote of the message this one answers; null for ordinary messages.
+  replyTo: z.object({ id: z.string().uuid(), sender: chatSenderSchema, body: z.string() }).nullable().default(null),
 });
 export const chatConversationSchema = z.object({
   id: z.string().uuid(),
@@ -97,6 +99,10 @@ export const chatSettingsSchema = z.object({
   aiPersona: z.string().max(1000).default("Yordamchi, aniq va samimiy Naqsh yordamchisi."),
   telegramNotify: z.boolean().default(true),
   quickReplies: z.array(z.string().min(1).max(80)).max(8).default(["Kurs tanlashda yordam", "To'lov savoli", "Bepul dars"]),
+});
+/** What `publicChatSettings()` actually exposes to visitors — no AI/internal config. */
+export const publicChatSettingsSchema = chatSettingsSchema.pick({
+  enabled: true, welcomeText: true, officeHours: true, replyTimeMinutes: true, offlineText: true, quickReplies: true,
 });
 export const chatSettingsRowSchema = z.object({ value: chatSettingsSchema });
 export const chatBootstrapSchema = z.object({ conversation: chatConversationSchema.nullable(), settings: chatSettingsSchema });

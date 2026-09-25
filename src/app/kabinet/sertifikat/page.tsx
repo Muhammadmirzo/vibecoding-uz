@@ -92,7 +92,7 @@ export default async function SertifikatPage() {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
-          <a href={certificate.downloadUrl} className="min-h-12 bg-gold px-6 rounded-lg text-xs font-semibold text-ink inline-flex items-center justify-center gap-2 hover:bg-gold-hover">
+          <a href={certificate.downloadUrl} className="min-h-12 bg-gold px-6 rounded-full text-xs font-semibold text-on-gold inline-flex items-center justify-center gap-2 hover:bg-gold-hover">
             <Download className="w-4 h-4" /> PDF formatida yuklab olish
           </a>
           <Link href={`/shahodatnoma/${certificate.code}`}>

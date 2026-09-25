@@ -3,10 +3,11 @@
 import * as React from "react";
 import { Bot, Send, VolumeX, WifiOff, X } from "lucide-react";
 import { isOfficeOpen } from "../domain/office-hours";
-import type { ChatConversationDto, ChatMessageDto, ChatSettingsInput, SendMessageInput } from "../contracts";
+import type { ChatConversationDto, ChatMessageDto, ChatSettingsInput } from "../contracts";
 import { ChatMessageBubble } from "./ChatMessageBubble";
 import { OfflineLeadForm, type OfflineLeadValues } from "./OfflineLeadForm";
 import { httpChatTransport, type ChatTransport } from "./transport";
+import { useChatOutbox } from "./useChatOutbox";
 
 const POLL_VISIBLE = 3_000;
 const POLL_HIDDEN = 20_000;
@@ -32,7 +33,6 @@ export default function ChatPanel({
   const [messages, setMessages] = React.useState<ChatMessageDto[]>([]);
   const [body, setBody] = React.useState("");
   const [error, setError] = React.useState<string | null>(null);
-  const [sending, setSending] = React.useState(false);
   const [typing, setTyping] = React.useState(false);
   const [apiDown, setApiDown] = React.useState(false);
   const [hasStickyBar, setHasStickyBar] = React.useState(false);
@@ -40,6 +40,24 @@ export default function ChatPanel({
   const composerRef = React.useRef<HTMLTextAreaElement>(null);
   const cursorRef = React.useRef<string | undefined>();
   const failuresRef = React.useRef(0);
+  const outbox = useChatOutbox(
+    (item) => transport.send({
+      clientId: item.clientId, body: item.body, sourcePath: window.location.pathname,
+      device: navigator.userAgent.slice(0, 120), ...item.contact,
+    }),
+    (message) => {
+      setMessages((current) => mergeMessages(current, [message]));
+      setApiDown(false);
+      if (conversation?.aiMode && conversation.aiMode !== "off") {
+        setTyping(true);
+        window.setTimeout(() => setTyping(false), 8_000);
+      }
+    },
+  );
+  // A send whose response was lost is already on the server: once polled, drop the local copy.
+  const deliveredClientIds = new Set(messages.map((message) => message.clientId));
+  const pending = outbox.items.filter((item) => !deliveredClientIds.has(item.clientId));
+  const sendFailed = pending.some((item) => item.status === "failed");
 
   React.useEffect(() => {
     setHasStickyBar(Boolean(document.querySelector("[data-sticky-buy-bar]")));
@@ -82,7 +100,7 @@ export default function ChatPanel({
         onConversationChange(Boolean(response.conversation));
         setMessages((current) => mergeMessages(current, response.messages));
         cursorRef.current = response.nextCursor || cursorRef.current;
-        if (response.messages.some((message) => message.sender !== "visitor")) {
+        if (response.messages.some((message) => message.sender !== "visitor" && !message.readAt)) {
           void transport.markRead();
           const now = new Date().toISOString();
           setMessages((current) => current.map((message) => message.sender !== "visitor" && !message.readAt ? { ...message, readAt: now } : message));
@@ -113,34 +131,19 @@ export default function ChatPanel({
     const list = dialogRef.current?.querySelector<HTMLElement>("[data-message-list]");
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     list?.scrollTo({ top: list.scrollHeight, behavior: reduced ? "auto" : "smooth" });
-  }, [messages.length, typing]);
+  }, [messages.length, pending.length, typing]);
 
-  async function sendMessage(value = body, contact?: OfflineLeadValues) {
+  function sendMessage(value = body, contact?: OfflineLeadValues) {
     const trimmed = value.trim();
-    if (!trimmed || sending) return false;
-    setSending(true); setError(null);
-    const input: SendMessageInput = {
-      clientId: crypto.randomUUID(), body: trimmed, sourcePath: window.location.pathname,
-      device: navigator.userAgent.slice(0, 120), ...contact,
-    };
-    try {
-      const message = await transport.send(input);
-      setMessages((current) => mergeMessages(current, [message]));
-      setBody(""); setApiDown(false);
-      if (conversation?.aiMode && conversation.aiMode !== "off") {
-        setTyping(true);
-        window.setTimeout(() => setTyping(false), 8_000);
-      }
-      return true;
-    } catch {
-      setError("Xabar yuborilmadi. Matn saqlandi — qayta urinib ko'ring.");
-      setApiDown(true);
-      return false;
-    } finally { setSending(false); }
+    if (!trimmed) return;
+    // Never blocks: the message appears at once and the outbox delivers it in order.
+    outbox.enqueue(trimmed, contact);
+    setBody("");
+    composerRef.current?.focus();
   }
 
   async function sendOffline(values: OfflineLeadValues) {
-    await sendMessage(body.trim() || "Hozir oflaynmiz. Telegram orqali bog'laning.", values);
+    sendMessage(body.trim() || "Hozir oflaynmiz. Telegram orqali bog'laning.", values);
   }
 
   const officeOpen = settings ? isOfficeOpen(new Date(), settings.officeHours) : false;
@@ -159,15 +162,23 @@ export default function ChatPanel({
           {settings ? <p className="rounded-xl border border-accent/20 bg-accent-soft p-3 text-sm leading-6 text-ink">{settings.welcomeText}</p> : null}
           {settings?.quickReplies.map((reply) => <button key={reply} type="button" onClick={() => setBody(reply)} className="min-h-11 rounded-full border border-brand/20 bg-brand-soft px-4 text-left text-base text-brand hover:bg-brand-soft/70">{reply}</button>)}
           {messages.map((message) => <ChatMessageBubble key={message.id} message={message} />)}
+          {pending.map((item) => (
+            <div key={item.clientId} className="chat-message flex justify-end">
+              <div className={`max-w-[88%] rounded-2xl rounded-br-sm bg-brand px-3.5 py-2.5 text-bg-elevated ${item.status === "failed" ? "opacity-70" : "opacity-80"}`}>
+                <p className="whitespace-pre-wrap break-words">{item.body}</p>
+                <p className="mt-1 text-xs opacity-70">{item.status === "failed" ? "Yuborilmadi" : "Yuborilmoqda…"}</p>
+              </div>
+            </div>
+          ))}
           {typing ? <div className="flex items-center gap-2 text-sm text-ink-muted" role="status"><Bot className="size-4" /><span className="flex gap-1"><i className="chat-dot" /><i className="chat-dot" /><i className="chat-dot" /></span>Yordamchi javob tayyorlanmoqda…</div> : null}
         </div>
-        {error ? <div role="alert" className="mx-4 mb-2 flex items-start gap-2 rounded-lg bg-danger-soft p-3 text-sm text-danger"><WifiOff className="mt-0.5 size-4 shrink-0" /><span className="flex-1">{error}</span>{body ? <button type="button" onClick={() => void sendMessage()} className="font-semibold underline">Qayta yuborish</button> : null}</div> : null}
-        {settings && !officeOpen ? <OfflineLeadForm offlineText={settings.offlineText} body={body} sending={sending} onBodyChange={setBody} onSubmit={sendOffline} /> : null}
+        {error || sendFailed ? <div role="alert" className="mx-4 mb-2 flex items-start gap-2 rounded-lg bg-danger-soft p-3 text-sm text-danger"><WifiOff className="mt-0.5 size-4 shrink-0" /><span className="flex-1">{error || "Xabar yuborilmadi. Internet qaytgach avtomatik qayta yuboramiz."}</span>{sendFailed ? <button type="button" onClick={outbox.retry} className="font-semibold underline">Qayta yuborish</button> : null}</div> : null}
+        {settings && !officeOpen ? <OfflineLeadForm offlineText={settings.offlineText} body={body} sending={pending.some((item) => item.status === "queued")} onBodyChange={setBody} onSubmit={sendOffline} /> : null}
         {!settings || officeOpen ? <div className="border-t border-border bg-bg-elevated p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
           <div className="mb-2 flex items-center justify-between text-xs text-ink-muted"><span>Ovoz o&apos;chirilgan</span><span className="inline-flex items-center gap-1"><VolumeX className="size-3" /> Xavfsiz chat</span></div>
           <div className="flex items-end gap-2">
-            <textarea ref={composerRef} value={body} onChange={(event) => setBody(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); void sendMessage(); } }} rows={2} maxLength={2000} placeholder="Xabaringizni yozing…" aria-label="Chat xabari" className="min-h-11 min-w-0 flex-1 resize-none rounded-xl border border-border bg-bg px-3 py-3 text-base outline-none focus:border-brand focus:ring-2 focus:ring-brand-soft" />
-            <button type="button" disabled={sending || !body.trim()} onClick={() => void sendMessage()} aria-label="Xabarni yuborish" className="btn-press grid size-11 shrink-0 place-items-center rounded-xl bg-gold text-ink disabled:opacity-50"><Send className="size-5" /></button>
+            <textarea ref={composerRef} value={body} onChange={(event) => setBody(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); sendMessage(); } }} rows={2} maxLength={2000} placeholder="Xabaringizni yozing…" aria-label="Chat xabari" className="min-h-11 min-w-0 flex-1 resize-none rounded-xl border border-border bg-bg px-3 py-3 text-base outline-none focus:border-brand focus:ring-2 focus:ring-brand-soft" />
+            <button type="button" disabled={!body.trim()} onClick={() => sendMessage()} aria-label="Xabarni yuborish" className="btn-press grid size-11 shrink-0 place-items-center rounded-xl bg-gold text-on-gold disabled:opacity-50"><Send className="size-5" /></button>
           </div>
         </div> : null}
       </section>

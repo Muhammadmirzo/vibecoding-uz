@@ -1,5 +1,5 @@
 import { BrainCircuit, CheckCircle2, MessageSquareText, Rocket } from "lucide-react";
-import { Container, Section } from "@/components/ui";
+import { Container, Eyebrow, Section } from "@/components/ui";
 import { ProcessDemo } from "@/features/motion/ui/ProcessDemo";
 import { Reveal } from "@/features/motion/ui/Reveal";
 import { ScrollFillText } from "@/features/motion/ui/ScrollFillText";
@@ -17,7 +17,7 @@ export function Transformation() {
       <Container>
         <div className="grid gap-8 lg:grid-cols-[1fr_.65fr] lg:items-end">
           <div>
-            <p className="mb-4 font-mono text-sm text-brand">transformatsiya / 0 → 8 hafta</p>
+            <Eyebrow className="mb-4 text-brand">transformatsiya / 0 → 8 hafta</Eyebrow>
             <h2 className="max-w-4xl font-display text-[clamp(2rem,1.2rem+3vw,3.6rem)] font-semibold leading-[1.08] tracking-[-0.045em] text-ink">
               <ScrollFillText text="G'oyadan — ishlaydigan mahsulotgacha." />
             </h2>

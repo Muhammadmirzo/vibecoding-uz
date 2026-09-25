@@ -12,7 +12,7 @@ async function main(): Promise<void> {
   const envToken = requireServerToken();
   const expected = process.env.MCP_AUTH_TOKEN;
   if (!expected || !verifyAuthToken(expected)) throw new Error("MCP_AUTH_TOKEN tekshiruvi muvaffaqiyatsiz");
-  const principal: McpPrincipal = { userId: process.env.MCP_ADMIN_USER_ID ?? "00000000-0000-4000-8000-000000000000", role: "admin", scopes: ["analytics:read", "students:read", "sales:read", "chat:read", "chat:write", "content:write"], clientId: null, sender: "admin", tokenId: `stdio-${envToken.slice(0, 8)}`, tokenType: "pat" };
+  const principal: McpPrincipal = { userId: process.env.MCP_ADMIN_USER_ID ?? "00000000-0000-4000-8000-000000000000", role: "admin", scopes: ["analytics:read", "students:read", "sales:read", "chat:read", "chat:write", "content:write", "leads:write"], clientId: null, sender: "admin", tokenId: `stdio-${envToken.slice(0, 8)}`, tokenType: "pat" };
   const server = createMcpServer(principal);
   await server.connect(new StdioServerTransport());
   console.error("Naqsh MCP Server running on stdio...");

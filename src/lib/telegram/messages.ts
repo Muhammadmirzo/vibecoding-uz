@@ -17,7 +17,8 @@ function escapeHtml(value: string): string {
 export async function sendTelegramMessage(
   chatId: string | number,
   text: string,
-  parseMode: "HTML" | "Markdown" = "HTML"
+  parseMode: "HTML" | "Markdown" = "HTML",
+  replyToMessageId?: number,
 ) {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   if (!token) {
@@ -34,6 +35,7 @@ export async function sendTelegramMessage(
         text,
         parse_mode: parseMode,
         disable_web_page_preview: false,
+        ...(replyToMessageId ? { reply_parameters: { message_id: replyToMessageId, allow_sending_without_reply: true } } : {}),
       }),
     }, 8_000);
 
@@ -45,6 +47,22 @@ export async function sendTelegramMessage(
   } catch (err) {
     console.error("Telegram xabari yuborilmadi:", err);
     return { success: false, error: String(err) };
+  }
+}
+
+/** Best-effort emoji reaction on a message (delivery receipt for admins); never throws. */
+export async function setTelegramReaction(chatId: string | number, messageId: number, emoji = "👍") {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  if (!token) return { success: false };
+  try {
+    const res = await fetchWithTimeout("Telegram", `https://api.telegram.org/bot${token}/setMessageReaction`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: chatId, message_id: messageId, reaction: [{ type: "emoji", emoji }] }),
+    }, 5_000);
+    return { success: res.ok };
+  } catch {
+    return { success: false };
   }
 }
 

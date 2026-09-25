@@ -1,5 +1,7 @@
+import { z } from "zod";
 import type { NextRequest } from "next/server";
 import { fail, ok } from "@/lib/api/v1/respond";
+import { v1Public } from "@/lib/api/v1/with-v1";
 import { passesCsrfCheck } from "@/lib/security/headers";
 import { checkRateLimit, createRateLimitResponse } from "@/lib/security/rateLimit";
 import { analyticsBatchSchema } from "@/features/analytics/contracts";
@@ -18,7 +20,11 @@ registerV1Route({
   tags: ["analytics"],
   summary: "Birinchi tomon analitika hodisalari (batch, anonim tashrifchi cookie)",
   request: { body: { content: { "application/json": { schema: analyticsBatchSchema } } } },
-  responses: { 200: { description: "Qabul qilindi" }, 403: { description: "CSRF" }, 429: { description: "Juda ko'p so'rov" } },
+  responses: {
+    202: { description: "Qabul qilindi", content: { "application/json": { schema: z.object({ accepted: z.number().int().nonnegative() }) } } },
+    403: { description: "CSRF" },
+    429: { description: "Juda ko'p so'rov" },
+  },
 });
 
 const MAX_BODY_BYTES = 16 * 1024;
@@ -31,64 +37,66 @@ function validCountry(value: string | null): string | null {
 }
 
 export async function POST(request: NextRequest) {
-  if (!passesCsrfCheck(request)) return fail(new Response(null, { status: 403 }));
+  return v1Public(request, async () => {
+    if (!passesCsrfCheck(request)) return fail(new Response(null, { status: 403 }));
 
-  const contentLength = Number(request.headers.get("content-length") ?? 0);
-  if (contentLength > MAX_BODY_BYTES) return fail(new Response(null, { status: 400 }));
+    const contentLength = Number(request.headers.get("content-length") ?? 0);
+    if (contentLength > MAX_BODY_BYTES) return fail(new Response(null, { status: 400 }));
 
-  let rawBody: string;
-  try {
-    rawBody = await request.text();
-  } catch {
-    return fail(new Response(null, { status: 400 }));
-  }
-  if (new TextEncoder().encode(rawBody).byteLength > MAX_BODY_BYTES) {
-    return fail(new Response(null, { status: 400 }));
-  }
-
-  let body: unknown;
-  try {
-    body = JSON.parse(rawBody);
-  } catch {
-    return fail(new Response(null, { status: 400 }));
-  }
-  const parsed = analyticsBatchSchema.safeParse(body);
-  if (!parsed.success) return fail(parsed.error);
-
-  const cookieToken = request.cookies.get(VISITOR_COOKIE)?.value;
-  const headerToken = request.headers.get("x-visitor-token")?.trim();
-  const suppliedToken = headerToken || cookieToken;
-  const visitorToken = suppliedToken && suppliedToken.length >= 16
-    ? suppliedToken
-    : createVisitorToken();
-
-  const limit = await checkRateLimit(hashVisitorToken(visitorToken), RATE_LIMIT);
-  if (!limit.success) return fail(createRateLimitResponse(limit));
-
-  const bot = isAnalyticsBot(request.headers.get("user-agent"));
-  let accepted = 0;
-  if (!bot) {
+    let rawBody: string;
     try {
-      accepted = await ingestAnalyticsBatch(parsed.data.events, {
-        visitorToken,
-        country: validCountry(request.headers.get("x-vercel-ip-country")),
-      }, { repository: analyticsEventRepository });
-    } catch (error) {
-      console.warn("[analytics] event batch dropped because storage is unavailable", {
-        cause: error instanceof Error ? error.name : "unknown",
+      rawBody = await request.text();
+    } catch {
+      return fail(new Response(null, { status: 400 }));
+    }
+    if (new TextEncoder().encode(rawBody).byteLength > MAX_BODY_BYTES) {
+      return fail(new Response(null, { status: 400 }));
+    }
+
+    let body: unknown;
+    try {
+      body = JSON.parse(rawBody);
+    } catch {
+      return fail(new Response(null, { status: 400 }));
+    }
+    const parsed = analyticsBatchSchema.safeParse(body);
+    if (!parsed.success) return fail(parsed.error);
+
+    const cookieToken = request.cookies.get(VISITOR_COOKIE)?.value;
+    const headerToken = request.headers.get("x-visitor-token")?.trim();
+    const suppliedToken = headerToken || cookieToken;
+    const visitorToken = suppliedToken && suppliedToken.length >= 16
+      ? suppliedToken
+      : createVisitorToken();
+
+    const limit = await checkRateLimit(hashVisitorToken(visitorToken), RATE_LIMIT);
+    if (!limit.success) return fail(createRateLimitResponse(limit));
+
+    const bot = isAnalyticsBot(request.headers.get("user-agent"));
+    let accepted = 0;
+    if (!bot) {
+      try {
+        accepted = await ingestAnalyticsBatch(parsed.data.events, {
+          visitorToken,
+          country: validCountry(request.headers.get("x-vercel-ip-country")),
+        }, { repository: analyticsEventRepository });
+      } catch (error) {
+        console.warn("[analytics] event batch dropped because storage is unavailable", {
+          cause: error instanceof Error ? error.name : "unknown",
+        });
+      }
+    }
+
+    const response = ok({ accepted }, undefined, { status: 202 });
+    if (!suppliedToken) {
+      response.cookies.set(VISITOR_COOKIE, visitorToken, {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: true,
+        path: "/",
+        maxAge: VISITOR_COOKIE_MAX_AGE,
       });
     }
-  }
-
-  const response = ok({ accepted }, undefined, { status: 202 });
-  if (!suppliedToken) {
-    response.cookies.set(VISITOR_COOKIE, visitorToken, {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: true,
-      path: "/",
-      maxAge: VISITOR_COOKIE_MAX_AGE,
-    });
-  }
-  return response;
+    return response;
+  });
 }

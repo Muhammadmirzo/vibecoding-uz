@@ -50,7 +50,7 @@ export function VideoPlayer({
 
   if (type === "empty") {
     return (
-      <div className={`relative aspect-video rounded-xl bg-ink text-bg flex flex-col items-center justify-center p-6 border border-border shadow-lg ${className}`}>
+      <div className={`relative aspect-video rounded-xl bg-terminal text-terminal-ink flex flex-col items-center justify-center p-6 border border-border shadow-lg ${className}`}>
         <Video className="w-12 h-12 text-ink-muted mb-3" />
         <p className="text-sm font-medium text-ink-muted">Dars videosi mavjud emas yoki havola berilmadi</p>
       </div>

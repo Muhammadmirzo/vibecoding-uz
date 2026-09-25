@@ -32,16 +32,18 @@ html[data-motion="full"][data-motion-hero="on"] .w6c-load {
 }
 @keyframes w6c-load { from { transform: translateY(10px); } to { transform: none; } }
 
-/* Girih section transition (same polygon vocabulary as home). */
+/* Clean section-transition edge: a soft 1px gradient line, not the earlier
+   zigzag "skyline" clip-path (read as a rendering glitch). Static — no
+   layout shift, no per-frame paint. */
 .w6c-wipe { position: relative; }
 .w6c-wipe::before {
   content: ""; position: absolute; z-index: 0; top: 0; right: 0; left: 0;
-  height: 72px; pointer-events: none; background: var(--accent-soft);
-  clip-path: polygon(0 0,100% 0,100% 28%,94% 42%,94% 76%,82% 76%,82% 100%,62% 100%,62% 66%,38% 66%,38% 100%,18% 100%,18% 76%,6% 76%,6% 42%,0 28%);
+  height: 1px; pointer-events: none;
+  background: linear-gradient(90deg, transparent, var(--border-strong) 20%, var(--border-strong) 80%, transparent);
 }
 
 /* Scroll-progress gradient text fill (same contract as W6A home). */
-.scroll-fill-text { display: inline-grid; color: var(--ink-subtle); }
+.scroll-fill-text { display: inline-grid; color: var(--ink); }
 .scroll-fill-text > span { grid-area: 1 / 1; min-width: 0; }
 .scroll-fill-base { color: transparent; background: linear-gradient(105deg, var(--brand) 0%, var(--brand-hover) 38%, var(--accent) 88%, var(--gold) 100%); background-clip: text; -webkit-background-clip: text; clip-path: inset(0 100% 0 0); }
 
@@ -52,8 +54,8 @@ html[data-motion="full"][data-motion-hero="on"] .w6c-load {
 .w6c-path-progress { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 2px; background: linear-gradient(to bottom, var(--brand), var(--accent), var(--gold)); transform: scaleY(1); transform-origin: 50% 0; }
 .w6c-step { position: relative; padding-left: 3rem; }
 .w6c-step-dot { position: absolute; top: 4px; left: 4px; width: 1rem; height: 1rem; border: 2px solid var(--border-strong); border-radius: 50%; background: var(--bg); transition: border-color var(--motion-fast), background-color var(--motion-fast); }
-.w6c-step-card { border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--bg-elevated); padding: 1.25rem; box-shadow: var(--shadow-sm); transition: transform var(--motion-base) var(--motion-ease-out), box-shadow var(--motion-base) var(--motion-ease-out), border-color var(--motion-base) var(--motion-ease-out); }
-.w6c-step-card:hover { transform: translateY(-3px); border-color: var(--border-strong); box-shadow: var(--shadow-md); }
+.w6c-step-card { border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--bg-elevated); padding: 1.25rem; box-shadow: var(--shadow-sm); transition: transform var(--motion-fast) var(--motion-ease-out), box-shadow var(--motion-fast) var(--motion-ease-out), border-color var(--motion-fast) var(--motion-ease-out); }
+.w6c-step-card:hover { transform: translateY(-2px); border-color: var(--border-strong); box-shadow: var(--shadow-md); }
 
 /* Sticky table of contents (calm: hover only, never animated text). */
 .w6c-toc { position: sticky; top: 6rem; }
@@ -104,17 +106,19 @@ html[data-motion="full"][data-motion-page="on"] .w6c-cover { view-transition-nam
 
 @supports (animation-timeline: view()) {
   html[data-motion-scroll="on"] .scroll-fill-base { animation: scroll-fill linear both; animation-timeline: view(); animation-range: entry 20% cover 45%; }
-  html[data-motion-scroll="on"] .w6c-wipe::before { animation: w6c-wipe var(--motion-slow) var(--motion-ease-out) both; animation-timeline: view(); animation-range: entry 0% cover 18%; }
   html[data-motion-scroll="on"] .w6c-path-progress { transform: scaleY(0); animation: w6c-path-draw linear both; animation-timeline: --w6c-path; animation-range: cover 0% cover 100%; }
   html[data-motion-scroll="on"] .w6c-step { view-timeline-name: --w6c-step; view-timeline-axis: block; }
   html[data-motion-scroll="on"] .w6c-step-dot { animation: w6c-dot linear both; animation-timeline: --w6c-step; animation-range: entry 0% cover 30%; }
-  html[data-motion-scroll="on"] .w6c-step-card { animation: w6c-step-lit linear both; animation-timeline: --w6c-step; animation-range: entry 0% cover 30%; }
+  html[data-motion-scroll="on"] .w6c-step-card::after { animation: w6c-step-lit linear both; animation-timeline: --w6c-step; animation-range: entry 0% cover 30%; }
 }
 @keyframes scroll-fill { to { clip-path: inset(0 0 0 0); } }
-@keyframes w6c-wipe { from { clip-path: polygon(0 0,100% 0,100% 0,94% 0,94% 0,82% 0,82% 0,62% 0,62% 0,38% 0,38% 0,18% 0,18% 0,6% 0,6% 0,0 0); } to { clip-path: polygon(0 0,100% 0,100% 28%,94% 42%,94% 76%,82% 76%,82% 100%,62% 100%,62% 66%,38% 66%,38% 100%,18% 100%,18% 76%,6% 76%,6% 42%,0 28%); } }
 @keyframes w6c-path-draw { to { transform: scaleY(1); } }
 @keyframes w6c-dot { from { border-color: var(--border-strong); background: var(--bg); } to { border-color: var(--gold); background: var(--gold-soft); } }
-@keyframes w6c-step-lit { from { border-color: var(--border); } to { border-color: var(--border-strong); } }
+/* Highlight on a pseudo-element: only its opacity animates, the card's own
+   border never repaints mid-scroll. */
+.w6c-step-card { position: relative; }
+.w6c-step-card::after { content: ""; position: absolute; inset: -1px; z-index: -1; border: 1px solid var(--border-strong); border-radius: inherit; opacity: 0; pointer-events: none; }
+@keyframes w6c-step-lit { to { opacity: 1; } }
 
 html[data-motion="off"] .w6c-hero-mesh, html[data-motion="off"] .w6c-hero-grain { display: none; }
 

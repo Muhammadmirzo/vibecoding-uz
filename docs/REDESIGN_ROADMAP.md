@@ -1,7 +1,7 @@
 # REDESIGN_ROADMAP.md — "AI-made"dan "World-class hand-crafted"ga yo'l xaritasi
 
-> Tuzilgan: 2026-09-09. Manba: ZAHAR-RESEARCHER (kodbaza audit, fayl:qator isbotlar bilan),
-> ZAHAR-STRATEGY (mahsulot strategiyasi), ZAHAR-ORKESTRATOR (jonli sayt vizual tekshiruvi).
+> Tuzilgan: 2026-09-09. Manba: SARBON-RESEARCHER (kodbaza audit, fayl:qator isbotlar bilan),
+> SARBON-STRATEGY (mahsulot strategiyasi), SARBON-ORKESTRATOR (jonli sayt vizual tekshiruvi).
 > Maqsad: sayt inson qo'li tekkan darajada ko'rinsin — lekin tezlik va user-friendliness pasaymasin.
 
 ---
@@ -69,7 +69,7 @@ Video: poster-frame + lazy embed, klip <5MB. Rasm: next/image + width/height (la
 
 ---
 
-## 3. ZAHAR'GA YAXSHIROQ SO'ROV BERISH PATTERNLARI (foydalanuvchi uchun)
+## 3. SARBON'GA YAXSHIROQ SO'ROV BERISH PATTERNLARI (foydalanuvchi uchun)
 
 1. Persona + cheklov + o'lchanadigan kriteriya: "Bu hero copy'ni qayta yoz. Persona: 25-40 yosh tadbirkor, Telegram'dan keldi. 3 variant, har biri 8 so'zdan oshmasin. Kriteriya: 5 soniyada 'bu menga' degan xulosa."
 2. Referens + "nega" tahlili: "vibecoding.uz hero'sini tahlil qil: nima yaxshi, nima AI-made ko'rinadi, biz qanday farqlanamiz — keyin biznikini yoz."

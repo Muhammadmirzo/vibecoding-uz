@@ -102,7 +102,7 @@ export function ChatLauncher() {
           <path d="M20 15a4 4 0 0 1-4 4H8l-5 3 1.5-4.5A7 7 0 0 1 3 13V8a4 4 0 0 1 4-4h9a4 4 0 0 1 4 4Z" />
           <path d="M8 10h.01M12 10h.01M16 10h.01" strokeLinecap="round" />
         </svg>
-        {unread > 0 ? <span className="absolute -right-1 -top-1 grid min-h-5 min-w-5 place-items-center rounded-full bg-gold px-1 text-xs font-bold text-ink">{unread > 9 ? "9+" : unread}</span> : null}
+        {unread > 0 ? <span className="absolute -right-1 -top-1 grid min-h-5 min-w-5 place-items-center rounded-full bg-gold px-1 text-xs font-bold text-on-gold">{unread > 9 ? "9+" : unread}</span> : null}
       </button>
       {open ? (
         <React.Suspense fallback={<div className="sr-only" role="status">Chat yuklanmoqda…</div>}>

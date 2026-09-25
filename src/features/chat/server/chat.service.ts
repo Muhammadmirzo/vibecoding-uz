@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, gt, gte, ne, notLike, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gt, gte, inArray, ne, notLike, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { auditLogs, chatConversations, chatMessages, leads } from "@/db/schema";
 import { ServiceError } from "@/lib/http/errors";
@@ -13,6 +13,9 @@ import { getChatSettings } from "./settings.service";
 import { hashVisitorToken } from "./visitor-token";
 
 type ConversationRow = typeof chatConversations.$inferSelect;
+type MessageRow = typeof chatMessages.$inferSelect;
+
+const CURSOR_OVERLAP_MS = 15_000;
 
 async function audit(input: {
   actorId?: string | null;
@@ -29,6 +32,17 @@ async function audit(input: {
     details: input.details ?? {},
     ipAddress: input.ip || null,
   });
+}
+
+/** Map rows to DTOs with the quoted parent of every reply (one extra query, only for parents outside the page). */
+async function messageDtos(rows: MessageRow[]): Promise<ChatMessageDto[]> {
+  const byId = new Map(rows.map((row) => [row.id, row]));
+  const missing = [...new Set(rows.map((row) => row.replyToId).filter((id): id is string => Boolean(id) && !byId.has(id!)))];
+  if (missing.length) {
+    const parents = await db.select().from(chatMessages).where(inArray(chatMessages.id, missing));
+    parents.forEach((parent) => byId.set(parent.id, parent));
+  }
+  return rows.map((row) => messageDto(row, row.replyToId ? byId.get(row.replyToId) ?? null : null));
 }
 
 async function requireConversation(id: string): Promise<ConversationRow> {
@@ -55,9 +69,11 @@ export async function listMessages(token: string, after?: string): Promise<ChatM
   const rows = await db.select().from(chatMessages).where(and(
     eq(chatMessages.conversationId, conversation.id),
     notLike(chatMessages.clientId, "draft:%"),
-    after ? gt(chatMessages.createdAt, new Date(after)) : undefined,
+    // Overlap the cursor: a row committed late (concurrent visitor/admin/AI writes) can carry
+    // an older created_at than the last one the client saw. The client dedupes by id.
+    after ? gt(chatMessages.createdAt, new Date(new Date(after).getTime() - CURSOR_OVERLAP_MS)) : undefined,
   )).orderBy(asc(chatMessages.createdAt));
-  return rows.map(messageDto);
+  return messageDtos(rows);
 }
 
 export async function sendVisitorMessage(
@@ -69,16 +85,10 @@ export async function sendVisitorMessage(
   let conversation = (await db.select().from(chatConversations)
     .where(eq(chatConversations.visitorTokenHash, tokenHash)).limit(1))[0];
 
-  if (conversation) {
-    const duplicate = (await db.select().from(chatMessages).where(and(
-      eq(chatMessages.conversationId, conversation.id),
-      eq(chatMessages.clientId, input.clientId),
-    )).limit(1))[0];
-    if (duplicate) return messageDto(duplicate);
-  }
-
   if (!conversation) {
     const settings = await getChatSettings();
+    // Two tabs/requests may create the same visitor's conversation at once: the unique
+    // token index keeps one row and the loser re-reads it instead of failing with 500.
     [conversation] = await db.insert(chatConversations).values({
       visitorTokenHash: tokenHash,
       userId,
@@ -88,7 +98,9 @@ export async function sendVisitorMessage(
       sourcePath: input.sourcePath,
       device: input.device,
       aiMode: settings.aiDefaultMode,
-    }).returning();
+    }).onConflictDoNothing({ target: chatConversations.visitorTokenHash }).returning();
+    conversation ??= (await db.select().from(chatConversations)
+      .where(eq(chatConversations.visitorTokenHash, tokenHash)).limit(1))[0];
   }
 
   const [message] = await db.transaction(async (tx) => {
@@ -97,7 +109,8 @@ export async function sendVisitorMessage(
       clientId: input.clientId,
       sender: "visitor",
       body: input.body,
-    }).returning();
+    }).onConflictDoNothing({ target: [chatMessages.conversationId, chatMessages.clientId] }).returning();
+    if (!inserted.length) return [];
     await tx.update(chatConversations).set({
       displayName: input.name || conversation.displayName,
       contactPhone: input.phone || conversation.contactPhone,
@@ -110,6 +123,13 @@ export async function sendVisitorMessage(
     }).where(eq(chatConversations.id, conversation.id));
     return inserted;
   });
+  if (!message) {
+    // Same clientId raced in from a retry: return the stored message (idempotent send).
+    const [stored] = await db.select().from(chatMessages).where(and(
+      eq(chatMessages.conversationId, conversation.id), eq(chatMessages.clientId, input.clientId),
+    )).limit(1);
+    return messageDto(stored);
+  }
 
   if ((input.phone || input.telegram) && !conversation.leadId) {
     const [lead] = await db.insert(leads).values({
@@ -167,7 +187,7 @@ export async function getThread(id: string) {
   const conversation = conversationDto(await requireConversation(id));
   const rows = await db.select().from(chatMessages)
     .where(eq(chatMessages.conversationId, id)).orderBy(asc(chatMessages.createdAt));
-  return { conversation, messages: rows.map(messageDto) };
+  return { conversation, messages: await messageDtos(rows) };
 }
 
 export async function postReply(
@@ -176,17 +196,17 @@ export async function postReply(
   body: string,
   clientId = crypto.randomUUID(),
   ip?: string,
+  replyToId: string | null = null,
   sender: "admin" | "ai" = "admin",
 ): Promise<ChatMessageDto> {
   await requireConversation(conversationId);
-  const existing = (await db.select().from(chatMessages).where(and(
-    eq(chatMessages.conversationId, conversationId), eq(chatMessages.clientId, clientId),
-  )).limit(1))[0];
-  if (existing) return messageDto(existing);
+  // clientId is the idempotency key: a retried request (Telegram re-delivers a webhook
+  // that failed) returns the stored reply instead of inserting a duplicate or failing.
   const [message] = await db.transaction(async (tx) => {
     const inserted = await tx.insert(chatMessages).values({
-      conversationId, clientId, sender, authorUserId: actorId, body: body.trim(),
-    }).returning();
+      conversationId, clientId, sender, authorUserId: actorId, body: body.trim(), replyToId,
+    }).onConflictDoNothing({ target: [chatMessages.conversationId, chatMessages.clientId] }).returning();
+    if (!inserted.length) return [];
     await tx.update(chatConversations).set({
       status: "open",
       unreadForVisitor: sql`${chatConversations.unreadForVisitor} + 1`,
@@ -198,7 +218,10 @@ export async function postReply(
     });
     return inserted;
   });
-  return messageDto(message);
+  const row = message ?? (await db.select().from(chatMessages).where(and(
+    eq(chatMessages.conversationId, conversationId), eq(chatMessages.clientId, clientId),
+  )).limit(1))[0];
+  return (await messageDtos([row]))[0];
 }
 
 export async function updateConversation(actorId: string, input: ConversationPatchInput, ip?: string) {

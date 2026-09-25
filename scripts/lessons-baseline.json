@@ -1,0 +1,4 @@
+{
+  "L13": ["src/app/kabinet/kurs/[id]/dars/[lessonId]/page.tsx", "src/app/shahodatnoma/[code]/page.tsx"],
+  "L19": ["src/features/chat/server/chat.service.ts"]
+}

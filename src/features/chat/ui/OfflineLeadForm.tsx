@@ -62,7 +62,7 @@ export function OfflineLeadForm({
         <input value={contact} onChange={(event) => setContact(event.target.value)} inputMode={contactType === "phone" ? "tel" : "text"} autoComplete={contactType === "phone" ? "tel" : "username"} placeholder={contactType === "phone" ? "+998 __ ___ __ __" : "@username"} className="min-h-11 min-w-0 flex-1 rounded-lg border border-border bg-bg px-3 text-base outline-none focus:border-brand focus:ring-2 focus:ring-brand-soft" />
       </div>
       {error ? <p role="alert" className="text-sm text-danger">{error}</p> : null}
-      <button disabled={sending} className="btn-press flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-gold px-4 font-semibold text-ink disabled:opacity-60">
+      <button disabled={sending} className="btn-press flex min-h-11 w-full items-center justify-center gap-2 rounded-full bg-gold px-4 font-semibold text-on-gold disabled:opacity-60">
         <Send className="size-4" aria-hidden="true" />{sending ? "Yuborilmoqda…" : "Xabar qoldirish"}
       </button>
     </form>
