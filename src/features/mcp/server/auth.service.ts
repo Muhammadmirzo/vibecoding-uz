@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { and, desc, eq, gt, isNull, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { mcpAccessTokens, mcpClients, mcpPersonalAccessTokens, users } from "@/db/schema";
-import type { McpScope, McpSender } from "../contracts";
+import { ALL_MCP_SCOPES, type McpScope, type McpSender } from "../contracts";
 
 export interface McpPrincipal {
   userId: string; role: string; scopes: McpScope[]; clientId: string | null;
@@ -16,7 +16,7 @@ function parseBearer(value: string | null): string | null {
 }
 
 function scopeList(value: string[]): McpScope[] {
-  const allowed = new Set(["analytics:read", "students:read", "students:read:pii", "sales:read", "chat:read", "chat:write", "content:write"]);
+  const allowed = new Set<string>(ALL_MCP_SCOPES);
   return value.filter((scope): scope is McpScope => allowed.has(scope));
 }
 

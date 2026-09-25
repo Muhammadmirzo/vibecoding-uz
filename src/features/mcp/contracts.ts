@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const MCP_SCOPES = [
-  "analytics:read", "students:read", "sales:read", "chat:read", "chat:write", "content:write",
+  "analytics:read", "students:read", "sales:read", "chat:read", "chat:write", "content:write", "leads:write",
 ] as const;
 export const MCP_PII_SCOPE = "students:read:pii" as const;
 export const ALL_MCP_SCOPES = [...MCP_SCOPES, MCP_PII_SCOPE] as const;
@@ -32,18 +32,31 @@ export const createPatSchema = z.object({
 });
 export type CreatePatInput = z.infer<typeof createPatSchema>;
 
+const BLOCKED_SCHEMES = new Set(["javascript:", "data:", "vbscript:", "file:", "blob:", "about:", "filesystem:"]);
+const LOOPBACK_HOSTS = new Set(["localhost", "127.0.0.1", "[::1]"]);
+/** OAuth 2.1 redirect URI rule: https, loopback http or a native-app scheme; never script-capable schemes, fragments or credentials. */
+export function isSafeRedirectUri(value: string): boolean {
+  let url: URL;
+  try { url = new URL(value); } catch { return false; }
+  if (url.hash || url.username || url.password || BLOCKED_SCHEMES.has(url.protocol)) return false;
+  if (url.protocol === "http:") return LOOPBACK_HOSTS.has(url.hostname);
+  return true; // https or a native-app scheme (RFC 8252), e.g. cursor://
+}
+export const redirectUriSchema = z.string().max(2048).refine(isSafeRedirectUri, { message: "Redirect URI xavfsiz emas" });
+
 export const registerClientSchema = z.object({
   client_name: z.string().trim().min(2).max(100),
-  redirect_uris: z.array(z.string().url().max(2048)).min(1).max(10),
+  redirect_uris: z.array(redirectUriSchema).min(1).max(10),
   client_uri: z.string().url().max(2048).optional(),
   scope: z.string().max(1000).optional(),
   token_endpoint_auth_method: z.literal("none").default("none"),
 });
 export const authorizeQuerySchema = z.object({
   response_type: z.literal("code"), client_id: z.string().min(3).max(200),
-  redirect_uri: z.string().url().max(2048), code_challenge: z.string().min(43).max(128),
+  redirect_uri: redirectUriSchema, code_challenge: z.string().min(43).max(128),
   code_challenge_method: z.literal("S256"), state: z.string().min(8).max(512),
-  scope: z.string().max(1000), resource: z.string().url().max(2048),
+  // Clients may omit scope: default to read-only scopes (the admin still sees them on the consent page).
+  scope: z.string().max(1000).default("analytics:read students:read sales:read chat:read"), resource: z.string().url().max(2048),
 });
 export const consentSchema = authorizeQuerySchema.extend({ decision: z.literal("allow") });
 export const tokenRequestSchema = z.object({

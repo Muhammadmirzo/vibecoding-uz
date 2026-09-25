@@ -35,6 +35,9 @@ import "@/app/api/v1/admin/chat/read/route";
 import "@/app/api/v1/admin/chat/messages/route";
 import "@/app/api/v1/admin/chat/conversations/route";
 import "@/app/api/v1/admin/chat/drafts/route";
+import "@/app/api/v1/mcp/pats/route";
+import "@/app/api/v1/mcp/pats/[id]/route";
+import "@/app/api/v1/mcp/clients/route";
 import "@/app/api/v1/docs/route";
 
 registerV1Route({

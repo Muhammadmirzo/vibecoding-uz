@@ -5,6 +5,8 @@ import { ServiceError } from "@/lib/http/errors";
 import { ALL_MCP_SCOPES, mcpScopeSchema, type CreatePatInput, type McpScope, type McpSender, type TokenRequest } from "../contracts";
 import { ACCESS_TTL_MS, AUTH_CODE_TTL_MS, REFRESH_TTL_MS, pkceS256, randomOpaqueToken, safeDigestEqual, safeHashEqual, tokenHash } from "./tokens";
 
+const REFRESH_REUSE_GRACE_MS = 30_000;
+
 function scopes(value: string | undefined): McpScope[] {
   const valid = new Set<string>(ALL_MCP_SCOPES);
   return [...new Set((value ?? "").split(/\s+/).filter((item) => valid.has(item) && mcpScopeSchema.safeParse(item).success))].map((item) => mcpScopeSchema.parse(item));
@@ -54,15 +56,23 @@ export async function exchangeToken(input: TokenRequest, expectedResource: strin
   }
   if (!input.refresh_token) throw new ServiceError("invalid_grant", "Refresh token talab qilinadi", 400);
   const refreshToken = input.refresh_token;
+  const [presented] = await db.select().from(mcpRefreshTokens).where(eq(mcpRefreshTokens.tokenHash, tokenHash(refreshToken))).limit(1);
+  // Reuse of an already rotated token means it leaked: kill the whole family. This runs outside the
+  // rotation transaction on purpose, a throw inside it would roll the revocation back.
+  // A 30 s grace (L11) keeps a client's own parallel refresh from logging it out.
+  if (presented?.rotatedAt && Date.now() - presented.rotatedAt.getTime() < REFRESH_REUSE_GRACE_MS) throw new ServiceError("invalid_grant", "Refresh token allaqachon aylantirilgan", 400);
+  if (presented?.rotatedAt) {
+    await db.update(mcpRefreshTokens).set({ revokedAt: new Date() }).where(and(eq(mcpRefreshTokens.familyId, presented.familyId), isNull(mcpRefreshTokens.revokedAt)));
+    throw new ServiceError("invalid_grant", "Token oilasi bekor qilindi", 400);
+  }
+  if (!presented || presented.expiresAt <= new Date() || presented.revokedAt) throw new ServiceError("invalid_grant", "Refresh token yaroqsiz", 400);
   return db.transaction(async (tx) => {
-    const [old] = await tx.select().from(mcpRefreshTokens).where(eq(mcpRefreshTokens.tokenHash, tokenHash(refreshToken))).limit(1);
-    if (!old || old.expiresAt <= new Date() || old.revokedAt) throw new ServiceError("invalid_grant", "Refresh token yaroqsiz", 400);
-    if (old.rotatedAt) { await tx.update(mcpRefreshTokens).set({ revokedAt: new Date() }).where(eq(mcpRefreshTokens.familyId, old.familyId)); throw new ServiceError("invalid_grant", "Token oilasi bekor qilindi", 400); }
-    const [client] = await tx.select().from(mcpClients).where(eq(mcpClients.clientId, old.clientId)).limit(1);
-    const [rotated] = await tx.update(mcpRefreshTokens).set({ rotatedAt: new Date(), revokedAt: new Date() }).where(and(eq(mcpRefreshTokens.id, old.id), isNull(mcpRefreshTokens.rotatedAt))).returning({ id: mcpRefreshTokens.id });
-    if (!rotated) throw new ServiceError("invalid_grant", "Refresh token allaqach aylantirilgan", 400);
-    const [access] = await tx.select().from(mcpClients).where(eq(mcpClients.clientId, old.clientId)).limit(1);
-    if (!client || !access) throw new ServiceError("invalid_client", "MCP mijoz topilmadi", 400);
+    // Atomic claim: of two parallel refreshes with the same token only one wins.
+    const [old] = await tx.update(mcpRefreshTokens).set({ rotatedAt: new Date(), revokedAt: new Date() })
+      .where(and(eq(mcpRefreshTokens.id, presented.id), isNull(mcpRefreshTokens.rotatedAt), isNull(mcpRefreshTokens.revokedAt))).returning();
+    if (!old) throw new ServiceError("invalid_grant", "Refresh token allaqachon aylantirilgan", 400);
+    const [client] = await tx.select().from(mcpClients).where(and(eq(mcpClients.clientId, old.clientId), isNull(mcpClients.revokedAt))).limit(1);
+    if (!client) throw new ServiceError("invalid_client", "MCP mijoz topilmadi", 400);
     const freshAccess = randomOpaqueToken("at"); const freshRefresh = randomOpaqueToken("rt");
     await tx.insert(mcpAccessTokens).values({ tokenHash: tokenHash(freshAccess), userId: old.userId, clientId: old.clientId, sender: client.defaultSender === "ai" ? "ai" : "admin", resource: expectedResource, scopes: old.scopes, expiresAt: new Date(Date.now() + ACCESS_TTL_MS) });
     await tx.insert(mcpRefreshTokens).values({ familyId: old.familyId, tokenHash: tokenHash(freshRefresh), userId: old.userId, clientId: old.clientId, scopes: old.scopes, expiresAt: new Date(Date.now() + REFRESH_TTL_MS) });
