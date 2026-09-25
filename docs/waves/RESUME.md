@@ -25,9 +25,10 @@ Then read `docs/waves/STATE.md` → "Phase 2" → the newest `### ▶ HANDOFF` s
 - New raw SQL → run it once on the live DB (`verify-sql-live`). UI → screenshots at 390/768/1280/1440 plus a video.
 
 ## 4. Release after every big wave (owner rule): an AGENT does it, not the orchestrator
-1. Write `.orchestra/wave-notes.md` (3-5 lines: what shipped, what's next, risks).
-2. `skillkit dispatch release-<wave> space-bunny-free scripts/waves/release-prompt.md .`
-3. Read only its `RELEASE:` / `LESSON:` lines, then verify with `gh run list --limit 2` and the live URL (200).
+`skillkit release <wave> --notes "shipped | next | risks | owner decisions"`. Settings live in `.skillkit.json`. The agent runs the gates,
+writes the handoff and pushes. Code then verifies the push, CI and the live URL, and tags `wave/<date>-<name>`. Rollback: `skillkit wave rollback <tag>`.
+If the free agent stalls for more than ~10 min, stop it by PID and hand the same job to a Claude subagent (Haiku for mechanical work).
+Skill: `wave-handoff`.
 
 ## 5. Next work, in order
 1. **Awwwards slice 1:** prototype route `/lab/naqsh` (noindex, not linked). The loom star (logo girih) draws itself on scroll.

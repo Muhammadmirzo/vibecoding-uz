@@ -1,0 +1,10 @@
+{
+  "handoff": "docs/waves/STATE.md",
+  "resume": "docs/waves/RESUME.md",
+  "branch": "main",
+  "push": ["origin main", "origin main:master"],
+  "live_url": "https://master-2-jade.vercel.app/",
+  "gates": ["npm run lessons:check", "npm run build", "npx vitest run"],
+  "lock": "scripts/waves/locked.sh",
+  "release_model": "space-bunny-free"
+}

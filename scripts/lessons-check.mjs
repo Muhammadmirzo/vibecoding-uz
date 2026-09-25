@@ -43,7 +43,7 @@ for (const f of files) {
   }
   // L15: never commit env files
   if (/(^|\/)\.env(\.|$)/.test(f) && !f.endsWith(".env.example")) hit("L15", f, "env file must not be committed");
-  // L3 (ZAHAR ledger): no machine-specific links in docs
+  // L3 (SARBON ledger): no machine-specific links in docs
   if (f.endsWith(".md")) grepLines(f, /\]\(file:\/\/\/home/, "DOC", "absolute local file link");
 }
 
