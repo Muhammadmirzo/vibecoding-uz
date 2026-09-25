@@ -24,7 +24,9 @@ export function conversationDto(row: ConversationRow): ChatConversationDto {
   });
 }
 
-export function messageDto(row: MessageRow): ChatMessageDto {
+const QUOTE_LENGTH = 160;
+
+export function messageDto(row: MessageRow, replyTo: MessageRow | null = null): ChatMessageDto {
   return chatMessageSchema.parse({
     id: row.id,
     conversationId: row.conversationId,
@@ -34,5 +36,10 @@ export function messageDto(row: MessageRow): ChatMessageDto {
     createdAt: row.createdAt.toISOString(),
     readAt: row.readAt?.toISOString() ?? null,
     isDraft: row.clientId.startsWith("draft:"),
+    replyTo: replyTo ? {
+      id: replyTo.id,
+      sender: replyTo.sender,
+      body: replyTo.body.length > QUOTE_LENGTH ? `${replyTo.body.slice(0, QUOTE_LENGTH - 1)}…` : replyTo.body,
+    } : null,
   });
 }

@@ -62,6 +62,8 @@ export const chatMessageSchema = z.object({
   createdAt: z.string().datetime(),
   readAt: z.string().datetime().nullable(),
   isDraft: z.boolean(),
+  // Short quote of the message this one answers; null for ordinary messages.
+  replyTo: z.object({ id: z.string().uuid(), sender: chatSenderSchema, body: z.string() }).nullable().default(null),
 });
 export const chatConversationSchema = z.object({
   id: z.string().uuid(),

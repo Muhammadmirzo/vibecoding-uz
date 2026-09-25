@@ -333,6 +333,8 @@ html[data-motion="subtle"] .chat-message { animation: chat-message-in var(--moti
 @keyframes chat-open { from { opacity: 0; transform: translateY(16px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
 @keyframes chat-message-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes chat-typing { 0%, 60%, 100% { opacity: 0.35; transform: translateY(0); } 30% { opacity: 1; transform: translateY(-2px); } }
+/* Tapping a reply's quote highlights the original message. */
+.chat-message-flash > div { outline: 2px solid var(--gold); outline-offset: 2px; transition: outline-color var(--motion-base) var(--motion-ease-out); }
 html[data-motion="off"] .chat-dot { animation: none; }
 @media (prefers-reduced-motion: reduce) { .chat-dot { animation: none; } }
 .naqsh-mark-diamond { transform-box: fill-box; transform-origin: center; }

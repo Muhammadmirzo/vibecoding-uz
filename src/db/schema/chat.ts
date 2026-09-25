@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, integer, uuid, boolean, index, uniqueIndex } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, integer, uuid, boolean, index, uniqueIndex, type AnyPgColumn } from "drizzle-orm/pg-core";
 import { users } from "./users";
 import { leads } from "./crm";
 
@@ -31,6 +31,9 @@ export const chatMessages = pgTable("chat_messages", {
   sender: text("sender").notNull(),
   authorUserId: uuid("author_user_id").references(() => users.id, { onDelete: "set null" }),
   body: text("body").notNull(),
+  // The message this one answers (e.g. the visitor message an admin replied to in Telegram),
+  // so a visitor who sent several messages can see which one each answer belongs to.
+  replyToId: uuid("reply_to_id").references((): AnyPgColumn => chatMessages.id, { onDelete: "set null" }),
   telegramMessageId: text("telegram_message_id"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   readAt: timestamp("read_at"),

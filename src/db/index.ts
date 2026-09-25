@@ -13,7 +13,23 @@ const maxConnections = process.env.DATABASE_MAX_CONNECTIONS
   ? parseInt(process.env.DATABASE_MAX_CONNECTIONS, 10) || 10
   : 10;
 
+/**
+ * Supabase's transaction pooler (port 6543, or any PgBouncer URL) hands each query to
+ * whichever backend is free, so named prepared statements created on one backend are
+ * missing on the next. Under concurrent load (several chat messages / Telegram replies
+ * at once) that made some queries fail at random. Unnamed statements work everywhere.
+ */
+export function usesTransactionPooler(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    return parsed.port === "6543" || parsed.searchParams.get("pgbouncer") === "true";
+  } catch {
+    return false;
+  }
+}
+
 const client = postgres(effectiveConnectionString, {
+  prepare: !usesTransactionPooler(effectiveConnectionString),
   max: Math.max(1, Math.min(maxConnections, 100)),
   idle_timeout: 30,
   connect_timeout: 10,

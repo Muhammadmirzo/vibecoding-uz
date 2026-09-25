@@ -7,7 +7,8 @@
 .story-kicker { color: var(--brand); font-family: var(--font-mono); font-size: .68rem; letter-spacing: .14em; text-transform: uppercase; }
 .story-heading h2 { max-width: 58rem; margin: .8rem auto 0; font-size: clamp(1.8rem, 4vw, 3.8rem); font-weight: 700; letter-spacing: -.04em; }
 .story-heading > p:last-child { max-width: 46rem; margin: 1rem auto 0; color: var(--ink-muted); }
-.story-stage { position: relative; min-height: 62vh; }
+/* Stacked (mobile, Safari/Firefox without scroll timelines, reduced motion): clear gaps between steps. */
+.story-stage { position: relative; display: grid; gap: 2rem; margin-top: 3rem; }
 .story-layer { position: relative; }
 .story-idea { border-left: 1px solid var(--border-strong); padding: .5rem 0 .5rem 1.5rem; }
 .story-idea-mark { display: grid; width: 3.5rem; height: 3.5rem; margin-bottom: 2rem; place-items: center; border-radius: 50%; background: var(--gold-soft); color: var(--gold); }
@@ -23,7 +24,9 @@
 .story-app .app-preview { max-width: 760px; }
 .story-app-caption { display: flex; align-items: center; gap: .5rem; margin-bottom: .75rem; color: var(--ink); font-weight: 700; }
 .story-app > p { margin-top: .65rem; color: var(--ink-subtle); }
-.story-rail { position: relative; display: flex; justify-content: space-between; margin: 2rem auto 0; color: var(--ink-subtle); font-family: var(--font-mono); font-size: .62rem; text-transform: uppercase; letter-spacing: .1em; }
+/* Full width always: the parent is a flex column, where `margin: auto` alone would shrink the rail
+   to its content and glue the three labels together ("G'OYAPROMPTILOVA"). */
+.story-rail { position: relative; display: flex; justify-content: space-between; width: 100%; margin: 2rem auto 0; color: var(--ink-subtle); font-family: var(--font-mono); font-size: .62rem; text-transform: uppercase; letter-spacing: .1em; }
 .story-step { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: .45rem; }
 .story-step > span { width: .5rem; height: .5rem; border-radius: 50%; background: currentColor; }
 .story-rail-line { position: absolute; top: .22rem; right: 1rem; left: 1rem; height: 1px; overflow: hidden; background: var(--border); }
@@ -38,7 +41,7 @@
     html[data-motion-scroll="on"] .story-heading { flex: none; }
     html[data-motion-scroll="on"] .story-heading h2 { margin-top: .5rem; font-size: clamp(1.9rem, min(3.3vw, 5.5vh), 3.5rem); }
     html[data-motion-scroll="on"] .story-heading > p:last-child { margin-top: .6rem; }
-    html[data-motion-scroll="on"] .story-stage { flex: 1; width: 100%; min-height: 0; margin-top: 3vh; }
+    html[data-motion-scroll="on"] .story-stage { display: block; flex: 1; width: 100%; min-height: 0; margin-top: 3vh; }
     html[data-motion-scroll="on"] .story-layer { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; transform: translateY(0); }
     html[data-motion-scroll="on"] .story-idea { margin: 0 auto; width: min(100%, 960px); padding: 1rem 0 1rem clamp(1rem, 3vw, 3rem); }
     html[data-motion-scroll="on"] .story-idea-mark { margin-bottom: 1.25rem; }
@@ -93,11 +96,6 @@
 @keyframes story-step-idea { 0%, 100% { color: var(--accent); } }
 @keyframes story-step-prompt-state { 0%, 32% { color: var(--ink-subtle); } 34%, 100% { color: var(--accent); } }
 @keyframes story-step-app-state { 0%, 64% { color: var(--ink-subtle); } 66%, 100% { color: var(--accent); } }
-
-@media (max-width: 1023px) {
-  .story-stage { display: grid; gap: 2rem; margin-top: 3rem; }
-  .story-layer + .story-layer { margin-top: 0; }
-}
 
 @media (prefers-reduced-motion: reduce) {
   .story-track { height: auto !important; }
