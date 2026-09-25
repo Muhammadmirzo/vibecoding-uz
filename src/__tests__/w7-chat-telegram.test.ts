@@ -62,11 +62,14 @@ describe("Telegram chat bridge security", () => {
 });
 
 describe("Telegram outgoing notification", () => {
-  it("suppresses notification when an admin was active in the last two minutes", async () => {
+  it("notifies on every visitor message, even right after an admin reply", async () => {
+    // Regression: follow-up messages were silently dropped for 2 min after an admin reply,
+    // so the admin never saw (and could not Telegram-reply to) the visitor's second message.
     mocks.selectResults.push([{ id: "recent" }]);
+    mocks.sendTelegramMessage.mockResolvedValue({ success: true, data: { ok: true, result: { message_id: 992 } } });
     const result = await notifyVisitorMessage(conversation, message);
-    expect(result.sent).toBe(false);
-    expect(mocks.sendTelegramMessage).not.toHaveBeenCalled();
+    expect(result.sent).toBe(true);
+    expect(mocks.sendTelegramMessage).toHaveBeenCalledTimes(1);
   });
 
   it("stores the returned message id on the visitor message", async () => {

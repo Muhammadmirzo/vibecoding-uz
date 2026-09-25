@@ -30,7 +30,8 @@ export async function GET(request: NextRequest) {
     if (parsed.data.conversationId && parsed.data.conversationId !== conversation?.id) {
       throw new ServiceError("NOT_FOUND", "Suhbat topilmadi", 404);
     }
-    if (conversation) await markConversationRead(token, "visitor");
+    // Only write when something is unread: every open chat polls every few seconds.
+    if (conversation && conversation.unreadForVisitor > 0) await markConversationRead(token, "visitor");
     return ok({ conversation, messages, nextCursor: messages.at(-1)?.createdAt ?? null });
   } catch (error) {
     return fail(error);
@@ -40,12 +41,16 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const ip = getClientIp(request);
-    const [perSecond, hourly] = await Promise.all([
-      checkRateLimit(`chat-second:${ip}`, { limit: 1, windowSeconds: 1, prefix: "chat-second" }),
-      checkRateLimit(`chat-hour:${ip}`, { limit: 60, windowSeconds: 3600, prefix: "chat-hour" }),
+    const token = await visitorIdentity(request);
+    // Burst + hourly limits are per visitor, so many people behind one NAT/mobile IP
+    // can chat at the same time; the IP cap only stops a single abusive source.
+    const [burst, hourly, ipHourly] = await Promise.all([
+      checkRateLimit(`chat-burst:${token}`, { limit: 5, windowSeconds: 10, prefix: "chat-burst" }),
+      checkRateLimit(`chat-hour:${token}`, { limit: 60, windowSeconds: 3600, prefix: "chat-hour" }),
+      checkRateLimit(`chat-ip-hour:${ip}`, { limit: 600, windowSeconds: 3600, prefix: "chat-ip-hour" }),
     ]);
-    if (!perSecond.success) return fail(createRateLimitResponse(perSecond));
-    if (!hourly.success) return fail(createRateLimitResponse(hourly));
+    const limited = [burst, hourly, ipHourly].find((result) => !result.success);
+    if (limited) return fail(createRateLimitResponse(limited));
 
     const parsed = sendMessageSchema.safeParse(await request.json().catch(() => null));
     if (!parsed.success) return fail(new ServiceError("validation_error", "Xabar yoki aloqa ma'lumotlari noto'g'ri", 400));
@@ -53,11 +58,10 @@ export async function POST(request: NextRequest) {
 
     const settings = await getChatSettings();
     if (!settings.enabled) throw new ServiceError("CHAT_DISABLED", "Chat vaqtincha yopilgan", 503);
-    const token = await visitorIdentity(request);
     const existing = await getVisitorConversation(token);
     if (!existing) {
       const newConversation = await checkRateLimit(`chat-new:${ip}`, {
-        limit: 10, windowSeconds: 3600, prefix: "chat-new",
+        limit: 30, windowSeconds: 3600, prefix: "chat-new",
       });
       if (!newConversation.success) return fail(createRateLimitResponse(newConversation));
     }

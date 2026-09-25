@@ -14,6 +14,8 @@ import { hashVisitorToken } from "./visitor-token";
 
 type ConversationRow = typeof chatConversations.$inferSelect;
 
+const CURSOR_OVERLAP_MS = 15_000;
+
 async function audit(input: {
   actorId?: string | null;
   action: string;
@@ -55,7 +57,9 @@ export async function listMessages(token: string, after?: string): Promise<ChatM
   const rows = await db.select().from(chatMessages).where(and(
     eq(chatMessages.conversationId, conversation.id),
     notLike(chatMessages.clientId, "draft:%"),
-    after ? gt(chatMessages.createdAt, new Date(after)) : undefined,
+    // Overlap the cursor: a row committed late (concurrent visitor/admin/AI writes) can carry
+    // an older created_at than the last one the client saw. The client dedupes by id.
+    after ? gt(chatMessages.createdAt, new Date(new Date(after).getTime() - CURSOR_OVERLAP_MS)) : undefined,
   )).orderBy(asc(chatMessages.createdAt));
   return rows.map(messageDto);
 }
@@ -69,16 +73,10 @@ export async function sendVisitorMessage(
   let conversation = (await db.select().from(chatConversations)
     .where(eq(chatConversations.visitorTokenHash, tokenHash)).limit(1))[0];
 
-  if (conversation) {
-    const duplicate = (await db.select().from(chatMessages).where(and(
-      eq(chatMessages.conversationId, conversation.id),
-      eq(chatMessages.clientId, input.clientId),
-    )).limit(1))[0];
-    if (duplicate) return messageDto(duplicate);
-  }
-
   if (!conversation) {
     const settings = await getChatSettings();
+    // Two tabs/requests may create the same visitor's conversation at once: the unique
+    // token index keeps one row and the loser re-reads it instead of failing with 500.
     [conversation] = await db.insert(chatConversations).values({
       visitorTokenHash: tokenHash,
       userId,
@@ -88,7 +86,9 @@ export async function sendVisitorMessage(
       sourcePath: input.sourcePath,
       device: input.device,
       aiMode: settings.aiDefaultMode,
-    }).returning();
+    }).onConflictDoNothing({ target: chatConversations.visitorTokenHash }).returning();
+    conversation ??= (await db.select().from(chatConversations)
+      .where(eq(chatConversations.visitorTokenHash, tokenHash)).limit(1))[0];
   }
 
   const [message] = await db.transaction(async (tx) => {
@@ -97,7 +97,8 @@ export async function sendVisitorMessage(
       clientId: input.clientId,
       sender: "visitor",
       body: input.body,
-    }).returning();
+    }).onConflictDoNothing({ target: [chatMessages.conversationId, chatMessages.clientId] }).returning();
+    if (!inserted.length) return [];
     await tx.update(chatConversations).set({
       displayName: input.name || conversation.displayName,
       contactPhone: input.phone || conversation.contactPhone,
@@ -110,6 +111,13 @@ export async function sendVisitorMessage(
     }).where(eq(chatConversations.id, conversation.id));
     return inserted;
   });
+  if (!message) {
+    // Same clientId raced in from a retry: return the stored message (idempotent send).
+    const [stored] = await db.select().from(chatMessages).where(and(
+      eq(chatMessages.conversationId, conversation.id), eq(chatMessages.clientId, input.clientId),
+    )).limit(1);
+    return messageDto(stored);
+  }
 
   if ((input.phone || input.telegram) && !conversation.leadId) {
     const [lead] = await db.insert(leads).values({

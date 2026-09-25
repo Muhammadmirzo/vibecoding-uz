@@ -7,11 +7,15 @@ const mocks = vi.hoisted(() => {
     updates: [] as Array<{ table: unknown; values: Record<string, unknown> }>,
   };
   const insert = (table: unknown) => ({
-    values: (values: Record<string, unknown>) => ({
-      returning: async () => (state.returningResults.shift() || []) as never,
-      then: (resolve: (value: unknown) => void) => Promise.resolve().then(() => resolve(undefined)),
-      values,
-    }),
+    values: (values: Record<string, unknown>) => {
+      const returning = async () => (state.returningResults.shift() || []) as never;
+      return {
+        returning,
+        onConflictDoNothing: () => ({ returning }),
+        then: (resolve: (value: unknown) => void) => Promise.resolve().then(() => resolve(undefined)),
+        values,
+      };
+    },
   });
   const update = (table: unknown) => ({
     set: (values: Record<string, unknown>) => {
@@ -60,11 +64,20 @@ describe("chat conversation lifecycle", () => {
     expect(mocks.updates.some((update) => update.values.status === "pending" && update.values.unreadForAdmin !== undefined)).toBe(true);
   });
 
-  it("deduplicates a retried clientId without another insert", async () => {
+  it("deduplicates a retried clientId without bumping unread", async () => {
+    // Insert hits the (conversation, clientId) conflict → returns nothing → stored row is re-read.
     mocks.selectResults.push([row], [{ id: messageId, conversationId: id, clientId: input.clientId, sender: "visitor", authorUserId: null, body: input.body, telegramMessageId: null, createdAt: now, readAt: null }]);
+    mocks.returningResults.push([]);
     const result = await sendVisitorMessage("token", input);
     expect(result.id).toBe(messageId);
-    expect(mocks.returningResults).toHaveLength(0);
+    expect(mocks.updates).toHaveLength(0);
+  });
+
+  it("re-reads the conversation when a concurrent request created it first", async () => {
+    mocks.selectResults.push([], [row]);
+    mocks.returningResults.push([], [{ id: messageId, conversationId: id, clientId: input.clientId, sender: "visitor", authorUserId: null, body: input.body, telegramMessageId: null, createdAt: now, readAt: null }]);
+    const result = await sendVisitorMessage("token", input);
+    expect(result.conversationId).toBe(id);
   });
 
   it("admin reply increments visitor unread and writes audit in one transaction", async () => {

@@ -48,7 +48,7 @@ html:not([data-motion="full"]) .hero-orbit, html.is-tab-hidden .hero-orbit { ani
 .app-preview-detailed .app-preview-bar strong { font-size: .8rem; }
 .app-demo-badge { border-radius: 999px; background: var(--success-soft); padding: .3rem .55rem; color: var(--success); font-family: var(--font-mono); font-size: .58rem; font-weight: 700; }
 .app-detail-body { display: grid; grid-template-columns: 1.2fr .8fr; align-items: stretch; min-height: 300px; }
-.app-detail-menu,.app-detail-cart { position: relative; inset: auto !important; display: flex; min-height: 260px; flex-direction: column; gap: .7rem; padding: 1.1rem; }
+.app-detail-menu,.app-detail-cart { position: relative; inset: auto !important; display: flex; align-items: stretch; min-height: 260px; flex-direction: column; gap: .7rem; padding: 1.1rem; }
 .app-detail-menu-head { display: flex; align-items: baseline; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: .65rem; }
 .app-detail-menu-head strong { font-size: .9rem; }.app-detail-menu-head small { color: var(--ink-subtle); font-size: .62rem; }
 .app-menu-item { display: flex; align-items: center; justify-content: space-between; border-radius: var(--radius-sm); background: var(--bg-sunken); padding: .7rem .8rem; font-size: .75rem; }

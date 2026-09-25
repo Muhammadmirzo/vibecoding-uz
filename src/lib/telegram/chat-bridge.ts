@@ -1,4 +1,4 @@
-import { and, eq, gte } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { BRAND } from "@/config/brand";
 import { db } from "@/db";
@@ -36,22 +36,14 @@ export async function notifyChatHuman(input: {
   return { sent: delivery.success };
 }
 
-async function adminWasRecentlyActive(conversationId: string) {
-  const since = new Date(Date.now() - 2 * 60_000);
-  const [recent] = await db.select({ id: chatMessages.id }).from(chatMessages).where(and(
-    eq(chatMessages.conversationId, conversationId),
-    eq(chatMessages.sender, "admin"),
-    gte(chatMessages.createdAt, since),
-  )).limit(1);
-  return Boolean(recent);
-}
-
 export async function notifyVisitorMessage(
   conversation: ChatConversationDto,
   message: ChatMessageDto,
 ) {
   const adminChatId = process.env.TELEGRAM_ADMIN_CHAT_ID;
-  if (!adminChatId || await adminWasRecentlyActive(conversation.id)) return { sent: false };
+  // Notify on every visitor message: the admin replies from Telegram by replying to
+  // this exact notification, so a skipped alert means an unanswerable message.
+  if (!adminChatId) return { sent: false };
   const link = `${BRAND.url}/admin/chat?conversation=${encodeURIComponent(conversation.id)}`;
   const text = [
     "<b>Naqsh chat — yangi xabar</b>",

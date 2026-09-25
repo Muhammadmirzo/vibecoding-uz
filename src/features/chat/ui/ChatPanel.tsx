@@ -40,6 +40,7 @@ export default function ChatPanel({
   const composerRef = React.useRef<HTMLTextAreaElement>(null);
   const cursorRef = React.useRef<string | undefined>();
   const failuresRef = React.useRef(0);
+  const pendingRef = React.useRef<{ body: string; clientId: string } | null>(null);
 
   React.useEffect(() => {
     setHasStickyBar(Boolean(document.querySelector("[data-sticky-buy-bar]")));
@@ -82,7 +83,7 @@ export default function ChatPanel({
         onConversationChange(Boolean(response.conversation));
         setMessages((current) => mergeMessages(current, response.messages));
         cursorRef.current = response.nextCursor || cursorRef.current;
-        if (response.messages.some((message) => message.sender !== "visitor")) {
+        if (response.messages.some((message) => message.sender !== "visitor" && !message.readAt)) {
           void transport.markRead();
           const now = new Date().toISOString();
           setMessages((current) => current.map((message) => message.sender !== "visitor" && !message.readAt ? { ...message, readAt: now } : message));
@@ -119,12 +120,16 @@ export default function ChatPanel({
     const trimmed = value.trim();
     if (!trimmed || sending) return false;
     setSending(true); setError(null);
+    // A retry of the same text keeps its clientId, so a send that reached the server
+    // before the network failed is not stored twice.
+    if (pendingRef.current?.body !== trimmed) pendingRef.current = { body: trimmed, clientId: crypto.randomUUID() };
     const input: SendMessageInput = {
-      clientId: crypto.randomUUID(), body: trimmed, sourcePath: window.location.pathname,
+      clientId: pendingRef.current.clientId, body: trimmed, sourcePath: window.location.pathname,
       device: navigator.userAgent.slice(0, 120), ...contact,
     };
     try {
       const message = await transport.send(input);
+      pendingRef.current = null;
       setMessages((current) => mergeMessages(current, [message]));
       setBody(""); setApiDown(false);
       if (conversation?.aiMode && conversation.aiMode !== "off") {
