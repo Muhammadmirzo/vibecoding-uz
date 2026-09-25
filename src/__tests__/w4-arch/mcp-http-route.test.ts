@@ -104,6 +104,12 @@ describe("POST /api/mcp — authorized calls", () => {
         "get_student_activity",
         "grade_homework",
         "query_leads_pipeline",
+        "get_analytics_overview",
+        "get_traffic_sources",
+        "get_conversion_funnel",
+        "get_landing_page_performance",
+        "get_sales_report",
+        "get_student_progress_report",
       ].sort()
     );
   });

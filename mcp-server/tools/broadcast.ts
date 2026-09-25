@@ -19,7 +19,7 @@ import { queueBroadcastRecord, type BroadcastInput, type QueuedBroadcast } from 
 export const TOOL_DEF: McpToolDef = {
   name: "broadcast_notification",
   description:
-    "Queues (does not send) a broadcast: inserts a broadcast_notifications row with status 'queued' and a real recipient count. Requires authToken.",
+    "Queues (does not send) a broadcast: inserts a broadcast_notifications row with status 'queued' and a real recipient count, plus an audit_logs row (actor 'mcp') in the same transaction. Requires authToken.",
   inputSchema: {
     type: "object",
     properties: withAuthProperty({

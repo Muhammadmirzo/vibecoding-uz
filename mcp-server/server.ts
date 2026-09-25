@@ -17,6 +17,12 @@ import { handle as handleHomework, TOOL_DEF as homeworkDef } from "./tools/homew
 import { handle as handleKpis, TOOL_DEF as kpisDef } from "./tools/kpis";
 import { handle as handleLeads, TOOL_DEF as leadsDef } from "./tools/leads";
 import { handle as handlePromocode, TOOL_DEF as promocodeDef } from "./tools/promocode";
+import { handle as handleOverview, TOOL_DEF as overviewDef } from "./tools/analytics-overview";
+import { handle as handleTraffic, TOOL_DEF as trafficDef } from "./tools/traffic-sources";
+import { handle as handleFunnel, TOOL_DEF as funnelDef } from "./tools/conversion-funnel";
+import { handle as handleLanding, TOOL_DEF as landingDef } from "./tools/landing-pages";
+import { handle as handleSales, TOOL_DEF as salesDef } from "./tools/sales-report";
+import { handle as handleStudents, TOOL_DEF as studentsDef } from "./tools/student-progress";
 
 export interface ToolEntry {
   def: McpToolDef;
@@ -31,6 +37,13 @@ export const toolRegistry: ToolEntry[] = [
   { def: broadcastDef, handle: handleBroadcast },
   { def: promocodeDef, handle: handlePromocode },
   { def: activityDef, handle: handleActivity },
+  // Read-only first-party analytics (same services as /admin/analytics).
+  { def: overviewDef, handle: handleOverview },
+  { def: trafficDef, handle: handleTraffic },
+  { def: funnelDef, handle: handleFunnel },
+  { def: landingDef, handle: handleLanding },
+  { def: salesDef, handle: handleSales },
+  { def: studentsDef, handle: handleStudents },
 ];
 
 export function listToolDefs(): McpToolDef[] {
