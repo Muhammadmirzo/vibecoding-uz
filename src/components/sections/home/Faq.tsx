@@ -3,7 +3,6 @@ import { FaqDisclosure } from "@/components/ui/FaqDisclosure";
 import { siteConfig } from "@/lib/siteConfig";
 
 const faqs = [
-  ...siteConfig.servicesPage.faq,
   { question: "Dasturlash tajribasi kerakmi?", answer: "Yo'q. Kurs tayyor dasturlash bilimi bo'lmaganlar uchun ham mo'ljallangan. AI vositalaridan foydalanishni 1-darsdanoq ko'rsatamiz." },
   { question: "Kurslar qanday o'tadi?", answer: `${siteConfig.sessionFormat}. Jonli sessiyalar yozib olinadi va shaxsiy kabinetingizda saqlanadi.` },
   { question: "To'lovni bo'lib to'lasam bo'ladimi?", answer: "Ha. Vibe Coding Express uchun 3 oylik to'lov rejasidan foydalanishingiz mumkin; aniq summa kurs sahifasida ko'rsatiladi." },

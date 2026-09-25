@@ -23,7 +23,7 @@ export default function Page() {
       >
         <section id="qachon" className="scroll-mt-24">
           <h2>1. Qachon qaytariladi?</h2>
-          <p>{siteConfig.guaranteeText} Kurs kirish havolasi ochilgandan keyin {siteConfig.guaranteeDays} kun ichida, birinchi 2 modulni yakunlab amaliy foyda ko‘rmagan bo‘lsangiz, ariza berishingiz mumkin.</p>
+          <p>{siteConfig.guaranteeText}. Kurs kirish havolasi ochilgandan keyin {siteConfig.guaranteeDays} kun ichida, birinchi 2 modulni yakunlab amaliy foyda ko‘rmagan bo‘lsangiz, ariza berishingiz mumkin.</p>
         </section>
         <section id="tartib" className="scroll-mt-24">
           <h2>2. Qaytarish tartibi</h2>

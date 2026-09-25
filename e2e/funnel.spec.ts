@@ -54,8 +54,8 @@ test.describe("Full Conversion Funnel (Quiz -> Lead -> Course Checkout)", () => 
     await expect(page.locator("h1")).toBeVisible();
 
     // Verify Guarantee & Pricing Card
-    await expect(page.getByText(/7 kunlik 100% Pul qaytarish kafolati|100% Pul qaytarish kafolati/i)).toBeVisible();
-    await expect(page.getByRole("button", { name: /Joyni band qilish/i })).toBeVisible();
+    await expect(page.getByText(/7 kunlik Pul qaytarish kafolati|Pul qaytarish kafolati/i)).toBeVisible();
+    await expect(page.getByRole("button", { name: /Kursga yozilish/i })).toBeVisible();
   });
 
   test("direct course detail page displays curriculum and pricing breakdown", async ({ page }) => {

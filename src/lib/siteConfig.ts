@@ -33,7 +33,7 @@ export const siteConfig: SiteConfig = siteConfigSchema.parse({
   nextCohortDate: "15-Oktyabr, 2026",
   nextCohortShortDate: "15-Oktyabr",
   guaranteeDays: 7,
-  guaranteeText: "7 kunlik 100% pul qaytarish kafolati",
+  guaranteeText: "7 kunlik pul qaytarish kafolati",
   guaranteeTermsUrl: "/pul-qaytarish",
   guaranteeSummary: "Kursni boshlaganizdan keyin 7 kun ichida belgilangan shartlarni bajarib, amaliy foyda ko'rmaganingizni tasdiqlashingiz mumkin.",
   sessionFormat: "8 haftalik jonli sessiyalar va yozuvlar",
