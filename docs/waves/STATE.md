@@ -23,6 +23,21 @@
 
 ## Phase 2 (started 2026-09-24)
 
+### ▶ HANDOFF 2026-09-25 (evening), wave "Q1 quality + skills + Awwwards phase 1-2", read this first
+- **Skills:** everything is managed by `skillkit` (`~/.skillkit`, private repo github.com/Muhammadmirzo/skillkit; new laptop: clone + `install.sh`).
+  Dispatch agents with `skillkit dispatch <task> <model> <prompt> [dir]` (`.orchestra/run.sh` delegates to it): mandatory LESSON footer,
+  model fallback, metrics, and `--standalone` (the shared opencode background service hung every request on 2026-09-25).
+  Useful: `skillkit stats`, `skillkit eval`, `skillkit doctor`, `skillkit review`.
+- **Lessons:** project facts go in `.claude/skills/naqsh-lessons` (L1-L19). General lessons attach to the skill that should have caught them
+  (`skillkit lesson "..." --skill X`; project details are rejected by code).
+- **Quality gate (new):** `npm run lessons:check` (also a pre-commit hook in `.githooks`, set by `npm prepare`) plus CI `.github/workflows/ci.yml`
+  (lessons + tsc + vitest). Known debt: `scripts/lessons-baseline.json` (chat.service.ts 262 lines; 2 dynamic pages without notFound).
+- **Awwwards redesign:** owner picked concept **A + C**: "Naqsh to'qiladi" loom star + a live prompt→site demo in the hero.
+  No Samarkand/historic-city references; keep the girih logo. Docs: `docs/redesign/awwwards/01-research-and-concepts.md`, `02-art-direction.md`.
+  **Next:** slice 1 = prototype route `/lab/naqsh` (noindex, not linked): the loom star plus the scroll scrub. The owner approves the feel before the home page is touched.
+- **Legal risk flagged to the owner:** Supabase is in ap-southeast-2 (Sydney); Uzbek personal-data law requires citizens' data to be stored in Uzbekistan.
+- **Owner rule:** after every big wave, run the gates, push (main + main:master), and update this handoff.
+
 ### ▶ HANDOFF 2026-09-25 — start here
 0. **Chat fix branch `claude/wife-coding-rules-fixes-5ehexs`** — adds migration **0011_chat_reply_to** (`chat_messages.reply_to_id`, idempotent). Apply it on the live DB (`npx drizzle-kit migrate`) BEFORE deploying that code, otherwise every chat query fails (drizzle selects the new column). Same branch: `prepare: false` on the transaction pooler (port 6543) — local PgBouncer repro lost 9 of 12 concurrent Telegram replies with prepared statements on.
 1. **Next: review W8B** (worktree ../vibecoding-uz-wt/w8b-mcp, branch wave/w8b-mcp, report reports/W8B-MCP.md). Same recipe as W7/W9: merge main into the branch → drop the wave's migration + restore main's `_journal.json` → `npx drizzle-kit generate` (becomes 0012 — 0011 is chat_reply_to) → register every new /api/v1 route in OpenAPI (import it in `src/app/api/v1/openapi.json/route.ts` AND `src/__tests__/mobile/openapi-completeness.test.ts`) → security review (OAuth: PKCE, redirect_uri allowlist, token hashing, scopes; admin-only tools) → gate → run new SQL on the live DB → merge → migrate live → deploy.
