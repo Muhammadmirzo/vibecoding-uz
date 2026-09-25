@@ -1,5 +1,7 @@
 # Wave STATE — single source of truth for resuming
 
+> **▶ NEWEST (2026-09-25): [docs/HANDOFF_2026-09-25-growth.md](../HANDOFF_2026-09-25-growth.md)** — skills + CRO + SEO + MCP analytics on PR #2 (branch `claude/relaxed-gates-9vl0ir`, not merged). "davom et" → start with its §2 verification checklist, then §3 tasks. The Phase 2 table below is still valid for W8B.
+
 > **"davom et" / "continue" protocol (for any new Claude session):**
 > 1. Read this file + [PLAN.md](PLAN.md). Do not re-plan; continue from the first row that is not ✅.
 > 2. For a row marked 🏃 running: check `tail .orchestra/logs/<wave>.log` (last line `exit=<n>` means finished) and `git -C ../vibecoding-uz-wt/<wave> log --oneline -3`.
