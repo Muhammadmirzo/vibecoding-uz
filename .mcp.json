@@ -2,7 +2,7 @@
   "mcpServers": {
     "naqsh": {
       "type": "http",
-      "url": "https://<your-domain>/api/mcp",
+      "url": "https://master-2-jade.vercel.app/api/mcp",
       "headers": {
         "Authorization": "Bearer ${MCP_AUTH_TOKEN}"
       }

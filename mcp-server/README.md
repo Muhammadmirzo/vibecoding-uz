@@ -52,14 +52,14 @@ MCP_AUTH_TOKEN=... npm run mcp:start
 
 ## Connect (remote, over HTTPS)
 
-The live site serves the same tools at `https://<your-domain>/api/mcp`.
+The live site serves the same tools at `https://master-2-jade.vercel.app/api/mcp`.
 `MCP_AUTH_TOKEN` must be set in the deployment's environment (Vercel) —
 without it the endpoint answers `503` for every request.
 
 ### Claude Code
 
 ```sh
-claude mcp add --transport http naqsh https://<your-domain>/api/mcp \
+claude mcp add --transport http naqsh https://master-2-jade.vercel.app/api/mcp \
   --header "Authorization: Bearer $MCP_AUTH_TOKEN"
 ```
 
@@ -79,7 +79,7 @@ config-file editing needed). If your build of Desktop instead reads
   "mcpServers": {
     "naqsh": {
       "type": "http",
-      "url": "https://<your-domain>/api/mcp",
+      "url": "https://master-2-jade.vercel.app/api/mcp",
       "headers": {
         "Authorization": "Bearer <your MCP_AUTH_TOKEN>"
       }
@@ -91,21 +91,21 @@ config-file editing needed). If your build of Desktop instead reads
 ### claude.ai custom connector
 
 Settings → Connectors → Add custom connector → URL
-`https://<your-domain>/api/mcp`, Authorization header
+`https://master-2-jade.vercel.app/api/mcp`, Authorization header
 `Bearer <your MCP_AUTH_TOKEN>`.
 
 ### curl smoke test
 
 ```sh
 # initialize
-curl -s https://<your-domain>/api/mcp \
+curl -s https://master-2-jade.vercel.app/api/mcp \
   -H "Authorization: Bearer $MCP_AUTH_TOKEN" \
   -H "Content-Type: application/json" \
   -H "Accept: application/json, text/event-stream" \
   -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"curl","version":"0"}}}'
 
 # tools/list
-curl -s https://<your-domain>/api/mcp \
+curl -s https://master-2-jade.vercel.app/api/mcp \
   -H "Authorization: Bearer $MCP_AUTH_TOKEN" \
   -H "Content-Type: application/json" \
   -H "Accept: application/json, text/event-stream" \
