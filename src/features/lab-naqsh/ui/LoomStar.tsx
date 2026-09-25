@@ -11,7 +11,8 @@ import { cn } from "@/components/ui/utils";
  * state) — useLoomMotion only *hides* strands with gsap.set() once JS
  * confirms motion is allowed, per the reduced-motion / no-JS rule.
  */
-export function LoomStar({ size = 320, className }: { size?: number; className?: string }) {
+/** `weight` thickens strokes for small renders (the phone rail star) so strands stay visible. */
+export function LoomStar({ size = 320, weight = 1, className }: { size?: number; weight?: number; className?: string }) {
   return (
     <svg
       width={size}
@@ -35,7 +36,7 @@ export function LoomStar({ size = 320, className }: { size?: number; className?:
         cy="16"
         r="15"
         stroke="var(--accent)"
-        strokeWidth="0.35"
+        strokeWidth={0.35 * weight}
         strokeDasharray="1"
         strokeDashoffset="0"
         pathLength={1}
@@ -62,7 +63,7 @@ export function LoomStar({ size = 320, className }: { size?: number; className?:
           data-strand="diamond"
           d={LOGO_DIAMOND}
           stroke="var(--gold)"
-          strokeWidth="0.6"
+          strokeWidth={0.6 * weight}
           strokeLinejoin="miter"
           strokeDasharray="1"
           strokeDashoffset="0"
@@ -70,7 +71,7 @@ export function LoomStar({ size = 320, className }: { size?: number; className?:
         />
 
         {/* section 1 — square strand, 4 corner strokes */}
-        <g stroke="var(--brand)" strokeWidth="0.6" strokeLinejoin="miter" strokeLinecap="butt">
+        <g stroke="var(--brand)" strokeWidth={0.6 * weight} strokeLinejoin="miter" strokeLinecap="butt">
           {LOGO_SQUARE_SEGMENTS.map((points) => (
             <polyline
               key={points}
@@ -87,7 +88,7 @@ export function LoomStar({ size = 320, className }: { size?: number; className?:
       {/* section 3 — over/under weave hint: the 8 crossing points */}
       <g data-strand="weave" fill="var(--accent)" opacity="1">
         {WEAVE_DOTS.map(([x, y]) => (
-          <circle key={`${x}-${y}`} cx={x} cy={y} r="0.55" />
+          <circle key={`${x}-${y}`} cx={x} cy={y} r={0.55 * weight} />
         ))}
       </g>
     </svg>

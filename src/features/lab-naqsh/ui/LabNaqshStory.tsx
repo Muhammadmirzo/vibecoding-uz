@@ -20,13 +20,16 @@ export function LabNaqshStory() {
 
   return (
     <div ref={containerRef} className="relative bg-brand-surface">
-      {/* phone: thin vertical thread in the left margin */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-4 w-px bg-white/15 lg:hidden" />
-      <div aria-hidden="true" className="pointer-events-none absolute bottom-24 left-4 -translate-x-1/2 lg:hidden">
-        <LoomStar size={56} />
+      {/* phone: thin thread in the left margin + a small star that stays on screen
+          (sticky) so the visitor actually sees it weave while scrolling */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-0 w-14 lg:hidden">
+        <div className="absolute inset-y-0 left-7 w-px bg-white/15" />
+        <div className="sticky top-[42vh] flex justify-center py-2">
+          <LoomStar size={48} weight={2} />
+        </div>
       </div>
 
-      <div className="mx-auto grid max-w-container grid-cols-1 gap-8 px-5 pl-12 sm:px-8 sm:pl-14 lg:grid-cols-12 lg:gap-12 lg:pl-8">
+      <div className="mx-auto grid max-w-container grid-cols-1 gap-8 px-5 pl-16 sm:px-8 sm:pl-16 lg:grid-cols-12 lg:gap-12 lg:pl-8">
         <div className="lg:col-span-7 lg:col-start-1">
           {STORY_SECTIONS.map((section, index) => (
             <StorySection key={section.id} section={section} index={index}>

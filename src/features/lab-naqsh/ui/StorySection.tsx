@@ -26,7 +26,7 @@ export function StorySection({
       </p>
       <h2
         className="lab-headline mt-4 max-w-2xl text-balance font-display font-bold leading-[0.95] tracking-[-0.045em] text-on-brand-surface [clip-path:inset(0_0_0_0)] [text-wrap:balance]"
-        style={{ fontSize: "clamp(2.25rem, 6vw, 6rem)" }}
+        style={{ fontSize: "clamp(1.625rem, 6vw, 6rem)" }}
       >
         {section.headline}
       </h2>
