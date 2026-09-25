@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { Check, Clock, ShieldCheck, User, X } from "lucide-react";
 import { FaqDisclosure } from "@/components/ui/FaqDisclosure";
 import { Button } from "@/components/ui/Button";
@@ -7,13 +6,15 @@ import { Eyebrow, Heading, Section } from "@/components/ui/Layout";
 import { PageHero } from "@/components/pages/PageHero";
 import { Reveal } from "@/features/motion/ui/Reveal";
 import { ScrollFillText } from "@/features/motion/ui/ScrollFillText";
+import { routeMetadata } from "@/lib/seo";
 import { BepulDarsLeadSection } from "./LeadSection";
 
-export const metadata: Metadata = {
+export const metadata = routeMetadata({
   title: "Bepul dars — 30 daqiqada AI bilan mahsulot qurish metodi",
   description:
     "Claude Code yordamida dasturchisiz ilova va bot qurish metodini 30 daqiqalik bepul darsda ko'ring.",
-};
+  path: "/bepul-dars",
+});
 
 const AGENDA = [
   { time: "0–5 daqiqa", title: "Metod bilan tanishuv", text: "Nega AI bilan qurish an'anaviy yo'ldan tezroq ishlaydi." },

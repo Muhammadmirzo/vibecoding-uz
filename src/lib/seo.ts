@@ -42,3 +42,22 @@ export function articleJsonLd(input: { title: string; description: string; image
     mainEntityOfPage: canonicalUrl(input.path),
   };
 }
+
+export function faqPageJsonLd(faqs: Array<{ question: string; answer: string }>): Record<string, unknown> {
+  return {
+    "@context": "https://schema.org", "@type": "FAQPage",
+    mainEntity: faqs.map((faq) => ({
+      "@type": "Question", name: faq.question,
+      acceptedAnswer: { "@type": "Answer", text: faq.answer },
+    })),
+  };
+}
+
+export function breadcrumbJsonLd(items: Array<{ name: string; path: string }>): Record<string, unknown> {
+  return {
+    "@context": "https://schema.org", "@type": "BreadcrumbList",
+    itemListElement: items.map((item, index) => ({
+      "@type": "ListItem", position: index + 1, name: item.name, item: canonicalUrl(item.path),
+    })),
+  };
+}
