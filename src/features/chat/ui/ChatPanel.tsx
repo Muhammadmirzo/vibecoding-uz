@@ -158,7 +158,7 @@ export default function ChatPanel({
           <div><h2 id="chat-title" className="font-display text-lg font-semibold">Naqsh bilan suhbat</h2><p className="mt-0.5 text-sm opacity-80">{officeOpen ? `Odatda ${settings?.replyTimeMinutes || 10} daqiqada javob beramiz` : "Hozir oflaynmiz — xabar qoldiring"}</p></div>
           <button type="button" onClick={close} aria-label="Chatni yopish" className="grid size-11 place-items-center rounded-lg hover:bg-bg-elevated/10"><X className="size-5" /></button>
         </header>
-        <div data-message-list className="flex-1 space-y-3 overflow-y-auto p-4" aria-live="polite">
+        <div data-message-list className="flex-1 space-y-3 overflow-y-auto overscroll-contain p-4" aria-live="polite">
           {settings ? <p className="rounded-xl border border-accent/20 bg-accent-soft p-3 text-sm leading-6 text-ink">{settings.welcomeText}</p> : null}
           {settings?.quickReplies.map((reply) => <button key={reply} type="button" onClick={() => setBody(reply)} className="min-h-11 rounded-full border border-brand/20 bg-brand-soft px-4 text-left text-base text-brand hover:bg-brand-soft/70">{reply}</button>)}
           {messages.map((message) => <ChatMessageBubble key={message.id} message={message} />)}
