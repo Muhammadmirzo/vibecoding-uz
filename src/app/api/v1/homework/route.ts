@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { created, ok } from "@/lib/api/v1/respond";
+import { created, fail, ok } from "@/lib/api/v1/respond";
 import { v1 } from "@/lib/api/v1/with-v1";
 import { registerV1Route } from "@/lib/api/v1/registry";
 import { homeworkItemSchema, homeworkSubmitSchema } from "@/features/mobile/contracts-resources";
@@ -24,7 +24,9 @@ registerV1Route({
   tags: ["homework"],
   summary: "Vazifa topshirish",
   request: { body: { content: { "application/json": { schema: homeworkSubmitSchema } } } },
-  responses: { 201: { description: "Qabul qilindi" } },
+  responses: {
+    201: { description: "Qabul qilindi", content: { "application/json": { schema: homeworkItemSchema.partial() } } },
+  },
 });
 
 function toItem(r: Awaited<ReturnType<typeof listMyHomework>>[number]) {
@@ -47,7 +49,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   return v1(request, async ({ session }) => {
     const limited = await checkRateLimit(`homework:${session.userId}`, { ...PRESETS.LOGIN, limit: 20, prefix: "homework-submit" });
-    if (!limited.success) return createRateLimitResponse(limited);
+    if (!limited.success) return fail(createRateLimitResponse(limited));
     const input = homeworkSubmitSchema.parse(await request.json());
     const createdRow = await submitHomework(session.userId, {
       assignmentId: input.assignmentId, fileUrls: input.fileUrls,

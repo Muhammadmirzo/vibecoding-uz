@@ -27,7 +27,7 @@ export async function POST(request: Request) {
   return v1Public(request, async () => {
     const ip = getClientIp(request);
     const limited = await checkRateLimit(ip, PRESETS.LOGIN);
-    if (!limited.success) return createRateLimitResponse(limited);
+    if (!limited.success) return fail(createRateLimitResponse(limited));
 
     const input = tokenRequestSchema.parse(await request.json());
     let captured: { sessionId: string; userId: string; role: string } | null = null;

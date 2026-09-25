@@ -12,7 +12,7 @@ registerV1Route({
   tags: ["auth"],
   summary: "Bitta qurilma sessiyasini yopish",
   request: { params: z.object({ id: z.string().uuid() }) },
-  responses: { 200: { description: "Yopildi" } },
+  responses: { 200: { description: "Yopildi", content: { "application/json": { schema: z.object({ success: z.literal(true) }) } } } },
 });
 
 type Ctx = { params: Promise<{ id: string }> };

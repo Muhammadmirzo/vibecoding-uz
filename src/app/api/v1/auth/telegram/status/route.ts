@@ -1,4 +1,4 @@
-import { ok } from "@/lib/api/v1/respond";
+import { fail, ok } from "@/lib/api/v1/respond";
 import { v1Public } from "@/lib/api/v1/with-v1";
 import { registerV1Route } from "@/lib/api/v1/registry";
 import { telegramStatusRequestSchema, telegramStatusResponseSchema } from "@/features/mobile/contracts-auth";
@@ -21,7 +21,7 @@ registerV1Route({
 export async function POST(request: Request) {
   return v1Public(request, async () => {
     const limited = await checkRateLimit(getClientIp(request), { ...PRESETS.LOGIN, limit: 30, prefix: "telegram-status" });
-    if (!limited.success) return createRateLimitResponse(limited);
+    if (!limited.success) return fail(createRateLimitResponse(limited));
 
     const input = telegramStatusRequestSchema.parse(await request.json());
     let captured: { sessionId: string; userId: string; role: string } | null = null;

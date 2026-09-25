@@ -12,7 +12,7 @@ registerV1Route({
   tags: ["devices"],
   summary: "Push qurilmani o'chirish",
   request: { params: z.object({ id: z.string().uuid() }) },
-  responses: { 200: { description: "O'chirildi" } },
+  responses: { 200: { description: "O'chirildi", content: { "application/json": { schema: z.object({ success: z.literal(true) }) } } } },
 });
 
 type Ctx = { params: Promise<{ id: string }> };

@@ -51,6 +51,24 @@ export async function v1(request: Request, handler: AuthedHandler): Promise<Next
   }
 }
 
+/**
+ * Same as `v1`, but gates on admin roles (superadmin/admin/manager) instead of
+ * plain auth. Handlers MUST NOT call requireAuth/requireAdmin themselves.
+ */
+export async function v1Admin(request: Request, handler: AuthedHandler): Promise<NextResponse> {
+  try {
+    const { requireAdmin } = await import("@/lib/auth/require-auth");
+    const auth = await requireAdmin(request);
+    if (!auth.ok) return withV1Headers(await fail(auth.response), request);
+    const response = await handler({
+      session: auth.session, requestId: requestIdOf(request), locale: resolveLocale(request),
+    });
+    return withV1Headers(response, request);
+  } catch (error) {
+    return withV1Headers(await fail(error), request);
+  }
+}
+
 type PublicHandler = (ctx: { requestId: string; locale: "uz" | "ru" | "en" }) => Promise<NextResponse> | NextResponse;
 
 /** Same envelope + headers for unauthenticated v1 endpoints (token, config, openapi). */

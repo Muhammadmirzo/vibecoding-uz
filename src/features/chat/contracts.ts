@@ -100,6 +100,10 @@ export const chatSettingsSchema = z.object({
   telegramNotify: z.boolean().default(true),
   quickReplies: z.array(z.string().min(1).max(80)).max(8).default(["Kurs tanlashda yordam", "To'lov savoli", "Bepul dars"]),
 });
+/** What `publicChatSettings()` actually exposes to visitors — no AI/internal config. */
+export const publicChatSettingsSchema = chatSettingsSchema.pick({
+  enabled: true, welcomeText: true, officeHours: true, replyTimeMinutes: true, offlineText: true, quickReplies: true,
+});
 export const chatSettingsRowSchema = z.object({ value: chatSettingsSchema });
 export const chatBootstrapSchema = z.object({ conversation: chatConversationSchema.nullable(), settings: chatSettingsSchema });
 export const chatMessagesResponseSchema = z.object({ conversation: chatConversationSchema.nullable(), messages: z.array(chatMessageSchema), nextCursor: z.string().nullable() });

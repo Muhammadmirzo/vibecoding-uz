@@ -1,5 +1,5 @@
 import { BRAND } from "@/config/brand";
-import { created } from "@/lib/api/v1/respond";
+import { created, fail } from "@/lib/api/v1/respond";
 import { v1Public } from "@/lib/api/v1/with-v1";
 import { registerV1Route } from "@/lib/api/v1/registry";
 import { telegramStartResponseSchema } from "@/features/mobile/contracts-auth";
@@ -22,7 +22,7 @@ export async function POST(request: Request) {
   return v1Public(request, async () => {
     const ip = getClientIp(request);
     const limited = await checkRateLimit(ip, { ...PRESETS.LOGIN, limit: 8, prefix: "telegram-start" });
-    if (!limited.success) return createRateLimitResponse(limited);
+    if (!limited.success) return fail(createRateLimitResponse(limited));
     const result = await startTelegramLogin(
       { ip, userAgent: request.headers.get("user-agent") ?? undefined },
       BRAND.telegramBot,

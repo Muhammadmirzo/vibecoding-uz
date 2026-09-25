@@ -17,7 +17,13 @@ registerV1Route({
     params: z.object({ id: z.string().uuid() }),
     body: { content: { "application/json": { schema: progressRequestSchema } } },
   },
-  responses: { 200: { description: "Saqlandi" } },
+  responses: {
+    200: {
+      description: "Saqlandi",
+      content: { "application/json": { schema: z.object({ lessonId: z.string().uuid(), positionSec: z.number(), completed: z.boolean() }) } },
+    },
+    403: { description: "Dars hali ochilmagan" },
+  },
 });
 
 type Ctx = { params: Promise<{ id: string }> };

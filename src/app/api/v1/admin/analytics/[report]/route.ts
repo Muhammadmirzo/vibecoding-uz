@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { fail, ok } from "@/lib/api/v1/respond";
-import { requireAdmin } from "@/lib/auth/require-auth";
+import { ok } from "@/lib/api/v1/respond";
+import { v1Admin } from "@/lib/api/v1/with-v1";
 import { analyticsRangeSchema, analyticsReportSchema } from "@/features/analytics/domain/report-types";
 import { getAnalyticsReport } from "@/features/analytics/server/analytics.service";
 import { drizzleAnalyticsRepository } from "@/features/analytics/server/analytics.repository";
@@ -13,15 +13,14 @@ registerV1Route({
   tags: ["admin"],
   summary: "Admin analitika hisoboti (from/to/granularity/metric/compare)",
   request: { params: z.object({ report: analyticsReportSchema }) },
-  responses: { 200: { description: "Hisobot ma'lumotlari" }, 403: { description: "Faqat admin" } },
+  // Report shape varies per `report` id (funnel/revenue/…) — kept as free-form JSON.
+  responses: { 200: { description: "Hisobot ma'lumotlari", content: { "application/json": { schema: z.record(z.unknown()) } } }, 403: { description: "Faqat admin" } },
 });
 
 type Context = { params: Promise<{ report: string }> };
 
 export async function GET(request: Request, context: Context) {
-  try {
-    const auth = await requireAdmin(request);
-    if (!auth.ok) return fail(auth.response);
+  return v1Admin(request, async () => {
     const { report: rawReport } = await context.params;
     const report = analyticsReportSchema.parse(rawReport);
     const url = new URL(request.url);
@@ -35,7 +34,5 @@ export async function GET(request: Request, context: Context) {
       compare: url.searchParams.get("compare") !== "false",
     });
     return ok(await getAnalyticsReport(drizzleAnalyticsRepository, report, range));
-  } catch (error) {
-    return fail(error);
-  }
+  });
 }
