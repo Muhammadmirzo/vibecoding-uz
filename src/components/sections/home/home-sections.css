@@ -52,7 +52,8 @@ html[data-motion="full"][data-motion-ambient="on"] .demo-caret { animation: demo
 .roadmap-path-progress { stroke: var(--gold); stroke-dasharray: 1; stroke-dashoffset: 1; }
 .roadmap-grid { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
 .roadmap-step { position: relative; padding-top: 148px; }
-.roadmap-dot { position: absolute; top: 72px; left: 12%; display: grid; width: 1.5rem; height: 1.5rem; place-items: center; border: 1px solid var(--border-strong); border-radius: 50%; background: var(--bg-sunken); }
+/* The curve + staggered cards already read as a path; free-floating dots never lined up with it. */
+.roadmap-dot { display: none !important; position: absolute; top: 72px; left: 12%; display: grid; width: 1.5rem; height: 1.5rem; place-items: center; border: 1px solid var(--border-strong); border-radius: 50%; background: var(--bg-sunken); }
 .roadmap-dot span { width: .5rem; height: .5rem; border-radius: 50%; background: var(--border-strong); }
 .roadmap-card { height: 100%; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--bg-elevated); padding: 1.25rem; box-shadow: var(--shadow-sm); transition: transform var(--motion-fast) var(--motion-ease-out), box-shadow var(--motion-fast) var(--motion-ease-out), border-color var(--motion-fast) var(--motion-ease-out); }
 .roadmap-card:hover { transform: translateY(-2px); border-color: var(--gold); box-shadow: var(--shadow-md); }
