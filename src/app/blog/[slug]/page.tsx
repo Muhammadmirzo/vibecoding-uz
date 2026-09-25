@@ -19,6 +19,13 @@ export function generateStaticParams() {
   return STATIC_BLOG_POSTS.map(({ slug }) => ({ slug }));
 }
 
+// STATIC_BLOG_POSTS is a fixed, static list (not DB-backed): reject unknown
+// slugs at the routing layer instead of rendering the page and calling
+// notFound(). Without this, root loading.tsx's Suspense boundary flushes a
+// 200 status before notFound() can run, so unknown /blog/<slug> was a
+// soft-404 (L13).
+export const dynamicParams = false;
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const post = STATIC_BLOG_POSTS.find((item) => item.slug === slug);

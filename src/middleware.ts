@@ -105,6 +105,19 @@ export async function middleware(request: NextRequest) {
       adminLoginUrl.searchParams.set("redirect", pathname);
       return withSecurityHeaders(NextResponse.redirect(adminLoginUrl), nonce);
     }
+    // /kabinet (exact) renders its own server-side guest CTA (cheap cookie
+    // check, no DB) so a guest gets LCP content on the first response
+    // instead of a 307 round trip to "/". Subpages still redirect: they
+    // assume an authenticated shell.
+    if (pathname === "/kabinet" || pathname === "/kabinet/") {
+      const requestHeaders = new Headers(request.headers || {});
+      requestHeaders.set("x-nonce", nonce);
+      requestHeaders.set("Content-Security-Policy", contentSecurityPolicy(nonce));
+      return withSecurityHeaders(
+        NextResponse.next({ request: { headers: requestHeaders } }),
+        nonce
+      );
+    }
     const loginUrl = new URL("/", request.url);
     loginUrl.searchParams.set("auth", "1");
     loginUrl.searchParams.set("redirect", `${pathname}${request.nextUrl.search}`);
