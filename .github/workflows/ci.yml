@@ -1,0 +1,24 @@
+# Quality gate on every push/PR: the same checks agents must pass before saying "done".
+# (Vercel still runs the production build on deploy.)
+name: ci
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Lessons check (naqsh-lessons)
+        run: npm run lessons:check
+      - name: Type check
+        run: npx tsc --noEmit
+      - name: Unit tests
+        run: npx vitest run

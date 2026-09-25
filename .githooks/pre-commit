@@ -1,0 +1,3 @@
+#!/bin/sh
+# Blocks commits that repeat a known mistake (naqsh-lessons). Bypass only with a reason: git commit --no-verify
+exec node scripts/lessons-check.mjs --staged

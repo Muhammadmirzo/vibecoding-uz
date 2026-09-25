@@ -6,7 +6,14 @@ description: MUST load before writing, fixing or reviewing ANY code in the vibec
 # Naqsh lessons: don't repeat mistakes we already fixed
 
 Every lesson below comes from a real `fix(...)` commit or incident in this repo. Before you say "done", run
-the check for every lesson your change touches. Also read `docs/CODER_AGENT_RULES.md` (the hard rules).
+the check for every lesson your change touches.
+
+Project conventions (read once per task, they beat any generic skill advice):
+`docs/CODER_AGENT_RULES.md` (architecture, security, definition of done) and `docs/design-system.md` (tokens, UI).
+
+Automated: `npm run lessons:check` enforces L6, L13, L15, L16 and L19. It also runs as a pre-commit hook and in CI
+(`.github/workflows/ci.yml`, together with tsc and vitest). Known debt is listed in `scripts/lessons-baseline.json`;
+fixing an item there means removing it from that file. Everything else below still needs your own check.
 
 ## 1. Load the right expert skill first
 
@@ -55,5 +62,6 @@ the check for every lesson your change touches. Also read `docs/CODER_AGENT_RULE
 ## 3. After every fix: add a lesson
 
 If you fixed a bug that a check could have caught, add a row to section 2 in the same commit:
-the mistake in one line and the concrete command or test that catches it next time. Keep this file ≤ 200 lines.
+the mistake in one line and the concrete command or test that catches it next time.
+If the check is a grep or a file rule, add it to `scripts/lessons-check.mjs` as well: code beats text. Keep this file ≤ 200 lines.
 If a lesson is general (not Naqsh-specific), say so in your report so the orchestrator can move it into a global skill.
