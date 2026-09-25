@@ -1,39 +1,45 @@
-# RESUME — what a new session does when the owner says "boshla" (or "davom et")
+# RESUME: what a new session does when the owner says "boshla" (or "davom et")
 
-Owner speaks Uzbek → reply in Uzbek, short and step by step. You are the ORCHESTRATOR (Opus, high effort): plan, dispatch free opencode agents, review, merge, deploy. Do not hand-write large features yourself.
+The owner speaks Uzbek, so reply in Uzbek, short and step by step. You are the ORCHESTRATOR (Claude Opus): plan, dispatch free
+opencode agents, review, decide. Don't hand-write large features, and don't do mechanical work (push, handoff) yourself.
 
-## 1. Get the live state (2 min)
+## 1. Live state (1 min)
 ```bash
 cd /home/mirzo/.zcode/workspace/vibecoding-uz
-git log --oneline -5 && git worktree list
-for w in w6a-design-home w6b-portfolio; do echo "== $w"; tail -n 3 .orchestra/logs/$w.log; git -C ../vibecoding-uz-wt/$w log --oneline -3 main..HEAD; git -C ../vibecoding-uz-wt/$w status --short | wc -l; done
-free -h | sed -n 2p
+git log --oneline -5 && git status --short && free -h | sed -n 2p
+ps -eo pid,etimes,args | grep "opencode run" | grep -v grep   # agents still running?
+skillkit doctor
 ```
-Then read `docs/waves/STATE.md` → "Phase 2" table (source of truth).
+Then read `docs/waves/STATE.md` → "Phase 2" → the newest `### ▶ HANDOFF` section (source of truth).
 
-## 2. For each Phase-2 row marked 🏃
-- Log ends with `exit=0` and a report exists → REVIEW (step 3).
-- Log has no `exit=` line and no opencode process is running for it, or `exit≠0`, or "Rate limit" → the agent died (closing the old terminal kills its background jobs). Re-dispatch in the background — the agent continues from its report + git state in the same worktree:
-  `scripts/waves/dispatch.sh <wave> space-bunny-free` (or `muse-spark-1.3-contributor-free` if not rate-limited). Max 2 agents at once.
-- After a reboot first run `opencode service restart` (the daemon auto-resumes old sessions in parallel).
+## 2. Tools (since 2026-09-25)
+- Skills: `skillkit` (`~/.skillkit`). The skill `naqsh-lessons` is loaded before any code in this repo.
+- Dispatch an agent: `skillkit dispatch <task> <model> <prompt-file> [dir]`. It adds the LESSON footer, falls back to another model on
+  a stall, runs `--standalone`, and records metrics. Models: `muse-spark-1.3-contributor-free` (deep), `space-bunny-free`
+  (fast/mechanical). Never use nemotron. Max 3 agents; heavy commands go through `scripts/waves/locked.sh`.
+- The agent's report has no LESSON line → review its diff yourself and record the lesson (`self-improve` skill).
+- Quality gate: `npm run lessons:check` (also runs as pre-commit), CI on GitHub (lessons + tsc + vitest).
 
-## 3. Review before merge (never skip — agents have shipped broken code 3 times)
-- Read the diff of risky parts, not just the report. Check: correctness, security, antifragility (DB/Redis/Telegram down must degrade, not throw), files ≤ 250 lines (`wc -l`), honest copy, theme tokens.
-- Gate in the worktree: `npx tsc --noEmit && npx vitest run && scripts/waves/locked.sh npm run build`.
-- UI waves: screenshots scrolled through the page at 390/1440, light + dark; `scripts/waves/locked.sh npx playwright test e2e/responsive.spec.ts e2e/visibility.spec.ts` with `E2E_PORT`; Lighthouse mobile with `--throttling-method=devtools` (CLS 0, LCP ≤ 2.5 s).
-- Merge: `git merge --no-ff wave/<wave>`; on main `npm install && npx vitest run && npm run build`; update STATE row to ✅ with notes; remove the worktree.
-- New migration (W6B adds one): apply to the live DB via the pooler URL in `.env` (`vercel env pull .env --environment=production --yes`), `npx drizzle-kit migrate`. Never run `scripts/portfolio/mark-unverified.ts --apply` until the owner confirms which projects are theirs.
-- Deploy: `git push origin main && git push origin main:master`, then smoke-test https://master-2-jade.vercel.app (routes 200, 0 console errors).
+## 3. Review before merge (never skip; agents have shipped broken code several times)
+- Read the risky diffs, not just the report. Check correctness, security, degraded modes, files ≤ 250 lines, honest copy, tokens only.
+- New raw SQL → run it once on the live DB (`verify-sql-live`). UI → screenshots at 390/768/1280/1440 plus a video.
 
-## 4. Next waves (prompts to write in docs/waves/prompts/, same style as w6a/w6b)
-- W6C design rollout to every page — after the owner sees and likes the W6A home page.
-- W7 chat centre, W8 analytics + MCP, W9 mobile API — ONLY after owner approval (see STATE "Waiting on the owner").
+## 4. Release after every big wave (owner rule): an AGENT does it, not the orchestrator
+1. Write `.orchestra/wave-notes.md` (3-5 lines: what shipped, what's next, risks).
+2. `skillkit dispatch release-<wave> space-bunny-free scripts/waves/release-prompt.md .`
+3. Read only its `RELEASE:` / `LESSON:` lines, then verify with `gh run list --limit 2` and the live URL (200).
 
-## 5. Open questions to ask the owner (if still unanswered)
-1. ~~Which portfolio projects are theirs~~ — answered: only Clash Nexus for now (Bozor bot later).
-2. Approve W7 / W8 / W9?
-3. Approve cuts: /ekspertlar, /testimoniyalar, /ish, SpinWheel, unbuilt feature flags?
-4. ~~Admin password reset~~ done 2026-09-24 (repeat on request: "parolni yangila") — reset via `scripts/create-admin.ts` with a generated password; never read or print existing secrets.
+## 5. Next work, in order
+1. **Awwwards slice 1:** prototype route `/lab/naqsh` (noindex, not linked). The loom star (logo girih) draws itself on scroll.
+   Spec: `docs/redesign/awwwards/02-art-direction.md` §6 and §9. Skills: `awwwards-craft`, `motion-design`, `creative-hub` → gsap-scrolltrigger.
+   The owner approves the feel on their phone before anything else changes.
+2. Awwwards slice 2: the hero live demo (prompt → site, labelled "namuna"), in the same lab route.
+3. W8B MCP review (see the older HANDOFF in STATE.md for the recipe; its migration becomes 0012).
+4. Small debt: soft-404 (2 pages in `scripts/lessons-baseline.json`), `/kabinet` guest LCP, split `chat.service.ts` (262 lines).
+
+## 6. Settled owner decisions (don't re-ask)
+- Telegram reply → site chat works. `ANTHROPIC_API_KEY` is deferred. Supabase stays in Sydney for now.
+- The redesign has no Samarkand/historic-city theme; the girih logo stays. Concept = A + C.
 
 ## Hard rules
-Never `pkill -f` (stop servers by PID from `ss -ltnp | grep :<port>`). Heavy commands via `scripts/waves/locked.sh`. Never nemotron. Machine has 7.6 GB RAM.
+Never `pkill -f` (stop servers by PID from `ss -ltnp | grep :<port>`). Never print secrets. Deploy = push main + main:master (release agent).
