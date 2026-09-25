@@ -40,7 +40,8 @@ MAVJUD MODELLAR:
   4. opencode/muse-spark-1.2-contributor-free — faqat zaxira (1.3 ishlamasa)
   TAQIQLANGAN: nemotron-3-ultra (sifat past). big-pickle, mimo, ling, nemotron-lightning — asosiy ishga qo'yilmaydi.
 
-Dispatch: `.orchestra/run.sh <nom> <model> <prompt-fayl>` (log: `.orchestra/logs/<nom>.log`).
+Dispatch: `skillkit dispatch <nom> <model> <prompt-fayl> [papka]` (yoki `.orchestra/run.sh`): majburiy LESSON footer,
+model javob bermasa keyingisiga o'tadi, natija `skillkit stats`ga yoziladi. Log: `.orchestra/logs/<nom>.log`.
 RAM 7.6 GB: bir vaqtda maksimal 3 agent; og'ir buyruqlar (build, vitest, playwright) faqat
 `scripts/waves/locked.sh` orqali. Yangi agent qo'shishdan oldin `free -h`.
 
