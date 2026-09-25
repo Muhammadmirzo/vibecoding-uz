@@ -17,7 +17,7 @@ Steps (run each command and paste its real output in your final report):
    If it is rejected for "workflow scope", STOP and report: the owner must run `gh auth refresh -h github.com -s workflow`.
 5. CI: wait about 60 s, then `gh run list --limit 3`. Poll `gh run view <id>` until done (max 15 min).
    Report success or failure with the failing step's log tail (`gh run view <id> --log-failed | tail -40`).
-6. Live check: `curl -s -o /dev/null -w "%{http_code}" https://<production domain from docs/HANDOFF_*.md or vercel.json>/` must be 200.
+6. Live check: `curl -s -o /dev/null -w "%{http_code}" https://master-2-jade.vercel.app/` must be 200.
 
 Final reply, exactly this shape:
 RELEASE: pushed <commit> | CI <passed/failed/pending> | live <code>
