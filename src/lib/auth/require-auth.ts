@@ -25,6 +25,7 @@ export const MENTOR_ROLES = ["superadmin", "admin", "manager", "mentor"] as cons
 export interface AuthSession {
   userId: string;
   role: string;
+  mcpAccess?: boolean;
   sessionId: string;
   /** "cookie" for web, "bearer" for native clients (CSRF skipped). */
   authMethod?: "cookie" | "bearer";
@@ -34,7 +35,7 @@ export interface SessionDeps {
   verifyToken?: typeof verifySessionToken;
   verifyBearer?: typeof verifyAccessToken;
   findSessionById?: (sessionId: string) => Promise<{ id: string; userId: string; expiresAt: Date } | null>;
-  findUserRole?: (userId: string) => Promise<string | null>;
+  findUserRole?: (userId: string) => Promise<{ role: string; mcpAccess: boolean } | null>;
   now?: () => number;
 }
 
@@ -49,13 +50,13 @@ async function defaultFindSessionById(
   return row ?? null;
 }
 
-async function defaultFindUserRole(userId: string): Promise<string | null> {
+async function defaultFindUserRole(userId: string): Promise<{ role: string; mcpAccess: boolean } | null> {
   const [row] = await db
-    .select({ role: users.role })
+    .select({ role: users.role, mcpAccess: users.mcpAccess })
     .from(users)
     .where(eq(users.id, userId))
     .limit(1);
-  return row?.role ?? null;
+  return row ? { role: row.role, mcpAccess: row.mcpAccess } : null;
 }
 
 async function readCookieToken(explicitHeader?: string | null): Promise<string | null> {
@@ -99,15 +100,15 @@ export async function getDbSession(
   if (record.expiresAt.getTime() <= now) return null;
 
   const findRole = deps.findUserRole ?? defaultFindUserRole;
-  let role: string | null;
+  let userInfo: { role: string; mcpAccess: boolean } | null;
   try {
-    role = await findRole(record.userId);
+    userInfo = await findRole(record.userId);
   } catch {
     return null;
   }
-  if (!role) return null;
+  if (!userInfo) return null;
 
-  return { userId: record.userId, role, sessionId: record.id, authMethod: "cookie" };
+  return { userId: record.userId, role: userInfo.role, mcpAccess: userInfo.mcpAccess, sessionId: record.id, authMethod: "cookie" };
 }
 
 export type AuthResult =
@@ -160,14 +161,14 @@ export async function getBearerSession(
   if (record.expiresAt.getTime() <= now) return null;
 
   const findRole = deps.findUserRole ?? defaultFindUserRole;
-  let role: string | null;
+  let userInfo: { role: string; mcpAccess: boolean } | null;
   try {
-    role = await findRole(record.userId);
+    userInfo = await findRole(record.userId);
   } catch {
     return null;
   }
-  if (!role) return null;
-  return { userId: record.userId, role, sessionId: record.id, authMethod: "bearer" };
+  if (!userInfo) return null;
+  return { userId: record.userId, role: userInfo.role, mcpAccess: userInfo.mcpAccess, sessionId: record.id, authMethod: "bearer" };
 }
 
 async function gate(

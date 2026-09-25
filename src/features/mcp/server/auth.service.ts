@@ -24,22 +24,24 @@ export async function authenticateMcp(value: string | null, requiredScope?: stri
   const token = parseBearer(value);
   if (!token) return { principal: null, status: 401 };
   const digest = createHash("sha256").update(token).digest("hex");
-  const [access] = await db.select({ row: mcpAccessTokens, role: users.role }).from(mcpAccessTokens)
+  const [access] = await db.select({ row: mcpAccessTokens, role: users.role, mcpAccess: users.mcpAccess }).from(mcpAccessTokens)
     .innerJoin(users, eq(users.id, mcpAccessTokens.userId))
     .where(and(eq(mcpAccessTokens.tokenHash, digest), gt(mcpAccessTokens.expiresAt, new Date()), isNull(mcpAccessTokens.revokedAt))).limit(1);
   if (access) {
     if (expectedResource && access.row.resource !== expectedResource) return { principal: null, status: 401 };
     if (!["superadmin", "admin", "manager"].includes(access.role)) return { principal: null, status: 403 };
+    if (access.role === "manager" && !access.mcpAccess) return { principal: null, status: 403 };
     const scopes = scopeList(access.row.scopes);
     if (requiredScope && !scopes.some((scope) => scope === requiredScope)) return { principal: null, status: 403 };
     void db.update(mcpAccessTokens).set({ lastUsedAt: new Date() }).where(eq(mcpAccessTokens.id, access.row.id));
     return { principal: { userId: access.row.userId, role: access.role, scopes, clientId: access.row.clientId, sender: access.row.sender === "ai" ? "ai" : "admin", tokenId: access.row.id, tokenType: "oauth" }, status: 401 };
   }
-  const [pat] = await db.select({ row: mcpPersonalAccessTokens, role: users.role }).from(mcpPersonalAccessTokens)
+  const [pat] = await db.select({ row: mcpPersonalAccessTokens, role: users.role, mcpAccess: users.mcpAccess }).from(mcpPersonalAccessTokens)
     .innerJoin(users, eq(users.id, mcpPersonalAccessTokens.createdBy))
     .where(and(eq(mcpPersonalAccessTokens.tokenHash, digest), gt(mcpPersonalAccessTokens.expiresAt, new Date()), isNull(mcpPersonalAccessTokens.revokedAt))).limit(1);
   if (!pat) return { principal: null, status: 401 };
   if (!["superadmin", "admin", "manager"].includes(pat.role)) return { principal: null, status: 403 };
+  if (pat.role === "manager" && !pat.mcpAccess) return { principal: null, status: 403 };
   const scopes = scopeList(pat.row.scopes);
   if (requiredScope && !scopes.some((scope) => scope === requiredScope)) return { principal: null, status: 403 };
   void db.update(mcpPersonalAccessTokens).set({ lastUsedAt: new Date() }).where(eq(mcpPersonalAccessTokens.id, pat.row.id));

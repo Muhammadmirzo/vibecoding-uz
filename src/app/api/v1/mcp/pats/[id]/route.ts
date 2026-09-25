@@ -10,6 +10,7 @@ registerV1Route({ method: "delete", path: "/api/v1/mcp/pats/{id}", security: [{ 
 export async function DELETE(request: Request, context: { params: Promise<{ id: string }> }): Promise<NextResponse> {
   const gate = await requireAdmin(request);
   if (!gate.ok) return fail(gate.response);
+  if (gate.session.role === "manager" && !gate.session.mcpAccess) return fail(new Response(JSON.stringify({ error: "forbidden", message: "MCP ruxsati yo'q" }), { status: 403 }));
   const { id } = await context.params;
   if (!z.string().uuid().safeParse(id).success) return fail(new Response(JSON.stringify({ error: "validation_error", message: "Token ID yaroqsiz" }), { status: 400 }));
   try { await revokeCredential(gate.session.userId, id); } catch (error) { return fail(error); }

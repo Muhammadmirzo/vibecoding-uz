@@ -26,7 +26,7 @@ function sessionDeps(role: string | null, record: FakeRecord | null | "default" 
         ? { userId: rec.userId, role: role ?? "student", sessionId: rec.id }
         : null,
     findSessionById: async (): Promise<FakeRecord | null> => rec,
-    findUserRole: async (): Promise<string | null> => role,
+    findUserRole: async (): Promise<{role: string, mcpAccess: boolean} | null> => role ? ({role, mcpAccess: false}) : null,
   };
 }
 
@@ -127,7 +127,7 @@ describe("W1-SEC: DB-backed authorization gates", () => {
         userId: "user-9",
         expiresAt: new Date(Date.now() + 60000),
       }),
-      findUserRole: async () => "admin",
+      findUserRole: async () => ({role: "admin", mcpAccess: true}),
     });
     expect(res.ok).toBe(true);
     if (res.ok) expect(res.session.userId).toBe("user-9");

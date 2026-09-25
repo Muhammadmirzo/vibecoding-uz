@@ -1,6 +1,6 @@
 import { and, desc, eq, gt, isNull } from "drizzle-orm";
 import { db } from "@/db";
-import { auditLogs, mcpAccessTokens, mcpAuthorizationCodes, mcpClients, mcpPersonalAccessTokens, mcpRefreshTokens } from "@/db/schema";
+import { auditLogs, mcpAccessTokens, mcpAuthorizationCodes, mcpClients, mcpPersonalAccessTokens, mcpRefreshTokens, users } from "@/db/schema";
 import { ServiceError } from "@/lib/http/errors";
 import { ALL_MCP_SCOPES, mcpScopeSchema, type CreatePatInput, type McpScope, type McpSender, type TokenRequest } from "../contracts";
 import { ACCESS_TTL_MS, AUTH_CODE_TTL_MS, REFRESH_TTL_MS, pkceS256, randomOpaqueToken, safeDigestEqual, safeHashEqual, tokenHash } from "./tokens";
@@ -99,4 +99,29 @@ export async function revokeCredential(userId: string, id: string) {
   const [pat] = await db.update(mcpPersonalAccessTokens).set({ revokedAt: new Date() }).where(and(eq(mcpPersonalAccessTokens.id, id), eq(mcpPersonalAccessTokens.createdBy, userId))).returning({ id: mcpPersonalAccessTokens.id });
   if (!pat) throw new ServiceError("NOT_FOUND", "Token topilmadi", 404);
   await db.insert(auditLogs).values({ userId, action: "mcp.pat.revoke", entityType: "mcp_personal_access_token", entityId: id });
+}
+
+export async function listManagers() {
+  const rows = await db.select({ id: users.id, fullName: users.fullName, email: users.email, role: users.role, mcpAccess: users.mcpAccess }).from(users).where(eq(users.role, "manager"));
+  return rows.map((r) => {
+    let masked = r.email;
+    if (masked && masked.includes("@")) {
+      const [name, dom] = masked.split("@");
+      masked = `${name.slice(0, 2)}***@${dom}`;
+    }
+    return { id: r.id, name: r.fullName, email: masked, mcpAccess: r.mcpAccess };
+  });
+}
+
+export async function updateManagerMcpAccess(adminId: string, managerId: string, mcpAccess: boolean) {
+  const [user] = await db.select({ role: users.role }).from(users).where(eq(users.id, managerId)).limit(1);
+  if (!user || user.role !== "manager") throw new ServiceError("NOT_FOUND", "Menejer topilmadi", 404);
+  await db.update(users).set({ mcpAccess }).where(eq(users.id, managerId));
+  if (!mcpAccess) {
+    // Revoke all tokens for this manager
+    await db.update(mcpAccessTokens).set({ revokedAt: new Date() }).where(and(eq(mcpAccessTokens.userId, managerId), isNull(mcpAccessTokens.revokedAt)));
+    await db.update(mcpRefreshTokens).set({ revokedAt: new Date() }).where(and(eq(mcpRefreshTokens.userId, managerId), isNull(mcpRefreshTokens.revokedAt)));
+    await db.update(mcpPersonalAccessTokens).set({ revokedAt: new Date() }).where(and(eq(mcpPersonalAccessTokens.createdBy, managerId), isNull(mcpPersonalAccessTokens.revokedAt)));
+  }
+  await db.insert(auditLogs).values({ userId: adminId, action: "admin.mcp.manager.update", entityType: "user", entityId: managerId, details: { mcpAccess } });
 }
