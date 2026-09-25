@@ -3,6 +3,7 @@ import { Button, Container, GirihPattern } from "@/components/ui";
 import { MagneticButton } from "@/features/motion/ui/MagneticButton";
 import { TextReveal } from "@/features/motion/ui/TextReveal";
 import { GirihWeave } from "@/features/motion/ui/GirihWeave";
+import { CohortCountdown } from "@/components/pages/CohortCountdown";
 import { siteConfig } from "@/lib/siteConfig";
 import { AppPreview } from "./AppPreview";
 
@@ -35,8 +36,11 @@ export function HeroSection() {
               <CirclePlay className="size-5" aria-hidden="true" />Bepul darsga yozilish
             </Button>
           </div>
-          <div className="mt-8 flex flex-col gap-3 border-t border-border pt-5 text-sm text-ink-muted sm:flex-row sm:gap-7">
+          <div className="mt-8 flex flex-col gap-3 border-t border-border pt-5 text-sm text-ink-muted sm:flex-row sm:flex-wrap sm:items-center sm:gap-7">
             <span>Keyingi guruh: <strong className="text-ink">{siteConfig.nextCohortDate}</strong></span>
+            <span className="inline-flex min-h-8 items-center">
+              <CohortCountdown date={siteConfig.nextCohortDate} />
+            </span>
             <span className="flex items-center gap-2"><ShieldCheck className="size-4 text-success" aria-hidden="true" />{siteConfig.guaranteeText}</span>
           </div>
         </div>
