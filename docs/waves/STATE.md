@@ -35,7 +35,8 @@
 - **Awwwards redesign:** owner picked concept **A + C**: "Naqsh to'qiladi" loom star + a live prompt→site demo in the hero.
   No Samarkand/historic-city references; keep the girih logo. Docs: `docs/redesign/awwwards/01-research-and-concepts.md`, `02-art-direction.md`.
   **Next:** slice 1 = prototype route `/lab/naqsh` (noindex, not linked): the loom star plus the scroll scrub. The owner approves the feel before the home page is touched.
-- **Legal risk flagged to the owner:** Supabase is in ap-southeast-2 (Sydney); Uzbek personal-data law requires citizens' data to be stored in Uzbekistan.
+- **Owner decisions 2026-09-25:** Telegram reply → site chat **confirmed working**. `ANTHROPIC_API_KEY` is deferred (AI chat stays off, which is fine).
+  Supabase region (Sydney) vs the Uzbek data-localization law: **accepted for now**; revisit when a server move is planned. Don't re-ask.
 - **Owner rule:** after every big wave, run the gates, push (main + main:master), and update this handoff.
 
 ### ▶ HANDOFF 2026-09-25 — start here
