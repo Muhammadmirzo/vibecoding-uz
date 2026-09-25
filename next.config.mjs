@@ -3,7 +3,11 @@ const nextConfig = {
   output: 'standalone',
   reactStrictMode: true,
   poweredByHeader: false,
+  // Next 15 streams <title>/<meta> into <body> for most user agents (incl. Googlebot).
+  // Our metadata is cheap to compute, so always put it in <head> for every crawler.
+  htmlLimitedBots: /.*/,
   images: {
+    formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       { protocol: 'https', hostname: 'images.unsplash.com' },
       { protocol: 'https', hostname: 'academy.mirzo.uz' },
