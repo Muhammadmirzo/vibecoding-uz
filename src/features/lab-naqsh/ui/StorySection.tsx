@@ -30,8 +30,8 @@ export function StorySection({
       >
         {section.headline}
       </h2>
-      <p className="mt-6 max-w-xl text-lg leading-relaxed text-on-brand-surface/75">
-        <span className="mr-2 rounded border border-white/25 px-1.5 py-0.5 font-mono text-[0.65rem] uppercase tracking-[0.1em] text-on-brand-surface/60">
+      <p className="mt-6 max-w-xl text-lg leading-relaxed text-on-brand-surface opacity-80">
+        <span className="mr-2 rounded border border-white/25 px-1.5 py-0.5 font-mono text-[0.65rem] uppercase tracking-[0.1em] text-on-brand-surface opacity-70">
           Placeholder
         </span>
         {section.body}
