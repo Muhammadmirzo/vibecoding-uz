@@ -4,8 +4,15 @@ import { STATIC_BLOG_POST_SUMMARIES } from "@/features/blog/blogData";
 import { NextStepCTA } from "@/components/ui/NextStepCTA";
 import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/features/motion/ui/Reveal";
+import { routeMetadata } from "@/lib/seo";
 import { BlogExplorer } from "./BlogExplorer";
 import "@/components/pages/w6c.css";
+
+export const metadata = routeMetadata({
+  title: "Blog — AI, vibe coding va mahsulot qurish haqida",
+  description: "AI vositalari, vibe coding va mahsulot qurish bo'yicha amaliy maqolalar va qo'llanmalar.",
+  path: "/blog",
+});
 
 export default function BlogListPage() {
   return (

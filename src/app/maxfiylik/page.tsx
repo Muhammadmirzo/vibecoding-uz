@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
 import { NextStepCTA } from "@/components/ui/NextStepCTA";
 import { LegalLayout } from "@/components/pages/PageBits";
+import { routeMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Maxfiylik siyosati", description: "Naqsh foydalanuvchilarining ma’lumotlari va ularni qanday qo‘llanishiga oid siyosat." };
+export const metadata = routeMetadata({ title: "Maxfiylik siyosati", description: "Naqsh foydalanuvchilarining ma’lumotlari va ularni qanday qo‘llanishiga oid siyosat.", path: "/maxfiylik" });
 
 const toc = [
   { id: "yigiladigan", label: "1. Yig‘iladigan ma’lumotlar" },

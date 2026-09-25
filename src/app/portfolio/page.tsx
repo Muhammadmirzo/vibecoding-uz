@@ -1,13 +1,14 @@
-import type { Metadata } from "next";
 import { Button } from "@/components/ui/Button";
 import { PageHero } from "@/components/pages/PageHero";
 import { PortfolioGallery } from "./PortfolioGallery";
 import { getPublicPortfolios } from "@/features/portfolio/server/portfolio.service";
+import { routeMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = routeMetadata({
   title: "Portfolio — AI bilan qurilgan loyihalar | Naqsh",
   description: "Tekshirilgan asosiy loyihalar, talabalar va mijozlar loyihalarini ko'rib chiqing.",
-};
+  path: "/portfolio",
+});
 
 export default async function PortfolioPage() {
   const { portfolios } = await getPublicPortfolios();

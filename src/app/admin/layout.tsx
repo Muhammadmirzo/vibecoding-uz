@@ -4,6 +4,7 @@ import { AdminNav } from "@/features/crm/components/AdminNav";
 export const metadata = {
   title: "Boshqaruv markazi | Naqsh",
   description: "Naqsh platformasi uchun CRM va boshqaruv markazi",
+  robots: { index: false, follow: false },
 };
 
 export default function AdminLayout({ children }: { children: ReactNode }) {

@@ -1,10 +1,10 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { siteConfig } from "@/lib/siteConfig";
 import { NextStepCTA } from "@/components/ui/NextStepCTA";
 import { LegalLayout } from "@/components/pages/PageBits";
+import { routeMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: `${siteConfig.guaranteeDays} kunlik pul qaytarish kafolati`, description: "Kursga qabul qilishdan keyin pul qaytarish shartlari va tartibi." };
+export const metadata = routeMetadata({ title: `${siteConfig.guaranteeDays} kunlik pul qaytarish kafolati`, description: "Kursga qabul qilishdan keyin pul qaytarish shartlari va tartibi.", path: "/pul-qaytarish" });
 
 const toc = [
   { id: "qachon", label: "1. Qachon qaytariladi?" },
