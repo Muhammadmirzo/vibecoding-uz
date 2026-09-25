@@ -59,7 +59,7 @@ DARAJALAR:
 | REVIEWER | tsc + vitest + Zod sifat audit, swallow-exception ovlash | muse-spark-1.3 / space-bunny | B |
 | DIZAYNER | UI token audit, 3 tema mosligi, responsive overlap tekshiruvi | muse-spark-1.3 / space-bunny | B |
 | RESEARCHER | Kodbaza struktura audit (read-only), modul chegaralari | muse-spark-1.3 / space-bunny | B |
-| FILE-GIT | Git sinxron, branch'lar, audit_log.txt yuritish | space-bunny | C |
+| FILE-GIT | Git sinxron, har bir katta wave'dan keyin RELEASE (gate → handoff → push → CI): `scripts/waves/release-prompt.md` | space-bunny | C |
 | ZAHAR-TESTER | E2E-QA va Responsive Smoke (Playwright) | muse-spark-1.3 / space-bunny | B |
 | ZAHAR-LEDGER | Da'vo-isbot mosligi, hujjat drift audit | muse-spark-1.3 / space-bunny | B |
 | ZAHAR-PERF | Bundle hajmi, Core Web Vitals, cache siyosati | muse-spark-1.3 / space-bunny | B |
