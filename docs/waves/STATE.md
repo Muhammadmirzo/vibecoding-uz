@@ -23,6 +23,14 @@
 
 ## Phase 2 (started 2026-09-24)
 
+### ▶ RELEASE 2026-09-26 (release-a): Awwwards slice 1 + /kabinet LCP, deployed
+- Owner approved the slice-1 loom feel on phone (2026-09-26) after the fix "phone star sticky + thicker" (8ed1289). `/lab/naqsh` is live (noindex, not linked).
+- /kabinet guest view server-rendered (Lighthouse mobile 64→84, TBT 2290→290 ms; simulated LCP 3.5 s, target 2.5 s not met yet).
+- Soft-404 on unknown /kurs/<slug>, /blog/<slug>: `dynamicParams=false` did NOT work (fresh build still 200) and was reverted. Next already adds `noindex` there, so nothing is indexed; a true 404 status needs root `src/app/loading.tsx` restructured (todo, low priority).
+- In progress: slice 2 (hero live demo) on branch `wave/awwwards-slice2` (worktree ../vibecoding-uz-wt/slice2). W8B on `wave/w8b-mcp`: MIGRATE 0012+0013 LIVE BEFORE DEPLOY (see its STATE note).
+
+   Run `npm run lessons:check`, commit `docs(waves): release-a handoff` with trailer `Co-Authored-By: Claude Haiku 4.5 <noreply@anthropic.com>`.
+
 ### ▶ HANDOFF 2026-09-25 (night): Awwwards slice 1, on branch `wave/awwwards-slice1` (NOT merged)
 - Prototype `/lab/naqsh` (noindex, not linked): the loom star draws on scroll (GSAP ScrollTrigger + Lenis), 6 placeholder story sections, reduced-motion shows the finished star. Commits 43fd16c + 3873387. Route First Load JS 177 kB (GSAP only on this route; `/` unchanged at 125 kB). Screenshots: `docs/redesign/awwwards/screens/slice1-*.png`.
 - **Next:** the owner opens the Vercel preview of this branch on their phone and approves the feel. Then merge into main via `skillkit release`, then slice 2 (hero live demo).
