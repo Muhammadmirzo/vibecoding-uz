@@ -87,7 +87,11 @@ Telegram bot token on 2026-09-26. Full per-wave detail: STATE.md "Phase 2" RELEA
    `timestamptz` + `lib/time.ts` (Asia/Tashkent), money canonical in `bigint` tiyin + currency (expand/contract), `org_id` (B2B possible),
    stored `users.referral_code`, unique tg_user_id / lower(email), one `toE164()`, `can()` permissions (48 role literals), Sentry.
    Every new SQL runs once on a real DB before merge (L2); migrations applied live BEFORE the deploy that needs them.
-5. After this: tell the skillkit session (vibecoding-uz-87, if alive) that F1+F2 are merged; it runs `skillkit init-project` (db-check gate).
+5. **Roadmap (owner request 2026-09-26): [docs/roadmap/README.md](../roadmap/README.md)** — lesson media (YouTube + stream + live),
+   MCP for every role (superadmin/accountant/manager/mentor/student, all AI clients), quality control, subdomain triggers,
+   mobile/desktop/Telegram Mini App. Order R0 → F3 → R1…R7. Each session: check the growth triggers (roadmap 06 §3) and
+   tell the owner in one message if one is reached.
+6. After this: tell the skillkit session (vibecoding-uz-87, if alive) that F1+F2 are merged; it runs `skillkit init-project` (db-check gate).
 
 ## 6. Settled owner decisions (don't re-ask)
 - Telegram reply → site chat works. `ANTHROPIC_API_KEY` is deferred. Supabase stays in Sydney for now.
