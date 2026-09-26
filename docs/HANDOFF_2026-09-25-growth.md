@@ -12,6 +12,11 @@ Bu PR yozilgandan keyin `main`ga ~45 commit qo'shildi (W8B MCP + OAuth, E0 hero 
 Kompyuterda davom ettirish uchun egasi yangi Claude sessiyasiga shuni yozadi:
 > `PR #2 (branch claude/relaxed-gates-9vl0ir) dagi docs/HANDOFF_2026-09-25-growth.md ni o'qi va §0 dan davom et.`
 
+- [ ] **R-1. AVVAL LAPTOP'DAGI ISHNI SAQLA (eng birinchi qadam).** Egasining laptopida push qilinmagan o'zgarishlar bo'lishi mumkin. Laptop'dagi repoda:
+  1. `git status` va `git worktree list` — har bir worktree'da commit qilinmagan/push qilinmagan ish bormi (`git log origin/<branch>..HEAD`).
+  2. Bor bo'lsa: o'z wave branch'iga commit qil va `git push origin <branch>` (main'ga emas). Hech narsani `reset --hard`/`checkout .`/`stash drop` qilma.
+  3. `git fetch origin` — keyin R0.
+  Qoida: **main'ga faqat bitta joy yozadi** (laptop orkestratori). PR #2 ni main'ga faqat R-1 va R0 tugagach, egasi aytganda merge qil. Hech qachon `push --force` main/master'ga.
 - [ ] **R0. PR'ni yangi main'ga moslashtirish** (kuchli model; egasi "ha" degandan keyin). Tartib:
   1. `git checkout claude/relaxed-gates-9vl0ir && git fetch origin`.
   2. **wave/mcp'ni qaytar** — W8B (`src/features/mcp/registry/*`: `analytics_overview`, `analytics_acquisition`, `analytics_funnel`, `sales_summary`, … OAuth bilan) buni to'liq qoplaydi: `git revert -m 1 be05c1c`. `mcp.json`/`mcp-config.json` o'chirilishi ham bekor bo'ladi — ular W8B holatida qolsin.
