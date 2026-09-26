@@ -2,6 +2,7 @@
 
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { buildCheckoutHref, PRIMARY_COURSE_SLUG } from "@/features/payments/domain/checkout-target";
 import { otpSendSchema, otpVerifySchema, userSchema, type User } from "@/lib/validations/auth";
 
 interface AuthContextType {
@@ -74,11 +75,15 @@ export function AuthProvider({ children, initialUser = null }: { children: React
   }, [clearMessages, router]);
 
   useEffect(() => {
-    const openCourseCheckout = () => {
+    const openCourseCheckout = (event: Event) => {
+      // The sticky buy bar sends its course slug so the pay page opens for
+      // the course the visitor is actually reading about.
+      const detail = (event as CustomEvent<{ courseSlug?: string }>).detail;
+      const href = buildCheckoutHref(detail?.courseSlug ?? PRIMARY_COURSE_SLUG);
       if (user) {
-        router.push("/kabinet/to-lovlar");
+        router.push(href);
       } else {
-        openAuthModal("login", "/kabinet/to-lovlar");
+        openAuthModal("login", href);
       }
     };
     window.addEventListener("open-course-checkout", openCourseCheckout);

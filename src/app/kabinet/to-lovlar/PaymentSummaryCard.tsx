@@ -9,21 +9,26 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import type { CheckoutTarget } from "@/features/payments/domain/checkout-target";
 import {
   computeInstallmentProgress,
   formatUzs,
   type PaymentProvider,
   type ProviderAvailability,
 } from "@/features/payments/format";
+import { buildCheckoutRequestBody } from "./checkout-request";
 
 interface PaymentSummaryCardProps {
   paidAmount: number;
+  /** Course price in so'm, from siteConfig (display only). */
   coursePrice: number;
+  /** Amount the server will charge for the open cohort, in so'm (trusted source). */
+  payableAmount: number;
   courseTitle: string;
   installmentText: string;
   guaranteeText: string;
   providers: ProviderAvailability;
-  enrollmentId: string | null;
+  target: CheckoutTarget;
 }
 
 function isCheckoutResponse(value: unknown): value is {
@@ -36,34 +41,41 @@ function isCheckoutResponse(value: unknown): value is {
 export function PaymentSummaryCard({
   paidAmount,
   coursePrice,
+  payableAmount,
   courseTitle,
   installmentText,
   guaranteeText,
   providers,
-  enrollmentId,
+  target,
 }: PaymentSummaryCardProps) {
   const firstAvailable = providers.payme ? "payme" : providers.click ? "click" : "payme";
   const [provider, setProvider] = React.useState<PaymentProvider>(firstAvailable);
   const [paying, setPaying] = React.useState(false);
   const [message, setMessage] = React.useState("");
   const [messageTone, setMessageTone] = React.useState<"status" | "alert">("status");
-  const progress = computeInstallmentProgress(paidAmount, coursePrice);
-  const outstanding = Math.max(coursePrice - paidAmount, 0);
+  const progress = computeInstallmentProgress(paidAmount, payableAmount);
+  const outstanding = Math.max(payableAmount - paidAmount, 0);
   const anyProviderAvailable = providers.payme || providers.click;
 
   async function handlePay(): Promise<void> {
+    const body = buildCheckoutRequestBody({
+      provider,
+      installmentMonth: 1,
+      target,
+      amountHint: outstanding,
+    });
+    if (!body) {
+      setMessageTone("alert");
+      setMessage("Hozircha ochiq guruh yo'q. Telegram orqali navbatga yoziling.");
+      return;
+    }
     setPaying(true);
     setMessageTone("status"); setMessage("To'lov oynasi tayyorlanmoqda…");
     try {
       const response = await fetch("/api/payments/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          provider,
-          amountSum: outstanding,
-          installmentMonth: 1,
-          ...(enrollmentId ? { enrollmentId } : {}),
-        }),
+        body: JSON.stringify(body),
       });
       const data: unknown = await response.json();
       if (!response.ok || !isCheckoutResponse(data) || !data.checkoutUrl) {
@@ -88,7 +100,10 @@ export function PaymentSummaryCard({
 
   return (
     <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
-      <section className="rounded-2xl border border-border bg-bg-elevated p-6 md:p-8">
+      <section
+        className="rounded-2xl border border-border bg-bg-elevated p-6 md:p-8"
+        data-checkout-target={target.state}
+      >
         <div className="mb-5 flex flex-wrap items-start justify-between gap-3 border-b border-border pb-4">
           <div>
             <p className="font-mono text-xs font-bold uppercase text-accent">Kurs</p>
@@ -101,8 +116,8 @@ export function PaymentSummaryCard({
 
         <div className="space-y-2">
           <div className="flex justify-between gap-3 font-mono text-xs text-ink-muted">
+            <span>Kurs narxi: <strong className="text-ink">{formatUzs(coursePrice)}</strong></span>
             <span>To'langan: <strong className="text-ink">{formatUzs(progress.paidAmount)}</strong></span>
-            <span>Jami: <strong className="text-ink">{formatUzs(progress.total)}</strong></span>
           </div>
           <div className="h-3 overflow-hidden rounded-full bg-bg-sunken" role="progressbar"
             aria-label="To'lov progressi" aria-valuenow={progress.percent} aria-valuemin={0} aria-valuemax={100}>
@@ -144,6 +159,12 @@ export function PaymentSummaryCard({
           {paying ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <CreditCard className="h-4 w-4" aria-hidden="true" />}
           {outstanding <= 0 ? "Kurs to'langan" : paying ? "To'lov tizimi ochilmoqda…" : `${formatUzs(outstanding)} to'lash`}
         </Button>
+        {!anyProviderAvailable ? (
+          <p className="mt-3 text-xs text-ink-muted">
+            Hozircha hech bir to&apos;lov tizimi ulanmagan. Telegram orqali to&apos;lov shartlarini
+            kelishamiz.
+          </p>
+        ) : null}
       </section>
 
       <aside className="flex flex-col justify-between rounded-2xl border border-border-strong bg-bg-elevated p-6 shadow-sm">

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/Button";
 import { CourseCheckoutButton } from "./CourseCheckoutButton";
 
 interface CourseCheckoutCardProps {
+  courseSlug: string;
   price: string;
   oldPrice: string;
   installment: string;
@@ -11,7 +12,7 @@ interface CourseCheckoutCardProps {
   guaranteeText: string;
 }
 
-export function CourseCheckoutCard({ price, oldPrice, installment, sessionFormat, guaranteeText }: CourseCheckoutCardProps) {
+export function CourseCheckoutCard({ courseSlug, price, oldPrice, installment, sessionFormat, guaranteeText }: CourseCheckoutCardProps) {
   return (
     <div className="rounded-xl border-2 border-accent bg-bg-elevated p-7 shadow-lg lg:sticky lg:top-24">
       <div className="space-y-1">
@@ -35,7 +36,7 @@ export function CourseCheckoutCard({ price, oldPrice, installment, sessionFormat
         </ul>
       </div>
       <div className="space-y-3 pt-2">
-        <span data-track="course_buy"><CourseCheckoutButton /></span>
+        <span data-track="course_buy"><CourseCheckoutButton courseSlug={courseSlug} /></span>
         <p className="text-sm leading-relaxed text-ink-muted">
           To&apos;lov oynasi `Kabinet → To&apos;lovlar` bo&apos;limida ochiladi — avval hisobingizga kiring.
         </p>
