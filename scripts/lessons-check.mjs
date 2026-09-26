@@ -57,6 +57,24 @@ if (!staged || files.includes("vercel.json")) {
   if (!/"syd1"/.test(read("vercel.json"))) failures.push('L16 vercel.json: region "syd1" missing');
 }
 
+// L27: an in-page anchor the site chrome deep-links to must exist as an id in
+// src. Deleting a section that owned an id (e.g. the old <Pricing id="kurs-tanlash">)
+// silently kills the nav link, the header CTA, the mobile drawer entry and the
+// CRM's default headerCtaLink at once, and nothing else notices.
+if (!staged) {
+  const wanted = new Set();
+  for (const f of sh("git ls-files 'src/components/layout' 'src/features/crm' 'src/config' 'src/components/ui'")) {
+    for (const m of read(f).matchAll(/["'`]\/(#[a-z0-9][a-z0-9-]*)["'`]/g)) wanted.add(m[1].slice(1));
+  }
+  const ids = new Set();
+  for (const f of sh("git ls-files 'src/*.tsx' 'src/**/*.tsx'")) {
+    for (const m of read(f).matchAll(/\bid=["'{]([a-z0-9][a-z0-9-]*)["'}]/g)) ids.add(m[1]);
+  }
+  for (const a of wanted) {
+    if (!ids.has(a)) failures.push(`L27 site chrome deep-links to /#${a} but no id="${a}" exists in any src/**/*.tsx`);
+  }
+}
+
 for (const d of debt) console.log(`debt  ${d}`);
 for (const f of failures) console.log(`FAIL  ${f}`);
 console.log(`lessons-check: ${failures.length} failure(s), ${debt.length} known debt (${staged ? "staged" : "repo"})`);
