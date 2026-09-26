@@ -10,6 +10,7 @@ const staticRoutes: MetadataRoute.Sitemap = [
   "",
   "/bepul-dars",
   "/diagnostika",
+  "/kurs",
   "/ekspertlar",
   "/ish", // W10 yopiq: pastdagi filtr yashiradi, ro'yxatdan o'chirilmaydi.
   "/atamalar",
