@@ -1,20 +1,5 @@
-/* Home bento, roadmap, fill and section transition primitives. */
+/* Home roadmap, fill and section-transition primitives. */
 
-.bento-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 1rem; }
-.bento-tile { grid-column: span 5; min-height: 340px; }
-.bento-wide { grid-column: span 7; }
-.bento-card { position: relative; display: flex; min-height: 100%; flex-direction: column; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--bg-elevated); padding: clamp(1.25rem, 3vw, 2rem); box-shadow: var(--shadow-sm); transition: border-color var(--motion-fast) var(--motion-ease-out), box-shadow var(--motion-fast) var(--motion-ease-out), transform var(--motion-fast) var(--motion-ease-out); }
-.bento-card::after { content: ""; position: absolute; right: -5rem; bottom: -6rem; width: 14rem; height: 14rem; border: 1px solid var(--border); border-radius: 50%; box-shadow: 0 0 0 1.5rem color-mix(in srgb, var(--border) 35%, transparent), 0 0 0 3rem color-mix(in srgb, var(--border) 18%, transparent); pointer-events: none; }
-.bento-card:hover { border-color: var(--border-strong); box-shadow: var(--shadow-md); transform: translateY(-2px); }
-.bento-index { position: absolute; top: 1.25rem; right: 1.25rem; color: var(--ink-subtle); font-family: var(--font-mono); font-size: .68rem; }
-.bento-icon { width: 2.5rem; height: 2.5rem; color: var(--accent); stroke-width: 1.4; }
-.bento-facts { position: relative; z-index: 1; display: flex; align-items: center; gap: .55rem; margin-top: 1.8rem; }
-.bento-facts span { display: flex; align-items: center; gap: .4rem; border: 1px solid var(--border); border-radius: 999px; background: var(--bg-sunken); padding: .42rem .65rem; color: var(--ink-muted); font-size: .66rem; }
-.bento-facts b { color: var(--brand); font-family: var(--font-mono); font-size: .58rem; }
-html.motion-armed[data-motion-scroll="on"] [data-reveal].is-visible .bento-icon * { animation: bento-icon-draw var(--motion-slow) var(--motion-ease-out) both; }
-@keyframes bento-icon-draw { from { opacity: 0; stroke-dasharray: 32; stroke-dashoffset: 32; transform: scale(.82); } to { opacity: 1; stroke-dasharray: 32; stroke-dashoffset: 0; transform: scale(1); } }
-.bento-card h3 { position: relative; z-index: 1; max-width: 30rem; font-size: clamp(1.35rem, 2vw, 1.8rem); font-weight: 700; letter-spacing: -.03em; }
-.bento-card p { position: relative; z-index: 1; max-width: 36rem; margin-top: .85rem; color: var(--ink-muted); }
 .tilt-card { height: 100%; transform-style: preserve-3d; }
 
 .demo-prompt { position: relative; z-index: 1; display: flex; align-items: center; gap: .65rem; margin-top: auto; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--bg-sunken); padding: .85rem; color: var(--ink-muted); font-family: var(--font-mono); font-size: .68rem; }
@@ -102,7 +87,6 @@ html[data-motion="full"][data-motion-ambient="on"] .demo-caret { animation: demo
 }
 
 @media (max-width: 1023px) {
-  .bento-tile,.bento-wide { grid-column: span 6; }
   .roadmap-path { display: none; }
   .roadmap-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   /* Reset the desktop path stagger: below 1024px the connecting path is
@@ -113,8 +97,5 @@ html[data-motion="full"][data-motion-ambient="on"] .demo-caret { animation: demo
   .roadmap-step .roadmap-dot { display: none; }
 }
 @media (max-width: 639px) {
-  .bento-tile,.bento-wide { grid-column: 1 / -1; min-height: 310px; }
-  .bento-facts { flex-wrap: wrap; margin-top: 1.25rem; }
-  .bento-facts span { padding: .38rem .55rem; }
   .roadmap-grid { grid-template-columns: 1fr; }
 }

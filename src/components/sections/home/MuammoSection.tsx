@@ -7,9 +7,10 @@
  *
  * Copy is real, not placeholder: the honesty rule (no invented numbers,
  * reviews or students) applies, and this text says nothing that isn't
- * already true of the learn-to-code funnel. It deliberately doesn't repeat
- * Transformation's "week by week" framing — this section is about why the
- * old way stalls before that transformation even starts.
+ * already true of the learn-to-code funnel. It deliberately doesn't use the
+ * "week by week" framing — this section is only about why the old way stalls
+ * before any transformation starts. (The old Transformation section that
+ * carried that framing was removed as dead code in slice E2.)
  */
 export function MuammoSection() {
   return (

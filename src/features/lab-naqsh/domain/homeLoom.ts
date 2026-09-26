@@ -13,7 +13,10 @@ export interface HomeLoomSection {
  * and add one entry here. HomeLoom derives which strands are still "muted"
  * (faint guide, no section yet) from whatever isn't listed.
  */
-export const HOME_LOOM_SECTIONS: readonly HomeLoomSection[] = [{ id: "muammo", strand: "square" }];
+export const HOME_LOOM_SECTIONS: readonly HomeLoomSection[] = [
+  { id: "muammo", strand: "square" },
+  { id: "usul", strand: "diamond" },
+];
 
 /**
  * Strands with no registered section yet. `glow` is excluded: it already
