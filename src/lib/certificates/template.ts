@@ -1,4 +1,10 @@
+import { randomInt } from "node:crypto";
 import { generateCertificateSchema, type GenerateCertificateInput } from "@/lib/validations";
+
+/** Unambiguous alphabet: no I, O, 0, 1 — a code is read aloud and typed by hand. */
+const CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+/** Random part length. Format: NAQSH-<year>-XXXXXXXX. */
+export const CODE_RANDOM_LENGTH = 8;
 
 export interface CertificateTemplateData {
   holderName: string;
@@ -8,13 +14,16 @@ export interface CertificateTemplateData {
   certCode: string;
 }
 
-/** Generates a unique certificate code (e.g., NAQSH-2026-7A9K2). */
+/**
+ * Generates a unique certificate code, e.g. `NAQSH-2026-7A9K2M4Q`.
+ * CSPRNG (`node:crypto` randomInt) — `Math.random` is forbidden for tokens/OTP
+ * and a certificate code is a public trust artefact (CODER_AGENT_RULES §6).
+ */
 export function generateUniqueCertificateCode(): string {
   const year = new Date().getFullYear();
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   let randomStr = "";
-  for (let index = 0; index < 5; index++) {
-    randomStr += chars.charAt(Math.floor(Math.random() * chars.length));
+  for (let index = 0; index < CODE_RANDOM_LENGTH; index++) {
+    randomStr += CODE_ALPHABET.charAt(randomInt(0, CODE_ALPHABET.length));
   }
   return `NAQSH-${year}-${randomStr}`;
 }

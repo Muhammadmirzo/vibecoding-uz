@@ -80,7 +80,8 @@ describe("Telegram Bot & LMS Drip & Certificate Generator", () => {
   describe("Certificate Generator", () => {
     it("generates a unique certificate code in correct format", () => {
       const code = generateUniqueCertificateCode();
-      expect(code).toMatch(/^NAQSH-\d{4}-[A-Z0-9]{5}$/);
+      // NAQSH-<year>-XXXXXXXX, ambiguous characters (I, O, 0, 1) excluded.
+      expect(code).toMatch(/^NAQSH-\d{4}-[A-HJ-NP-Z2-9]{8}$/);
     });
 
     it("generates a valid PDF buffer with student credentials", async () => {
