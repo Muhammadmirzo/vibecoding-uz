@@ -19,15 +19,20 @@ export const HOME_LOOM_SECTIONS: readonly HomeLoomSection[] = [
   { id: "dastur", strand: "weave" },
   { id: "natijalar", strand: "ring" },
   { id: "narx", strand: "fill" },
+  { id: "boshlash", strand: "glow" },
 ];
 
 /**
- * Strands with no registered section yet. `glow` is excluded: it already
- * rests at opacity 0 in the SVG (section 6's pulse-in effect), so muting it
- * further would be a no-op — this only touches strands that would otherwise
- * render at full/near-full opacity as if "finished".
+ * Strands with no registered section yet — the faint, unfinished guide state.
+ *
+ * All six strands are now registered (Wave E, slice E6 shipped `boshlash` ->
+ * `glow`), so this returns []: the star is fully woven and the loom shows no
+ * muted strand. The earlier `strand !== "glow"` special case existed only
+ * because the glow halo rests at opacity 0 in the SVG while no section claimed
+ * it; now that `boshlash` claims it, glow is muted by the same rule as every
+ * other strand, and the registry is the single source of truth.
  */
 export function mutedHomeStrands(sections: readonly HomeLoomSection[] = HOME_LOOM_SECTIONS): StrandKey[] {
   const active = new Set(sections.map((section) => section.strand));
-  return STRAND_KEYS.filter((strand) => strand !== "glow" && !active.has(strand));
+  return STRAND_KEYS.filter((strand) => !active.has(strand));
 }

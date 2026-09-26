@@ -11,9 +11,9 @@ import { UsulSection } from "@/components/sections/home/UsulSection";
 import { DasturSection } from "@/components/sections/home/DasturSection";
 import { NatijalarSection } from "@/components/sections/home/NatijalarSection";
 import { NarxSection } from "@/components/sections/home/NarxSection";
+import { BoshlashSection } from "@/components/sections/home/BoshlashSection";
 import { Mentor } from "@/components/sections/home/Mentor";
 import { Comparison } from "@/components/sections/home/Comparison";
-import { NextStepCTA } from "@/components/ui";
 import { siteConfig } from "@/lib/siteConfig";
 import { BRAND } from "@/config/brand";
 
@@ -27,4 +27,4 @@ export const metadata: Metadata = { title: { absolute: `${title} — ${BRAND.nam
 const organization = { "@context": "https://schema.org", "@type": "Organization", name: BRAND.name, url: siteUrl, description };
 const courseList = { "@context": "https://schema.org", "@type": "ItemList", itemListElement: Object.keys(siteConfig.courses).map((slug, index) => ({ "@type": "ListItem", position: index + 1, item: { "@type": "Course", name: slug === "ai-asoslari" ? "AI Asoslari" : "Vibe Coding Express", description: slug === "ai-asoslari" ? "AI vositalarini amaliy qo'llash kursi" : "AI bilan ishlaydigan ilova qurish kursi", url: `${siteUrl}/kurs/${slug}`, provider: { "@id": `${siteUrl}/#organization` } } })) };
 
-export default function HomePage() { return <><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify([{ ...organization, "@id": `${siteUrl}/#organization` }, courseList]) }} /><HeroSection /><HomeLoom><MuammoSection /><UsulSection /><DasturSection /><NatijalarSection /><NarxSection /></HomeLoom><BuildStory /><ToolStrip /><Mentor /><Comparison /><NextStepCTA /></>; }
+export default function HomePage() { return <><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify([{ ...organization, "@id": `${siteUrl}/#organization` }, courseList]) }} /><HeroSection /><HomeLoom><MuammoSection /><UsulSection /><DasturSection /><NatijalarSection /><NarxSection /><BoshlashSection /></HomeLoom><BuildStory /><ToolStrip /><Mentor /><Comparison /></>; }
