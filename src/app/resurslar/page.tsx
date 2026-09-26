@@ -39,7 +39,7 @@ export default function Page() {
           </Card>
         </Reveal>
       </Container>
-      <NextStepCTA title="Resurdan keyin o‘z loyihangizni boshlang" />
+      <NextStepCTA title="Resursdan keyin o‘z loyihangizni boshlang" />
     </div>
   );
 }

@@ -9,6 +9,8 @@ import {
 import type { DbExecutor } from "@/features/payments/server/payments.repository";
 import { drizzleAuthSessionRepository, type AuthSessionRepository } from "./auth-session.repository";
 import { drizzleAuthUserRepository, type AuthUserRepository } from "./auth-user.repository";
+import { attributeReferralFromCookieTx, type AttributionTxStore } from "@/features/referrals/server/attribution.service";
+import { drizzleReferralsRepository } from "@/features/referrals/server/referrals.repository";
 import {
   drizzleTelegramLoginRequestRepository,
   publicTelegramRequestState,
@@ -25,6 +27,8 @@ export interface TelegramLoginDependencies {
   users: Pick<AuthUserRepository, "findById" | "findByTgId">;
   sessions: Pick<AuthSessionRepository, "createSessionTx">;
   transaction: typeof withTransactionLock;
+  /** Referral store — used only to attribute a `ref_code` cookie on signup. */
+  referrals?: AttributionTxStore;
 }
 
 const defaultDependencies: TelegramLoginDependencies = {
@@ -32,6 +36,7 @@ const defaultDependencies: TelegramLoginDependencies = {
   users: drizzleAuthUserRepository,
   sessions: drizzleAuthSessionRepository,
   transaction: withTransactionLock,
+  referrals: drizzleReferralsRepository,
 };
 
 function dependencies(overrides?: Partial<TelegramLoginDependencies>): TelegramLoginDependencies {
@@ -49,6 +54,17 @@ export interface TelegramStatusResult {
   state: "pending" | "approved" | "rejected" | "expired" | "consumed" | "unknown";
   user?: PublicAuthUser;
   token?: string;
+  refCodeAttributed?: boolean;
+}
+
+/**
+ * True when the account was created after this login request started — i.e. the
+ * Telegram login flow itself created the user (the bot only asks for a contact
+ * when `findByTgId` found nothing). Only then may a `ref_code` cookie be
+ * attributed, matching the phone/OTP path which attributes new users only.
+ */
+export function isSignupFromRequest(userCreatedAt: Date, requestCreatedAt: Date): boolean {
+  return userCreatedAt.getTime() >= requestCreatedAt.getTime();
 }
 
 export function hashTelegramLoginToken(token: string): string {
@@ -91,6 +107,7 @@ export async function getTelegramLoginStatus(
   cookieToken: string | null,
   signer: SessionSigner,
   overrides?: Partial<TelegramLoginDependencies>,
+  options: { refCode?: string } = {},
 ): Promise<TelegramStatusResult> {
   const deps = dependencies(overrides);
   try {
@@ -120,7 +137,17 @@ export async function getTelegramLoginStatus(
         role: user.role,
         expiresAt: expiresAt.getTime(),
       });
-      return { state: "approved" as const, user: toPublicUser(user), token };
+      // Same rule as the phone/OTP path: attribute the `ref_code` cookie only
+      // for an account this login just created, in the same transaction.
+      let refCodeAttributed = false;
+      if (deps.referrals && options.refCode && isSignupFromRequest(user.createdAt, row.createdAt)) {
+        const attribution = await attributeReferralFromCookieTx(deps.referrals, ex, {
+          code: options.refCode,
+          referredUserId: user.id,
+        });
+        refCodeAttributed = attribution.attributed;
+      }
+      return { state: "approved" as const, user: toPublicUser(user), token, refCodeAttributed };
     });
   } catch (error) {
     console.error("[telegram-login] status failed", error);

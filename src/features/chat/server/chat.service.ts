@@ -12,6 +12,7 @@ import { conversationDto, messageDto } from "./chat-dto";
 import { audit, CURSOR_OVERLAP_MS, messageDtos, requireConversation } from "./chat-helpers";
 import { getChatSettings } from "./settings.service";
 import { hashVisitorToken } from "./visitor-token";
+import { notifyNewLead } from "@/features/leads/server/lead-notification";
 
 export async function getVisitorConversation(token: string): Promise<ChatConversationDto | null> {
   try {
@@ -102,6 +103,13 @@ export async function sendVisitorMessage(
     }).returning();
     [conversation] = await db.update(chatConversations)
       .set({ leadId: lead.id }).where(eq(chatConversations.id, conversation.id)).returning();
+    // Best-effort manager alert; a failed notification never fails the chat.
+    void notifyNewLead({
+      leadId: lead.id,
+      name: lead.name,
+      contact: input.telegram ?? input.phone ?? "",
+      source: input.telegram ? "Telegram suhbat" : "Sayt chati",
+    });
   }
   return messageDto(message);
 }

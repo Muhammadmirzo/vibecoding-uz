@@ -7,6 +7,7 @@ import {
   submitQuizLead,
 } from "@/features/quiz/server/quiz.service";
 import { freeLessonLeadSchema, quizLeadSchema } from "@/lib/validations";
+import { canonicalTelegramContact } from "@/features/leads/domain/telegram-username";
 import { checkRateLimit, getClientIp, createRateLimitResponse, PRESETS } from "@/lib/security/rateLimit";
 import { errorResponse } from "@/lib/http/errors";
 
@@ -30,15 +31,26 @@ export async function POST(request: Request) {
     const source = rawBody.source === "free_lesson" ? "free_lesson" : "quiz";
     const normalizedName = typeof rawBody.name === "string" ? rawBody.name.trim() : "";
     const normalizedPhone = normalizeQuizContact(rawBody.phone);
-    const normalizedTelegram = typeof rawBody.telegram === "string"
-      ? rawBody.telegram.trim()
-      : source === "free_lesson" && normalizedPhone.startsWith("@") ? normalizedPhone : "";
+    // A Telegram handle may arrive with or without `@` (and sometimes in the
+    // phone field on the free-lesson form) — canonicalize server-side so the
+    // CRM never stores "ali" and "@ali" as two different contacts.
+    const normalizedTelegram = canonicalTelegramContact(
+      typeof rawBody.telegram === "string" && rawBody.telegram.trim() !== ""
+        ? rawBody.telegram
+        : source === "free_lesson" && normalizedPhone.startsWith("@")
+          ? normalizedPhone
+          : "",
+    );
 
     if (source === "free_lesson") {
+      // A handle typed into the phone field belongs to `telegram`, otherwise
+      // the "only one contact method" refinement would reject the very payload
+      // the free-lesson form sends.
+      const phoneFromHandle = normalizedPhone.startsWith("@");
       const data = freeLessonLeadSchema.parse({
         ...rawBody,
         name: normalizedName,
-        phone: normalizedPhone || undefined,
+        phone: phoneFromHandle ? undefined : normalizedPhone || undefined,
         telegram: normalizedTelegram || undefined,
         source,
       });

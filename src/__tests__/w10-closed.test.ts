@@ -21,6 +21,7 @@ import { resourceLinks } from "@/components/layout/headerData";
 import { STATIC_SEARCH_DATA } from "@/features/search/domain/search";
 import IshClosedLayout from "@/app/ish/layout";
 import TestimonialsClosedLayout from "@/app/testimoniyalar/layout";
+import ExpertsClosedLayout from "@/app/ekspertlar/layout";
 import { POST as applyPost } from "@/app/api/ish/apply/route";
 
 describe("W10 closed-features registry", () => {
@@ -36,7 +37,7 @@ describe("W10 closed-features registry", () => {
     expect(isClosedRoute("/ish")).toBe(true);
     expect(isClosedRoute("/ish/senior-vibe-coding-mentor")).toBe(true);
     expect(isClosedRoute("/testimoniyalar")).toBe(true);
-    expect(isClosedRoute("/ekspertlar")).toBe(false);
+    expect(isClosedRoute("/ekspertlar")).toBe(true);
     expect(isClosedRoute("/")).toBe(false);
     expect(closedRoutePrefixes()).toEqual(expect.arrayContaining(["/ish", "/testimoniyalar"]));
     expect(isClosedApi("/api/ish/apply")).toBe(true);
@@ -49,7 +50,7 @@ describe("W10 closed-features registry", () => {
     expect(urls.length).toBeGreaterThan(0);
     expect(urls.some((url) => url.endsWith("/ish") || url.includes("/ish/"))).toBe(false);
     expect(urls.some((url) => url.endsWith("/testimoniyalar"))).toBe(false);
-    expect(urls.some((url) => url.endsWith("/ekspertlar"))).toBe(true);
+    expect(urls.some((url) => url.endsWith("/ekspertlar"))).toBe(false);
   });
 
   it("keeps closed routes out of header navigation and the search index", () => {
@@ -65,15 +66,16 @@ describe("W10 closed-features registry", () => {
   it("renders a real 404 from the closed page layouts", () => {
     expect(() => IshClosedLayout({ children: null })).toThrowError(/NEXT_NOT_FOUND/);
     expect(() => TestimonialsClosedLayout({ children: null })).toThrowError(/NEXT_NOT_FOUND/);
+    expect(() => ExpertsClosedLayout({ children: null })).toThrowError(/NEXT_NOT_FOUND/);
   });
 
   it("returns a real 404 from middleware for closed routes", async () => {
     const { middleware } = await import("@/middleware");
-    for (const path of ["/ish", "/ish/senior-vibe-coding-mentor", "/testimoniyalar"]) {
+    for (const path of ["/ish", "/ish/senior-vibe-coding-mentor", "/testimoniyalar", "/ekspertlar"]) {
       const response = await middleware({ nextUrl: new URL(`http://localhost${path}`) } as never);
       expect(response.status).toBe(404);
     }
-    const open = await middleware({ nextUrl: new URL("http://localhost/ekspertlar") } as never);
+    const open = await middleware({ nextUrl: new URL("http://localhost/kurs") } as never);
     expect(open.status).not.toBe(404);
   });
 

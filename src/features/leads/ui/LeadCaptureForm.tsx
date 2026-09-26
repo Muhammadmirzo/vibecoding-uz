@@ -8,9 +8,12 @@ import { FieldError, Input, Label } from "@/components/ui/Form";
 import { SuccessCheck } from "@/features/motion/ui/SuccessCheck";
 import {
   formatPhoneMask,
-  isValidTelegramUsername,
   isValidUzbekPhone,
 } from "./phoneMask";
+import {
+  isValidTelegramUsername,
+  normalizeTelegramUsername,
+} from "../domain/telegram-username";
 
 export type LeadSource = "quiz" | "free_lesson" | "xizmatlar" | "meetlar" | "resurslar";
 
@@ -37,7 +40,7 @@ export function LeadCaptureForm({
   recommendedCourseId,
   revealUrl,
   revealTitle = "So'rovingiz qabul qilindi",
-  revealText = "Tez orada siz bilan bog'lanamiz.",
+  revealText = "Quyidagi tugma orqali davom eting — biz shu yeda siz bilan bog'lanamiz.",
   redirectUrl,
   onSuccess,
 }: LeadCaptureFormProps) {
@@ -67,7 +70,7 @@ export function LeadCaptureForm({
       fieldErrors.phone = "Telefonni to'liq kiriting: +998 XX XXX-XX-XX.";
     }
     if (cleanTelegram !== "" && !isValidTelegramUsername(cleanTelegram)) {
-      fieldErrors.telegram = "Telegram username @ bilan boshlansin (@username).";
+      fieldErrors.telegram = "Telegram username @ bilan yoki @siz yozing (kamida 3 belgi).";
     }
     if (Object.keys(fieldErrors).length > 0) {
       setErrors(fieldErrors);
@@ -82,7 +85,7 @@ export function LeadCaptureForm({
         body: JSON.stringify({
           name: cleanName,
           phone,
-          telegram: cleanTelegram || undefined,
+          telegram: normalizeTelegramUsername(cleanTelegram) || undefined,
           source,
           quizAnswers: quizAnswers ?? undefined,
           recommendedCourseId: recommendedCourseId ?? undefined,
@@ -90,7 +93,7 @@ export function LeadCaptureForm({
       }, 10_000);
       if (!response.ok) {
         const data = (await response.json().catch(() => null)) as { error?: string; message?: string } | null;
-        setServerError(data?.message ?? data?.error ?? "So'rov qabul qilinmadi. Ma'lumotlaringiz shu yerde saqlangan; qayta urinib ko'ring.");
+        setServerError(data?.message ?? data?.error ?? "So'rovni yuborib bo'lmadi va ma'lumotlaringiz yozilmadi. Bir oz kutib, yana urinib ko'ring.");
         return;
       }
       setDone(true);

@@ -10,10 +10,10 @@ export function BepulDarsLeadSection() {
         source="free_lesson"
         ctaLabel="Dars havolasini olish"
         title="Bepul darsni ko'rish uchun so'rov qoldiring"
-        description="Telefon raqamingizni kiriting. So'rov bazaga saqlanganini tasdiqlaymiz; dars havolasini Telegram orqali yuborish jarayoni alohida boshqariladi."
+        description="Telefon raqamingizni yoki Telegram username yozing. Keyingi qadam — dars havolasi — shu yerda ochiladi."
         revealUrl={TELEGRAM_URL}
-        revealTitle="So'rovingiz qabul qilindi"
-        revealText="So'rov saqlandi. Dars havolasini tezroq olish uchun quyidagi tugma orqali Telegram orqali murojaat qiling."
+        revealTitle="Dars havolasi shu yeda"
+        revealText="Endi quyidagi tugmani bosing: biz Telegram'da siz bilan bog'lanib, dars havolasini yuboramiz."
       />
       <p className="mt-4 text-center text-xs text-ink-subtle">
         Ma'lumotlaringiz xavfsiz saqlanadi va spam yuborilmaydi.
