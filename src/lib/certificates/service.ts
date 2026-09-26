@@ -42,9 +42,12 @@ export async function verifyCertificate(input: VerifyCertificateInput) {
 }
 
 export interface CertificateOwner {
-  /** Real student name (users.full_name), falling back to the issued holder name. */
+  /**
+   * Real student name (users.full_name), falling back to the holder name
+   * snapshotted onto the certificate at issuance. NEVER a phone number: this
+   * page is public and unauthenticated, so no PII beyond the printed name.
+   */
   holderName: string;
-  phone: string | null;
   courseTitle: string;
   /** Server-derived score written at issuance; null when no finite number is stored. */
   score: number | null;
@@ -60,10 +63,11 @@ export interface CertificateOwner {
 export async function loadCertificateOwner(
   certificate: typeof certificates.$inferSelect,
 ): Promise<CertificateOwner> {
+  // PII: `users.phone` is deliberately NOT selected — the public verification page
+  // must never render (nor fall back to) a phone number.
   const [row] = await db
     .select({
       fullName: users.fullName,
-      phone: users.phone,
       courseTitle: courses.title,
       enrollmentScore: enrollments.finalScore,
     })
@@ -78,8 +82,7 @@ export async function loadCertificateOwner(
   const enrollment = Number(row?.enrollmentScore);
 
   return {
-    holderName: row?.fullName || certificate.holderName || row?.phone || "",
-    phone: row?.phone ?? null,
+    holderName: row?.fullName || certificate.holderName || "",
     courseTitle: row?.courseTitle || certificate.courseTitle,
     score: Number.isFinite(stored) ? stored : Number.isFinite(enrollment) ? enrollment : null,
     issuedAt: certificate.issuedAt,
