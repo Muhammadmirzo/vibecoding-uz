@@ -9,6 +9,7 @@ import { KabinetPageHeader, KabinetSkeleton, KabinetState } from "@/features/lms
 import { fetchWithTimeout } from "@/lib/http/fetch";
 import {
   hasActiveEnrollment,
+  kabinetErrorState,
   type KabinetDashboardPayment,
   type KabinetDashboardUser,
   type KabinetInitialData,
@@ -16,9 +17,24 @@ import {
 
 type DashboardUser = KabinetDashboardUser;
 type Payment = KabinetDashboardPayment;
-type State = { loading: boolean; error: string | null; payments: Payment[]; user: DashboardUser | null };
+type LoadError = { status: number; message: string };
+type State = { loading: boolean; error: LoadError | null; payments: Payment[]; user: DashboardUser | null };
 
 const initialState: State = { loading: true, error: null, payments: [], user: null };
+
+/** Carries the HTTP status so a 401 (expired session) is not shown as a technical error. */
+class ApiError extends Error {
+  constructor(readonly status: number, message: string) {
+    super(message);
+    this.name = "ApiError";
+  }
+}
+
+function toError(error: unknown): LoadError {
+  if (error instanceof ApiError) return { status: error.status, message: error.message };
+  return { status: 0, message: error instanceof Error ? error.message : "Xatolik yuz berdi" };
+}
+
 
 /**
  * `initialData` is prefetched on the server (page.tsx): when present the first
@@ -40,12 +56,12 @@ export default function KabinetDashboardClient({ initialData }: { initialData?: 
     Promise.all([
       fetchWithTimeout("Kabinet", "/api/me", { cache: "no-store", signal: controller.signal }, 10_000).then(async (res) => {
         const data: { user?: DashboardUser; error?: string; message?: string } = await res.json();
-        if (!res.ok) throw new Error(data.message || data.error || "Texnik xizmat vaqtincha ishlamayapti");
+        if (!res.ok) throw new ApiError(res.status, data.message || data.error || "Texnik xizmat vaqtincha ishlamayapti");
         return data.user || null;
       }),
       fetchWithTimeout("Kabinet", "/api/me/payments", { cache: "no-store", signal: controller.signal }, 10_000).then(async (res) => {
         const data: { payments?: Payment[]; error?: string; message?: string } = await res.json();
-        if (!res.ok) throw new Error(data.message || data.error || "Texnik xizmat vaqtincha ishlamayapti");
+        if (!res.ok) throw new ApiError(res.status, data.message || data.error || "Texnik xizmat vaqtincha ishlamayapti");
         return data.payments || [];
       }),
     ])
@@ -53,7 +69,7 @@ export default function KabinetDashboardClient({ initialData }: { initialData?: 
         if (active) setState({ loading: false, error: null, payments, user });
       })
       .catch((error: unknown) => {
-        if (active) setState({ loading: false, error: error instanceof Error ? error.message : "Xatolik yuz berdi", payments: [], user: null });
+        if (active) setState({ loading: false, error: toError(error), payments: [], user: null });
       });
     return () => { active = false; controller.abort(); };
   }, []);
@@ -70,12 +86,7 @@ export default function KabinetDashboardClient({ initialData }: { initialData?: 
         />
 
         {state.loading ? <KabinetSkeleton label="Kabinet ma&apos;lumotlari yuklanmoqda" /> : null}
-        {!state.loading && state.error ? (
-          <div className="space-y-4">
-            <KabinetState tone="error" title="Texnik xizmat vaqtincha ishlamayapti" description={state.error} />
-            <div className="text-center"><Button onClick={() => window.location.reload()}>Qayta urinish</Button></div>
-          </div>
-        ) : null}
+        {!state.loading && state.error ? <KabinetLoadError error={state.error} /> : null}
         {!state.loading && !state.error && !hasEnrollment ? (
           <KabinetState
             title="Faol kurs a&apos;zoligingiz yo&apos;q"
@@ -86,6 +97,25 @@ export default function KabinetDashboardClient({ initialData }: { initialData?: 
         {!state.loading && !state.error && hasEnrollment ? <ActiveCourse /> : null}
         {!state.loading && !state.error ? <QuickLinks /> : null}
       </main>
+    </div>
+  );
+}
+
+/**
+ * A 401 (expired session) must not offer a reload button — that is an infinite
+ * loop for the visitor. It links back to login with a redirect to /kabinet.
+ */
+export function KabinetLoadError({ error }: { error: LoadError }) {
+  const view = kabinetErrorState(error.status, error.message);
+  if (view.unauthorized && view.action) {
+    return (
+      <KabinetState tone="error" title={view.title} description={view.description} action={view.action} />
+    );
+  }
+  return (
+    <div className="space-y-4">
+      <KabinetState tone="error" title={view.title} description={view.description} />
+      <div className="text-center"><Button onClick={() => window.location.reload()}>Qayta urinish</Button></div>
     </div>
   );
 }
