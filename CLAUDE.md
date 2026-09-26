@@ -16,7 +16,7 @@
 
 ## 📍 Current Status
 
-**Owner says "boshla" or "davom et" → immediately follow [docs/waves/RESUME.md](docs/waves/RESUME.md) (no questions first). Live state: [docs/waves/STATE.md](docs/waves/STATE.md) → "Phase 2".**
+**Owner says "boshlang", "boshla" or "davom et" → immediately follow [docs/waves/RESUME.md](docs/waves/RESUME.md) (no questions first). Live state: [docs/waves/STATE.md](docs/waves/STATE.md) → "Phase 2".**
 
 **Background: [docs/HANDOFF_2026-09-24.md](docs/HANDOFF_2026-09-24.md) §0** — live state, blockers (Supabase DB down), Telegram bot (@Boyakagabot), and next steps. Owner speaks Uzbek — reply in Uzbek.
 
