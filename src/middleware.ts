@@ -6,11 +6,14 @@ import {
 } from "@/lib/auth/session";
 import { contentSecurityPolicy, SECURITY_HEADERS } from "@/lib/security/headers";
 import { isClosedRoute } from "@/lib/features/closed";
+import { REQUEST_ID_HEADER, resolveRequestId } from "@/lib/request-id";
 
 const ADMIN_ROLES = ["superadmin", "admin", "manager"];
 const ALL_AUTHENTICATED_ROLES = ["superadmin", "admin", "manager", "mentor", "student"];
 
-function withSecurityHeaders(response: NextResponse, nonce: string): NextResponse {
+type Ctx = { nonce: string; requestId: string };
+
+function withSecurityHeaders(response: NextResponse, { nonce, requestId }: Ctx): NextResponse {
   for (const [name, value] of Object.entries(SECURITY_HEADERS)) {
     try {
       response.headers.set(name, value);
@@ -19,33 +22,44 @@ function withSecurityHeaders(response: NextResponse, nonce: string): NextRespons
     }
   }
   response.headers.set("Content-Security-Policy", contentSecurityPolicy(nonce));
+  response.headers.set(REQUEST_ID_HEADER, requestId);
   return response;
 }
 
-function unauthorizedJson(nonce: string) {
+/** Forwarded request headers: nonce/CSP for rendering + the request id for route handlers and logs. */
+function forwardedHeaders(request: NextRequest, { nonce, requestId }: Ctx): Headers {
+  const headers = new Headers(request.headers || {});
+  headers.set("x-nonce", nonce);
+  headers.set("Content-Security-Policy", contentSecurityPolicy(nonce));
+  headers.set(REQUEST_ID_HEADER, requestId);
+  return headers;
+}
+
+function unauthorizedJson(ctx: Ctx) {
   return withSecurityHeaders(
     NextResponse.json(
       { error: "Autentifikatsiya talab qilinadi (Unauthorized)" },
       { status: 401 }
     ),
-    nonce
+    ctx
   );
 }
 
-function forbiddenJson(nonce: string) {
+function forbiddenJson(ctx: Ctx) {
   return withSecurityHeaders(
     NextResponse.json(
       { error: "Ruxsat etilmagan amal (Forbidden)" },
       { status: 403 }
     ),
-    nonce
+    ctx
   );
 }
 
 export async function middleware(request: NextRequest) {
   const nonce = crypto.randomUUID().replace(/-/g, "");
+  const ctx: Ctx = { nonce, requestId: resolveRequestId(request?.headers?.get(REQUEST_ID_HEADER)) };
   if (!request || !request.nextUrl) {
-    return withSecurityHeaders(NextResponse.next(), nonce);
+    return withSecurityHeaders(NextResponse.next(), ctx);
   }
 
   const pathname = request.nextUrl.pathname || "";
@@ -60,7 +74,7 @@ export async function middleware(request: NextRequest) {
         status: 404,
         headers: { "content-type": "text/plain; charset=utf-8" },
       }),
-      nonce,
+      ctx,
     );
   }
 
@@ -68,10 +82,7 @@ export async function middleware(request: NextRequest) {
   const isStudentCabinetRoute = pathname.startsWith("/kabinet") || pathname.startsWith("/api/kabinet");
 
   if (!isAdminRoute && !isStudentCabinetRoute) {
-    const publicRequestHeaders = new Headers(request.headers);
-    publicRequestHeaders.set("x-nonce", nonce);
-    publicRequestHeaders.set("Content-Security-Policy", contentSecurityPolicy(nonce));
-    return withSecurityHeaders(NextResponse.next({ request: { headers: publicRequestHeaders } }), nonce);
+    return withSecurityHeaders(NextResponse.next({ request: { headers: forwardedHeaders(request, ctx) } }), ctx);
   }
 
   let token: string | undefined;
@@ -91,60 +102,55 @@ export async function middleware(request: NextRequest) {
   // Allow public access to /admin/login
   if (pathname.startsWith("/admin/login")) {
     if (session && session.role && ADMIN_ROLES.includes(session.role)) {
-      return withSecurityHeaders(NextResponse.redirect(new URL("/admin", request.url)), nonce);
+      return withSecurityHeaders(NextResponse.redirect(new URL("/admin", request.url)), ctx);
     }
-    return withSecurityHeaders(NextResponse.next(), nonce);
+    return withSecurityHeaders(NextResponse.next({ request: { headers: forwardedHeaders(request, ctx) } }), ctx);
   }
 
   if (!session) {
     if (pathname.startsWith("/api/")) {
-      return unauthorizedJson(nonce);
+      return unauthorizedJson(ctx);
     }
     if (isAdminRoute) {
       const adminLoginUrl = new URL("/admin/login", request.url);
       adminLoginUrl.searchParams.set("redirect", pathname);
-      return withSecurityHeaders(NextResponse.redirect(adminLoginUrl), nonce);
+      return withSecurityHeaders(NextResponse.redirect(adminLoginUrl), ctx);
     }
     // /kabinet (exact) renders its own server-side guest CTA (cheap cookie
     // check, no DB) so a guest gets LCP content on the first response
     // instead of a 307 round trip to "/". Subpages still redirect: they
     // assume an authenticated shell.
     if (pathname === "/kabinet" || pathname === "/kabinet/") {
-      const requestHeaders = new Headers(request.headers || {});
-      requestHeaders.set("x-nonce", nonce);
-      requestHeaders.set("Content-Security-Policy", contentSecurityPolicy(nonce));
       return withSecurityHeaders(
-        NextResponse.next({ request: { headers: requestHeaders } }),
-        nonce
+        NextResponse.next({ request: { headers: forwardedHeaders(request, ctx) } }),
+        ctx
       );
     }
     const loginUrl = new URL("/", request.url);
     loginUrl.searchParams.set("auth", "1");
     loginUrl.searchParams.set("redirect", `${pathname}${request.nextUrl.search}`);
-    return withSecurityHeaders(NextResponse.redirect(loginUrl), nonce);
+    return withSecurityHeaders(NextResponse.redirect(loginUrl), ctx);
   }
 
   if (isAdminRoute) {
     if (!session.role || !ADMIN_ROLES.includes(session.role)) {
       if (pathname.startsWith("/api/")) {
-        return forbiddenJson(nonce);
+        return forbiddenJson(ctx);
       }
-      return withSecurityHeaders(NextResponse.redirect(new URL("/kabinet", request.url)), nonce);
+      return withSecurityHeaders(NextResponse.redirect(new URL("/kabinet", request.url)), ctx);
     }
   }
 
   if (isStudentCabinetRoute) {
     if (!session.role || !ALL_AUTHENTICATED_ROLES.includes(session.role)) {
       if (pathname.startsWith("/api/")) {
-        return forbiddenJson(nonce);
+        return forbiddenJson(ctx);
       }
-      return withSecurityHeaders(NextResponse.redirect(new URL("/", request.url)), nonce);
+      return withSecurityHeaders(NextResponse.redirect(new URL("/", request.url)), ctx);
     }
   }
 
-  const requestHeaders = new Headers(request.headers || {});
-  requestHeaders.set("x-nonce", nonce);
-  requestHeaders.set("Content-Security-Policy", contentSecurityPolicy(nonce));
+  const requestHeaders = forwardedHeaders(request, ctx);
   requestHeaders.set("x-user-id", session.userId || "");
   requestHeaders.set("x-user-role", session.role || "student");
   requestHeaders.set("x-session-id", session.sessionId || session.userId || "");
@@ -155,7 +161,7 @@ export async function middleware(request: NextRequest) {
         headers: requestHeaders,
       },
     }),
-    nonce
+    ctx
   );
 }
 

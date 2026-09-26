@@ -43,6 +43,11 @@ for (const f of files) {
   }
   // L15: never commit env files
   if (/(^|\/)\.env(\.|$)/.test(f) && !f.endsWith(".env.example")) hit("L15", f, "env file must not be committed");
+  // L23: every table created from migration 0014 on must enable RLS in the same migration
+  const mig = /^drizzle\/(\d{4})_.*\.sql$/.exec(f);
+  if (mig && Number(mig[1]) >= 14 && /CREATE TABLE/i.test(read(f)) && !/ENABLE ROW LEVEL SECURITY/i.test(read(f))) {
+    hit("L23", f, "CREATE TABLE without ENABLE ROW LEVEL SECURITY (Supabase Data API would expose it)");
+  }
   // L3 (SARBON ledger): no machine-specific links in docs
   if (f.endsWith(".md")) grepLines(f, /\]\(file:\/\/\/home/, "DOC", "absolute local file link");
 }

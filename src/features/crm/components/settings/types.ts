@@ -18,11 +18,7 @@ export type SettingsState = {
   guaranteeRefundDays: number;
   guaranteeTextUz: string;
   paymeMerchantId: string;
-  paymeSecretKey: string;
   clickServiceId: string;
-  clickSecretKey: string;
-  telegramBotToken: string;
-  smsApiKey: string;
   enableGamification: boolean;
   enableCommunityForum: boolean;
   enableInteractiveQuizzes: boolean;

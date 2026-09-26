@@ -1,3 +1,5 @@
+import { verifyWebhookSecret } from "./headers";
+
 /**
  * Cron authorization helper (fail-closed).
  *
@@ -11,5 +13,7 @@ export function isCronAuthorized(request: Request): boolean {
   const authHeader = request.headers.get("authorization");
   const secretHeader = request.headers.get("x-cron-secret");
   const token = authHeader ? authHeader.replace(/^Bearer\s+/i, "") : secretHeader;
-  return token === cronSecret;
+  // Constant-time compare. Vercel Cron sends `Authorization: Bearer $CRON_SECRET`; any external
+  // scheduler (GitHub Actions, cron-job.org) can call the same routes with either header.
+  return verifyWebhookSecret(token, cronSecret);
 }

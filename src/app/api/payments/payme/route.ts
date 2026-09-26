@@ -18,6 +18,7 @@ import {
 } from "@/features/payments/server/payme.service";
 import { paymeRpcRequestSchema } from "@/lib/validations/payment";
 import { checkRateLimit, getClientIp, PRESETS } from "@/lib/security/rateLimit";
+import { errorFields, requestLogger } from "@/lib/log";
 
 const repo = drizzlePaymentsRepository;
 
@@ -68,7 +69,7 @@ export async function POST(req: NextRequest) {
   if (method === "CheckTransaction") return toResult(await checkTransaction(repo, providerTxnId));
   return fail();
   } catch (error) {
-    console.error("Payme webhook failed:", error);
+    requestLogger(req, "/api/payments/payme").error("payment_webhook_failed", { provider: "payme", ...errorFields(error) });
     return NextResponse.json(createPaymeErrorResponse(0, PAYME_ERRORS.CANNOT_PERFORM), { status: 503 });
   }
 }

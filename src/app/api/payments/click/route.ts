@@ -4,6 +4,7 @@ import { drizzlePaymentsRepository } from "@/features/payments/server/payments.r
 import { handleClickWebhook } from "@/features/payments/server/click.service";
 import { clickWebhookSchema } from "@/lib/validations/payment";
 import { checkRateLimit, getClientIp, PRESETS } from "@/lib/security/rateLimit";
+import { errorFields, requestLogger } from "@/lib/log";
 
 const repo = drizzlePaymentsRepository;
 
@@ -40,7 +41,7 @@ export async function POST(req: NextRequest) {
   if (!outcome.ok) return protocolError(outcome.note, outcome.status);
   return NextResponse.json(outcome.body);
   } catch (error) {
-    console.error("Click webhook failed:", error);
+    requestLogger(req, "/api/payments/click").error("payment_webhook_failed", { provider: "click", ...errorFields(error) });
     return protocolError("To'lov xizmati vaqtincha ishlamayapti. Qayta urinib ko'ring", 503);
   }
 }
