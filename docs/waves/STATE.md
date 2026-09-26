@@ -23,6 +23,18 @@
 
 ## Phase 2 (started 2026-09-24)
 
+### ▶ RELEASE 2026-09-26 (release-e6): Wave E slice E6 — home "Boshlash" section + glow strand (Awwwards 6-strand culmination) — merged + pushed by Gemini (Antigravity)
+- **Shipped:** completes the 6-strand Girih star redesign on the home page (`/`)! Adds `BoshlashSection.tsx` (156 lines <= 250, L19) with primary `/diagnostika` and secondary `/bepul-dars` CTAs, honest 7-day guarantee derived from `siteConfig.guaranteeText` (L14), and gold glow motif. Registers `{ id: "boshlash", strand: "glow" }` in `HOME_LOOM_SECTIONS`, wires `glow` into `HomeLoomMotionImpl` for scrub animation, and removes redundant `NextStepCTA` invocation from `/`. All 6 story strands (`square`, `diamond`, `weave`, `ring`, `fill`, `glow`) are fully woven; `mutedHomeStrands()` returns `[]`.
+- **Gates on committed main:** `npm run lessons:check` → 0 failures, 3 known debt · `npx tsc --noEmit` → exit 0 · `npx vitest run` → 112 files / 757 tests passed · `npm run build` → exit 0 · Playwright responsive `e2e/responsive.spec.ts` → 12/12 passed (375-1440 × light/dark, 0 errors, no horizontal scroll).
+- **Tag:** `wave/2026-09-26-e6-boshlash`. Pushed to `origin main` and `origin main:master`.
+- **Report:** `reports/E6-BOSHLASH.md`.
+
+### ▶ RELEASE 2026-09-26 (release-e5): Wave E slice E5 — home "Narx + savollar" section + fill strand — merged + pushed by Gemini (Antigravity)
+- **Shipped:** replaces legacy `Pricing` and `Faq` with `NarxSection.tsx` (248 lines <= 250, L19) inside `<HomeLoom>` on `/`. Honest course pricing derived directly from `siteConfig.courses` (both 550,000 so'm; no invented fake urgency or countdown timers per L14). Accessible disclosure FAQ (`<details>/<summary>`). The gold fill motif (`fill` strand) renders as the star's center plate. Preserved `id="kurs-tanlash"` and `scroll-mt-24` so deep links from chrome and CRM continue working. Discovered and codified lesson L27 (deep-link anchor check in `lessons-check.mjs`).
+- **Gates on committed main:** `npm run lessons:check` → 0 failures, 3 known debt · `npx tsc --noEmit` → exit 0 · `npx vitest run` → 112 files / 753 tests passed · `npm run build` → exit 0 · Playwright responsive → 12/12 passed.
+- **Tag:** `wave/2026-09-26-e5-narx`. Pushed to `origin main` and `origin main:master`.
+- **Report:** `reports/E5-NARX.md`.
+
 ### ▶ RELEASE 2026-09-26 (release-e4): Wave E slice E4 — home "Natijalar" section + ring strand — merged + verified by Gemini (Antigravity)
 - **Shipped:** replaces legacy `Projects` with `NatijalarSection` inside `<HomeLoom>` on `/`. Real student projects showcase with geometric octagonal ring motif and dashed accent octagon echoing LoomStar's ring strand. Copy derived strictly from `VERIFIED_PORTFOLIO_FALLBACK` (Clash Nexus; L14 honesty strictly adhered to: unverified/hidden projects excluded). Section title at `clamp(2.25rem, 6vw, 6rem)` Unbounded 700 with U+02BB. Registers `{ id: "natijalar", strand: "ring" }` in `HOME_LOOM_SECTIONS`. Fourth strand of the girih star is now active and scrubs with scroll. Retired `src/components/sections/home/Projects.tsx`. Added lesson L26 (percentage clip-path polygons on non-square elements).
 - **Gates on committed main:** `npm run lessons:check` → 0 failures, 3 known debt · `npm run build` → exit 0 (103 kB shared JS) · `npx vitest run` → 112 files / 748 tests passed · `npx playwright test e2e/responsive.spec.ts -g "home"` → 12/12 passed (375-1440 × light/dark, 0 errors, no horizontal scroll).

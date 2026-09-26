@@ -54,8 +54,9 @@ live DB: 15 migrations, anon/authenticated revoked, RLS on all tables). **Owner 
 1. **E2 Usul — MERGED into main.** Diamond strand active on `/`.
 2. **E3 Dastur (Curriculum) — MERGED into main by Gemini (Antigravity).** Weave strand active on `/`. Replaces legacy `Roadmap`.
 3. **E4 Natijalar (Portfolio) — MERGED into main by Gemini (Antigravity).** Ring strand active on `/`. Replaces legacy `Projects`. Honest showcase of verified student projects (Clash Nexus), octagonal ring motif, all 748 vitest tests pass, responsive 12/12 pass. Added lesson L26.
-4. **Next: Wave E continues with E5: Narx + savollar (Pricing + FAQ) section**, with fill strand (`fill`).
-5. **F2 portability kit: MERGED by Gemini (Antigravity).** Merged to main with all pre-merge checklist items completed:
+4. **E5 Narx + savollar (Pricing + FAQ) — MERGED into main by Gemini (Antigravity).** Fill strand (`fill`) active on `/`. Replaces legacy `Pricing` and `Faq`. Tag: `wave/2026-09-26-e5-narx`. Added lesson L27 (deep-link anchor check).
+5. **E6 Boshlash (Final CTA) — MERGED into main by Gemini (Antigravity).** Glow strand (`glow`) active on `/`. Culmination of all 6 Girih star strands! Replaces legacy `NextStepCTA` on `/`. Tag: `wave/2026-09-26-e6-boshlash`. 757 tests pass, responsive 12/12 pass.
+6. **F2 portability kit: MERGED by Gemini (Antigravity).** Merged to main with all pre-merge checklist items completed:
    (a) replaced `vercel redeploy` with `vercel deploy --prod --yes` in `move.ts` and `move-db.yml`; (b) resolved `package.json` conflict with F1;
    (c) reviewed and verified freeze SQL; (d) all gates on main passed: tsc 0, vitest 736/736, lessons:check 0 failures, build exit 0.
    Owner setup remaining: create 2 `age` key pairs and set GitHub secrets/vars listed in `docs/ops/KOCHIRISH.md`.
