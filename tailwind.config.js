@@ -1,3 +1,12 @@
+function alpha(variableName) {
+  return ({ opacityValue }) => {
+    if (opacityValue !== undefined && !opacityValue.includes("var(")) {
+      return `color-mix(in srgb, var(${variableName}) calc(${opacityValue} * 100%), transparent)`;
+    }
+    return `var(${variableName})`;
+  };
+}
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: ["class"],
@@ -5,19 +14,19 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        bg: { DEFAULT: "var(--bg)", elevated: "var(--bg-elevated)", sunken: "var(--bg-sunken)" },
-        ink: { DEFAULT: "var(--ink)", muted: "var(--ink-muted)", subtle: "var(--ink-subtle)" },
-        brand: { DEFAULT: "var(--brand)", hover: "var(--brand-hover)", soft: "var(--brand-soft)", surface: "var(--brand-surface)" },
-        accent: { DEFAULT: "var(--accent)", hover: "var(--accent-hover)", soft: "var(--accent-soft)" },
-        gold: { DEFAULT: "var(--gold)", hover: "var(--gold-hover)", soft: "var(--gold-soft)" },
-        border: { DEFAULT: "var(--border)", strong: "var(--border-strong)", onBrand: "var(--border-on-brand-surface)" },
-        success: { DEFAULT: "var(--success)", soft: "var(--success-soft)", line: "var(--success-line)" },
-        danger: { DEFAULT: "var(--danger)", soft: "var(--danger-soft)" },
-        telegram: { DEFAULT: "var(--telegram)", hover: "var(--telegram-hover)", soft: "var(--telegram-soft)", solid: "var(--telegram-solid)" },
+        bg: { DEFAULT: alpha("--bg"), elevated: alpha("--bg-elevated"), sunken: alpha("--bg-sunken") },
+        ink: { DEFAULT: alpha("--ink"), muted: alpha("--ink-muted"), subtle: alpha("--ink-subtle") },
+        brand: { DEFAULT: alpha("--brand"), hover: alpha("--brand-hover"), soft: alpha("--brand-soft"), surface: "var(--brand-surface)" },
+        accent: { DEFAULT: alpha("--accent"), hover: alpha("--accent-hover"), soft: alpha("--accent-soft") },
+        gold: { DEFAULT: alpha("--gold"), hover: alpha("--gold-hover"), soft: alpha("--gold-soft") },
+        border: { DEFAULT: alpha("--border"), strong: alpha("--border-strong"), onBrand: "var(--border-on-brand-surface)" },
+        success: { DEFAULT: alpha("--success"), soft: alpha("--success-soft"), line: alpha("--success-line") },
+        danger: { DEFAULT: alpha("--danger"), soft: alpha("--danger-soft") },
+        telegram: { DEFAULT: alpha("--telegram"), hover: alpha("--telegram-hover"), soft: alpha("--telegram-soft"), solid: "var(--telegram-solid)" },
         "on-gold": "var(--on-gold)",
         "on-brand-surface": "var(--on-brand-surface)",
         "on-telegram": "var(--on-telegram)",
-        terminal: { DEFAULT: "var(--terminal-bg)", ink: "var(--terminal-ink)", muted: "var(--terminal-muted)", border: "var(--terminal-border)" },
+        terminal: { DEFAULT: alpha("--terminal-bg"), ink: alpha("--terminal-ink"), muted: alpha("--terminal-muted"), border: alpha("--terminal-border") },
       },
       fontFamily: { display: ["var(--font-display)", "var(--font-sans)", "sans-serif"], sans: ["var(--font-sans)", "system-ui", "sans-serif"], mono: ["var(--font-mono)", "monospace"] },
       borderRadius: { sm: "var(--radius-sm)", md: "var(--radius-md)", lg: "var(--radius-lg)", xl: "var(--radius-xl)" },
