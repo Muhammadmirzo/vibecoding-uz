@@ -7,17 +7,34 @@ import { Button } from "@/components/ui/Button";
 import { KabinetNav } from "@/features/lms/components/KabinetNav";
 import { KabinetPageHeader, KabinetSkeleton, KabinetState } from "@/features/lms/components/KabinetPage";
 import { fetchWithTimeout } from "@/lib/http/fetch";
+import {
+  hasActiveEnrollment,
+  type KabinetDashboardPayment,
+  type KabinetDashboardUser,
+  type KabinetInitialData,
+} from "@/features/lms/domain/kabinet-dashboard";
 
-type DashboardUser = { fullName: string | null };
-type Payment = { enrollmentId: string | null; status: string };
+type DashboardUser = KabinetDashboardUser;
+type Payment = KabinetDashboardPayment;
 type State = { loading: boolean; error: string | null; payments: Payment[]; user: DashboardUser | null };
 
 const initialState: State = { loading: true, error: null, payments: [], user: null };
 
-export default function KabinetDashboardClient() {
-  const [state, setState] = useState<State>(initialState);
+/**
+ * `initialData` is prefetched on the server (page.tsx): when present the first
+ * paint is the real dashboard, so no skeleton and no client fetch waterfall
+ * (LCP). When absent (prefetch failed, e.g. DB hiccup) the effect below fetches
+ * exactly like before.
+ */
+export default function KabinetDashboardClient({ initialData }: { initialData?: KabinetInitialData }) {
+  const [state, setState] = useState<State>(() =>
+    initialData
+      ? { loading: false, error: null, payments: initialData.payments, user: initialData.user }
+      : initialState
+  );
 
   useEffect(() => {
+    if (initialData) return;
     let active = true;
     const controller = new AbortController();
     Promise.all([
@@ -41,7 +58,7 @@ export default function KabinetDashboardClient() {
     return () => { active = false; controller.abort(); };
   }, []);
 
-  const hasEnrollment = state.payments.some((payment) => payment.status === "paid" && payment.enrollmentId);
+  const hasEnrollment = hasActiveEnrollment(state.payments);
 
   return (
     <div className="min-h-screen bg-bg text-ink">
