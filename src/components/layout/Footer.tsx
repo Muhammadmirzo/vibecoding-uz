@@ -5,7 +5,7 @@ import { BRAND } from "@/config/brand";
 import { Brand } from "./Brand";
 
 const columns = [
-  ["Kurslar", [["Vibe Coding Express", "/kurs/vibe-coding-express"], ["AI Asoslari", "/kurs/ai-asoslari"], ["Diagnostika", "/diagnostika"], ["Bepul dars", "/bepul-dars"]]],
+  ["Kurslar", [["Barcha kurslar", "/kurs"], ["Vibe Coding Express", "/kurs/vibe-coding-express"], ["AI Asoslari", "/kurs/ai-asoslari"], ["Diagnostika", "/diagnostika"], ["Bepul dars", "/bepul-dars"]]],
   ["Resurslar", [["Blog", "/blog"], ["Portfolio", "/portfolio"], ["Bepul resurslar", "/resurslar"], ["Meetlar", "/meetlar"]]],
   ["Kompaniya", [["Xizmatlar", "/xizmatlar"], ["Biz haqimizda", "/xizmatlar"], ["Aloqa", "mailto:hello@academy.mirzo.uz"]]],
   ["Huquqiy", [["Pul qaytarish", "/pul-qaytarish"], ["Maxfiylik", "/maxfiylik"], ["Oferta", "/offerta"]]],
