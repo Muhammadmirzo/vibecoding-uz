@@ -33,7 +33,9 @@ export async function authenticateMcp(value: string | null, requiredScope?: stri
     if (access.role === "manager" && !access.mcpAccess) return { principal: null, status: 403 };
     const scopes = scopeList(access.row.scopes);
     if (requiredScope && !scopes.some((scope) => scope === requiredScope)) return { principal: null, status: 403 };
-    void db.update(mcpAccessTokens).set({ lastUsedAt: new Date() }).where(eq(mcpAccessTokens.id, access.row.id));
+    // Fire-and-forget: drizzle's query builder is a lazy thenable and only runs once
+    // `.then()`/`.catch()` is called, so this needs an explicit .catch to actually execute.
+    void db.update(mcpAccessTokens).set({ lastUsedAt: new Date() }).where(eq(mcpAccessTokens.id, access.row.id)).catch(() => {});
     return { principal: { userId: access.row.userId, role: access.role, scopes, clientId: access.row.clientId, sender: access.row.sender === "ai" ? "ai" : "admin", tokenId: access.row.id, tokenType: "oauth" }, status: 401 };
   }
   const [pat] = await db.select({ row: mcpPersonalAccessTokens, role: users.role, mcpAccess: users.mcpAccess }).from(mcpPersonalAccessTokens)
@@ -44,7 +46,7 @@ export async function authenticateMcp(value: string | null, requiredScope?: stri
   if (pat.role === "manager" && !pat.mcpAccess) return { principal: null, status: 403 };
   const scopes = scopeList(pat.row.scopes);
   if (requiredScope && !scopes.some((scope) => scope === requiredScope)) return { principal: null, status: 403 };
-  void db.update(mcpPersonalAccessTokens).set({ lastUsedAt: new Date() }).where(eq(mcpPersonalAccessTokens.id, pat.row.id));
+  void db.update(mcpPersonalAccessTokens).set({ lastUsedAt: new Date() }).where(eq(mcpPersonalAccessTokens.id, pat.row.id)).catch(() => {});
   return { principal: { userId: pat.row.createdBy, role: pat.role, scopes, clientId: null, sender: pat.row.sender === "ai" ? "ai" : "admin", tokenId: pat.row.id, tokenType: "pat" }, status: 401 };
 }
 

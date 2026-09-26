@@ -29,6 +29,6 @@ export async function refundsList(query: { limit?: number; cursor?: string; stat
 }
 
 export async function salesByCourse(from: Date, to: Date) {
-  const result = await db.execute<QueryRow>(sql`SELECT c.id AS "courseId", c.title AS "courseTitle", count(p.id)::int AS orders, coalesce(sum(p."amountSum"), 0)::bigint AS "revenueUzs" FROM courses c LEFT JOIN cohorts co ON co."courseId" = c.id LEFT JOIN enrollments e ON e."cohortId" = co.id LEFT JOIN payments p ON p."enrollmentId" = e.id AND p.status = 'paid' AND p."paidAt" >= ${from} AND p."paidAt" < ${to} GROUP BY c.id ORDER BY "revenueUzs" DESC LIMIT 50`);
+  const result = await db.execute<QueryRow>(sql`SELECT c.id AS "courseId", c.title AS "courseTitle", count(p.id)::int AS orders, coalesce(sum(p.amount_sum), 0)::bigint AS "revenueUzs" FROM courses c LEFT JOIN cohorts co ON co.course_id = c.id LEFT JOIN enrollments e ON e.cohort_id = co.id LEFT JOIN payments p ON p.enrollment_id = e.id AND p.status = 'paid' AND p.paid_at >= ${from} AND p.paid_at < ${to} GROUP BY c.id ORDER BY "revenueUzs" DESC LIMIT 50`);
   return result.map((row) => ({ courseId: textValue(row.courseId), courseTitle: textValue(row.courseTitle), orders: numberValue(row.orders), revenueUzs: numberValue(row.revenueUzs) }));
 }
