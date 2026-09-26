@@ -5,7 +5,8 @@ and continue down the list. Only stop to ask when a step says "owner".
 
 The owner speaks Uzbek, so reply in Uzbek, short and step by step. You are the ORCHESTRATOR: plan, route tasks to agents, review, decide.
 ### 0. Who is the orchestrator? (owner rule 2026-09-26: the owner only picks the model; you configure yourself)
-Whichever model the owner opened this session with IS the orchestrator. Find your row, then act on it without asking:
+Whichever model the owner opened this session with IS the orchestrator. Source of truth for ALL projects: `~/.skillkit/roster.json`
+(skill `orchestrator-roster`; the owner changes it there). The table below is a snapshot; if they differ, roster.json wins. Find your row, then act on it without asking:
 | Rank | Orchestrator model | Where it runs | Your agents (route per §2) | Extra duty |
 | :--- | :--- | :--- | :--- | :--- |
 | 1 | Claude Opus 5.5 (medium) | Claude Code | muse-spark, space-bunny (opencode) + gemini-3.8-flash-high (agy) | first audit unchecked `GEMINI-LEDGER.md` rows (§5 step 1) |
