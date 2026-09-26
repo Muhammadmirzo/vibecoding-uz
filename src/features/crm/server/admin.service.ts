@@ -41,6 +41,7 @@ export async function listAuditLogs(repo: AdminRepository, query: AuditLogsQuery
   return repo.listAuditLogs({ action: query.action, search: query.search, limit: query.limit });
 }
 
+// Legacy rows deleted in migration 0014; the filter stays as defence in depth (env vars are the only source).
 const SECRET_SETTING_KEYS = new Set(["paymeSecretKey", "clickSecretKey", "telegramBotToken", "smsApiKey"]);
 
 export type IntegrationStatus = { payme: "sozlangan" | "sozlanmagan"; click: "sozlangan" | "sozlanmagan"; telegram: "sozlangan" | "sozlanmagan"; sms: "sozlangan" | "sozlanmagan" };
@@ -51,7 +52,7 @@ export function getIntegrationStatus(): IntegrationStatus {
     payme: configured([process.env.PAYME_MERCHANT_ID, process.env.PAYME_KEY]) ? "sozlangan" : "sozlanmagan",
     click: configured([process.env.CLICK_SERVICE_ID, process.env.CLICK_MERCHANT_ID, process.env.CLICK_SECRET_KEY]) ? "sozlangan" : "sozlanmagan",
     telegram: configured([process.env.TELEGRAM_BOT_TOKEN]) ? "sozlangan" : "sozlanmagan",
-    sms: configured([process.env.ESKIZ_API_KEY]) ? "sozlangan" : "sozlanmagan",
+    sms: configured([process.env.ESKIZ_EMAIL, process.env.ESKIZ_PASSWORD]) ? "sozlangan" : "sozlanmagan",
   };
 }
 

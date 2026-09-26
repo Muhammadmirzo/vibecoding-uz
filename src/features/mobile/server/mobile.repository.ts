@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, isNull } from "drizzle-orm";
+import { and, asc, desc, eq, isNull, sql } from "drizzle-orm";
 import { db } from "@/db";
 import {
   cohorts, courses, courseSections, enrollments, homeworkAssignments,
@@ -64,21 +64,30 @@ export const drizzleMobileRepository: MobileRepository = {
     return { positionSec: row.positionSec ?? 0, completed: row.completedAt !== null };
   },
   async saveProgress(userId, lessonId, positionSec, completed) {
-    const [existing] = await db.select({ lessonId: lessonProgress.lessonId }).from(lessonProgress)
-      .where(and(eq(lessonProgress.userId, userId), eq(lessonProgress.lessonId, lessonId))).limit(1);
-    if (existing) {
-      await db.update(lessonProgress).set({
-        positionSec, lastSeenAt: new Date(),
-        ...(completed ? { completedAt: new Date() } : {}),
-      }).where(and(eq(lessonProgress.userId, userId), eq(lessonProgress.lessonId, lessonId)));
-      return;
-    }
-    await db.insert(lessonProgress).values({
-      userId, lessonId, positionSec,
-      completedAt: completed ? new Date() : null, lastSeenAt: new Date(),
-    });
+    await upsertLessonProgress(db, userId, lessonId, positionSec, completed);
   },
 };
+
+type DbExecutor = Pick<typeof db, "select" | "insert">;
+
+/**
+ * One atomic upsert on the (user_id, lesson_id) unique index: two parallel saves can no longer
+ * both miss a SELECT and insert duplicates. The first completion time is kept (COALESCE).
+ */
+export async function upsertLessonProgress(
+  ex: DbExecutor, userId: string, lessonId: string, positionSec: number, completed: boolean,
+): Promise<void> {
+  const now = new Date();
+  await ex.insert(lessonProgress).values({
+    userId, lessonId, positionSec, completedAt: completed ? now : null, lastSeenAt: now,
+  }).onConflictDoUpdate({
+    target: [lessonProgress.userId, lessonProgress.lessonId],
+    set: {
+      positionSec, lastSeenAt: now,
+      ...(completed ? { completedAt: sql`COALESCE(${lessonProgress.completedAt}, excluded.completed_at)` } : {}),
+    },
+  });
+}
 
 export interface HomeworkRow {
   id: string; assignmentId: string; assignmentTitle: string; lessonTitle: string | null;
@@ -114,17 +123,43 @@ export async function submitHomework(
     const { ServiceError } = await import("@/lib/http/errors");
     throw new ServiceError("NOT_FOUND", "Topshiriq topilmadi", 404);
   }
-  const prior = await db.select({ attemptNo: homeworkSubmissions.attemptNo }).from(homeworkSubmissions)
-    .where(and(eq(homeworkSubmissions.userId, userId), eq(homeworkSubmissions.assignmentId, input.assignmentId)))
+  const payload = { fileUrls: input.fileUrls, githubUrl: input.githubUrl ?? undefined, note: input.note ?? undefined };
+  // Parallel double-submit → one INSERT hits the (assignment_id, user_id, attempt_no) unique index
+  // (23505) and we retry with the next number.
+  for (let attempt = 0; attempt < MAX_ATTEMPT_NO_RETRIES; attempt++) {
+    try {
+      return await insertNextAttempt(db, userId, input.assignmentId, payload);
+    } catch (error) {
+      if (!isUniqueViolation(error)) throw error;
+    }
+  }
+  throw new Error("Homework submit failed: attempt number conflict");
+}
+
+/** attempt_no = max + 1, then INSERT; the unique index rejects a parallel duplicate with 23505. */
+export async function insertNextAttempt(
+  ex: DbExecutor, userId: string, assignmentId: string, payload: Record<string, unknown>,
+): Promise<{ id: string; attemptNo: number }> {
+  const prior = await ex.select({ attemptNo: homeworkSubmissions.attemptNo }).from(homeworkSubmissions)
+    .where(and(eq(homeworkSubmissions.userId, userId), eq(homeworkSubmissions.assignmentId, assignmentId)))
     .orderBy(desc(homeworkSubmissions.attemptNo)).limit(1);
   const attemptNo = (prior[0]?.attemptNo ?? 0) + 1;
-  const [row] = await db.insert(homeworkSubmissions).values({
-    assignmentId: input.assignmentId, userId, attemptNo,
-    payload: { fileUrls: input.fileUrls, githubUrl: input.githubUrl ?? undefined, note: input.note ?? undefined },
-    status: "submitted",
+  const [row] = await ex.insert(homeworkSubmissions).values({
+    assignmentId, userId, attemptNo, payload, status: "submitted",
   }).returning({ id: homeworkSubmissions.id });
   if (!row) throw new Error("Homework submit failed");
-  return { id: row.id };
+  return { id: row.id, attemptNo };
+}
+
+const MAX_ATTEMPT_NO_RETRIES = 3;
+
+/** Postgres unique_violation (23505); drizzle may wrap the driver error in `cause`. */
+export function isUniqueViolation(error: unknown): boolean {
+  for (let current: unknown = error, depth = 0; current && depth < 3; depth++) {
+    if (typeof current === "object" && (current as { code?: unknown }).code === "23505") return true;
+    current = typeof current === "object" ? (current as { cause?: unknown }).cause : undefined;
+  }
+  return false;
 }
 
 export async function registerPushDevice(input: {

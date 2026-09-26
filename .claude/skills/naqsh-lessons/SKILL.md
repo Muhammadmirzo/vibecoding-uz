@@ -11,7 +11,7 @@ the check for every lesson your change touches.
 Project conventions (read once per task, they beat any generic skill advice):
 `docs/CODER_AGENT_RULES.md` (architecture, security, definition of done) and `docs/design-system.md` (tokens, UI).
 
-Automated: `npm run lessons:check` enforces L6, L13, L15, L16 and L19. It also runs as a pre-commit hook and in CI
+Automated: `npm run lessons:check` enforces L6, L13, L15, L16, L19 and L23. It also runs as a pre-commit hook and in CI
 (`.github/workflows/ci.yml`, together with tsc and vitest). Known debt is listed in `scripts/lessons-baseline.json`;
 fixing an item there means removing it from that file. Everything else below still needs your own check.
 
@@ -61,6 +61,7 @@ fixing an item there means removing it from that file. Everything else below sti
 | L20 | Release agent smoke-tested `master-2.vercel.app` (someone else's project) and reported prod 404s | Production domain is **`master-2-jade.vercel.app`**. Get it from `vercel inspect <prod deployment>` → Aliases, never guess. |
 | L21 | `dynamicParams=false` "fixed" soft-404 but a fresh prod build still returned 200 | Root `loading.tsx` streams first; Next adds `noindex` on those pages. Verify status fixes with curl on a FRESH `next build` + `next start`, never on an old server. |
 | L22 | Smoke-tested the per-deployment URL (`vercel inspect` → `*-<hash>-<scope>.vercel.app`): Deployment Protection answers **302 → "Redirecting..."** (15 bytes), so old and new deployment bodies compared byte-identical and it looked like the deploy never landed | Curl the production **alias** (`vercel inspect` → `Aliases` block), not the deployment URL. And check the status before comparing content: `curl -s -o /dev/null -w '%{http_code}' <url>` must be 200 before you trust a body diff. Same family as L20 — never guess or improvise the prod URL. |
+| L23 | Supabase Data API roles (`anon`, `authenticated`) had full grants on every public table, RLS off (fixed by migration 0014) | Every new table: `ALTER TABLE ... ENABLE ROW LEVEL SECURITY` in the same migration (lessons-check L23 fails otherwise); after migrating run `npm run db:lockdown-check` (0 grants, RLS everywhere). Webhooks dedupe by provider event id; "check then insert" needs a unique index + upsert/retry (L11). |
 
 ## 3. After every fix: add a lesson
 

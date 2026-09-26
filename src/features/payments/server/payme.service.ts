@@ -44,7 +44,9 @@ export async function createTransaction(
   createTime: number,
 ): Promise<PaymeResult> {
   type Outcome = { error: number } | { terminal: true } | { created: true; createTime: number };
-  const outcome = await withTransactionLock<Outcome>(`payme:${providerTxnId}`, async (tx: DbExecutor | null | undefined) => {
+  // Lock the ORDER, not the Payme transaction: two different Payme transactions for one order
+  // must serialize, so the second sees providerTxnId already set and is refused.
+  const outcome = await withTransactionLock<Outcome>(`payme-order:${orderId}`, async (tx: DbExecutor | null | undefined) => {
     const ex = tx ?? null;
     if (!ex) throw new Error("Payment database transaction is unavailable");
     const payment = await repo.findPaymentByIdTx(ex, orderId, "payme");

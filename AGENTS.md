@@ -89,6 +89,9 @@ This document serves as your **authoritative architectural map**, **token-sparin
 - `DATABASE_URL` is a **required** env var (`src/db/index.ts` throws without it — no fallback by design).
 - Get it via `vercel env pull .env` after linking — do NOT ask the user to paste secrets and NEVER commit them.
 - Schema changes: `npm run db:generate` → review → `npm run db:migrate` (target the Supabase `DATABASE_URL`).
+- **Every new table MUST `ENABLE ROW LEVEL SECURITY`** in the same migration (no policies needed: the app connects as `postgres`, which bypasses RLS; `anon`/`authenticated` must see nothing). Migration 0014 revoked all Data API grants in `public`; `npm run lessons:check` (L23) fails a new `CREATE TABLE` without RLS, and `npm run db:lockdown-check` verifies the live DB (0 grants, RLS on every table). `db:push` was removed: migrations only.
+- Health: `GET /api/health` runs `select 1` (5 s timeout) → 200 `{status:"ok"}` / 503 `{status:"degraded"}`; point an uptime monitor at it. Every response carries `x-request-id` (middleware); server logs use `src/lib/log.ts` (JSON lines with `requestId`).
+- Crons: `vercel.json` runs `/api/cron/reminders` (04:00 UTC = 09:00 Tashkent) and `/api/cron/analytics-retention` (22:00 UTC) daily with `Authorization: Bearer $CRON_SECRET`; any external scheduler may call the same routes with that header.
 
 ### Secrets policy
 - `.env`, `.env*.local`, `.vercel/` are gitignored. Never hardcode credentials in source (a leaked DB password previously lived in `src/db/index.ts` and git history — see WEBSITE_AUDIT_SPEC.md).
