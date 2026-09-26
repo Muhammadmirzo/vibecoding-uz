@@ -23,6 +23,16 @@
 
 ## Phase 2 (started 2026-09-24)
 
+### ▶ RELEASE 2026-09-26 (release-d2): Wave D2 CSS Alpha Tokens & Opacity Modernization — merged + verified by Gemini (Antigravity)
+- **Shipped:** resolved the 121 dead Tailwind opacity classes across the entire codebase and fixed vitest test harness completeness:
+  1. `vitest.config.ts`: expanded `include` to `["src/__tests__/**/*.test.ts", "src/features/**/*.test.ts"]`, adding previously skipped motion tests (now 115 test files / 780 tests covered).
+  2. `tailwind.config.js`: introduced `alpha()` helper using modern CSS `color-mix(in srgb, var(...) calc(<alpha-value> * 100%), transparent)`. Returns clean `var(...)` when no opacity modifier is supplied (zero overhead/breaking changes), and emits standards-compliant `color-mix` when opacity modifiers (e.g. `/60`, `/20`, `/90`) are specified.
+  3. Verified via Node CSS analysis on `.next/static/css/*.css`: 58 `color-mix()` rules emitted (previously 0). Verified selectors include `bg-ink\/60`, `border-success\/20`, `bg-bg-elevated\/50`, `border-gold\/20`, `hover\:bg-accent\/90`, `bg-danger\/10`, `border-brand\/20`.
+  4. Recorded general lesson in `skillkit` (`frontend-ui-engineering`).
+- **Gates on committed main:** `npm run lessons:check` → **0 failure(s), 0 known debt (repo)** · `npx tsc --noEmit` → exit 0 · `npx vitest run` → **115 files / 780 tests passed (0 failed)** · `npm run build` → exit 0 (103 kB shared JS, all static/dynamic routes compiled) · Playwright responsive suite `e2e/responsive.spec.ts -g "home"` → **12 passed (46.3s)** across 375px–1440px × light/dark.
+- **Tag:** `wave/2026-09-26-d2-css-alpha`.
+- **Report:** `reports/D2-CSS-ALPHA.md`.
+
 ### ▶ RELEASE 2026-09-26 (release-d1): Wave D1 Repo Debt Cleanup (0 known debt) — merged + verified by Gemini (Antigravity)
 - **Shipped:** eliminated all 3 known debts in `scripts/lessons-baseline.json` (baseline is now `{}`):
   1. `src/features/chat/server/chat.service.ts`: split from 263 lines to 224 lines (<= 240, satisfying L19) by extracting helpers (`audit()`, `messageDtos()`, `requireConversation()`, cursor constants) into `src/features/chat/server/chat-helpers.ts` (49 lines).
