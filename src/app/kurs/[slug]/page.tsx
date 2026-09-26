@@ -27,11 +27,6 @@ export async function generateStaticParams() {
   return COURSE_SLUGS.map((slug) => ({ slug }));
 }
 
-// COURSE_SLUGS is a fixed, static list (not DB-backed): reject unknown slugs
-// at the routing layer instead of rendering the page and calling notFound().
-// Without this, root loading.tsx's Suspense boundary flushes a 200 status
-// before notFound() can run, so unknown /kurs/<slug> was a soft-404 (L13).
-export const dynamicParams = false;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
