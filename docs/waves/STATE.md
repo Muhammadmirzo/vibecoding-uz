@@ -23,6 +23,20 @@
 
 ## Phase 2 (started 2026-09-24)
 
+### ▶ RELEASE 2026-09-26 (release-c): W8B remote MCP (OAuth 2.1 + PKCE, PATs, visual charts) + per-manager access — merged + pushed
+- **Shipped:** W8B merged to main as `823796b` (from `wave/w8b-mcp`, SQL fixes in `61876a9`). Remote MCP over HTTP with OAuth 2.1 + PKCE, personal access tokens, and the visual chart tools. Plus per-manager MCP access: an admin toggles it in **Admin → MCP** ("Menejerlar uchun MCP ruhsati"); PII scope stays admin-only; turning it off revokes the manager's tokens in one transaction.
+- **Migrations order respected:** 0012 + 0013 were applied on the LIVE DB **before** this deploy (verified: 14 migrations, 5 `mcp_*` tables, `users.mcp_access`). Deploying 0013's `users.mcp_access` before migrating would have broken EVERY login (`getDbSession`/`getBearerSession` select it).
+- **Live-DB SQL verification caught 4 real bugs** before release (mock tests passed and were wrong): `students_list`, `student_profile`, `sales_by_course` used camelCase columns in raw SQL, and `last_used_at` updates never executed because Drizzle update builders are lazy. All fixed in `61876a9`. (Lesson L2 again — mock-only DB tests hide real SQL bugs.)
+- **Gates on the committed state (release agent, real output):** `npm run lessons:check` → 0 failures, 3 known debt (L13 `kabinet/kurs/[id]/dars/[lessonId]`, L13 `shahodatnoma/[code]`, L19 `chat.service.ts` 263 lines) · `npm run build` → exit 0 · `npx vitest run` → 96 files / 659 tests passed.
+- **Risk / must-do right after deploy:** the first real MCP client connection is NOT yet tested end-to-end in production. Smoke-test `https://master-2-jade.vercel.app/.well-known/oauth-authorization-server` and log in — login reads `users.mcp_access`, so a wrong/missing column shows up there first. Curl the prod **alias** from `vercel inspect` → Aliases, never the per-deployment URL (L20/L22).
+- **Next, in order:**
+  1. **Wave E: rebuild the home page sections 0→6 in the approved lab style** (art direction §9 step 3) — one section per slice, the owner checks each slice before the next.
+  2. `skillkit improve` (auto-actions per verdict; design in the `wave/a-fixes` STATE handoff "session B"). Measurement (`skillkit eval outcome`, `skillkit stats skills`) already exists.
+  3. **Debt:** 121 Tailwind opacity classes on `var()` colours produce no CSS (fix `tailwind.config.js` with `<alpha-value>`, then a visual review of all pages); `src/features/**` tests missing from the vitest include (one CountUp test fails to parse); true 404 status for unknown kurs/blog slugs (noindex already, low priority); split `src/features/chat/server/chat.service.ts` (263 lines); /kabinet simulated LCP 3.5 s.
+- **In progress:** no agent running on this wave. The `wave/w8b-mcp` worktree (`../vibecoding-uz-wt/w8b-mcp`) can be dropped — its content is on main. The slice-2 worktree `../vibecoding-uz-wt/release-b` can be dropped too.
+- **Owner decision 2026-09-26:** owner said "Deploy qil" for W8B. Do not re-ask.
+- **Resume:** open the repo, say "davom et" — a new session reads [RESUME.md](RESUME.md) and this section. Roll back: `skillkit wave status`, then `skillkit wave rollback <tag>`.
+
 ### ▶ RELEASE 2026-09-26 (release-b): Awwwards slice 2 (hero live demo) merged + pushed
 - **Shipped:** Awwwards slice 2 = the hero live prompt→site demo on `/lab/naqsh` (prompt types, girih tiles weave, site mock renders). Merged to main as `2d4057b` (from `wave/release-b` = origin/main + `wave/awwwards-slice2`). Pushed to `main` and `master`.
 - **Still deliberately hidden:** `/lab/naqsh` is `noindex` and not linked from anywhere. The home page is NOT touched yet — slice 2 is a prototype route, not the home hero.
