@@ -1,5 +1,11 @@
 /* Native scroll storytelling: G'oya → Prompt → Ilova. No scroll handlers. */
 
+/* Wave E home loom (HomeLoom + LoomStar mutedStrands): strands whose section
+   hasn't shipped yet sit as a faint static guide instead of the finished
+   look, so the star visibly has "more to weave" without ever being fully
+   drawn. Applies to opacity only — never a hex color (tokens stay in the SVG). */
+.loom-strand-muted { opacity: 0.22; }
+
 .story-section { position: relative; }
 .story-track { min-height: 0; }
 .story-pin { padding: 5rem 0; }

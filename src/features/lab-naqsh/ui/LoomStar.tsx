@@ -1,5 +1,6 @@
 import { LOGO_DIAMOND, LOGO_SQUARE_SEGMENTS, LOGO_VIEWBOX } from "@/components/brand/logoGeometry";
 import { cn } from "@/components/ui/utils";
+import type { StrandKey } from "../domain/strands";
 
 /**
  * The loom star: the brand mark's 8-point girih geometry (reused from
@@ -11,8 +12,24 @@ import { cn } from "@/components/ui/utils";
  * state) — useLoomMotion only *hides* strands with gsap.set() once JS
  * confirms motion is allowed, per the reduced-motion / no-JS rule.
  */
-/** `weight` thickens strokes for small renders (the phone rail star) so strands stay visible. */
-export function LoomStar({ size = 320, weight = 1, className }: { size?: number; weight?: number; className?: string }) {
+/**
+ * `weight` thickens strokes for small renders (the phone rail star) so strands
+ * stay visible. `mutedStrands` (Wave E, home loom): strands whose section
+ * hasn't shipped yet render as a faint, static guide instead of the finished
+ * state — used only by the home page loom (HomeLoom), never by `/lab/naqsh`.
+ */
+export function LoomStar({
+  size = 320,
+  weight = 1,
+  className,
+  mutedStrands,
+}: {
+  size?: number;
+  weight?: number;
+  className?: string;
+  mutedStrands?: readonly StrandKey[];
+}) {
+  const muted = (strand: StrandKey) => (mutedStrands?.includes(strand) ? "loom-strand-muted" : undefined);
   return (
     <svg
       width={size}
@@ -32,6 +49,7 @@ export function LoomStar({ size = 320, weight = 1, className }: { size?: number;
       {/* section 4 — outer ring / tessellation hint */}
       <circle
         data-strand="ring"
+        className={muted("ring")}
         cx="16"
         cy="16"
         r="15"
@@ -56,11 +74,12 @@ export function LoomStar({ size = 320, weight = 1, className }: { size?: number;
 
       <g data-strand-core="true">
         {/* section 5 — gold fill */}
-        <path data-strand="fill" d={LOGO_DIAMOND} fill="var(--gold)" fillOpacity="0.85" />
+        <path data-strand="fill" className={muted("fill")} d={LOGO_DIAMOND} fill="var(--gold)" fillOpacity="0.85" />
 
         {/* section 2 — diamond strand */}
         <path
           data-strand="diamond"
+          className={muted("diamond")}
           d={LOGO_DIAMOND}
           stroke="var(--gold)"
           strokeWidth={0.6 * weight}
@@ -71,7 +90,7 @@ export function LoomStar({ size = 320, weight = 1, className }: { size?: number;
         />
 
         {/* section 1 — square strand, 4 corner strokes */}
-        <g stroke="var(--brand)" strokeWidth={0.6 * weight} strokeLinejoin="miter" strokeLinecap="butt">
+        <g stroke="var(--brand)" strokeWidth={0.6 * weight} strokeLinejoin="miter" strokeLinecap="butt" className={muted("square")}>
           {LOGO_SQUARE_SEGMENTS.map((points) => (
             <polyline
               key={points}
@@ -86,7 +105,7 @@ export function LoomStar({ size = 320, weight = 1, className }: { size?: number;
       </g>
 
       {/* section 3 — over/under weave hint: the 8 crossing points */}
-      <g data-strand="weave" fill="var(--accent)" opacity="1">
+      <g data-strand="weave" className={muted("weave")} fill="var(--accent)" opacity="1">
         {WEAVE_DOTS.map(([x, y]) => (
           <circle key={`${x}-${y}`} cx={x} cy={y} r={0.55 * weight} />
         ))}

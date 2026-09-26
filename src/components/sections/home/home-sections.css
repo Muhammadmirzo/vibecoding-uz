@@ -1,7 +1,5 @@
 /* Home bento, roadmap, fill and section transition primitives. */
 
-.problem-panel { border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--bg); }
-.problem-panel-new { border-color: color-mix(in srgb, var(--accent) 42%, var(--border)); background: color-mix(in srgb, var(--accent-soft) 58%, var(--bg)); }
 .bento-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 1rem; }
 .bento-tile { grid-column: span 5; min-height: 340px; }
 .bento-wide { grid-column: span 7; }
