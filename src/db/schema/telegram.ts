@@ -1,4 +1,4 @@
-import { index, pgTable, uuid, text, timestamp } from "drizzle-orm/pg-core";
+import { bigint, index, pgTable, uuid, text, timestamp } from "drizzle-orm/pg-core";
 import { users } from "./users";
 
 export const telegramLoginRequests = pgTable("telegram_login_requests", {
@@ -16,3 +16,9 @@ export const telegramLoginRequests = pgTable("telegram_login_requests", {
 }, (table) => [
   index("telegram_login_requests_tg_pending_idx").on(table.tgUserId, table.status, table.expiresAt),
 ]);
+
+/** Telegram retries a webhook until it gets 200; insert-first on update_id makes processing idempotent. */
+export const telegramUpdates = pgTable("telegram_updates", {
+  updateId: bigint("update_id", { mode: "number" }).primaryKey(),
+  receivedAt: timestamp("received_at", { withTimezone: true }).defaultNow().notNull(),
+});

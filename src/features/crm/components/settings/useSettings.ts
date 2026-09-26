@@ -10,7 +10,7 @@ const initialSettings: SettingsState = {
   announcementBannerText: "Yangi Vibe Coding Express guruhiga qabul boshlandi! Mashg'ulotlar tez orada start oladi.", announcementBannerLink: "/kurs/vibe-coding-express", enableAnnouncementBanner: true,
   defaultCoursePrice: "550000.00", installmentRate3Months: 0, installmentRate6Months: 10, guaranteeRefundDays: siteConfig.guaranteeDays,
   guaranteeTextUz: siteConfig.guaranteeSummary,
-  paymeMerchantId: "", paymeSecretKey: "", clickServiceId: "", clickSecretKey: "", telegramBotToken: "", smsApiKey: "",
+  paymeMerchantId: "", clickServiceId: "",
   enableGamification: true, enableCommunityForum: true, enableInteractiveQuizzes: true, enableB2BEnterprise: true, enableCardReferrals: true, enableLevelGating: true, enableGuaranteeTrust: true,
   credPhone: "", credEmail: "", oldPassword: "", newPassword: "", confirmPassword: "",
   integrationStatus: { payme: "sozlanmagan", click: "sozlanmagan", telegram: "sozlanmagan", sms: "sozlanmagan" },
