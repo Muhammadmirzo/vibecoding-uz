@@ -72,14 +72,14 @@ Telegram bot token on 2026-09-26. Full per-wave detail: STATE.md "Phase 2" RELEA
    cert PII leak L30, cert DB-down + real 404 L31/L37, CSPRNG codes L34, /kabinet 401 loop L32, `listPayments` UUID guard L33,
    `vercel redeploy` in docs, live-test timeout L35). New lessons L30–L38, 4 enforced in `scripts/lessons-check.mjs`.
    Still open from that audit: the D2 light/dark visual check, and the prod smoke of this wave's certificate/401 behaviour.
-0b. **Verify the g1-growth wave on the prod alias** (agents do it, you read the result) — **wait until the Production deployment
+0b. **Partly verified by Claude 2026-09-26 after Ready:** `/kurs` 200, `/ekspertlar` 404 (closed), `/api/health` 200, `/kabinet/to-lovlar` 307 to login. Still to check: bot `/start` prices, new-student checkout on a preview with a dev cohort. **Verify the g1-growth wave on the prod alias** (agents do it, you read the result) — **wait until the Production deployment
    reads `Ready` in `vercel ls`, then curl (L42)**: `/api/health` = 200 `{"status":"ok"}` with `x-request-id`; `/kurs` = 200;
    `/ekspertlar` shows the honest "closed until real profiles" state; the Telegram bot's `/start` prices match the site; a brand-new
    student reaches checkout (or sees the waitlist when no cohort is open). If `/api/health` is 404, prod is on old code → deploy the
    latest main (`vercel deploy --prod --yes` from a clean main; never `vercel redeploy <alias>`).
 0c. ~~Growth audit synthesis~~ **DONE: `docs/roadmap/07-growth-audit.md`** (plus `08-pricing-plans.md` and
    `09-admin-mentors-community.md`, all written 2026-09-26). **R0 foundations** next in the roadmap order.
-1. **Wave A1 admin panel — the next build (muse-spark, roadmap [09 §A](../roadmap/09-admin-mentors-community.md)):**
+1. **Wave `admin-a1` (name it so; NOT the same as release `a1-fixes`) admin panel — the next build (muse-spark, roadmap [09 §A](../roadmap/09-admin-mentors-community.md)):**
    courses, plans **Start / Pro / Premium**, lessons, free-lesson flag, with the **DB as the single price source** (already the
    stated source in `a1f4526`). Prerequisite: **F3 money (bigint tiyin + currency) and 68 `timestamp` → `timestamptz`**, expand/contract.
    All SQL on **naqsh-dev first** (agents use `.env.agents`), then prod via migration BEFORE the deploy. Also in A1: make gate runs
