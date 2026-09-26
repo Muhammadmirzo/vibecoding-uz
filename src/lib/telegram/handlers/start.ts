@@ -4,12 +4,7 @@ import { beginTelegramLogin } from "@/features/auth/server/telegram-login.servic
 import { formatTelegramDevice, formatTelegramRequestTime } from "../user-agent";
 import { ServiceError } from "@/lib/http/errors";
 import { linkTelegramAccount } from "../linkAccount";
-
-const mainKeyboard = Markup.keyboard([
-  ["📚 Kurslar va Narxlar", "🎯 Bepul Diagnostika"],
-  ["💡 G'oya Kalkulyatori", "🎁 Bepul Dars"],
-  ["📱 Hisobni Ulash (Telefon)", "🆘 Mentor / Operator"],
-]).resize();
+import { mainKeyboard } from "./menu";
 
 function escapeHtml(value: string): string {
   return value.replace(/[&<>"']/g, (character) => ({
