@@ -58,6 +58,8 @@ fixing an item there means removing it from that file. Everything else below sti
 | L17 | main/master desync; linked to a deleted duplicate Vercel project | Deploy only with `git push origin main && git push origin main:master`; project = `master-2`. |
 | L18 | Agents OOM-killed; an agent killed itself with `pkill -f` | Heavy commands via `scripts/waves/locked.sh`; stop servers with `kill $(lsof -t -i:<port>)`. |
 | L19 | Files grew past 300 lines, hard to review | Every file ≤ 250 lines. Check `wc -l` on changed files. |
+| L20 | Release agent smoke-tested `master-2.vercel.app` (someone else's project) and reported prod 404s | Production domain is **`master-2-jade.vercel.app`**. Get it from `vercel inspect <prod deployment>` → Aliases, never guess. |
+| L21 | `dynamicParams=false` "fixed" soft-404 but a fresh prod build still returned 200 | Root `loading.tsx` streams first; Next adds `noindex` on those pages. Verify status fixes with curl on a FRESH `next build` + `next start`, never on an old server. |
 
 ## 3. After every fix: add a lesson
 
