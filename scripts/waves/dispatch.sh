@@ -21,7 +21,11 @@ if [ ! -d "$wt" ]; then
 fi
 [ -e "$wt/node_modules" ] || ln -s "$root/node_modules" "$wt/node_modules"
 for f in .env .env.local; do [ -f "$root/$f" ] && [ ! -f "$wt/$f" ] && cp "$root/$f" "$wt/$f"; done
-cd "$wt" && timeout 5400 opencode run --auto -m "opencode/$model#medium" --title "$wave" "$(cat "$prompt")" > "$log" 2>&1
+if [[ "$model" == gemini* ]] || [[ "$model" == claude* ]] || [[ "$model" == gpt* ]]; then
+  cd "$wt" && timeout 5400 agy -p "$(cat "$prompt")" --model "$model" --dangerously-skip-permissions > "$log" 2>&1
+else
+  cd "$wt" && timeout 5400 opencode run --auto -m "opencode/$model#medium" --title "$wave" "$(cat "$prompt")" > "$log" 2>&1
+fi
 echo "exit=$?" >> "$log"
 # Worktrees share the root node_modules via symlink; an agent running npm
 # install on an older package.json prunes deps other waves added. Restore.

@@ -43,3 +43,4 @@ test-results/
 
 # stray cache dir some agent tools create inside worktrees
 /vibecoding-uz/
+.claude/worktrees/
