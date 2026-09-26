@@ -1,20 +1,7 @@
 "use client";
 
 import * as React from "react";
-
-const UZ_MONTHS: Record<string, number> = {
-  yanvar: 0, fevral: 1, mart: 2, aprel: 3, may: 4, iyun: 5,
-  iyul: 6, avgust: 7, sentyabr: 8, oktyabr: 9, noyabr: 10, dekabr: 11,
-};
-
-/** Parse the real cohort date from siteConfig ("15-Oktyabr, 2026"). */
-function parseCohortDate(raw: string): Date | null {
-  const match = raw.match(/(\d{1,2})\s*-\s*([A-Za-z'‘`]+),?\s*(\d{4})/);
-  if (!match) return null;
-  const month = UZ_MONTHS[match[2].toLowerCase().replace(/['‘`]/g, "")];
-  if (month === undefined) return null;
-  return new Date(Number(match[3]), month, Number(match[1]));
-}
+import { parseCohortDate } from "@/features/courses/domain/cohort-date";
 
 /**
  * Live cohort countdown derived from the REAL `siteConfig.nextCohortDate`
