@@ -23,6 +23,20 @@
 
 ## Phase 2 (started 2026-09-24)
 
+### ▶ RELEASE 2026-09-26 (release-e): Wave E slice E1 — home "Muammo" section + pinned loom star — merged + pushed
+- **Shipped:** replaces ProblemShift with `HomeLoom` (reusable pinned-star wrapper: right 4 cols desktop, thin thread on phone) + `MuammoSection`, the first of the Wave E story sections on `/`. Only the square strand scrubs with scroll this slice; other strands render as a faint static guide via `LoomStar`'s `mutedStrands` prop (`/lab/naqsh` unaffected). Performance: `gsap` + `ScrollTrigger` stay out of `/` initial bundle (lazy-loaded via next/dynamic ssr:false on idle, skipped on prefers-reduced-motion). First Load JS unchanged at 129 kB on `/` (103 kB shared). Merged to main from `wave/e1-muammo` (`d61ae00`). Owner approved proceeding 2026-09-26.
+- **Gates on the committed state (real output):** `npm run lessons:check` → 0 failures, 3 known debt (L13 `kabinet/kurs/[id]/dars/[lessonId]`, L13 `shahodatnoma/[code]`, L19 `chat.service.ts` 263 lines) · `npm run build` → exit 0 (shared First Load JS 103 kB) · `npx vitest run` → 97 files / 663 tests passed.
+- **Migrations:** no `.sql` migrations changed since `wave/2026-09-26-w8b-mcp` → no live-DB step needed for this slice.
+- **Next, in order:**
+  1. **Wave E2: the home "Yechim / Qadriyat" section**, then **E3 → E6, one section per slice**; the owner checks each preview before the next slice starts.
+  2. After deploy: smoke-test `https://master-2-jade.vercel.app/` (prod alias from `vercel inspect` → Aliases, never the per-deployment URL — L20/L22).
+  3. `skillkit improve` (auto-actions per verdict; design in the `wave/a-fixes` STATE handoff "session B"). Measurement (`skillkit eval outcome`, `skillkit stats skills`) already exists.
+  4. **Debt:** 121 Tailwind opacity classes on `var()` colours produce no CSS (fix `tailwind.config.js` with `<alpha-value>`, then a visual review of all pages); `src/features/**` tests missing from the vitest include (one CountUp test fails to parse); true 404 status for unknown kurs/blog slugs (noindex already, low priority); split `src/features/chat/server/chat.service.ts` (263 lines); /kabinet simulated LCP 3.5 s.
+- **In progress:** no agent running. The `wave/e1-muammo` worktree (`../vibecoding-uz-wt/e1-muammo`) can be dropped — its content is on main.
+- **Settled (carried over, still valid):** the redesign has no Samarkand/historic-city theme and the girih logo stays (concept A + C); `/lab/naqsh` stays `noindex` and unlinked; Telegram reply → site chat confirmed working; `ANTHROPIC_API_KEY` deferred (AI chat off); Supabase stays in Sydney for now; heavy commands go through `scripts/waves/locked.sh` (7.6 GB RAM).
+- **Still unverified from release-c:** the first real MCP client connection is not yet tested end-to-end in production (smoke-test `/.well-known/oauth-authorization-server` + login, which reads `users.mcp_access`).
+- **Resume:** open the repo, say "davom et" — a new session reads [RESUME.md](RESUME.md) and this section. Roll back: `skillkit wave status`, then `skillkit wave rollback <tag>`.
+
 ### ▶ RELEASE 2026-09-26 (release-d): Wave E slice E0 — home hero = live prompt→site demo — merged + pushed
 - **Shipped:** the home hero (`/`) is now the owner-approved live prompt→site demo (from `/lab/naqsh`). SSR headline = LCP element, the demo lazy-loads after idle, static fallback renders in the SAME box → **CLS 0**. Bundle: First Load JS 125 → 129 kB on `/`. Removed the Samarkand signature text, the eyebrow and the mesh/orbit decorations, plus a duplicated cohort date. Merged to main as `10dd9ab` (branch `wave/e0-hero`, 3 commits). Owner said **"Zo'r"** on the preview 2026-09-26.
 - **Gates on the committed state (release agent, real output):** `npm run lessons:check` → 0 failures, 3 known debt (L13 `kabinet/kurs/[id]/dars/[lessonId]`, L13 `shahodatnoma/[code]`, L19 `chat.service.ts` 263 lines) · `npm run build` → exit 0 (shared First Load JS 103 kB) · `npx vitest run` → 96 files / 659 tests passed.

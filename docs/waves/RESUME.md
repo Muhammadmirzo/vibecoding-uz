@@ -36,19 +36,16 @@ writes the handoff and pushes. Code then verifies the push, CI and the live URL,
 If the free agent stalls for more than ~10 min, stop it by PID and hand the same job to a Claude subagent (Haiku for mechanical work).
 Skill: `wave-handoff`.
 
-## 5. Next work, in order (updated 2026-09-26, after release-d)
+## 5. Next work, in order (updated 2026-09-26, after release-e)
 Done and live: Awwwards slice 1 (`/lab/naqsh` loom star, owner approved), /kabinet guest LCP (tag wave/2026-09-26-release-a),
 Awwwards slice 2 (hero live prompt→site demo) merged as 2d4057b and pushed to main + master on 2026-09-26 (release-b),
-and **W8B remote MCP (OAuth 2.1 + PKCE, PATs, visual chart tools) + per-manager access merged as 823796b and pushed on
-2026-09-26** (release-c), and **Wave E slice E0 — the home hero IS the live prompt→site demo — merged as 10dd9ab and
-pushed on 2026-09-26** (release-d). E0: SSR headline = LCP, the demo lazy-loads after idle, the static fallback renders in the same box →
-CLS 0; home First Load JS 125 → 129 kB; Samarkand signature text, eyebrow, mesh/orbit decorations and a duplicate cohort date removed.
-Owner said "Zo'r" on the E0 preview. Migrations 0012+0013 were applied on the live DB BEFORE that deploy; the new SQL was verified
-against the live DB and 4 real bugs were fixed in 61876a9 (camelCase columns in 3 raw queries, `last_used_at` never executed).
-`/lab/naqsh` stays `noindex` and unlinked. Do NOT ask again about deploying slice 2, W8B or E0 — the owner approved all three on 2026-09-26.
+**W8B remote MCP (OAuth 2.1 + PKCE, PATs, visual chart tools) + per-manager access merged as 823796b and pushed on 2026-09-26** (release-c),
+**Wave E slice E0 — the home hero IS the live prompt→site demo — merged as 10dd9ab and pushed on 2026-09-26** (release-d),
+and **Wave E slice E1 — home "Muammo" section + pinned loom star — merged as d61ae00 and pushed on 2026-09-26** (release-e).
+E1: replaces ProblemShift with HomeLoom + MuammoSection; only square strand scrubs with scroll; First Load JS unchanged at 129 kB on `/`.
 0. **Wave E continues, one section per slice, and the owner checks each preview before the next slice starts:**
-   1. **E1: the home "Muammo" section** (square strand), then **E2 … E6**, one section each (art direction §9 step 3).
-   2. After the E0 deploy: smoke-test `https://master-2-jade.vercel.app/` — use the prod **alias** from `vercel inspect` → Aliases,
+   1. **E2: the home "Yechim / Qadriyat" section**, then **E3 … E6**, one section each (art direction §9 step 3).
+   2. After deploy: smoke-test `https://master-2-jade.vercel.app/` — use the prod **alias** from `vercel inspect` → Aliases,
       never the per-deployment URL (L20/L22). Check the hero demo hydrates (it lazy-loads after idle) and that CLS is still 0.
       Cosmetic debt: the BuildStory scroll section shows a blank track in full-page screenshots (pre-existing, rebuilt in a later slice).
    3. Still unverified from release-c: the first real MCP client connection end-to-end in production —
