@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
-import { certificates, enrollments } from "@/db/schema";
+import { certificates, cohorts, courses, enrollments, users } from "@/db/schema";
 import {
   issueCertificateSchema,
   verifyCertificateSchema,
@@ -39,4 +39,49 @@ export async function verifyCertificate(input: VerifyCertificateInput) {
     .where(eq(certificates.code, code))
     .limit(1);
   return certs.length === 0 ? null : certs[0];
+}
+
+export interface CertificateOwner {
+  /** Real student name (users.full_name), falling back to the issued holder name. */
+  holderName: string;
+  phone: string | null;
+  courseTitle: string;
+  /** Server-derived score written at issuance; null when no finite number is stored. */
+  score: number | null;
+  issuedAt: Date;
+}
+
+/**
+ * Loads the display data behind an already-verified certificate row: the
+ * student's own record and the course they were enrolled in. Falls back to the
+ * immutable values snapshotted onto the certificate at issuance so a
+ * verification page can never render an empty or invented field.
+ */
+export async function loadCertificateOwner(
+  certificate: typeof certificates.$inferSelect,
+): Promise<CertificateOwner> {
+  const [row] = await db
+    .select({
+      fullName: users.fullName,
+      phone: users.phone,
+      courseTitle: courses.title,
+      enrollmentScore: enrollments.finalScore,
+    })
+    .from(enrollments)
+    .innerJoin(users, eq(enrollments.userId, users.id))
+    .leftJoin(cohorts, eq(enrollments.cohortId, cohorts.id))
+    .leftJoin(courses, eq(cohorts.courseId, courses.id))
+    .where(eq(enrollments.id, certificate.enrollmentId))
+    .limit(1);
+
+  const stored = Number(certificate.finalScore);
+  const enrollment = Number(row?.enrollmentScore);
+
+  return {
+    holderName: row?.fullName || certificate.holderName || row?.phone || "",
+    phone: row?.phone ?? null,
+    courseTitle: row?.courseTitle || certificate.courseTitle,
+    score: Number.isFinite(stored) ? stored : Number.isFinite(enrollment) ? enrollment : null,
+    issuedAt: certificate.issuedAt,
+  };
 }

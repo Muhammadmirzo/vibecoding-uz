@@ -6,6 +6,7 @@ import { Send, ShieldCheck } from "lucide-react";
 import { Container } from "@/components/ui/Layout";
 import { NextStepCTA } from "@/components/ui/NextStepCTA";
 import { Seal } from "@/components/pages/PageBits";
+import { loadCertificateOwner, verifyCertificate, type CertificateOwner } from "@/lib/certificates/service";
 import "@/components/pages/w6c.css";
 
 interface Props {
@@ -16,6 +17,10 @@ interface Props {
 // alphanumeric parts joined by dashes. Anything else must 404 instead of rendering a
 // "verified" certificate for a code that cannot exist (soft-404 → fake trust badge).
 const CERTIFICATE_CODE = /^[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*$/;
+
+// Reserved code kept for the e2e/responsive suites (e2e/responsive.spec.ts, e2e/visibility.spec.ts).
+// It is rendered as an obvious demo — never as a real, verified certificate (L14).
+const DEMO_CODE = "DEMO2026";
 
 function isCertificateCode(code: string | undefined): boolean {
   return typeof code === "string" && code.length <= 64 && CERTIFICATE_CODE.test(code);
@@ -30,16 +35,55 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-const ROWS = [
-  { label: "Egasining ismi", value: "Jamshid Alimov", accent: false },
-  { label: "Kurs nomi", value: "Vibe Coding Express (8 hafta)", accent: true },
-  { label: "Umumiy o'rtacha ball", value: "9.4 / 10", accent: false, mono: true },
-  { label: "Berilgan sana", value: "07.09.2026", accent: false, mono: true },
-] as const;
+interface Row {
+  label: string;
+  value: string;
+  accent: boolean;
+  mono: boolean;
+}
+
+/** Demo values are placeholders that look like placeholders (L14). */
+const DEMO_ROWS: readonly Row[] = [
+  { label: "Egasining ismi", value: "Demo talaba (nunamuna)", accent: false, mono: false },
+  { label: "Kurs nomi", value: "Vibe Coding Express — namuna", accent: true, mono: false },
+  { label: "Umumiy o'rtacha ball", value: "—", accent: false, mono: true },
+  { label: "Berilgan sana", value: "—", accent: false, mono: true },
+];
+
+/** Formats the server-derived score to one decimal, e.g. `8.5 / 10`. */
+function formatScore(score: number | null): string {
+  if (score === null || !Number.isFinite(score)) return "—";
+  return `${score.toFixed(1)} / 10`;
+}
+
+function formatDate(date: Date): string {
+  return date.toLocaleDateString("uz-UZ", { day: "2-digit", month: "2-digit", year: "numeric" });
+}
+
+function toRows(owner: CertificateOwner): readonly Row[] {
+  return [
+    { label: "Egasining ismi", value: owner.holderName || "Ma'lumot yo'q", accent: false, mono: false },
+    { label: "Kurs nomi", value: owner.courseTitle || "Ma'lumot yo'q", accent: true, mono: false },
+    { label: "Umumiy o'rtacha ball", value: formatScore(owner.score), accent: false, mono: true },
+    { label: "Berilgan sana", value: formatDate(owner.issuedAt), accent: false, mono: true },
+  ];
+}
 
 export default async function CertificateVerificationPage({ params }: Props) {
   const { code } = await params;
   if (!isCertificateCode(code)) notFound();
+
+  const isDemo = code === DEMO_CODE;
+  let rows: readonly Row[] = DEMO_ROWS;
+  let verified = false;
+
+  if (!isDemo) {
+    // L14: the "Verified" badge may only appear for a code that really exists in the DB.
+    const certificate = await verifyCertificate({ code });
+    if (!certificate) notFound();
+    rows = toRows(await loadCertificateOwner(certificate));
+    verified = true;
+  }
 
   return (
     <div className="min-h-screen bg-bg pb-20">
@@ -48,9 +92,15 @@ export default async function CertificateVerificationPage({ params }: Props) {
         <Container className="relative z-10 pt-28 text-center sm:pt-32">
           <Seal className="w6c-load mx-auto size-24" />
           <p className="w6c-load mt-6" style={{ "--i": 1 } as React.CSSProperties}>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-success-line bg-success-soft px-3 py-1 font-mono text-xs font-bold text-success">
-              <ShieldCheck className="size-4" aria-hidden="true" /> Haqiqiy Sertifikat (Verified)
-            </span>
+            {verified ? (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-success-line bg-success-soft px-3 py-1 font-mono text-xs font-bold text-success">
+                <ShieldCheck className="size-4" aria-hidden="true" /> Haqiqiy Sertifikat (Verified)
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-bg-sunken px-3 py-1 font-mono text-xs font-bold text-ink-muted">
+                <ShieldCheck className="size-4" aria-hidden="true" /> Demo namuna — tekshirilmagan
+              </span>
+            )}
           </p>
           <h1 className="w6c-load mx-auto mt-4 max-w-2xl text-balance font-display text-[clamp(1.9rem,1.2rem+2.4vw,2.9rem)] font-semibold leading-[1.1] tracking-[-0.04em] text-ink" style={{ "--i": 2 } as React.CSSProperties}>
             Sertifikat Tekshiruvi
@@ -65,15 +115,21 @@ export default async function CertificateVerificationPage({ params }: Props) {
         <div className="rounded-[var(--radius-xl)] border-2 border-gold bg-bg-elevated p-8 text-left shadow-[var(--shadow-md)] sm:p-10">
           <p className="text-center font-display text-sm font-semibold uppercase tracking-[0.2em] text-ink-subtle">— Sertifikat —</p>
           <dl className="mt-6 space-y-0 text-sm">
-            {ROWS.map((row) => (
+            {rows.map((row) => (
               <div key={row.label} className="flex items-baseline justify-between gap-4 border-b border-border py-3 last:border-0">
                 <dt className="font-semibold text-ink-muted">{row.label}:</dt>
-                <dd className={`text-right font-semibold ${row.accent ? "text-accent" : "text-ink"} ${"mono" in row && row.mono ? "font-mono" : ""}`}>
+                <dd className={`text-right font-semibold ${row.accent ? "text-accent" : "text-ink"} ${row.mono ? "font-mono" : ""}`}>
                   {row.value}
                 </dd>
               </div>
             ))}
           </dl>
+          {isDemo && (
+            <p className="mt-6 rounded-lg border border-border bg-bg-sunken px-4 py-3 text-center text-xs text-ink-muted">
+              Bu demo namuna: haqiqiy ma&apos;lumot emas. Haqiqiy sertifikat kodi bilan tekshiruv
+              ma&apos;lumotlar bazasidan olinadi.
+            </p>
+          )}
           <p className="mt-6 rounded-lg bg-bg-sunken px-4 py-3 text-center font-mono text-xs text-ink-muted">
             Tekshiruv manzili: naqsh.uz/shahodatnoma/{code}
           </p>
@@ -91,13 +147,13 @@ export default async function CertificateVerificationPage({ params }: Props) {
             href="/kurs/vibe-coding-express"
             className="btn-press inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-brand px-5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-hover hover:shadow-md"
           >
-            Men ham o‘qimoqchiman
+            Men ham o&apos;qimoqchiman
           </a>
         </div>
         <p className="mt-6 text-center text-xs text-ink-subtle">
-          Ma’lumot mos kelmadimi? <Link href="/xizmatlar" className="font-semibold text-brand underline underline-offset-4">Biz bilan bog‘laning</Link>.
+          Ma&apos;lumot mos kelmadimi? <Link href="/xizmatlar" className="font-semibold text-brand underline underline-offset-4">Biz bilan bog&apos;laning</Link>.
         </p>
-        <NextStepCTA title="Siz ham amaliyotchi bo‘ling" />
+        <NextStepCTA title="Siz ham amaliyotchi bo&apos;ling" />
       </Container>
     </div>
   );

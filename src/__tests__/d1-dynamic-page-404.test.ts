@@ -40,8 +40,10 @@ describe("L13 dynamic pages", () => {
     await expectNotFound(() => LessonPlayerPage({ params: Promise.resolve(params) }));
   });
 
-  it("renders a certificate for a valid code", async () => {
-    const node = await CertificateVerificationPage({ params: Promise.resolve({ code: "NAQSH-2026-ABCDE" }) });
+  // The demo code is the only renderable certificate that needs no database row
+  // (a real code 404s when it is absent — see c1-certificate-verify.test.ts).
+  it("renders the certificate demo code", async () => {
+    const node = await CertificateVerificationPage({ params: Promise.resolve({ code: "DEMO2026" }) });
     expect(node).toBeTruthy();
   });
 
