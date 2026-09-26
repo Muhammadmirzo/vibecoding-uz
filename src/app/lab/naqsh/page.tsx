@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { HeroDemo } from "@/features/lab-naqsh/ui/HeroDemo";
 import { LabNaqshStory } from "@/features/lab-naqsh/ui/LabNaqshStory";
 
 /**
@@ -11,6 +12,7 @@ export const metadata: Metadata = { title: "Lab: Naqsh", robots: { index: false,
 export default function LabNaqshPage() {
   return (
     <main className="bg-brand-surface">
+      <HeroDemo />
       <LabNaqshStory />
     </main>
   );
