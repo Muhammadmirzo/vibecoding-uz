@@ -1,0 +1,75 @@
+# Weekly proof that the newest backup restores: throwaway Postgres 17 → skillkit restore drill
+# (scripts/restore-drill.mjs) → checksum verification against the backup's own manifest.
+# A backup that was never restored is not a backup. Fails loudly (red run + Telegram).
+name: restore-drill
+on:
+  schedule:
+    - cron: "41 20 * * 0" # Monday 01:41 Asia/Tashkent
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: restore-drill
+  cancel-in-progress: false
+jobs:
+  drill:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - uses: ./.github/actions/pg-tools
+      - name: Throwaway Postgres 17
+        run: |
+          set -euo pipefail
+          PW="$(openssl rand -hex 24)"; echo "::add-mask::$PW"
+          docker run -d --name drill -e POSTGRES_PASSWORD="$PW" -p 127.0.0.1:55432:5432 postgres:17 >/dev/null
+          for i in $(seq 1 60); do docker exec drill pg_isready -U postgres >/dev/null 2>&1 && break; sleep 1; done
+          echo "DRILL_DATABASE_URL=postgres://postgres:$PW@127.0.0.1:55432/postgres" >> "$GITHUB_ENV"
+      - name: Download newest backup
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          read -r RUN_ID CREATED < <(gh run list --workflow db-backup.yml --status success --limit 1 \
+            --json databaseId,createdAt --jq '.[0] | "\(.databaseId) \(.createdAt)"')
+          [ -n "${RUN_ID:-}" ] || { echo "::error::no successful db-backup run found; run db-backup first"; exit 1; }
+          AGE_H=$(( ( $(date -u +%s) - $(date -u -d "$CREATED" +%s) ) / 3600 ))
+          echo "Newest backup: run $RUN_ID, ${AGE_H}h old"
+          [ "$AGE_H" -le 72 ] || { echo "::error::newest backup is ${AGE_H}h old (> 72h): nightly backups are failing"; exit 1; }
+          gh run download "$RUN_ID" --name db-backup --dir "$RUNNER_TEMP/enc"
+      - name: Decrypt (drill key)
+        env:
+          BACKUP_DRILL_AGE_KEY: ${{ secrets.BACKUP_DRILL_AGE_KEY }}
+        run: |
+          set -euo pipefail
+          umask 077
+          D="$RUNNER_TEMP/drill"; mkdir -p "$D"
+          [ -n "$BACKUP_DRILL_AGE_KEY" ] || { echo "::error::BACKUP_DRILL_AGE_KEY secret missing"; exit 1; }
+          printf '%s\n' "$BACKUP_DRILL_AGE_KEY" > "$D/key"
+          DUMP="$(ls "$RUNNER_TEMP"/enc/naqsh-*.dump.age | sort | tail -1)"
+          age -d -i "$D/key" -o "$D/backup.dump" "$DUMP"
+          age -d -i "$D/key" -o "$D/manifest.json" "${DUMP%.dump.age}.manifest.json.age"
+          rm -f "$D/key"
+      - name: Restore (skillkit restore drill)
+        run: node scripts/restore-drill.mjs --dump "$RUNNER_TEMP/drill/backup.dump" --target-url "$DRILL_DATABASE_URL"
+      - name: Verify row counts + checksums against the manifest
+        run: npx tsx scripts/ops/verify-restore.ts --manifest "$RUNNER_TEMP/drill/manifest.json" --to DRILL_DATABASE_URL
+      - name: Clean up
+        if: always()
+        run: |
+          rm -rf "$RUNNER_TEMP/drill" "$RUNNER_TEMP/enc"
+          docker rm -f drill >/dev/null 2>&1 || true
+      - name: Alert owner on failure
+        if: failure()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_ADMIN_CHAT_ID: ${{ secrets.TELEGRAM_ADMIN_CHAT_ID }}
+        run: bash .github/scripts/alert.sh "weekly restore drill FAILED - backups may be unusable"

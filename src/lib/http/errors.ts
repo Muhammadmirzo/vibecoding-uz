@@ -67,6 +67,23 @@ export function isDatabaseUnavailable(error: unknown): boolean {
     message.includes("the database system is") || message.includes("timeout exceeded");
 }
 
+/**
+ * SQLSTATE 25006 (read_only_sql_transaction): the database is frozen read-only for a move or
+ * maintenance (scripts/ops/move-db.ts, docs/ops/PORTABILITY.md). Reads keep working; writes get a
+ * friendly, retryable 503 instead of a 500.
+ */
+export function isMaintenanceReadOnly(error: unknown, depth = 0): boolean {
+  if (!error || typeof error !== "object" || depth > 3) return false;
+  const candidate = error as { code?: unknown; message?: unknown; cause?: unknown };
+  if (candidate.code === "25006") return true;
+  if (typeof candidate.message === "string" && candidate.message.includes("in a read-only transaction")) return true;
+  // Newer ORMs wrap the driver error; look one level down.
+  return isMaintenanceReadOnly(candidate.cause, depth + 1);
+}
+
+export const MAINTENANCE_MESSAGE =
+  "Saytda qisqa texnik ishlar ketmoqda: hozircha faqat ko'rish mumkin. Bir necha daqiqadan so'ng qayta urinib ko'ring.";
+
 const RECOVERY_MESSAGE = "Texnik xizmat vaqtincha ishlamayapti. Ma'lumotlaringiz saqlangan; qisqa vaqt ichida qayta urinib ko'ring.";
 
 /**
@@ -83,6 +100,13 @@ export function errorResponse(error: unknown): NextResponse {
     return NextResponse.json(
       { error: "validation_error", details: error.flatten() },
       { status: 400 },
+    );
+  }
+  if (isMaintenanceReadOnly(error)) {
+    console.warn("[api] maintenance: write refused, database is read-only");
+    return NextResponse.json(
+      { error: "maintenance", message: MAINTENANCE_MESSAGE, retryable: true },
+      { status: 503, headers: { "Retry-After": "120" } },
     );
   }
   if (typeof error === "object" && error !== null) {
