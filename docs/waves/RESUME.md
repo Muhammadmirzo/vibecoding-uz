@@ -2,8 +2,10 @@
 
 Do NOT ask questions first: read this file + the newest STATE.md handoff, report the state in 5 short Uzbek lines, then start step 5.1.
 
-The owner speaks Uzbek, so reply in Uzbek, short and step by step. You are the ORCHESTRATOR (Claude Opus): plan, dispatch free
-opencode agents, review, decide. Don't hand-write large features, and don't do mechanical work (push, handoff) yourself.
+The owner speaks Uzbek, so reply in Uzbek, short and step by step. You are the ORCHESTRATOR (Claude Opus 5.5, **medium** effort):
+plan, dispatch agents, review, decide. **Owner rule (2026-09-26): Claude limits run out, so use free agents MAXIMALLY and in PARALLEL**
+(space-bunny, muse-spark, Gemini via agy). Keep Claude subagents for review/security-critical work only. Don't hand-write features,
+and don't do mechanical work (push, handoff, screenshots, gates) yourself.
 
 ## 1. Live state (1 min)
 ```bash
@@ -14,17 +16,22 @@ skillkit doctor
 ```
 Then read `docs/waves/STATE.md` → "Phase 2" → the newest `### ▶ HANDOFF` section (source of truth).
 
-## 2. Tools (since 2026-09-25)
-- Skills: `skillkit` (`~/.skillkit`). The skill `naqsh-lessons` is loaded before any code in this repo.
-- Free opencode models (muse-spark, space-bunny) were DOWN on 2026-09-25/26. Use Claude subagents (Sonnet = UI/creative,
-  Haiku = release/mechanical, Opus = security review) or Gemini via Antigravity: `agy -p "<prompt>" --model gemini-3.1-pro-high|gemini-3.8-flash-high --dangerously-skip-permissions`
-  (skillkit dispatch supports `gemini-*`). Gemini reports overclaim: always re-run gates on the COMMITTED state yourself.
-- Production URL: **https://master-2-jade.vercel.app** (`master-2.vercel.app` is NOT ours, lesson L20).
-- Dispatch an agent: `skillkit dispatch <task> <model> <prompt-file> [dir]`. It adds the LESSON footer, falls back to another model on
-  a stall, runs `--standalone`, and records metrics. Models: `muse-spark-1.3-contributor-free` (deep), `space-bunny-free`
-  (fast/mechanical). Never use nemotron. Max 3 agents; heavy commands go through `scripts/waves/locked.sh`.
+## 2. Tools and agents (updated 2026-09-26)
+- Skills: `skillkit` (`~/.skillkit`). Load `naqsh-lessons` before any code in this repo; `foundations-first` + `database-safety` for data/infra work.
+- **Dispatch free agents in parallel** (each in its own worktree `../vibecoding-uz-wt/<wave>`, prompt file in `.orchestra/prompts/`):
+  `nohup skillkit dispatch <task> <model> .orchestra/prompts/<task>.md ../vibecoding-uz-wt/<wave> > .orchestra/logs/<task>.out 2>&1 &`
+  then wait with a background loop `while kill -0 <pid>; do sleep 20; done` (you get notified; never foreground `sleep`).
+  - `space-bunny-free`: fast, precise fixes from a concrete defect list, UI fixes, screenshots, gates. Worked well on E2 (2026-09-26).
+  - `muse-spark-1.3-contributor-free`: deeper builds (new sections, features).
+  - Gemini via Antigravity: `agy -p "<prompt>" --model gemini-3.1-pro-high|gemini-3.8-flash-high --dangerously-skip-permissions`
+    (or `skillkit dispatch <task> gemini-3.1-pro-high ...`). Reports overclaim: always re-run gates on the COMMITTED state.
+  - Never nemotron. `skillkit dispatch` health-probes models and falls back to `claude:haiku` if free models are down.
+- Parallelism: as many agents as RAM allows (7.6 GB machine: check `free -h`; ~4 agents is safe). Heavy commands
+  (build, vitest, playwright) always go through `scripts/waves/locked.sh`. Other Claude sessions on this machine may run evals:
+  `ListAgents` + `ps -eo pid,etimes,args | grep "opencode run"` before merging.
+- Production URL: **https://master-2-jade.vercel.app** (`master-2.vercel.app` is NOT ours, lesson L20). Smoke-test the alias only (L22).
 - The agent's report has no LESSON line → review its diff yourself and record the lesson (`self-improve` skill).
-- Quality gate: `npm run lessons:check` (also runs as pre-commit), CI on GitHub (lessons + tsc + vitest).
+- Quality gate: `npm run lessons:check` (also runs as pre-commit), CI on GitHub (lessons + tsc + vitest). `npm run db:lockdown-check` after any migration.
 
 ## 3. Review before merge (never skip; agents have shipped broken code several times)
 - Read the risky diffs, not just the report. Check correctness, security, degraded modes, files ≤ 250 lines, honest copy, tokens only.
@@ -36,29 +43,45 @@ writes the handoff and pushes. Code then verifies the push, CI and the live URL,
 If the free agent stalls for more than ~10 min, stop it by PID and hand the same job to a Claude subagent (Haiku for mechanical work).
 Skill: `wave-handoff`.
 
-## 5. Next work, in order (updated 2026-09-26, after release-e)
-Done and live: Awwwards slice 1 (`/lab/naqsh` loom star, owner approved), /kabinet guest LCP (tag wave/2026-09-26-release-a),
-Awwwards slice 2 (hero live prompt→site demo) merged as 2d4057b and pushed to main + master on 2026-09-26 (release-b),
-**W8B remote MCP (OAuth 2.1 + PKCE, PATs, visual chart tools) + per-manager access merged as 823796b and pushed on 2026-09-26** (release-c),
-**Wave E slice E0 — the home hero IS the live prompt→site demo — merged as 10dd9ab and pushed on 2026-09-26** (release-d),
-and **Wave E slice E1 — home "Muammo" section + pinned loom star — merged as d61ae00 and pushed on 2026-09-26** (release-e).
-E1: replaces ProblemShift with HomeLoom + MuammoSection; only square strand scrubs with scroll; First Load JS unchanged at 129 kB on `/`.
-0. **Wave E continues, one section per slice, and the owner checks each preview before the next slice starts:**
-   1. **E2: the home "Yechim / Qadriyat" section**, then **E3 … E6**, one section each (art direction §9 step 3).
-   2. After deploy: smoke-test `https://master-2-jade.vercel.app/` — use the prod **alias** from `vercel inspect` → Aliases,
-      never the per-deployment URL (L20/L22). Check the hero demo hydrates (it lazy-loads after idle) and that CLS is still 0.
-      Cosmetic debt: the BuildStory scroll section shows a blank track in full-page screenshots (pre-existing, rebuilt in a later slice).
-   3. Still unverified from release-c: the first real MCP client connection end-to-end in production —
-      smoke-test `https://master-2-jade.vercel.app/.well-known/oauth-authorization-server` and log in (login reads `users.mcp_access`).
-2. Skillkit: build `skillkit improve` (auto actions per verdict; design in wave/a-fixes STATE handoff "session B"). Measurement
-   (`skillkit eval outcome`, `skillkit stats skills`) already exists.
-3. Debt: 121 Tailwind opacity classes on var() colours produce no CSS (fix tailwind.config.js with <alpha-value> + visual review);
-   `src/features/**` tests are not in vitest include (one CountUp test fails to parse); true 404 status for unknown kurs/blog slugs
-   (noindex already, low priority); split `chat.service.ts` (263 lines); /kabinet simulated LCP 3.5 s.
+## 5. Next work, in order (updated 2026-09-26 evening, session vibecoding-uz-1e → new terminal)
+Done and live: slice 1+2 (`/lab/naqsh`), W8B MCP (tag wave/2026-09-26-w8b-mcp), E0 hero (wave/2026-09-26-e0-hero),
+E1 Muammo (wave/2026-09-26-e1-muammo), F1 foundations (wave/2026-09-26-f1-foundations; migration 0014 applied live;
+live DB: 15 migrations, anon/authenticated revoked, RLS on all tables). **Owner rotated the leaked Supabase DB password
+(rotate-db-password.sh said TAYYOR) and the Telegram bot token (set in Vercel) on 2026-09-26.**
+0. **Verify prod first:** `curl https://master-2-jade.vercel.app/api/health` must be 200 `{"status":"ok"}` and responses must carry
+   `x-request-id`. If 404, production is on pre-F1 code: from a clean main run `vercel deploy --prod --yes` (NOT `vercel redeploy <alias>`,
+   which rebuilt old code on 2026-09-26). Then ask the owner to send `/start` to the bot and confirm it answers (new token).
+1. **E2 Usul — owner preview pending.** Branch `wave/e2-usul` (bea3c0b = 3fda275 + space-bunny fix b6b35de + lessons L24/L25 +
+   main merged; tsc 0). Screens: `docs/redesign/awwwards/screens/e2-usul-*.png` in that worktree. Preview:
+   https://master-2-git-wave-e2-usul-muhammadmirzos-projects.vercel.app (Vercel login). Ask ONE question: "E2 ni ko'rdingizmi, chiqaraymi?"
+   On "zo'r" → merge (no-ff) → `skillkit release e2-usul --notes ...` → verify alias. Open item: BuildStory (below HomeLoom) overlaps
+   Usul's method content; decide in E3 whether BuildStory is removed/merged.
+2. **Wave E continues E3 → E6** (Dastur, Natijalar (real projects only), Narx+savollar, Boshlash), one section per slice, owner checks each.
+   Pattern: add `<Section/>` inside `<HomeLoom>` + `{ id, strand }` in `src/features/lab-naqsh/domain/homeLoom.ts`. Build with muse-spark
+   or space-bunny; review screenshots yourself (L24/L25: verify token classes exist in built CSS).
+3. **F2 portability kit: BUILT, not merged.** Branch `wave/f2-portability` at f12044c (gates: tsc 0, vitest 712/712, lessons ok, build ok).
+   Status + owner setup: `docs/ops/F2-STATUS.md`, `docs/ops/KOCHIRISH.md` in that branch. Verified: a real prod→local PG17 move
+   (43 tables / 856 rows identical, read-only on prod), backup→age→drill→verify, freeze/unfreeze. NOT run: the GitHub workflows,
+   docker build/compose, freeze through the Supabase pooler, `--switch-vercel`.
+   **Before merge:** (a) replace any `vercel redeploy <alias>` in its switch path with a deploy of the latest main (same trap as
+   2026-09-26, see Hard rules); (b) resolve the `package.json` conflict with F1; (c) review the freeze SQL (ALTER ROLE/DATABASE read-only)
+   yourself; (d) have space-bunny run `actionlint` + one `gh workflow run move-db -f rehearsal=true` after the owner sets the secrets.
+   Then release. The owner then creates 2 `age` key pairs and sets the GitHub secrets/vars listed in KOCHIRISH.md.
+4. **F3 data foundations** (after the owner creates the `naqsh-dev` Supabase project and puts its URL into Vercel Preview + Development
+   `DATABASE_URL`; agents then stop using prod): 68 `timestamp` → `timestamptz` + `lib/time.ts` (Asia/Tashkent), money canonical in
+   `bigint` tiyin + currency (expand/contract), `org_id`, stored `users.referral_code`, unique tg_user_id/lower(email), one `toE164()`,
+   `can()` permissions (48 role literals), parity manifest web↔v1↔MCP test, 426 min-app-version, v1 cursor pagination, Sentry.
+   Full audit with evidence: this session's foundations audit (summary in STATE.md handoff 2026-09-26 "foundations").
+5. After F1+F2 merge: ping session vibecoding-uz-87 (skillkit) — it will run `skillkit init-project` on Naqsh (db-check gate).
+   `skillkit improve` is being built by the skillkit session, not here.
+6. Debt: 121 Tailwind opacity classes on var() colours produce no CSS; `src/features/**` tests not in vitest include; true 404 for unknown
+   kurs/blog slugs; split `chat.service.ts` (263 lines); /kabinet LCP 3.5 s; uptime monitor on /api/health (owner, free UptimeRobot).
 
 ## 6. Settled owner decisions (don't re-ask)
 - Telegram reply → site chat works. `ANTHROPIC_API_KEY` is deferred. Supabase stays in Sydney for now.
 - The redesign has no Samarkand/historic-city theme; the girih logo stays. Concept = A + C.
+- 2026-09-26: free nightly encrypted backups (no Supabase Pro) · a separate dev DB project · B2B is possible → `org_id` early ·
+  one-command portability.
 
 ## Hard rules
-Never `pkill -f` (stop servers by PID from `ss -ltnp | grep :<port>`). Never print secrets. Deploy = push main + main:master (release agent).
+Never `pkill -f` (stop servers by PID from `ss -ltnp | grep :<port>`). Never print secrets. Deploy = push main + main:master (release agent). After changing Vercel env vars, deploy the latest main (`vercel deploy --prod --yes` from a clean main), never `vercel redeploy <alias>`.

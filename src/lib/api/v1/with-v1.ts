@@ -1,7 +1,8 @@
-import { createHash, randomUUID } from "node:crypto";
+import { createHash } from "node:crypto";
 import { NextResponse } from "next/server";
 import { fail, ok, type V1Meta } from "./respond";
 import type { AuthSession } from "@/lib/auth/require-auth";
+import { requestIdFrom } from "@/lib/request-id";
 
 export const SUPPORTED_LOCALES = ["uz", "ru", "en"] as const;
 
@@ -13,8 +14,9 @@ export function resolveLocale(request: Request): "uz" | "ru" | "en" {
   return "uz";
 }
 
+/** Same id the middleware stamped on the request and response (see src/lib/request-id.ts). */
 export function requestIdOf(request: Request): string {
-  return request.headers.get("x-request-id")?.trim() || randomUUID();
+  return requestIdFrom(request);
 }
 
 function withV1Headers(response: NextResponse, request: Request): NextResponse {

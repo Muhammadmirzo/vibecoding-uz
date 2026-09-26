@@ -23,6 +23,45 @@
 
 ## Phase 2 (started 2026-09-24)
 
+### ▶ HANDOFF 2026-09-26 evening (session vibecoding-uz-1e): foundations, security, portability
+- **Security incidents fixed today:** (1) the live DB password was in PUBLIC git history (scripts/reset_supabase_db_password.js,
+  test_db_connection.js, src/db/index.ts, first 82f9aa3) → owner rotated it with `scripts/ops/rotate-db-password.sh` (TAYYOR). (2) Supabase
+  `anon`/`authenticated` had full grants on all 41 tables with RLS off → revoked + RLS on (migration 0014, `npm run db:lockdown-check`).
+  (3) legacy `site_settings.telegramBotToken` row deleted by 0014; owner rotated the bot token and set it in Vercel.
+- **Deploy trap:** `rotate-db-password.sh` used `vercel redeploy <alias>`, which rebuilt the pre-F1 code; fixed to `vercel deploy --prod`.
+  A manual `vercel deploy --prod` from main (8456857+) was started to put F1 live; verify `/api/health` = 200 first thing.
+- **Foundations audit (foundations-first skill, 38 items)** — top gaps, in order: backups (none; owner chose free nightly age-encrypted
+  pg_dump via GitHub Actions + weekly restore drill → F2), separate dev/preview DB (preview + agents use PROD; owner creates `naqsh-dev`),
+  68 `timestamp` columns without time zone (admin datetime-local 5 h off, analytics day buckets in UTC) → F3, money in both
+  `amount_sum numeric` and `amount_tiyin int` (payments not live yet) → F3 bigint tiyin, permissions scattered (48 role literals,
+  unused `middleware/rbac.ts`) → F3 `can()`, parity web↔/api/v1↔MCP missing for checkout, diagnostika, lead signup, portfolio,
+  referrals claim, certificate verify; no push sender; min-app-version is advisory only → F3, observability (health/request id done in F1;
+  Sentry + uptime monitor pending), referral code = first 8 hex of user UUID (store it), certificate codes enumerable (5 hex).
+  OK already: UUID PKs, `/api/v1` versioning + envelope, analytics contract, rate limits in Postgres, design tokens, module boundaries.
+- **New skill for all projects:** `foundations-first` (~/.skillkit/own/skills, linked from senior-checklist A.6), incl. item 31
+  portability (one-command move, no data/security loss).
+- **Owner decisions:** free backups, separate dev DB, B2B possible → `org_id` early, one-command portability, free agents maximally in
+  parallel with Claude Opus 5.5 (medium) as orchestrator only.
+
+### ▶ RELEASE 2026-09-26 (release-f): F1 foundations — observability, cron, Telegram dedupe, atomic writes, DB lockdown — merged + pushed
+- **Shipped:** the F1 foundations slice.
+  - **Migration 0014 was APPLIED LIVE BEFORE this deploy** (verified: 15 migrations, `npm run db:lockdown-check` OK): `anon`/`authenticated` Data API grants revoked on every `public` table, RLS enabled everywhere, new `telegram_updates` dedupe table, `lesson_progress` unique constraint, `homework` attempt unique constraint, legacy secret rows deleted. `db:push` is gone — migrations only.
+  - `GET /api/health` (`select 1`, 5 s timeout) → 200 `{status:"ok"}` / 503 `{status:"degraded"}`; point an uptime monitor at it.
+  - `x-request-id` on **every** response (middleware) + JSON-line logging via `src/lib/log.ts` with `requestId`.
+  - Daily Vercel crons (`vercel.json`): `/api/cron/reminders` at 04:00 UTC (09:00 Tashkent) and `/api/cron/analytics-retention` at 22:00 UTC, both with `Authorization: Bearer $CRON_SECRET`.
+  - Telegram `update_id` dedupe (no double-processing of a replayed update), atomic progress upsert, Payme lock by order id, complete `.env.example`, `scripts/ops/rotate-db-password.sh`.
+- **Gates on the committed state (release agent, real output):** `npm run lessons:check` → 0 failures, 3 known debt (L13 `kabinet/kurs/[id]/dars/[lessonId]`, L13 `shahodatnoma/[code]`, L19 `chat.service.ts` 263 lines) · `npm run build` → exit 0 (shared First Load JS 103 kB) · `npx vitest run` → **103 files / 687 tests passed** (up from 97/663 at release-e).
+- **Next, in order:**
+  1. **URGENT — owner rotates the leaked Supabase DB password** with `scripts/ops/rotate-db-password.sh` (the password is in public git history), and rotates the **Telegram bot token**. Nothing else in this list matters as much.
+  2. **E2 fix (space-bunny)**, then the owner checks the preview; Wave E continues one section per slice after that.
+  3. **F2 portability kit review** (one-command portability is an accepted owner goal).
+  4. **F3**: timestamptz + money in tiyin + `org_id` + `can()` permissions — only after the owner creates the `naqsh-dev` Supabase project.
+  5. **Smoke after deploy:** `/`, `/api/health`, `/api/v1/me` (must be 401), Telegram webhook GET. Use the prod **alias** from `vercel inspect` → Aliases, never the per-deployment URL (L20/L22).
+- **In progress:** no agent running. Nothing on a wave branch — F1 went straight to main.
+- **Settled owner decisions 2026-09-26 (don't re-ask):** free nightly encrypted backups (no Supabase Pro) · a **separate dev DB project** · B2B is possible → `org_id` early · one-command portability.
+- **Risks / debt:** middleware now sets `x-request-id` on every response (watch the header size/caching). The leaked DB password is still live in git history until the owner rotates it — that is the top open risk. Untracked and left alone: `scripts/db-check.ts` (owner debug script) and `.claude/worktrees/`. Carried debt from release-e still open: 121 Tailwind opacity classes on `var()` colours produce no CSS; `src/features/**` tests not in the vitest include; true 404 for unknown kurs/blog slugs; split `chat.service.ts` (263 lines); /kabinet simulated LCP 3.5 s; the BuildStory blank track in full-page screenshots. Still unverified from release-c: the first real MCP client connection end-to-end in production.
+- **Resume:** open the repo, say "davom et" — a new session reads [RESUME.md](RESUME.md) and this section. Roll back: `skillkit wave status`, then `skillkit wave rollback <tag>`.
+
 ### ▶ RELEASE 2026-09-26 (release-e): Wave E slice E1 — home "Muammo" section + pinned loom star — merged + pushed
 - **Shipped:** replaces ProblemShift with `HomeLoom` (reusable pinned-star wrapper: right 4 cols desktop, thin thread on phone) + `MuammoSection`, the first of the Wave E story sections on `/`. Only the square strand scrubs with scroll this slice; other strands render as a faint static guide via `LoomStar`'s `mutedStrands` prop (`/lab/naqsh` unaffected). Performance: `gsap` + `ScrollTrigger` stay out of `/` initial bundle (lazy-loaded via next/dynamic ssr:false on idle, skipped on prefers-reduced-motion). First Load JS unchanged at 129 kB on `/` (103 kB shared). Merged to main from `wave/e1-muammo` (`d61ae00`). Owner approved proceeding 2026-09-26.
 - **Gates on the committed state (real output):** `npm run lessons:check` → 0 failures, 3 known debt (L13 `kabinet/kurs/[id]/dars/[lessonId]`, L13 `shahodatnoma/[code]`, L19 `chat.service.ts` 263 lines) · `npm run build` → exit 0 (shared First Load JS 103 kB) · `npx vitest run` → 97 files / 663 tests passed.

@@ -97,9 +97,8 @@ jobs:
           APP_URL: ${{ secrets[format('{0}_APP', inputs.target_secret)] || secrets[inputs.target_secret] }}
         run: |
           set -euo pipefail
-          [ -n "$VERCEL_TOKEN" ] && [ -n "$VERCEL_ORG_ID" ] && [ -n "$VERCEL_PROJECT_ID" ] || { echo "::error::VERCEL_TOKEN/ORG_ID/PROJECT_ID secrets missing; switch by hand (scripts/ops/switch-host.md)"; exit 1; }
           printf '%s' "$APP_URL" | npx --yes vercel@latest env update DATABASE_URL production --yes --token "$VERCEL_TOKEN"
-          npx --yes vercel@latest redeploy "$VERCEL_PROD_URL" --target=production --token "$VERCEL_TOKEN"
+          npx --yes vercel@latest deploy --prod --yes --token "$VERCEL_TOKEN"
           echo "Switched. Old DB stays read-only. Smoke test now (switch-host.md step 5)."
       - name: Remove throwaway Postgres
         if: always() && steps.mode.outputs.mode == 'rehearsal'

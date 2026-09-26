@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, integer, jsonb, uuid, decimal } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, integer, jsonb, uuid, decimal, uniqueIndex } from "drizzle-orm/pg-core";
 import { submissionStatusEnum } from "./enums";
 import { lessons } from "./courses";
 import { users } from "./users";
@@ -19,7 +19,9 @@ export const homeworkSubmissions = pgTable("homework_submissions", {
   payload: jsonb("payload").notNull(), // { fileUrls: string[], githubUrl?: string, note?: string }
   status: submissionStatusEnum("status").default("submitted").notNull(),
   submittedAt: timestamp("submitted_at").defaultNow().notNull(),
-});
+}, (table) => [
+  uniqueIndex("homework_submissions_attempt_uq").on(table.assignmentId, table.userId, table.attemptNo),
+]);
 
 export const homeworkReviews = pgTable("homework_reviews", {
   id: uuid("id").primaryKey().defaultRandom(),

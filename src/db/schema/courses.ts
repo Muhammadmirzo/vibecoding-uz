@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, integer, boolean, jsonb, uuid, decimal, index } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, integer, boolean, jsonb, uuid, decimal, index, uniqueIndex } from "drizzle-orm/pg-core";
 import { courseStatusEnum, dripRuleEnum } from "./enums";
 import { users } from "./users";
 
@@ -55,4 +55,6 @@ export const lessonProgress = pgTable("lesson_progress", {
   positionSec: integer("position_sec").default(0).notNull(),
   completedAt: timestamp("completed_at"),
   lastSeenAt: timestamp("last_seen_at").defaultNow().notNull(),
-});
+}, (table) => [
+  uniqueIndex("lesson_progress_user_lesson_uq").on(table.userId, table.lessonId),
+]);

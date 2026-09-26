@@ -83,14 +83,14 @@ async function switchVercel(appEnv: string, yes: boolean): Promise<void> {
     throw new Error(`vercel env update failed (is the CLI logged in and linked to master-2?): ${err.trim()}`);
   }
   log("  ✔ Vercel DATABASE_URL (production) updated.");
-  // Env changes only apply to new deployments: rebuild the current production deployment.
-  const prod = process.env.VERCEL_PROD_URL ?? "https://master-2-jade.vercel.app";
-  const rd = spawnSync("vercel", ["redeploy", prod, "--target=production"], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+  // Env changes only apply to new deployments: deploy current checkout with --prod.
+  // We avoid `vercel redeploy <alias>` which can roll back production to older code (Hard rules).
+  const rd = spawnSync("vercel", ["deploy", "--prod", "--yes"], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
   if (rd.status !== 0) {
-    log(`  ! redeploy failed; redeploy from the Vercel dashboard (switch-host.md step 4): ${(rd.stderr ?? "").trim().slice(-300)}`);
+    log(`  ! deploy failed; deploy from the Vercel dashboard or run 'vercel deploy --prod': ${(rd.stderr ?? "").trim().slice(-300)}`);
     return;
   }
-  log(`  ✔ Redeployed: ${rd.stdout.trim()} — now smoke test (switch-host.md step 5).`);
+  log(`  ✔ Deployed: ${rd.stdout.trim()} — now smoke test (switch-host.md step 5).`);
 }
 
 async function main(): Promise<void> {
