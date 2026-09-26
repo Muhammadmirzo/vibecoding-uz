@@ -23,6 +23,13 @@
 
 ## Phase 2 (started 2026-09-24)
 
+### ▶ HANDOFF 2026-09-25 (night): Awwwards slice 1, on branch `wave/awwwards-slice1` (NOT merged)
+- Prototype `/lab/naqsh` (noindex, not linked): the loom star draws on scroll (GSAP ScrollTrigger + Lenis), 6 placeholder story sections, reduced-motion shows the finished star. Commits 43fd16c + 3873387. Route First Load JS 177 kB (GSAP only on this route; `/` unchanged at 125 kB). Screenshots: `docs/redesign/awwwards/screens/slice1-*.png`.
+- **Next:** the owner opens the Vercel preview of this branch on their phone and approves the feel. Then merge into main via `skillkit release`, then slice 2 (hero live demo).
+- **Found (next wave, site-wide):** Tailwind drops opacity modifiers on var() colors. 121 classes like `bg-danger/10` and `border-brand/30` generate no CSS. Fix in `tailwind.config.js` (define the token colors with `<alpha-value>`, e.g. color-mix), then do a visual review of all pages.
+- Free opencode models were down on 2026-09-25 evening; this slice was built by a Claude Sonnet subagent. `skillkit dispatch` now health-probes models and falls back to `claude:haiku`.
+- Agents on this machine: other terminals may be running agents on main, so check `ps -eo etimes,args | grep "opencode run"` before merging.
+
 ### ▶ HANDOFF 2026-09-25 (evening), wave "Q1 quality + skills + Awwwards phase 1-2", read this first
 - **Skills:** everything is managed by `skillkit` (`~/.skillkit`, private repo github.com/Muhammadmirzo/skillkit; new laptop: clone + `install.sh`).
   Dispatch agents with `skillkit dispatch <task> <model> <prompt> [dir]` (`.orchestra/run.sh` delegates to it): mandatory LESSON footer,
