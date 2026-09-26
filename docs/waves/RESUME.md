@@ -44,6 +44,9 @@ Agents run ONLY on these free models; pick per task yourself:
   then wait in the background: `while kill -0 <pid>; do sleep 20; done; tail -30 .orchestra/logs/<task>.out` (never a foreground sleep).
 - Parallelism: up to ~4 agents (7.6 GB RAM, check `free -h`); build/vitest/playwright always via `scripts/waves/locked.sh`.
   Other sessions on this machine (skillkit work) may be running: `ListAgents` + `ps -eo pid,etimes,args | grep "opencode run"`.
+- **Dev DB (2026-09-26):** agents use `cp <main repo>/.env.agents .env` (gitignored; same as `.env` but `DATABASE_URL` = `naqsh-dev`,
+  Supabase Frankfurt, second account). NEVER give agents the prod `.env`. Vercel Preview + Development also point to `naqsh-dev`;
+  Production stays on prod (`gvfzomtdswzlxstjvwiv`). New SQL: run on `naqsh-dev` first, then prod via migration before the deploy.
 - Agent reports overclaim (Gemini especially): re-run gates on the COMMITTED state before merging. No LESSON line → record it yourself.
 - Skills: `skillkit` (`~/.skillkit`). `naqsh-lessons` before any code; `foundations-first` + `database-safety` for data/infra work.
 - Production URL: **https://master-2-jade.vercel.app** (not `master-2.vercel.app`, L20). Smoke-test the alias only (L22).
@@ -80,9 +83,8 @@ Telegram bot token on 2026-09-26. Full per-wave detail: STATE.md "Phase 2" RELEA
    a feature lacks its v1 endpoint (in OpenAPI) or MCP tool (or `n/a` + reason); enforce min app version (426 `update_required`);
    `meta.nextCursor` on v1 lists. Then the missing v1 endpoints: lead signup (bepul-dars/meetlar), diagnostika, portfolio, referral claim,
    certificate verify. Owner goal: mobile app and MCP keep pace with the site.
-3. **Owner actions (ask once, in one message) — the FIRST one blocks F3 and the parity work:** (a) **create the `naqsh-dev` Supabase
-   project** for preview/dev (blocked earlier by the free-project limit; steps in the STATE 2026-09-26 evening handoff) and point
-   Vercel Preview/Development `DATABASE_URL` at it; (b) buy the domain **naqsh.uz**; (c) create 2 `age` key pairs + GitHub
+3. **Owner actions (ask once, in one message) (F3 + parity now unblocked):** (a) DONE 2026-09-26: `naqsh-dev` created (second Supabase account, Frankfurt), migrated 0000–0014, seeded, lockdown OK,
+   Vercel Preview/Development point to it; (b) buy the domain **naqsh.uz**; (c) create 2 `age` key pairs + GitHub
    secrets/vars from `docs/ops/KOCHIRISH.md` so nightly backups start; (d) free uptime monitor on `/api/health`; (e) send `/start`
    to the Telegram bot to confirm the new token works.
 4. **F3 data foundations** (ONLY after `naqsh-dev` exists and Vercel Preview/Development `DATABASE_URL` point to it): 68 `timestamp` →
