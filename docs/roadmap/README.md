@@ -12,6 +12,7 @@ Bu papka — shu ishlarning yagona rejasi. Orkestrator har sessiyada shu yerdan 
 | [04-domains-subdomains.md](04-domains-subdomains.md) | Subdomen xaritasi, qachon ajratiladi (triggerlar), hozirdan tayyorgarlik |
 | [05-clients-apps.md](05-clients-apps.md) | Web, mobile (Expo), desktop (PWA → Tauri), Telegram Mini App, MCP — bitta backend |
 | [06-platform-growth.md](06-platform-growth.md) | Supabase hozir, keyin ko'chirish; o'sish triggerlari va "maslahatchi" |
+| [08-pricing-plans.md](08-pricing-plans.md) | Tariflar: har kursda 1–3 (Start · Pro · Premium) |
 
 ## Asosiy tamoyillar (hamma to'lqinga tegishli)
 1. **Bitta backend, ko'p mijoz.** Mantiq `src/features/*` servislarida; web, `/api/v1`, MCP, Telegram, mobile, desktop
@@ -44,5 +45,6 @@ bitta xabarda aytadi: nima, nega, qancha turadi, nima qilish kerak.
 ## Egasining qarorlari (bir marta so'raladi)
 - Hal qilingan: Supabase hozircha (Sidney), keyin ko'chirish mumkin bo'lsin; YouTube ham qo'llab-quvvatlansin;
   MCP barcha rollar va deyarli barcha AI'lar uchun; subdomen mantig'ini orkestrator belgilaydi.
-- Ochiq: (1) domen (`naqsh.uz`?) sotib olinganmi, kimning nomida; (2) o'quvchilar soni va video soatlari (narx
+- 2026-09-26: domen hozir olinadi (egasi nomida); tariflar har kursda 1–3 (08); `naqsh-dev` qadamlari yuborildi.
+- Ochiq: (2) o'quvchilar soni va video soatlari (narx
   hisobi uchun); (3) dars formati: jonli guruh / yozilgan video / aralash; (4) `naqsh-dev` yaratish.
