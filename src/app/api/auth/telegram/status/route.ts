@@ -4,6 +4,7 @@ import { SESSION_COOKIE_NAME, createSessionToken } from "@/lib/auth/session";
 import { errorResponse } from "@/lib/http/errors";
 import { checkRateLimit, createRateLimitResponse, getClientIp, PRESETS } from "@/lib/security/rateLimit";
 import { telegramRequestIdSchema } from "@/lib/validations/auth";
+import { clearRefCodeCookie, parseRefCodeCookie } from "@/features/referrals/domain/referral-code";
 
 function cookieValue(request: Request, id: string): string | null {
   const name = `tg_login_${id}`;
@@ -31,9 +32,14 @@ export async function GET(request: Request) {
     });
     if (!limit.success) return createRateLimitResponse(limit);
 
-    const result = await getTelegramLoginStatus(id.data, cookieValue(request, id.data), {
-      sign: createSessionToken,
-    });
+    const result = await getTelegramLoginStatus(
+      id.data,
+      cookieValue(request, id.data),
+      { sign: createSessionToken },
+      undefined,
+      // The visitor's referral cookie rides along, exactly like phone signup.
+      { refCode: parseRefCodeCookie(request.headers.get("cookie")) },
+    );
     if (result.state === "approved" && result.token && result.user) {
       const secure = process.env.NODE_ENV === "production";
       const response = NextResponse.json({ state: "approved", user: result.user });
@@ -51,6 +57,7 @@ export async function GET(request: Request) {
         sameSite: "lax",
         secure,
       });
+      if (result.refCodeAttributed) response.headers.append("Set-Cookie", clearRefCodeCookie());
       return response;
     }
     return NextResponse.json({ state: result.state });

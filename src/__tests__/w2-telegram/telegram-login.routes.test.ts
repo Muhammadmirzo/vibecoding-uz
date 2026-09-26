@@ -64,7 +64,7 @@ describe("Telegram auth routes", () => {
 
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({ state: "unknown" });
-    expect(mocks.status).toHaveBeenCalledWith(requestId, null, expect.any(Object));
+    expect(mocks.status).toHaveBeenCalledWith(requestId, null, expect.any(Object), undefined, { refCode: "" });
   });
 
   it("sets the session cookie and clears the initiator cookie on approval", async () => {
