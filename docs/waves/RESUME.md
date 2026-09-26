@@ -37,20 +37,18 @@ If the free agent stalls for more than ~10 min, stop it by PID and hand the same
 Skill: `wave-handoff`.
 
 ## 5. Next work, in order (updated 2026-09-26)
-Done and live: Awwwards slice 1 (`/lab/naqsh` loom star, owner approved), /kabinet guest LCP (tag wave/2026-09-26-release-a).
-1. **Awwwards slice 2 (hero live demo) is BUILT, gated, NOT deployed.** Branch `wave/release-b` (worktree ../vibecoding-uz-wt/release-b) =
-   origin/main + wave/awwwards-slice2; tsc 0, vitest 648/648, build OK, `/lab/naqsh` 189 kB. Owner said "Zo'r" about the demo but then
-   **"Yo'q" to deploying it for now**: ask ONE question first: "2-bosqichni saytga chiqaraymi?" If yes → release agent pushes
-   `wave/release-b:main` and `:master`, smoke-test on master-2-jade, tag `wave/<date>-release-b`.
-   Preview: https://master-2-git-wave-awwwards-slice2-muhammadmirzos-projects.vercel.app/lab/naqsh (Vercel login needed).
-2. **W8B MCP + per-manager access** on `wave/w8b-mcp` (934a702): reviewed + gated (tsc 0, vitest 623/623, build OK). Owner decision:
+Done and live: Awwwards slice 1 (`/lab/naqsh` loom star, owner approved), /kabinet guest LCP (tag wave/2026-09-26-release-a),
+**Awwwards slice 2 (hero live prompt→site demo) merged as 2d4057b and pushed to main + master on 2026-09-26** (release-b).
+`/lab/naqsh` stays `noindex` and unlinked; `/` is unchanged (shared JS 103 kB). Do NOT ask again about deploying slice 2 —
+the owner approved it on 2026-09-26.
+1. **W8B MCP + per-manager access** on `wave/w8b-mcp` (934a702): reviewed + gated (tsc 0, vitest 623/623, build OK). Owner decision:
    managers may use MCP (incl. lead status writes) only when an admin enables it; PII stays admin-only. Waiting for the owner's
    "W8B deploy qil". Order: run the new OAuth/PAT/manager SQL on the live DB → `npx drizzle-kit migrate` (0012 + 0013) → merge → deploy.
    **0013 adds users.mcp_access which every login reads: deploying before migrating breaks ALL logins.**
-3. Wave E: rebuild the home page sections 0→6 in the approved lab style (art direction §9 step 3), one section per slice, owner checks each.
-4. Skillkit: build `skillkit improve` (auto actions per verdict; design in wave/a-fixes STATE handoff "session B"). Measurement
+2. Wave E: rebuild the home page sections 0→6 in the approved lab style (art direction §9 step 3), one section per slice, owner checks each.
+3. Skillkit: build `skillkit improve` (auto actions per verdict; design in wave/a-fixes STATE handoff "session B"). Measurement
    (`skillkit eval outcome`, `skillkit stats skills`) already exists.
-5. Debt: 121 Tailwind opacity classes on var() colours produce no CSS (fix tailwind.config.js with <alpha-value> + visual review);
+4. Debt: 121 Tailwind opacity classes on var() colours produce no CSS (fix tailwind.config.js with <alpha-value> + visual review);
    `src/features/**` tests are not in vitest include (one CountUp test fails to parse); true 404 status for unknown kurs/blog slugs
    (noindex already, low priority); split `chat.service.ts`; /kabinet simulated LCP 3.5 s.
 

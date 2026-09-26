@@ -23,6 +23,18 @@
 
 ## Phase 2 (started 2026-09-24)
 
+### ▶ RELEASE 2026-09-26 (release-b): Awwwards slice 2 (hero live demo) merged + pushed
+- **Shipped:** Awwwards slice 2 = the hero live prompt→site demo on `/lab/naqsh` (prompt types, girih tiles weave, site mock renders). Merged to main as `2d4057b` (from `wave/release-b` = origin/main + `wave/awwwards-slice2`). Pushed to `main` and `master`.
+- **Still deliberately hidden:** `/lab/naqsh` is `noindex` and not linked from anywhere. The home page is NOT touched yet — slice 2 is a prototype route, not the home hero.
+- **Owner decision 2026-09-26:** owner approved deploying slice 2. Earlier in the day the owner had said "Yo'q" to deploying; the go came later the same day, so the deploy is authorized. Do not re-ask.
+- **Gates on the committed state (release agent, real output):** `lessons:check` 0 failures (3 known debt: L13 `kabinet/kurs/[id]/dars/[lessonId]`, L13 `shahodatnoma/[code]`, L19 `chat.service.ts` 262 lines) · `npm run build` exit 0 · `npx vitest run` 94 files / 648 tests passed.
+- **Risk:** `/lab/naqsh` First Load JS ~189 kB (66.4 kB route + shared 103 kB) because GSAP/Lenis load only on that route. `/` is unchanged at 103 kB shared. Not a home-page regression yet; it becomes one only if the demo moves to `/` — measure before that happens.
+- **Next, in order:**
+  1. **W8B deploy — needs the owner's "W8B deploy qil".** Branch `wave/w8b-mcp` (934a702, reviewed + gated). Order matters: run the new OAuth/PAT/manager SQL on the LIVE DB → `npx drizzle-kit migrate` (**0012 + 0013**) → merge → gates → deploy. **0013 adds `users.mcp_access`, which every login reads: deploying before migrating breaks ALL logins.**
+  2. Wave E: rebuild the home page sections 0→6 in the approved lab style (art direction §9 step 3), one section per slice, owner checks each slice.
+- **In progress:** no agent running on this wave; slice-2 worktree `../vibecoding-uz-wt/release-b` can be dropped (its content is on main).
+- **Resume:** open the repo, say "davom et" — a new session reads [RESUME.md](RESUME.md) and this section. Roll back: `skillkit wave status`, then `skillkit wave rollback <tag>`.
+
 ### ▶ RELEASE 2026-09-26 (release-a): Awwwards slice 1 + /kabinet LCP, deployed
 - Owner approved the slice-1 loom feel on phone (2026-09-26) after the fix "phone star sticky + thicker" (8ed1289). `/lab/naqsh` is live (noindex, not linked).
 - /kabinet guest view server-rendered (Lighthouse mobile 64→84, TBT 2290→290 ms; simulated LCP 3.5 s, target 2.5 s not met yet).
