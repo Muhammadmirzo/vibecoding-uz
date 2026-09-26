@@ -23,6 +23,18 @@
 
 ## Phase 2 (started 2026-09-24)
 
+### ▶ RELEASE 2026-09-26 (release-f2): Wave F2 Portability Kit — merged + verified by Gemini (Antigravity)
+- **Shipped:** one-command DB move (`npm run move -- db --to NEW_DATABASE_URL [--switch-vercel]`), encrypted nightly backups (`db-backup.yml`, age-encrypted, 7 d artifact), weekly restore drill (`restore-drill.yml` using skillkit template), Docker standalone container (`Dockerfile` non-root with `/api/health` check, `docker-compose.yml` with Caddy + cron sidecar), 503 maintenance mode on SQLSTATE 25006 (`src/lib/http/errors.ts`). 44 files changed, 49 new tests in `src/__tests__/ops/`.
+- **Pre-merge checklist completed by Gemini (Antigravity):**
+  1. Replaced `vercel redeploy` in `scripts/ops/move.ts` and `.github/workflows/move-db.yml` with `vercel deploy --prod --yes` (avoids stale snapshot trap per Hard rules).
+  2. Resolved `package.json` conflict with F1 (`db:lockdown-check` kept alongside `move*`, `backup:db`, `restore:drill`).
+  3. Reviewed and verified freeze SQL (`ALTER ROLE CURRENT_USER IN DATABASE ... SET default_transaction_read_only = on` + session termination + auto-unfreeze).
+  4. Gates on committed main: `npm run lessons:check` → 0 failures, 3 debt · `npm run build` → exit 0 (103 kB shared JS) · `npx vitest run` → 110 files / 736 tests passed.
+- **For Claude upon return (resets 4:50pm):**
+  - F2 is safely merged into `main` and all gates are green.
+  - Wave E2 (`wave/e2-usul`, commit `3fda275`) is ready in worktree `../vibecoding-uz-wt/e2-usul` (all 663 tests passed).
+  - Next: review/merge E2, then proceed to E3 (Dastur section) or F3 (data foundations).
+
 ### ▶ HANDOFF 2026-09-26 evening (session vibecoding-uz-1e): foundations, security, portability
 - **Security incidents fixed today:** (1) the live DB password was in PUBLIC git history (scripts/reset_supabase_db_password.js,
   test_db_connection.js, src/db/index.ts, first 82f9aa3) → owner rotated it with `scripts/ops/rotate-db-password.sh` (TAYYOR). (2) Supabase
