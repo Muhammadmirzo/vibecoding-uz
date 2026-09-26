@@ -51,14 +51,9 @@ live DB: 15 migrations, anon/authenticated revoked, RLS on all tables). **Owner 
 0. **Verify prod first:** `curl https://master-2-jade.vercel.app/api/health` must be 200 `{"status":"ok"}` and responses must carry
    `x-request-id`. If 404, production is on pre-F1 code: from a clean main run `vercel deploy --prod --yes` (NOT `vercel redeploy <alias>`,
    which rebuilt old code on 2026-09-26). Then ask the owner to send `/start` to the bot and confirm it answers (new token).
-1. **E2 Usul — owner preview pending.** Branch `wave/e2-usul` (bea3c0b = 3fda275 + space-bunny fix b6b35de + lessons L24/L25 +
-   main merged; tsc 0). Screens: `docs/redesign/awwwards/screens/e2-usul-*.png` in that worktree. Preview:
-   https://master-2-git-wave-e2-usul-muhammadmirzos-projects.vercel.app (Vercel login). Ask ONE question: "E2 ni ko'rdingizmi, chiqaraymi?"
-   On "zo'r" → merge (no-ff) → `skillkit release e2-usul --notes ...` → verify alias. Open item: BuildStory (below HomeLoom) overlaps
-   Usul's method content; decide in E3 whether BuildStory is removed/merged.
-2. **Wave E continues E3 → E6** (Dastur, Natijalar (real projects only), Narx+savollar, Boshlash), one section per slice, owner checks each.
-   Pattern: add `<Section/>` inside `<HomeLoom>` + `{ id, strand }` in `src/features/lab-naqsh/domain/homeLoom.ts`. Build with muse-spark
-   or space-bunny; review screenshots yourself (L24/L25: verify token classes exist in built CSS).
+1. **E2 Usul — MERGED into main.** Diamond strand active on `/`. BuildStory overlap to be resolved in E3.
+2. **Wave E continues with E3: Dastur (Curriculum) section**, then E4 → E6, one section per slice, owner checks each.
+   Pattern: add `<DasturSection/>` inside `<HomeLoom>` + `{ id: "dastur", strand: "weave" }` in `src/features/lab-naqsh/domain/homeLoom.ts`. Build with space-bunny; review screenshots (L24/L25: verify token classes exist in built CSS).
 3. **F2 portability kit: MERGED by Gemini (Antigravity).** Merged to main with all pre-merge checklist items completed:
    (a) replaced `vercel redeploy` with `vercel deploy --prod --yes` in `move.ts` and `move-db.yml`; (b) resolved `package.json` conflict with F1;
    (c) reviewed and verified freeze SQL; (d) all gates on main passed: tsc 0, vitest 736/736, lessons:check 0 failures, build exit 0.

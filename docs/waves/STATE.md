@@ -23,6 +23,11 @@
 
 ## Phase 2 (started 2026-09-24)
 
+### ▶ RELEASE 2026-09-26 (release-e2): Wave E slice E2 — home "Usul" section + diamond strand — merged + pushed
+- **Shipped:** replaces Transformation with `UsulSection` (3 steps: 01 Muammoni aniqlash, 02 AI bilan tezkor iteratsiya, 03 Qaror va sifat nazorati); registers `{ id: "usul", strand: "diamond" }` in `HOME_LOOM_SECTIONS`; renders inside `<HomeLoom>` on `/`. Second strand of the girih star (gold diamond) is now active and scrubs with scroll.
+- **Gates on committed main:** `npm run lessons:check` → 0 failures, 3 known debt · `npm run build` → exit 0 (103 kB shared JS) · `npx vitest run` → 110 files / 736 tests passed.
+- **Next:** Wave E slice E3: "Dastur" (curriculum) section with over-under weave strand (`weave`).
+
 ### ▶ RELEASE 2026-09-26 (release-f2): Wave F2 Portability Kit — merged + verified by Gemini (Antigravity)
 - **Shipped:** one-command DB move (`npm run move -- db --to NEW_DATABASE_URL [--switch-vercel]`), encrypted nightly backups (`db-backup.yml`, age-encrypted, 7 d artifact), weekly restore drill (`restore-drill.yml` using skillkit template), Docker standalone container (`Dockerfile` non-root with `/api/health` check, `docker-compose.yml` with Caddy + cron sidecar), 503 maintenance mode on SQLSTATE 25006 (`src/lib/http/errors.ts`). 44 files changed, 49 new tests in `src/__tests__/ops/`.
 - **Pre-merge checklist completed by Gemini (Antigravity):**
