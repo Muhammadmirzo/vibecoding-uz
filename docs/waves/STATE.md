@@ -23,6 +23,32 @@
 
 ## Phase 2 (started 2026-09-24)
 
+### ▶ RELEASE 2026-09-26 (release-a1-fixes): Wave A1 — Claude audit of the Gemini-orchestrated merges, fixes applied — merged + pushed
+- **Shipped:** the audit of every Gemini-orchestrated merge (`docs/waves/GEMINI-LEDGER.md`) and the fixes it found. Merged as `fbc04de` from `wave/a1-fixes`; audit verdicts recorded in the ledger commit `e2d213c`.
+  1. **Public certificate page PII leak (L30)** — `/shahodatnoma/[code]` fell back `holderName` to `users.phone`, so an unauthenticated visitor could read a student's phone number from the URL. The public page no longer even SELECTs PII.
+  2. **Certificate page states (L31 + L37)** — DB-down rendered a 500 (and a retry a 404), and `notFound()` was called inside the `try` whose `catch` only re-threw the legacy `NEXT_NOT_FOUND` digest, so a well-formed unknown code rendered "Hozir tekshirib bo'lmadi" with **HTTP 200**. Now: found / not found (real 404) / **cannot check** (honest state, no verified badge), `force-dynamic`, `notFound()` called after the `try/catch`.
+  3. **CSPRNG certificate codes (L34)** — `Math.random` and a 5-char random part (~1 B codes, guessable on a public trust page) → `node:crypto` `randomInt`, 8-char random part.
+  4. **`/kabinet` 401 session-expired state (L32)** — a 401 from `/api/me` rendered a "reload" box, i.e. an infinite reload loop for an expired session. A 401 is no longer retryable: the HTTP status is kept on the thrown error, classified in a pure `features/*/domain` function, and rendered as a login link with a redirect back.
+  5. **`listPayments` UUID guard (L33)** — the sibling of the already-guarded `findActiveSessionUser` had no guard, so a non-UUID cookie burned a round trip and raised Postgres 22P02.
+  6. **Docs:** `vercel redeploy` removed from `scripts/ops/move.ts` + `scripts/ops/switch-host.md` (it rebuilt pre-F1 code) → `vercel deploy --prod`.
+  7. **Tests:** live-DB suite timeout made explicit (`LIVE_TIMEOUT_MS` on every `it`, L35); 5 new regression tests (`a1-certificate-code`, `a1-certificate-owner-pii`, `a1-kabinet-list-payments-uuid`, `a1-kabinet-session-expired`, extended `c1-certificate-verify`). New lessons L30–L38 codified, 4 of them enforced in `scripts/lessons-check.mjs`.
+- **Gates on committed main (release agent, real output):** `npm run lessons:check` → `0 failure(s), 0 known debt` · `npm run build` → exit 0 (103 kB shared First Load JS) · `npx vitest run` → **122 files / 826 tests passed** (was 118/798).
+- **Migrations:** no `.sql` migrations changed since `wave/2026-09-26-c1-cert` → no live-DB step needed.
+- **Next, in order:**
+  1. **OWNER: create the `naqsh-dev` Supabase project** (the free-project limit blocked it) and point Vercel Preview/Development `DATABASE_URL` at it. Everything in F3 and the parity work is blocked on this.
+  2. **Growth audit synthesis → `docs/roadmap/07`** (the `m1`–`m4` audit reports are not in `reports/` yet — collect them, then write the synthesis like 06). Followed by **R0 foundations** in the roadmap order.
+  3. **Verify the deploy of this wave** on the prod alias `https://master-2-jade.vercel.app`: `/api/health` = 200, an unknown certificate code must now return a real 404 (L37), an expired session in `/kabinet` must show the login link, not a reload button.
+  4. **Parity web ↔ /api/v1 ↔ MCP** (`docs/features.json` manifest + the test that fails on a missing endpoint/tool), then the missing v1 endpoints (lead signup, diagnostika, portfolio, referral claim, certificate verify). No schema change — can start now.
+  5. **D2 visual check still open:** key pages at 390/1440 in light + dark (no invisible borders/backgrounds after the color-mix alpha tokens).
+  6. **F3 data foundations** (timestamptz, money in tiyin, `org_id`, stored `referral_code`, `can()` permissions, Sentry) — only after step 1.
+- **In progress:** no agent running. `wave/a1-fixes` is merged into `main`; its worktree can be dropped. Untracked and left alone: `scripts/db-check.ts` (owner debug script), `.claude/worktrees/`.
+- **Settled owner decisions 2026-09-26 (don't re-ask):** domain **naqsh.uz** is to be bought · pricing = **Start / Pro / Premium**, 1–3 plans per course (→ `docs/roadmap/08-pricing-plans.md`) · free nightly encrypted backups · a separate dev DB project · B2B possible → `org_id` early · one-command portability. Roadmap exists: `docs/roadmap/README.md` (media, MCP roles, quality, subdomains, apps, growth, pricing) — order R0 → F3 → R1…R7.
+- **Risks / debt:**
+  - **`/shahodatnoma/<unknown code>` still returns HTTP 200 with a 404 body** on production, because the root `src/app/loading.tsx` streams first and Next keeps the 200 status (L21). The body is now correct and `noindex`; a true status needs the root loading file restructured. Low priority, still open.
+  - Carried debt: `src/features/**` tests missing from the vitest include; split `chat.service.ts`; /kabinet simulated LCP; BuildStory blank track in full-page screenshots; first real MCP client connection still not tested end-to-end in production.
+  - `docs/roadmap/07` does not exist yet (gap between 06 and 08).
+- **Resume:** open the repo, say "davom et" — a new session reads [RESUME.md](RESUME.md) and this section. Roll back: `skillkit wave status`, then `skillkit wave rollback <tag>`.
+
 ### ▶ RELEASE 2026-09-26 (release-p1): Wave P1 /kabinet LCP & Server Hydration Optimization — merged + verified by Gemini (Antigravity)
 - **Shipped:** eliminated client waterfall and hydration lag on `/kabinet`:
   1. `src/features/lms/domain/kabinet-dashboard.ts`: pure types + `hasActiveEnrollment()` domain rule (safe for client import).

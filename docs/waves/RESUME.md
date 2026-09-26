@@ -64,33 +64,35 @@ Done and live on main (tags `wave/2026-09-26-*`): `/lab/naqsh`, W8B MCP, the who
 F1 foundations (migration 0014 live, lockdown, /api/health, crons, idempotency), F2 portability kit, D1 debt (0 known debt),
 D2 color-mix alpha tokens, C1 real certificate verification, P1 /kabinet LCP (~0.9 s). Owner rotated the leaked DB password and the
 Telegram bot token on 2026-09-26. Full per-wave detail: STATE.md "Phase 2" RELEASE/HANDOFF sections (newest first).
-0. **Verify (agents do it, you read the result):** space-bunny runs gates on main (`lessons:check`, `tsc`, `vitest`, `build`) and smoke-tests
-   the prod alias: `/api/health` = 200 `{"status":"ok"}` with `x-request-id`, `/` `/lab/naqsh` `/kabinet` = 200, `/api/v1/me` with a fake
-   cookie = 401. If `/api/health` is 404, prod is on old code → deploy the latest main (`vercel deploy --prod --yes` from a clean main;
-   never `vercel redeploy <alias>`).
-1. **Audit the Gemini-orchestrated merges** (`docs/waves/GEMINI-LEDGER.md` + STATE RELEASE sections): dispatch `gemini-3.8-flash-high`
-   reviewers in parallel with a checklist each; the orchestrator itself reads only the risky diffs:
-   - P1 `/kabinet` server prefetch: no user's data rendered for another user or cached publicly (auth, `cache`/`revalidate`, headers).
-   - C1 certificate verification: the new SQL was run on the live DB (L2); unknown codes can't be enumerated and leak no PII.
-   - F2 move/backup: freeze SQL scope (only the source DB), no `vercel redeploy`, secrets masked, workflows pass actionlint.
-   - D2 color-mix: visual check of key pages 390/1440 light+dark (no invisible borders/backgrounds).
-   - E3–E6: honesty (L14: no invented numbers/testimonials, prices from siteConfig), anchors (L27), files ≤ 250 lines.
-   Record findings as lessons; fix via space-bunny with a defect list. Mark audited ledger rows "Claude: OK/fixed".
+0. ~~**Verify**~~ **DONE 2026-09-26 (release-a1-fixes):** gates green on main — `lessons:check` 0 failures / 0 debt, `build` exit 0,
+   `vitest` **122 files / 826 tests**. Audit of the Gemini merges **DONE** (verdicts in `GEMINI-LEDGER.md`, fixes merged as `fbc04de`:
+   cert PII leak L30, cert DB-down + real 404 L31/L37, CSPRNG codes L34, /kabinet 401 loop L32, `listPayments` UUID guard L33,
+   `vercel redeploy` in docs, live-test timeout L35). New lessons L30–L38, 4 enforced in `scripts/lessons-check.mjs`.
+   Still open from that audit: the D2 light/dark visual check, and the prod smoke of this wave's certificate/401 behaviour.
+0b. **Verify THIS wave on the prod alias** (agents do it, you read the result): `https://master-2-jade.vercel.app` —
+   `/api/health` = 200 `{"status:"ok"}` with `x-request-id`; an unknown `/shahodatnoma/<code>` shows the not-found body (the HTTP
+   status is still 200 because root `loading.tsx` streams first — L21, accepted); an expired session in `/kabinet` shows the login
+   link, not a reload button. If `/api/health` is 404, prod is on old code → deploy the latest main (`vercel deploy --prod --yes`
+   from a clean main; never `vercel redeploy <alias>`).
+0c. **Growth audit synthesis → `docs/roadmap/07`** (the `m1`–`m4` audit reports are not in `reports/` yet: collect them, then write
+   the synthesis in the same shape as 06), then **R0 foundations** in the roadmap order.
 2. **Parity web ↔ /api/v1 ↔ MCP (no DB schema change, can start now, muse-spark):** a `docs/features.json` manifest + a test that fails when
    a feature lacks its v1 endpoint (in OpenAPI) or MCP tool (or `n/a` + reason); enforce min app version (426 `update_required`);
    `meta.nextCursor` on v1 lists. Then the missing v1 endpoints: lead signup (bepul-dars/meetlar), diagnostika, portfolio, referral claim,
    certificate verify. Owner goal: mobile app and MCP keep pace with the site.
-3. **Owner actions (ask once, in one message):** (a) create the `naqsh-dev` Supabase project for preview/dev (steps in STATE 2026-09-26
-   evening handoff); (b) create 2 `age` key pairs + GitHub secrets/vars from `docs/ops/KOCHIRISH.md` so nightly backups start;
-   (c) free uptime monitor on `/api/health`; (d) send `/start` to the Telegram bot to confirm the new token works.
+3. **Owner actions (ask once, in one message) — the FIRST one blocks F3 and the parity work:** (a) **create the `naqsh-dev` Supabase
+   project** for preview/dev (blocked earlier by the free-project limit; steps in the STATE 2026-09-26 evening handoff) and point
+   Vercel Preview/Development `DATABASE_URL` at it; (b) buy the domain **naqsh.uz**; (c) create 2 `age` key pairs + GitHub
+   secrets/vars from `docs/ops/KOCHIRISH.md` so nightly backups start; (d) free uptime monitor on `/api/health`; (e) send `/start`
+   to the Telegram bot to confirm the new token works.
 4. **F3 data foundations** (ONLY after `naqsh-dev` exists and Vercel Preview/Development `DATABASE_URL` point to it): 68 `timestamp` →
    `timestamptz` + `lib/time.ts` (Asia/Tashkent), money canonical in `bigint` tiyin + currency (expand/contract), `org_id` (B2B possible),
    stored `users.referral_code`, unique tg_user_id / lower(email), one `toE164()`, `can()` permissions (48 role literals), Sentry.
    Every new SQL runs once on a real DB before merge (L2); migrations applied live BEFORE the deploy that needs them.
 5. **Roadmap (owner request 2026-09-26): [docs/roadmap/README.md](../roadmap/README.md)** — lesson media (YouTube + stream + live),
    MCP for every role (superadmin/accountant/manager/mentor/student, all AI clients), quality control, subdomain triggers,
-   mobile/desktop/Telegram Mini App. Order R0 → F3 → R1…R7. Each session: check the growth triggers (roadmap 06 §3) and
-   tell the owner in one message if one is reached.
+   mobile/desktop/Telegram Mini App, growth, and pricing (**Start / Pro / Premium**, 1–3 plans per course → 08). Order
+   R0 → F3 → R1…R7. Each session: check the growth triggers (roadmap 06 §3) and tell the owner in one message if one is reached.
 6. After this: tell the skillkit session (vibecoding-uz-87, if alive) that F1+F2 are merged; it runs `skillkit init-project` (db-check gate).
 
 ## 6. Settled owner decisions (don't re-ask)
@@ -98,6 +100,7 @@ Telegram bot token on 2026-09-26. Full per-wave detail: STATE.md "Phase 2" RELEA
 - The redesign has no Samarkand/historic-city theme; the girih logo stays. Concept = A + C.
 - 2026-09-26: free nightly encrypted backups (no Supabase Pro) · a separate dev DB project · B2B is possible → `org_id` early ·
   one-command portability.
+- 2026-09-26 (wave a1-fixes): the domain **naqsh.uz** is to be bought · pricing = **Start / Pro / Premium**, 1–3 plans per course.
 
 ## Hard rules
 Never `pkill -f` (stop servers by PID from `ss -ltnp | grep :<port>`). Never print secrets. Deploy = push main + main:master (release agent). After changing Vercel env vars, deploy the latest main (`vercel deploy --prod --yes` from a clean main), never `vercel redeploy <alias>`.
