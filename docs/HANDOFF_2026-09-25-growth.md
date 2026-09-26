@@ -1,9 +1,32 @@
 # Handoff — Growth sprint (skills + CRO + SEO + MCP), 2026-09-25
 
-> **"davom et" desa:** shu faylni o'qi → §3 dagi birinchi ✅ bo'lmagan taskdan davom et. Qayta rejalashtirma.
+> **"davom et" desa:** shu faylni o'qi → §0 (R0, R1) → §2 → §3 → §6 tartibida birinchi `[ ]` taskdan davom et. Qayta rejalashtirma.
 > Egasi o'zbekcha gapiradi — o'zbekcha, qisqa javob ber. Har task tugagach shu faylda katakchani `[x]` qil va commit qil.
 
 PR: https://github.com/Muhammadmirzo/vibecoding-uz/pull/2 — branch `claude/relaxed-gates-9vl0ir`. Hali `main`ga merge QILINMAGAN, deploy QILINMAGAN.
+
+## 0. ⚠️ HOLAT 2026-09-26 — `main` oldinga ketdi, AVVAL SHU BO'LIMNI BAJAR
+
+Bu PR yozilgandan keyin `main`ga ~45 commit qo'shildi (W8B MCP + OAuth, E0 hero live demo, Awwwards lab, a-fixes, SARBON, skillkit). PR #2 hozir **6 faylda konflikt** qiladi: `CLAUDE.md`, `src/app/robots.ts`, `src/components/sections/home/HeroSection.tsx`, `src/app/kurs/[slug]/page.tsx`, `src/app/blog/[slug]/page.tsx`, `src/__tests__/w4-arch/mcp-http-route.test.ts` (main'da o'chirilgan).
+
+Kompyuterda davom ettirish uchun egasi yangi Claude sessiyasiga shuni yozadi:
+> `PR #2 (branch claude/relaxed-gates-9vl0ir) dagi docs/HANDOFF_2026-09-25-growth.md ni o'qi va §0 dan davom et.`
+
+- [ ] **R0. PR'ni yangi main'ga moslashtirish** (kuchli model; egasi "ha" degandan keyin). Tartib:
+  1. `git checkout claude/relaxed-gates-9vl0ir && git fetch origin`.
+  2. **wave/mcp'ni qaytar** — W8B (`src/features/mcp/registry/*`: `analytics_overview`, `analytics_acquisition`, `analytics_funnel`, `sales_summary`, … OAuth bilan) buni to'liq qoplaydi: `git revert -m 1 be05c1c`. `mcp.json`/`mcp-config.json` o'chirilishi ham bekor bo'ladi — ular W8B holatida qolsin.
+  3. `git merge origin/main` (rebase EMAS — PR ochiq). Konfliktlar:
+     - `CLAUDE.md` → main'nikini ol, faqat 2 qator qo'sh: skills README havolasi va shu handoff havolasi.
+     - `HeroSection.tsx` → **main'nikini to'liq ol** (E0 hero egasi tasdiqlagan). CohortCountdown'ni qo'shma; kerak bo'lsa egasidan so'ra.
+     - `robots.ts` → main'dagi `/lab` disallow + bizning AI bot qoidalari (har bir botga ham `/lab`).
+     - `kurs/[slug]`, `blog/[slug]` → main'ning kodini asos qil, ustiga faqat bizning FAQPage/BreadcrumbList JSON-LD qo'shimchalarini qo'y.
+     - `mcp-http-route.test.ts` → o'chir (main kabi).
+  4. `src/middleware.ts` avtomatik merge bo'ladi — main'da a-fixes'ning `dynamicParams=false` urinishi qaytarilgan (`c830c07`), ya'ni soft-404 main'da HALI tuzalmagan; bizning middleware yechimi kerak. Takroriy tekshiruv yo'qligini ko'r.
+  5. Gate: `npm run lessons:check` (main'dagi yangi qoida), `npx tsc --noEmit`, `npx vitest run`, `npm run build`. So'ng §2 T2–T5.
+  6. Push faqat shu branch'ga. `main`ga merge — faqat egasi aytganda.
+- [ ] **R1. SARBON/skillkit bilan moslik.** main'da `ZAHAR_ORCHESTRATION.md` → `SARBON_ORCHESTRATION.md`, `.skillkit.json`, `.claude/skills/naqsh-lessons` bor. Bizning `.claude/skills/*` va `docs/skills/ALL_SKILLS.md` ularga zid emasligini tekshir; `AGENTS.md`dagi havolani saqla. Model matritsasi/skillkit sozlamalarini O'ZGARTIRMA (egasi taqiqlagan).
+- Qaysi ish hali qimmatli (R0 dan keyin qoladi): skills, SEO (canonical, JSON-LD, noindex, AI robots, llms.txt, **middleware soft-404**), a11y fokus halqasi, telefonda header CTA, halol kafolat matni, FAQ tozalash, "Kursga yozilish", audit hisobotlari `docs/growth/reports/`.
+- Endi keraksiz: wave/mcp (W8B qoplaydi), hero countdown (hero almashgan).
 
 ---
 
@@ -17,11 +40,11 @@ PR: https://github.com/Muhammadmirzo/vibecoding-uz/pull/2 — branch `claude/rel
 | wave/mcp | 6 ta read-only MCP analitika vositasi (`get_analytics_overview`, `get_traffic_sources`, `get_conversion_funnel`, `get_landing_page_performance`, `get_sales_report`, `get_student_progress_report`); `grade_homework` va `broadcast_notification` endi `audit_logs`ga yozadi (bitta tranzaksiyada); eski `mcp.json`/`mcp-config.json` (o'lik `/api/mcp/sse`) o'chirildi; README yangilandi | tsc ✅, vitest 635/635 ✅ (haqiqiy lokal Postgres'da) |
 | wave/seo | canonical (routeMetadata) 11 sahifada, /atamalar (yangi layout.tsx) va /blog metadata, FAQPage + BreadcrumbList JSON-LD, /admin va yangi /kabinet/layout.tsx'da noindex, robots.ts'da AI botlar, `public/llms.txt`, soft-404: `src/middleware.ts` noma'lum `/kurs/<slug>` va `/blog/<slug>`ni statik slug ro'yxatlariga (`COURSE_SLUGS`, `STATIC_BLOG_POSTS`) qarab 404 qiladi | agent: tsc ✅, vitest ✅, build ✅, standalone server'da curl 404/200 ✅. Merge'dan keyin: tsc ✅, vitest 641/641 ✅ (build qayta ishga tushirilmagan) |
 
-Audit hisobotlari (xulosalari shu faylda; to'liq matn sessiya scratchpad'ida qoldi, repoda yo'q).
+Audit va implementatsiya hisobotlari to'liq matni: `docs/growth/reports/` (A-FUNNEL, B-SEO, C-UI, D-ADMIN-MCP, I-*). Eslatma: D-ADMIN-MCP va I-MCP W8B'dan oldin yozilgan — MCP bo'yicha main'dagi `docs/waves/reports/W8B-MCP.md` ustun.
 
 ---
 
-## 2. TO'LIQ TEKSHIRUV — hali QILINMAGAN (birinchi navbatda shu)
+## 2. TO'LIQ TEKSHIRUV — hali QILINMAGAN (R0 dan keyin)
 
 Egasi aytdi: tekshiruvni bepul agentlar bajaradi. Tartib bilan, har biri o'tishi shart:
 
@@ -75,12 +98,38 @@ Natija: `docs/growth/<nom>.md`, o'zbekcha, faqat haqiqiy faktlar, egasi ko'rib c
 
 - Eslatma: `/testimoniyalar` yopiq route (W10) — unga qo'shilgan canonical zararsiz. Ba'zi eski sarlavhalarda "| Naqsh" ikki marta chiqadi (layout template ham qo'shadi) — kichik tuzatish, T9 bilan birga qilsa bo'ladi.
 
+## 6. 🚚 KO'CHIRISH TALABI (egasi 2026-09-26) — hostingdan mustaqillik
+
+**Talab (egasining so'zi bilan):** loyiha hozir Vercel + Supabase'da. Uni istalgan boshqa serverga (VPS, boshqa bulut) va bazani boshqa servisga **bitta buyruq bilan** ko'chirish mumkin bo'lsin. Ko'chirishda **hech qanday ma'lumot yo'qolmasin**, xatolik bo'lmasin, **xavfsizlikka zarar yetmasin**.
+
+**Hozirgi holat (main, 2026-09-26 tekshirildi):**
+- ✅ Yaxshi: kod Supabase SDK ishlatmaydi — oddiy Postgres (`DATABASE_URL`, Drizzle, `drizzle/` migratsiyalar). `next.config.mjs`da `output: 'standalone'`, `Dockerfile` (node:20-alpine, standalone) va `docker-compose.yml` (postgres:16 + MinIO) bor. `@vercel/*` paketlari yo'q.
+- ⚠️ `docker-compose.yml`da **standart parollar hardcode** (`POSTGRES_PASSWORD`/`MINIO_ROOT_PASSWORD` default qiymatlari) — prod'da xavfli; default'siz majburiy qilish kerak.
+- ⚠️ `.env.example`da ~15 ta o'zgaruvchi, kod esa ~40 tasini o'qiydi (ESKIZ_*, API_JWT_SECRET, CRON_SECRET, TELEGRAM_*, MCP_*, UPSTASH_*, RESEND_*, IOS_*/ANDROID_* …) — ko'chirganda nimadir unutiladi.
+- ⚠️ Cron route'lar (`/api/cron/reminders`, `/api/cron/analytics-retention`) Vercel'dan tashqarida o'zi ishlamaydi — tashqi scheduler kerak.
+- ⚠️ `vercel.json` `regions: ["syd1"]` — Supabase (ap-southeast-2) yoniga qo'yilgan; baza ko'chsa, server ham bazaga yaqin bo'lishi kerak (aks holda login 3–5 s — STATE.md tarixi).
+- ⚠️ Telegram webhook URL domen o'zgarsa qayta ro'yxatdan o'tkazilishi kerak; `NEXT_PUBLIC_APP_URL`, OAuth issuer (W8B `/.well-known/oauth-*`), CSP ham domenga bog'liq.
+
+**Tasklar** (ZAHAR-DB/SHIELD darajasi — kuchli model; har bir qadam egasi ruxsati bilan; production DB'ga yozish faqat egasi "ha" desa):
+- [ ] **M1. `.env.example` to'liq** — kod o'qiydigan barcha o'zgaruvchilar (grep `process.env.`), har biriga izoh: majburiymi, qayerdan olinadi. Qiymat YOZILMAYDI. Env'ni Zod bilan startda tekshirish (yo'q bo'lsa aniq xato, sirni chop etmay).
+- [ ] **M2. docker-compose prod-xavfsiz** — default parollarni olib tashlash (`${POSTGRES_PASSWORD:?required}`), portlarni faqat localhost'ga, app servisi + healthcheck, cron uchun kichik scheduler servisi (`CRON_SECRET` bilan `curl`).
+- [ ] **M3. `scripts/migrate-host.sh` — bitta buyruq.** Talablar:
+  - `--dry-run` standart; haqiqiy ko'chirish faqat `--apply` bilan.
+  - Manba va nishon DB URL'lari env'dan (`SOURCE_DATABASE_URL`, `TARGET_DATABASE_URL`), hech qachon ekranga/logga chiqarilmaydi.
+  - Qadamlar: manba zaxirasi (`pg_dump -Fc`, sana bilan, checksum) → nishonga `pg_restore` → `drizzle-kit migrate` → **har jadval qator soni manba = nishon** tekshiruvi (+ asosiy jadvallar uchun hash) → farq bo'lsa to'xtaydi va hech narsani o'chirmaydi.
+  - Manba HECH QACHON o'zgartirilmaydi/o'chirilmaydi; eski hosting nishon tekshirilgunicha ishlab turadi (rollback = DNS'ni qaytarish).
+  - Yozuv oynasi: ko'chirish paytida saytni "faqat o'qish" rejimiga o'tkazish yoki qisqa maintenance (to'lov webhook'lari yo'qolmasligi uchun — Payme/Click qayta yuboradi, lekin tekshirilsin).
+- [ ] **M4. Fayllar/media** — hozir rasmlar qayerda saqlanadi (public/, tashqi URL, MinIO?) — aniqlash va ko'chirish skriptiga qo'shish.
+- [ ] **M5. Domen/tashqi servislar checklist** — `docs/runbooks/MIGRATE-HOST.md`: DNS, TLS, Telegram `setWebhook`, Payme/Click callback URL, OAuth issuer, CSP, `NEXT_PUBLIC_APP_URL`, cron, backup jadvali. Har qadamda tekshirish buyrug'i.
+- [ ] **M6. Mashq (rehearsal)** — lokal: docker-compose'da bo'sh nishonga, seed'langan manbadan `migrate-host.sh --apply`; qator sonlari teng, sayt ishlaydi, login ishlaydi. Natija runbook'ga.
+- [ ] **M7. Xavfsizlik review** (kuchli model, `security-review`): skript sirlarni chiqarmasligi, zaxira fayllar ruxsatlari (600), shifrlash, tarmoq faqat TLS.
+
 ## 4. Bepul agentlar uchun model tavsiyasi
 | Task turi | Model darajasi |
 | :--- | :--- |
 | T1–T7 tekshiruv, T14 | tez/arzon model yetadi (buyruq ishga tushirish, natijani yozish) |
 | T9–T13, G1–G5 | o'rta model (matn + kod) |
-| T15, Q6, W8B review, har qanday auth/to'lov/DB o'zgarishi | eng kuchli model yoki egasi bilan Claude — bepul modelga berma |
+| R0, T15, Q6, M1–M7, har qanday auth/to'lov/DB o'zgarishi | eng kuchli model yoki egasi bilan Claude — bepul modelga berma |
 
 Qoida (STATE.md dan): agentlar mock testlar bilan haqiqiy SQL xatolarini 3 marta o'tkazib yuborgan — DB'ga tegadigan har o'zgarishni haqiqiy DB'da sinab ko'r.
 
