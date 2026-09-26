@@ -23,6 +23,26 @@
 
 ## Phase 2 (started 2026-09-24)
 
+### ▶ HANDOFF 2026-09-26 evening (session vibecoding-uz-1e): foundations, security, portability
+- **Security incidents fixed today:** (1) the live DB password was in PUBLIC git history (scripts/reset_supabase_db_password.js,
+  test_db_connection.js, src/db/index.ts, first 82f9aa3) → owner rotated it with `scripts/ops/rotate-db-password.sh` (TAYYOR). (2) Supabase
+  `anon`/`authenticated` had full grants on all 41 tables with RLS off → revoked + RLS on (migration 0014, `npm run db:lockdown-check`).
+  (3) legacy `site_settings.telegramBotToken` row deleted by 0014; owner rotated the bot token and set it in Vercel.
+- **Deploy trap:** `rotate-db-password.sh` used `vercel redeploy <alias>`, which rebuilt the pre-F1 code; fixed to `vercel deploy --prod`.
+  A manual `vercel deploy --prod` from main (8456857+) was started to put F1 live; verify `/api/health` = 200 first thing.
+- **Foundations audit (foundations-first skill, 38 items)** — top gaps, in order: backups (none; owner chose free nightly age-encrypted
+  pg_dump via GitHub Actions + weekly restore drill → F2), separate dev/preview DB (preview + agents use PROD; owner creates `naqsh-dev`),
+  68 `timestamp` columns without time zone (admin datetime-local 5 h off, analytics day buckets in UTC) → F3, money in both
+  `amount_sum numeric` and `amount_tiyin int` (payments not live yet) → F3 bigint tiyin, permissions scattered (48 role literals,
+  unused `middleware/rbac.ts`) → F3 `can()`, parity web↔/api/v1↔MCP missing for checkout, diagnostika, lead signup, portfolio,
+  referrals claim, certificate verify; no push sender; min-app-version is advisory only → F3, observability (health/request id done in F1;
+  Sentry + uptime monitor pending), referral code = first 8 hex of user UUID (store it), certificate codes enumerable (5 hex).
+  OK already: UUID PKs, `/api/v1` versioning + envelope, analytics contract, rate limits in Postgres, design tokens, module boundaries.
+- **New skill for all projects:** `foundations-first` (~/.skillkit/own/skills, linked from senior-checklist A.6), incl. item 31
+  portability (one-command move, no data/security loss).
+- **Owner decisions:** free backups, separate dev DB, B2B possible → `org_id` early, one-command portability, free agents maximally in
+  parallel with Claude Opus 5.5 (medium) as orchestrator only.
+
 ### ▶ RELEASE 2026-09-26 (release-f): F1 foundations — observability, cron, Telegram dedupe, atomic writes, DB lockdown — merged + pushed
 - **Shipped:** the F1 foundations slice.
   - **Migration 0014 was APPLIED LIVE BEFORE this deploy** (verified: 15 migrations, `npm run db:lockdown-check` OK): `anon`/`authenticated` Data API grants revoked on every `public` table, RLS enabled everywhere, new `telegram_updates` dedupe table, `lesson_progress` unique constraint, `homework` attempt unique constraint, legacy secret rows deleted. `db:push` is gone — migrations only.

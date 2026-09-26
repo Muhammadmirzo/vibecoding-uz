@@ -46,8 +46,13 @@ node -e '
   }
   console.log("   " + n + " ta fayl yangilandi");'
 
-echo "4/4 Production qayta deploy qilinmoqda (2-3 daqiqa)..."
-vercel redeploy https://master-2-jade.vercel.app --target production >/dev/null
+echo "4/4 Production qayta deploy qilinmoqda (3-5 daqiqa)..."
+# Deploy the current main checkout, NOT `vercel redeploy <alias>`: redeploying the alias rebuilds whatever
+# is live and can race a pending git deploy, rolling production back to older code (happened 2026-09-26).
+if [ -n "$(git status --porcelain --untracked-files=no)" ] || [ "$(git rev-parse --abbrev-ref HEAD)" != "main" ]; then
+  echo "   Diqqat: repo main'da emas yoki o'zgarishlar bor. Env yangilandi, lekin deployni Claude'ga qoldiring."; exit 1
+fi
+vercel deploy --prod --yes >/dev/null
 code=$(curl -s -o /dev/null -w "%{http_code}" -H "cookie: session_token=rotation-smoke-test" https://master-2-jade.vercel.app/api/v1/me)
 home=$(curl -s -o /dev/null -w "%{http_code}" https://master-2-jade.vercel.app/)
 echo "   Sayt: $home (200 kutiladi), login tekshiruvi: $code (401 kutiladi)"
