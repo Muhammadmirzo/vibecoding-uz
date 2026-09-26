@@ -2,6 +2,7 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { getAuthSession } from "@/lib/auth/session";
+import { loadKabinetInitialData } from "@/features/lms/server/kabinet-dashboard";
 
 const KabinetDashboardClient = dynamic(() => import("./KabinetDashboardClient"));
 
@@ -13,7 +14,15 @@ const KabinetDashboardClient = dynamic(() => import("./KabinetDashboardClient"))
 export default async function KabinetPage() {
   const session = await getAuthSession();
   if (!session) return <KabinetGuestView />;
-  return <KabinetDashboardClient />;
+  // Logged-in: prefetch on the server so the dashboard ships in the first
+  // HTML (LCP) instead of a skeleton + two client fetches. The prefetch
+  // validates the session row itself and returns null on any DB problem, which
+  // keeps the old client-fetch path instead of failing the route.
+  const initialData = await loadKabinetInitialData({
+    userId: session.userId,
+    sessionId: session.sessionId ?? "",
+  });
+  return <KabinetDashboardClient initialData={initialData ?? undefined} />;
 }
 
 function KabinetGuestView() {
