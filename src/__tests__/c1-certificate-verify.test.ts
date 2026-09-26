@@ -19,7 +19,7 @@ vi.mock("@/lib/certificates/service", () => ({
   loadCertificateOwner: (cert: unknown) => loadCertificateOwner(cert),
 }));
 
-import CertificateVerificationPage from "@/app/shahodatnoma/[code]/page";
+import CertificateVerificationPage, { generateMetadata } from "@/app/shahodatnoma/[code]/page";
 
 // vitest transpiles .tsx with the classic JSX runtime, so rendering needs React in scope.
 const { createElement, Fragment } = await import("react");
@@ -94,7 +94,6 @@ describe("C1 certificate verification page", () => {
     verifyCertificate.mockResolvedValue(CERTIFICATE);
     loadCertificateOwner.mockResolvedValue({
       holderName: "Nilufar Karimova",
-      phone: "+998901234567",
       courseTitle: "Vibe Coding Express",
       score: 8.5,
       issuedAt: new Date("2026-09-07T00:00:00Z"),
@@ -106,5 +105,38 @@ describe("C1 certificate verification page", () => {
     expect(text).toContain("Vibe Coding Express");
     expect(text).toContain("8.5 / 10");
     expect(text).not.toContain("Jamshid Alimov");
+  });
+
+  // A1 defect 2: a DB failure must be an honest "cannot check right now" state —
+  // never a 404 (the code may exist), never a 500, never a verified badge.
+  it("renders an honest unavailable state (no verified badge, no 404) when the DB throws", async () => {
+    verifyCertificate.mockRejectedValue(new Error("connection terminated unexpectedly"));
+    const text = textOf(await render(CODE));
+    expect(text).toContain("Hozir tekshirib bo");
+    expect(text).toContain("birozdan so");
+    expect(text).not.toContain("Haqiqiy Sertifikat (Verified)");
+    expect(text).not.toContain("Demo talaba");
+  });
+
+  it("renders the unavailable state when loadCertificateOwner throws", async () => {
+    verifyCertificate.mockResolvedValue(CERTIFICATE);
+    loadCertificateOwner.mockRejectedValue(new Error("relation \"enrollments\" does not exist"));
+    const text = textOf(await render(CODE));
+    expect(text).toContain("Hozir tekshirib bo");
+    expect(text).not.toContain("Haqiqiy Sertifikat (Verified)");
+  });
+
+  it("keeps force-dynamic so a stale verified badge is never cached", async () => {
+    const mod = await import("@/app/shahodatnoma/[code]/page");
+    expect(mod.dynamic).toBe("force-dynamic");
+  });
+
+  it("noindexes the demo code and invalid formats, but keeps a real code indexable", async () => {
+    const demo = await generateMetadata({ params: Promise.resolve({ code: "DEMO2026" }) });
+    const invalid = await generateMetadata({ params: Promise.resolve({ code: "not a code!" }) });
+    const real = await generateMetadata({ params: Promise.resolve({ code: CODE }) });
+    expect(demo.robots).toEqual({ index: false, follow: false });
+    expect(invalid.robots).toEqual({ index: false, follow: false });
+    expect(real.robots).toBeUndefined();
   });
 });
