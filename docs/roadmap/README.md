@@ -12,6 +12,7 @@ Bu papka — shu ishlarning yagona rejasi. Orkestrator har sessiyada shu yerdan 
 | [04-domains-subdomains.md](04-domains-subdomains.md) | Subdomen xaritasi, qachon ajratiladi (triggerlar), hozirdan tayyorgarlik |
 | [05-clients-apps.md](05-clients-apps.md) | Web, mobile (Expo), desktop (PWA → Tauri), Telegram Mini App, MCP — bitta backend |
 | [06-platform-growth.md](06-platform-growth.md) | Supabase hozir, keyin ko'chirish; o'sish triggerlari va "maslahatchi" |
+| [07-growth-audit.md](07-growth-audit.md) | Marketing/sotuv/biznes/texnik audit, G1 (sotuvni to'xtatayotgan xatolar), G2 |
 | [08-pricing-plans.md](08-pricing-plans.md) | Tariflar: har kursda 1–3 (Start · Pro · Premium) |
 
 ## Asosiy tamoyillar (hamma to'lqinga tegishli)
