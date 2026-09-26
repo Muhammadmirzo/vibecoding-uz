@@ -87,10 +87,6 @@ function toRows(owner: CertificateOwner): readonly Row[] {
 }
 
 
-function isNotFound(error: unknown): boolean {
-  return typeof error === "object" && error !== null && (error as { digest?: unknown }).digest === "NEXT_NOT_FOUND";
-}
-
 export default async function CertificateVerificationPage({ params }: Props) {
   const { code } = await params;
   if (!isCertificateCode(code)) notFound();
@@ -103,18 +99,27 @@ export default async function CertificateVerificationPage({ params }: Props) {
   let unavailable = false;
 
   if (!isDemo) {
+    // L37: a real 404 must be raised OUTSIDE the try. In Next 15 `notFound()`
+    // throws an error whose digest is "NEXT_HTTP_ERROR_FALLBACK;404", NOT the
+    // legacy "NEXT_NOT_FOUND" — a catch that only re-throws the old digest
+    // swallows it and turns a 404 into a 200 "cannot check right now" page.
+    let missing = false;
     try {
       // L14: the "Verified" badge may only appear for a code that really exists in the DB.
       const certificate = await verifyCertificate({ code });
-      if (!certificate) notFound();
-      rows = toRows(await loadCertificateOwner(certificate));
-      verified = true;
+      if (certificate) {
+        rows = toRows(await loadCertificateOwner(certificate));
+        verified = true;
+      } else {
+        missing = true;
+      }
     } catch (error: unknown) {
-      if (isNotFound(error)) throw error;
       // errorFields() never logs the message: it can hold SQL or PII.
       log.error("certificate_verify_failed", errorFields(error));
       unavailable = true;
     }
+    // L13/L37: "the row does not exist" is a 404; only a thrown error above is "cannot check".
+    if (missing) notFound();
   }
 
   return (

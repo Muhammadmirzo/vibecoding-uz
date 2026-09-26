@@ -100,6 +100,14 @@ if (!staged) {
   for (const f of sh("git ls-files 'src/lib/certificates'")) {
     grepCodeLines(f, /Math\.random/, "L34", "Math.random in certificate-code code; use node:crypto randomInt (CODER_AGENT_RULES \u00a76)");
   }
+  // L37: a notFound() raised INSIDE a try/catch is swallowed unless the catch
+  // re-throws it. Next 15 throws digest "NEXT_HTTP_ERROR_FALLBACK;404", not the
+  // legacy "NEXT_NOT_FOUND", so a digest=== "NEXT_NOT_FOUND" re-throw check
+  // silently turns a 404 into a 200. Never branch on the old digest; call
+  // notFound() after the try/catch.
+  for (const f of sh("git ls-files 'src/app'")) {
+    grepCodeLines(f, /NEXT_NOT_FOUND/, "L37", 'legacy "NEXT_NOT_FOUND" digest check; in Next 15 notFound() throws NEXT_HTTP_ERROR_FALLBACK;404 and a catch that re-throws only the old digest swallows the 404');
+  }
 }
 
 for (const d of debt) console.log(`debt  ${d}`);
