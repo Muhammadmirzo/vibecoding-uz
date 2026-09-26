@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, gt, gte, inArray, ne, notLike, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gt, gte, ne, notLike, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { auditLogs, chatConversations, chatMessages, leads } from "@/db/schema";
 import { ServiceError } from "@/lib/http/errors";
@@ -9,47 +9,9 @@ import {
   type SendMessageInput,
 } from "../contracts";
 import { conversationDto, messageDto } from "./chat-dto";
+import { audit, CURSOR_OVERLAP_MS, messageDtos, requireConversation } from "./chat-helpers";
 import { getChatSettings } from "./settings.service";
 import { hashVisitorToken } from "./visitor-token";
-
-type ConversationRow = typeof chatConversations.$inferSelect;
-type MessageRow = typeof chatMessages.$inferSelect;
-
-const CURSOR_OVERLAP_MS = 15_000;
-
-async function audit(input: {
-  actorId?: string | null;
-  action: string;
-  conversationId: string;
-  details?: Record<string, unknown>;
-  ip?: string;
-}) {
-  await db.insert(auditLogs).values({
-    userId: input.actorId ?? null,
-    action: input.action,
-    entityType: "chat_conversation",
-    entityId: input.conversationId,
-    details: input.details ?? {},
-    ipAddress: input.ip || null,
-  });
-}
-
-/** Map rows to DTOs with the quoted parent of every reply (one extra query, only for parents outside the page). */
-async function messageDtos(rows: MessageRow[]): Promise<ChatMessageDto[]> {
-  const byId = new Map(rows.map((row) => [row.id, row]));
-  const missing = [...new Set(rows.map((row) => row.replyToId).filter((id): id is string => Boolean(id) && !byId.has(id!)))];
-  if (missing.length) {
-    const parents = await db.select().from(chatMessages).where(inArray(chatMessages.id, missing));
-    parents.forEach((parent) => byId.set(parent.id, parent));
-  }
-  return rows.map((row) => messageDto(row, row.replyToId ? byId.get(row.replyToId) ?? null : null));
-}
-
-async function requireConversation(id: string): Promise<ConversationRow> {
-  const [row] = await db.select().from(chatConversations).where(eq(chatConversations.id, id)).limit(1);
-  if (!row) throw new ServiceError("NOT_FOUND", "Suhbat topilmadi", 404);
-  return row;
-}
 
 export async function getVisitorConversation(token: string): Promise<ChatConversationDto | null> {
   try {

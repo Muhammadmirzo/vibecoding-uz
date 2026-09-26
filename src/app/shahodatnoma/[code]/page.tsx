@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type * as React from "react";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { Send, ShieldCheck } from "lucide-react";
 import { Container } from "@/components/ui/Layout";
 import { NextStepCTA } from "@/components/ui/NextStepCTA";
@@ -11,8 +12,18 @@ interface Props {
   params: Promise<{ code: string }>;
 }
 
+// L13: a certificate code is `NAQSH-<year>-XXXXX` (see generateUniqueCertificateCode),
+// alphanumeric parts joined by dashes. Anything else must 404 instead of rendering a
+// "verified" certificate for a code that cannot exist (soft-404 → fake trust badge).
+const CERTIFICATE_CODE = /^[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*$/;
+
+function isCertificateCode(code: string | undefined): boolean {
+  return typeof code === "string" && code.length <= 64 && CERTIFICATE_CODE.test(code);
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { code } = await params;
+  if (!isCertificateCode(code)) return { title: "Sertifikat topilmadi | Naqsh" };
   return {
     title: `Sertifikat Tekshiruvi ${code} | Naqsh`,
     description: "Sertifikatning haqiqiyligini ommaviy tekshirish sahifasi.",
@@ -28,6 +39,7 @@ const ROWS = [
 
 export default async function CertificateVerificationPage({ params }: Props) {
   const { code } = await params;
+  if (!isCertificateCode(code)) notFound();
 
   return (
     <div className="min-h-screen bg-bg pb-20">
