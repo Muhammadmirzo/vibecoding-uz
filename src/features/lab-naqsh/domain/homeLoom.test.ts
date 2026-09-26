@@ -3,10 +3,11 @@ import { STRAND_KEYS } from "./strands";
 import { HOME_LOOM_SECTIONS, mutedHomeStrands } from "./homeLoom";
 
 describe("HOME_LOOM_SECTIONS", () => {
-  it("registers slice E1 and E2 (muammo -> square, usul -> diamond)", () => {
+  it("registers slices E1-E3 (muammo -> square, usul -> diamond, dastur -> weave)", () => {
     expect(HOME_LOOM_SECTIONS).toEqual([
       { id: "muammo", strand: "square" },
       { id: "usul", strand: "diamond" },
+      { id: "dastur", strand: "weave" },
     ]);
   });
 });
@@ -16,9 +17,10 @@ describe("mutedHomeStrands", () => {
     const muted = mutedHomeStrands();
     expect(muted).not.toContain("square");
     expect(muted).not.toContain("diamond");
+    expect(muted).not.toContain("weave");
     expect(muted).not.toContain("glow");
     for (const strand of STRAND_KEYS) {
-      if (strand === "square" || strand === "diamond" || strand === "glow") continue;
+      if (strand === "square" || strand === "diamond" || strand === "weave" || strand === "glow") continue;
       expect(muted).toContain(strand);
     }
   });
@@ -27,8 +29,18 @@ describe("mutedHomeStrands", () => {
     const muted = mutedHomeStrands([
       { id: "muammo", strand: "square" },
       { id: "usul", strand: "diamond" },
+      { id: "dastur", strand: "weave" },
     ]);
     expect(muted).not.toContain("diamond");
+    expect(muted).not.toContain("weave");
+  });
+
+  it("un-mutes weave only because the dastur section is registered", () => {
+    const withoutDastur = mutedHomeStrands([
+      { id: "muammo", strand: "square" },
+      { id: "usul", strand: "diamond" },
+    ]);
+    expect(withoutDastur).toContain("weave");
   });
 
   it("never mutes glow even with an empty registry", () => {
