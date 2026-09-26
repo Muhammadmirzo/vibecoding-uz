@@ -3,7 +3,7 @@
 Har kurs uchun **1, 2 yoki 3 tarif** — egasi har kursda o'zi tanlaydi. Nomlar: **Start · Pro · Premium**
 (1 ta tarif bo'lsa nom ko'rsatilmaydi, faqat narx).
 
-## Ma'lumot modeli (F3 pul poydevori bilan birga, `siteConfig` → keyin `course_plans` jadvali)
+## Ma'lumot modeli (F3 bilan; yagona manba = DB `course_plans`, admin paneldan tahrirlanadi — 09 §A; `siteConfig.courses` o'chiriladi)
 - `plans[]` (uzunligi 1–3): `id` (`start|pro|premium`), `name`, `priceTiyin` (bigint), `oldPriceTiyin?`,
   `installmentMonths?` (bo'lib to'lash matni avtomatik hisoblanadi, qo'lda yozilmaydi), `features[]`
   (✔/— jadvali uchun), `highlighted` (bittasi "Eng ko'p tanlanadi" — faqat haqiqiy sotuv ma'lumoti bo'lsa, L14),
