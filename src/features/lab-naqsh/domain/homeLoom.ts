@@ -17,6 +17,7 @@ export const HOME_LOOM_SECTIONS: readonly HomeLoomSection[] = [
   { id: "muammo", strand: "square" },
   { id: "usul", strand: "diamond" },
   { id: "dastur", strand: "weave" },
+  { id: "natijalar", strand: "ring" },
 ];
 
 /**
