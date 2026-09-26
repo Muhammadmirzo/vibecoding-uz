@@ -14,6 +14,7 @@ Bu papka — shu ishlarning yagona rejasi. Orkestrator har sessiyada shu yerdan 
 | [06-platform-growth.md](06-platform-growth.md) | Supabase hozir, keyin ko'chirish; o'sish triggerlari va "maslahatchi" |
 | [07-growth-audit.md](07-growth-audit.md) | Marketing/sotuv/biznes/texnik audit, G1 (sotuvni to'xtatayotgan xatolar), G2 |
 | [08-pricing-plans.md](08-pricing-plans.md) | Tariflar: har kursda 1–3 (Start · Pro · Premium) |
+| [09-admin-mentors-community.md](09-admin-mentors-community.md) | Hammasi admin paneldan (narx, guruh, darslar, bepul dars); mentor sahifalari; kurs hamjamiyati |
 
 ## Asosiy tamoyillar (hamma to'lqinga tegishli)
 1. **Bitta backend, ko'p mijoz.** Mantiq `src/features/*` servislarida; web, `/api/v1`, MCP, Telegram, mobile, desktop
