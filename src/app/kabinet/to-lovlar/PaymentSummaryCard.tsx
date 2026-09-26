@@ -20,10 +20,12 @@ import { buildCheckoutRequestBody } from "./checkout-request";
 
 interface PaymentSummaryCardProps {
   paidAmount: number;
-  /** Course price in so'm, from siteConfig (display only). */
-  coursePrice: number;
+  /** siteConfig price text — marketing copy, not the charge (see payableLabel). */
+  marketingPriceText: string;
   /** Amount the server will charge for the open cohort, in so'm (trusted source). */
   payableAmount: number;
+  /** The same amount pre-formatted as "X so'm" (from the cohort row). */
+  payableLabel: string;
   courseTitle: string;
   installmentText: string;
   guaranteeText: string;
@@ -40,8 +42,9 @@ function isCheckoutResponse(value: unknown): value is {
 
 export function PaymentSummaryCard({
   paidAmount,
-  coursePrice,
+  marketingPriceText,
   payableAmount,
+  payableLabel,
   courseTitle,
   installmentText,
   guaranteeText,
@@ -115,9 +118,15 @@ export function PaymentSummaryCard({
         </div>
 
         <div className="space-y-2">
-          <div className="flex justify-between gap-3 font-mono text-xs text-ink-muted">
-            <span>Kurs narxi: <strong className="text-ink">{formatUzs(coursePrice)}</strong></span>
-            <span>To'langan: <strong className="text-ink">{formatUzs(progress.paidAmount)}</strong></span>
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <p className="font-mono text-xs uppercase text-ink-muted">To&apos;lanadigan narx</p>
+            <p className="font-display text-2xl font-bold text-ink" data-payable-amount>
+              {payableLabel}
+            </p>
+          </div>
+          <div className="flex flex-wrap justify-between gap-3 font-mono text-xs text-ink-muted">
+            <span>Saytdagi kurs narxi: <span className="text-ink-muted">{marketingPriceText}</span></span>
+            <span>To&apos;langan: <strong className="text-ink">{formatUzs(progress.paidAmount)}</strong></span>
           </div>
           <div className="h-3 overflow-hidden rounded-full bg-bg-sunken" role="progressbar"
             aria-label="To'lov progressi" aria-valuenow={progress.percent} aria-valuemin={0} aria-valuemax={100}>

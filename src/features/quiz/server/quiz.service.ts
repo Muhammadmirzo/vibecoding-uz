@@ -4,7 +4,7 @@ import { courses, leads } from "@/db/schema";
 import { ServiceError } from "@/lib/http/errors";
 import { recomputeQuizResult, validateQuizAnswers, type ServerQuizResult } from "../domain/validation";
 import { trackServerEvent } from "@/features/analytics/server/track";
-import { notifyNewLead } from "@/features/leads/server/lead-notification";
+import { scheduleNewLeadAlert } from "@/features/leads/server/lead-notification";
 import { COURSES } from "@/features/courses/content";
 
 /** Legacy error class (kept for compatibility; services now throw {@link ServiceError}). */
@@ -117,7 +117,7 @@ export async function submitFreeLessonLead(
     path: "/bepul-dars",
     props: { leadId: stored.id, source: "free_lesson" },
   });
-  void notifyNewLead({
+  void scheduleNewLeadAlert({
     leadId: stored.id,
     name: input.name,
     contact: input.telegram ?? input.phone ?? "",
@@ -149,7 +149,7 @@ export async function submitQuizLead(repo: QuizRepository, input: QuizLeadInput)
     utm: input.utm ?? null,
   });
   void trackServerEvent({ type: "lead_created", path: "/diagnostika", props: { leadId: stored.id, source: "quiz" } });
-  void notifyNewLead({
+  void scheduleNewLeadAlert({
     leadId: stored.id,
     name: input.name,
     contact: input.phone,

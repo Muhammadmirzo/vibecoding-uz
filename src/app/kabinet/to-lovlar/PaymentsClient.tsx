@@ -5,8 +5,10 @@ import { AlertCircle, CreditCard, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui";
 import { KabinetNav } from "@/features/lms/components/KabinetNav";
 import { KabinetPageHeader, KabinetSkeleton } from "@/features/lms/components/KabinetPage";
-import type { CourseOffer, CheckoutTarget } from "@/features/payments/domain/checkout-target";
+import type { CheckoutTarget, CourseOffer } from "@/features/payments/domain/checkout-target";
+import { resolvePayablePrice } from "@/features/payments/domain/payable-price";
 import type { PaymentsResponse } from "@/features/payments/format";
+import { formatUzs } from "@/features/payments/format";
 import { fetchWithTimeout } from "@/lib/http/fetch";
 import { siteConfig } from "@/lib/siteConfig";
 import { NoOpenCohortState } from "./NoOpenCohortState";
@@ -14,7 +16,6 @@ import { PaymentHistorySection } from "./PaymentHistorySection";
 import { PaymentSummaryCard } from "./PaymentSummaryCard";
 import {
   errorMessageFrom,
-  extractAmount,
   isPaymentsResponse,
   sumPaidAmount,
 } from "./payments-response";
@@ -22,14 +23,14 @@ import {
 export interface PaymentsClientProps {
   offer: CourseOffer;
   target: CheckoutTarget;
-  /** Trusted cohort amount in so'm; null when there is nothing payable yet. */
-  payableAmount: number | null;
+  /** Trusted cohort amount in tiyin; null when there is nothing payable yet. */
+  payableTiyin: number | null;
   targetError: boolean;
   /** Server-prefetched feed; null falls back to the client fetch. */
   initialData?: PaymentsResponse | null;
 }
 
-export function PaymentsClient({ offer, target, payableAmount, targetError, initialData = null }: PaymentsClientProps) {
+export function PaymentsClient({ offer, target, payableTiyin, targetError, initialData = null }: PaymentsClientProps) {
   const [data, setData] = React.useState<PaymentsResponse | null>(initialData);
   const [error, setError] = React.useState("");
   const [loading, setLoading] = React.useState(initialData === null);
@@ -55,7 +56,11 @@ export function PaymentsClient({ offer, target, payableAmount, targetError, init
   }, [initialData, loadPayments]);
 
   const paidAmount = data ? sumPaidAmount(data.payments) : 0;
-  const payable = payableAmount ?? extractAmount(offer.price);
+  // What the server will charge (cohort row). siteConfig's price text stays
+  // marketing/waitlist copy only — never a fallback "amount" (L14, L39).
+  const price = resolvePayablePrice({ amountTiyin: payableTiyin, marketingText: offer.price });
+  const payable = price.amount ?? 0;
+  const nothingPayable = targetError || target.state === "waitlist" || price.amount === null;
 
   return (
     <div className="min-h-screen bg-bg text-ink">
@@ -70,7 +75,7 @@ export function PaymentsClient({ offer, target, payableAmount, targetError, init
         {!loading && error ? <ErrorState message={error} onRetry={loadPayments} /> : null}
         {!loading && !error && data ? (
           <>
-            {targetError || target.state === "waitlist" ? (
+            {nothingPayable ? (
               <NoOpenCohortState
                 courseTitle={offer.title}
                 courseSlug={offer.slug}
@@ -80,8 +85,9 @@ export function PaymentsClient({ offer, target, payableAmount, targetError, init
             ) : (
               <PaymentSummaryCard
                 paidAmount={paidAmount}
-                coursePrice={extractAmount(offer.price)}
+                marketingPriceText={price.marketingText}
                 payableAmount={payable}
+                payableLabel={price.label ?? formatUzs(payable)}
                 courseTitle={offer.title}
                 installmentText={offer.installment}
                 guaranteeText={siteConfig.guaranteeText}

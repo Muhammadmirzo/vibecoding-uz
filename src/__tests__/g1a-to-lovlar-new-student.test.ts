@@ -72,7 +72,7 @@ describe("G1a: /kabinet/to-lovlar for a NEW student with an open cohort", () => 
 
   it("sends the cohortId in the checkout request, so the server accepts it", async () => {
     const element = await ToLovlarPage({ searchParams: Promise.resolve({}) });
-    const props = (element as { props: { target: Parameters<typeof buildCheckoutRequestBody>[0]["target"]; payableAmount: number } }).props;
+    const props = (element as { props: { target: Parameters<typeof buildCheckoutRequestBody>[0]["target"]; payableTiyin: number } }).props;
     const body = buildCheckoutRequestBody({
       provider: "payme",
       installmentMonth: 1,
@@ -80,7 +80,9 @@ describe("G1a: /kabinet/to-lovlar for a NEW student with an open cohort", () => 
       amountHint: 550_000,
     });
 
-    expect(props.payableAmount).toBe(550_000);
+    // The page hands the client the trusted cohort amount in tiyin (the
+    // checkout.service pricing), not the siteConfig price string.
+    expect(props.payableTiyin).toBe(55_000_000);
     expect(body).toMatchObject({ provider: "payme", cohortId: COHORT_ID });
     expect(body?.enrollmentId).toBeUndefined();
   });

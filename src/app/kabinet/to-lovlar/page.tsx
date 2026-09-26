@@ -30,7 +30,7 @@ export default async function ToLovlarPage({ searchParams }: ToLovlarPageProps) 
   if (!session) return <GuestView courseSlug={offer.slug} />;
 
   let target = WAITLIST_TARGET;
-  let payableAmount: number | null = null;
+  let payableTiyin: number | null = null;
   let targetError = false;
   let initialData: PaymentsResponse | null = null;
   try {
@@ -39,7 +39,8 @@ export default async function ToLovlarPage({ searchParams }: ToLovlarPageProps) 
       courseSlug: offer.slug,
     });
     target = resolved;
-    payableAmount = resolved.amountTiyin === null ? null : resolved.amountTiyin / 100;
+    // The cohort row, not the siteConfig price: this is what checkout charges.
+    payableTiyin = resolved.amountTiyin;
   } catch {
     // A failed cohort lookup is NOT "no open cohort": say so honestly.
     targetError = true;
@@ -56,7 +57,7 @@ export default async function ToLovlarPage({ searchParams }: ToLovlarPageProps) 
     <PaymentsClient
       offer={offer}
       target={target}
-      payableAmount={payableAmount}
+      payableTiyin={payableTiyin}
       targetError={targetError}
       initialData={initialData}
     />
