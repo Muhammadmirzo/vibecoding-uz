@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { BRAND } from "@/config/brand";
+import { cohortDateToIso } from "@/features/courses/domain/cohort-date";
 
 export const canonicalBase = (() => {
   try { return new URL(BRAND.url); } catch { return new URL("https://master-2-jade.vercel.app"); }
@@ -26,10 +27,14 @@ export function serializeJsonLd(value: unknown): string {
 
 export function courseJsonLd(input: { name: string; description: string; price: string; path: string; startDate: string }): Record<string, unknown> {
   const amount = Number(input.price.replace(/[^0-9]/g, ""));
+  // Schema.org wants an ISO 8601 date; the human copy is Uzbek ("15-Oktyabr,
+  // 2026"), so convert through the shared parser and drop the field when the
+  // configured value cannot be parsed rather than emit a broken date.
+  const startDate = cohortDateToIso(input.startDate) ?? undefined;
   return {
     "@context": "https://schema.org", "@type": "Course", name: input.name, description: input.description,
     url: canonicalUrl(input.path), provider: { "@type": "Organization", name: BRAND.name, url: canonicalBase.toString() },
-    hasCourseInstance: { "@type": "CourseInstance", courseMode: "online", startDate: input.startDate,
+    hasCourseInstance: { "@type": "CourseInstance", courseMode: "online", ...(startDate ? { startDate } : {}),
       offers: { "@type": "Offer", price: amount, priceCurrency: "UZS", url: canonicalUrl(input.path), availability: "https://schema.org/InStock" } },
   };
 }

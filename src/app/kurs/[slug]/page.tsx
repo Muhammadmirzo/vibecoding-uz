@@ -70,6 +70,7 @@ export default async function CourseDetailPage({ params }: Props) {
               <CohortCountdown date={siteConfig.nextCohortDate} />
             </div>
             <CourseCheckoutCard
+              courseSlug={slug}
               price={pricing.price}
               oldPrice={pricing.oldPrice}
               installment={pricing.installment}
@@ -209,7 +210,7 @@ export default async function CourseDetailPage({ params }: Props) {
         title="Hali ikkilanayapsizmi?"
         subtitle="Avval 2 daqiqalik diagnostikadan o'ting yoki bepul darsni ko'ring — keyin qaror qiling."
       />
-      <StickyBuyBar price={pricing.price} title={course.title} />
+      <StickyBuyBar price={pricing.price} title={course.title} courseSlug={slug} />
       <div className="h-[calc(5rem+env(safe-area-inset-bottom))] lg:hidden" aria-hidden="true" />
     </div>
   );

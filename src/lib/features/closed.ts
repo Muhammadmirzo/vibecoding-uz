@@ -8,7 +8,7 @@
  * - `routes`: public page prefixes that must 404 (see `isClosedRoute`).
  * - `apis`: API prefixes that must 404 (see `isClosedApi`).
  */
-export type ClosedFeatureKey = "jobs" | "testimonials" | "spinWheel" | "adminFeatureFlags";
+export type ClosedFeatureKey = "jobs" | "testimonials" | "experts" | "spinWheel" | "adminFeatureFlags";
 
 export interface ClosedFeature {
   closed: boolean;
@@ -29,6 +29,15 @@ export const CLOSED_FEATURES: Record<ClosedFeatureKey, ClosedFeature> = {
     routes: ["/testimoniyalar"],
     apis: [],
     note: "Namunaviy fikrlar sahifasi. Kod: src/app/testimoniyalar, src/features/testimonials.",
+  },
+  experts: {
+    closed: true,
+    routes: ["/ekspertlar"],
+    apis: [],
+    note:
+      "G1b (2026-09-26): faqat 'Namuna profil 1/2' namuna profillari bor, haqiqiy mentor ma'lumotlari yo'q — " +
+      "ishonch pasaytiradi. Ega haqiqiy ism/rol/kontaktlarni bergach `closed: false` qilish yetarli. " +
+      "Kod: src/app/ekspertlar.",
   },
   spinWheel: {
     closed: true,

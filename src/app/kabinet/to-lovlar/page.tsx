@@ -1,105 +1,84 @@
-"use client";
+import Link from "next/link";
+import { Button } from "@/components/ui/Button";
+import { listCourseOffers } from "@/features/courses/offers";
+import { resolveCourseOffer, WAITLIST_TARGET } from "@/features/payments/domain/checkout-target";
+import { resolveCheckoutTargetForCourse } from "@/features/payments/server/checkout-target.service";
+import { loadStudentPaymentsFeed } from "@/features/payments/server/payments-feed";
+import type { PaymentsResponse } from "@/features/payments/format";
+import { getAuthSession } from "@/lib/auth/session";
+import { PaymentsClient } from "./PaymentsClient";
 
-import * as React from "react";
-import { AlertCircle, CreditCard, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui";
-import { KabinetNav } from "@/features/lms/components/KabinetNav";
-import { KabinetPageHeader, KabinetSkeleton } from "@/features/lms/components/KabinetPage";
-import { siteConfig } from "@/lib/siteConfig";
-import { fetchWithTimeout } from "@/lib/http/fetch";
-import type { PaymentRecord, PaymentsResponse } from "@/features/payments/format";
-import { PaymentSummaryCard } from "./PaymentSummaryCard";
-import { PaymentHistorySection } from "./PaymentHistorySection";
-
-const course = siteConfig.courses["vibe-coding-express"];
-
-function extractAmount(value: string): number {
-  const match = value.match(/[\d\s]+/);
-  return match ? Number(match[0].replace(/\s/g, "")) : 0;
+interface ToLovlarPageProps {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
-function isPayment(value: unknown): value is PaymentRecord {
-  if (typeof value !== "object" || value === null) return false;
-  const row = value as Record<string, unknown>;
-  return typeof row.id === "string" && typeof row.amountSum === "string" &&
-    typeof row.status === "string" && typeof row.createdAt === "string" &&
-    (row.provider === "payme" || row.provider === "click" || row.provider === "manual");
-}
+export const dynamic = "force-dynamic";
 
-function isPaymentsResponse(value: unknown): value is PaymentsResponse {
-  if (typeof value !== "object" || value === null) return false;
-  const response = value as Record<string, unknown>;
-  const providers = response.providers as Record<string, unknown> | undefined;
-  return Array.isArray(response.payments) && response.payments.every(isPayment) &&
-    typeof providers?.payme === "boolean" && typeof providers?.click === "boolean";
-}
+/**
+ * The pay page resolves the chosen course and the next OPEN cohort on the
+ * server: a new student has no enrollment, so the cohort id is what makes
+ * checkout work (the client never prices anything).
+ */
+export default async function ToLovlarPage({ searchParams }: ToLovlarPageProps) {
+  const params = await searchParams;
+  const requested = params.course;
+  const offer = resolveCourseOffer(
+    typeof requested === "string" ? requested : undefined,
+    listCourseOffers(),
+  );
+  const session = await getAuthSession();
+  if (!session) return <GuestView courseSlug={offer.slug} />;
 
-export default function ToLovlarPage() {
-  const [data, setData] = React.useState<PaymentsResponse | null>(null);
-  const [error, setError] = React.useState("");
-  const [loading, setLoading] = React.useState(true);
-
-  const loadPayments = React.useCallback(async () => {
-    setLoading(true);
-    setError("");
-    try {
-      const response = await fetchWithTimeout("To'lovlar", "/api/me/payments", { cache: "no-store" }, 10_000);
-      const body: unknown = await response.json();
-      if (!response.ok) {
-        const message = typeof body === "object" && body !== null && "message" in body && typeof body.message === "string"
-          ? body.message
-          : "To'lovlarni yuklab bo'lmadi";
-        throw new Error(message);
-      }
-      if (!isPaymentsResponse(body)) throw new Error("To'lovlar javobi noto'g'ri");
-      setData(body);
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "To'lovlarni yuklab bo'lmadi");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  React.useEffect(() => { void loadPayments(); }, [loadPayments]);
-
-  const paidAmount = data?.payments
-    .filter((payment) => payment.status === "paid")
-    .reduce((sum, payment) => sum + extractAmount(payment.amountSum), 0) ?? 0;
-  const enrollmentId = data?.payments.find((payment) => payment.enrollmentId)?.enrollmentId ?? null;
+  let target = WAITLIST_TARGET;
+  let payableTiyin: number | null = null;
+  let targetError = false;
+  let initialData: PaymentsResponse | null = null;
+  try {
+    const resolved = await resolveCheckoutTargetForCourse({
+      userId: session.userId,
+      courseSlug: offer.slug,
+    });
+    target = resolved;
+    // The cohort row, not the siteConfig price: this is what checkout charges.
+    payableTiyin = resolved.amountTiyin;
+  } catch {
+    // A failed cohort lookup is NOT "no open cohort": say so honestly.
+    targetError = true;
+  }
+  try {
+    // Server prefetch: the pay button / waitlist state is in the first HTML.
+    // On failure the client falls back to its own fetch (never a blank page).
+    initialData = await loadStudentPaymentsFeed(session.userId);
+  } catch {
+    initialData = null;
+  }
 
   return (
-    <div className="min-h-screen bg-bg text-ink">
-      <KabinetNav />
-      <main className="mx-auto w-full max-w-6xl space-y-8 px-5 pb-28 pt-24 md:px-8 md:pt-28 lg:pl-80 lg:pr-8">
-        <KabinetPageHeader title="To&apos;lovlar va cheklar" description="Hisobingizdagi haqiqiy to&apos;lovlar, ularning holati va mavjud cheklar." icon={CreditCard} />
-        {loading ? <KabinetSkeleton label="To&apos;lovlar yuklanmoqda" rows={2} /> : null}
-        {!loading && error ? <ErrorState message={error} onRetry={loadPayments} /> : null}
-        {!loading && !error && data ? (
-          <>
-            <PaymentSummaryCard
-              paidAmount={paidAmount}
-              coursePrice={extractAmount(course.price)}
-              courseTitle="Vibe Coding Express"
-              installmentText={course.installment}
-              guaranteeText={siteConfig.guaranteeText}
-              providers={data.providers}
-              enrollmentId={enrollmentId}
-            />
-            <PaymentHistorySection payments={data.payments} />
-          </>
-        ) : null}
-      </main>
-    </div>
+    <PaymentsClient
+      offer={offer}
+      target={target}
+      payableTiyin={payableTiyin}
+      targetError={targetError}
+      initialData={initialData}
+    />
   );
 }
 
-function ErrorState({ message, onRetry }: { message: string; onRetry: () => Promise<void> }) {
+function GuestView({ courseSlug }: { courseSlug: string }) {
+  const redirect = encodeURIComponent(`/kabinet/to-lovlar?course=${courseSlug}`);
   return (
-    <section className="rounded-xl border border-danger bg-bg-elevated p-8 text-center" role="alert">
-      <AlertCircle className="mx-auto h-8 w-8 text-danger" aria-hidden="true" />
-      <h2 className="mt-3 font-display text-lg font-semibold text-ink">To&apos;lovlarni yuklab bo&apos;lmadi</h2>
-      <p className="mt-2 text-base text-ink-muted">{message}</p>
-      <Button onClick={() => void onRetry()} className="mt-5"><Loader2 className="h-4 w-4" aria-hidden="true" /> Qayta urinish</Button>
-    </section>
+    <div className="min-h-screen bg-bg text-ink">
+      <section className="mx-auto flex min-h-[calc(100vh-16rem)] w-full max-w-2xl flex-col items-center justify-center px-5 py-24 text-center">
+        <h1 className="font-display text-2xl font-semibold leading-tight text-ink md:text-3xl">
+          To&apos;lov qilish uchun tizimga kiring
+        </h1>
+        <p className="mt-3 max-w-md text-base leading-relaxed text-ink-muted md:text-[17px]">
+          Kursga yozilish va to&apos;lovni rasmiylashtirish uchun avval hisobingizga kiring.
+        </p>
+        <Button asChild size="lg" className="mt-6">
+          <Link href={`/?auth=1&redirect=${redirect}`} prefetch={false}>Kirish</Link>
+        </Button>
+      </section>
+    </div>
   );
 }

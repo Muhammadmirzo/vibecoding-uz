@@ -37,7 +37,7 @@ export const siteConfig: SiteConfig = siteConfigSchema.parse({
   guaranteeDays: 7,
   guaranteeText: "7 kunlik 100% pul qaytarish kafolati",
   guaranteeTermsUrl: "/pul-qaytarish",
-  guaranteeSummary: "Kursni boshlaganizdan keyin 7 kun ichida belgilangan shartlarni bajarib, amaliy foyda ko'rmaganingizni tasdiqlashingiz mumkin.",
+  guaranteeSummary: "Kursni boshlaganingizdan keyin 7 kun ichida belgilangan shartlarni bajarib, amaliy foyda ko'rmaganingizni tasdiqlashingiz mumkin.",
   sessionFormat: "8 haftalik jonli sessiyalar va yozuvlar",
   // Fakt: 1 jonli loyiha (Clash Nexus). Talaba soni birinchi guruhdan keyin yangilanadi.
   stats: {

@@ -21,7 +21,7 @@ export default function Page() {
         variant="compact"
         eyebrow="Hamjamiyat namunasi"
         title="Kurs jamoasi va mentorlik yo‘nalishlari"
-        lede="Quyidagi profillar namuna ko‘rinishida berilgan. Haqiqiy ishtirokchi ma’lumotlari faqat rozik va tekshirilgan holda qo‘shiladi."
+        lede="Quyidagi profillar namuna ko‘rinishida berilgan. Haqiqiy ishtirokchi ma’lumotlari faqat rozilik va tekshirilgan holda qo‘shiladi."
       />
       <Container className="pb-20 sm:pb-28">
         <RevealGroup className="grid gap-5 md:grid-cols-2">
@@ -42,7 +42,7 @@ export default function Page() {
                     </span>
                   ))}
                 </div>
-                <p className="mt-6 border-t border-border pt-4 text-sm leading-relaxed text-ink-muted">Bu namuna ma’lumot emas. Haqiqiy profil uchun ism, rol va kontaktlar rozik bilan tasdiqlanadi.</p>
+                <p className="mt-6 border-t border-border pt-4 text-sm leading-relaxed text-ink-muted">Bu namuna ma’lumot emas. Haqiqiy profil uchun ism, rol va kontaktlar rozilik bilan tasdiqlanadi.</p>
               </Card>
             </Tilt>
           ))}

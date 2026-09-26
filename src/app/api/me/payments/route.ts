@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { listUserPayments } from "@/features/payments/server/payments.repository";
+import { loadStudentPaymentsFeed } from "@/features/payments/server/payments-feed";
 import { getDbSession } from "@/lib/auth/require-auth";
 import { errorResponse } from "@/lib/http/errors";
 
@@ -34,24 +34,8 @@ export async function GET() {
       );
     }
 
-    const rows = await listUserPayments(authSession.userId);
-
-    const result = paymentsResponseSchema.parse({
-      payments: rows.map((row) => ({
-        ...row,
-        amountSum: String(row.amountSum),
-        paidAt: row.paidAt?.toISOString() ?? null,
-        createdAt: row.createdAt.toISOString(),
-      })),
-      providers: {
-        payme: Boolean(process.env.PAYME_MERCHANT_ID?.trim()) && Boolean(process.env.PAYME_KEY?.trim()),
-        click: Boolean(
-          process.env.CLICK_SERVICE_ID?.trim() && process.env.CLICK_MERCHANT_ID?.trim() && process.env.CLICK_SECRET_KEY?.trim()
-        ),
-      },
-    });
-
-    return NextResponse.json(result);
+    const feed = await loadStudentPaymentsFeed(authSession.userId);
+    return NextResponse.json(paymentsResponseSchema.parse(feed));
   } catch (error) {
     return errorResponse(error);
   }

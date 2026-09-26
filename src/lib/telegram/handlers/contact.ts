@@ -5,12 +5,7 @@ import { ServiceError } from "@/lib/http/errors";
 import { handleOperatorHandoff } from "../handoff";
 import { linkTelegramAccount } from "../linkAccount";
 import { loginConfirmationKeyboard, loginConfirmationText } from "./start";
-
-const mainKeyboard = Markup.keyboard([
-  ["📚 Kurslar va Narxlar", "🎯 Bepul Diagnostika"],
-  ["💡 G'oya Kalkulyatori", "🎁 Bepul Dars"],
-  ["📱 Hisobni Ulash (Telefon)", "🆘 Mentor / Operator"],
-]).resize();
+import { MAIN_MENU, mainKeyboard } from "./menu";
 
 function escapeHtml(value: string): string {
   const entities: Record<string, string> = {
@@ -32,7 +27,7 @@ export function isContactOwnedBySender(
 }
 
 export function registerAccountHandlers(bot: Telegraf) {
-  bot.hears("📱 Hisobni Ulash (Telefon)", async (ctx) => ctx.reply(
+  bot.hears(MAIN_MENU.sharePhone, async (ctx) => ctx.reply(
     "Platformadagi akkauntingizni ushbu botga bog'lash uchun quyidagi tugma orqali telefon raqamingizni yuboring:",
     Markup.keyboard([
       [Markup.button.contactRequest("📱 Raqamimni tasdiqlash")],
@@ -40,7 +35,7 @@ export function registerAccountHandlers(bot: Telegraf) {
     ]).resize(),
   ));
 
-  bot.hears("🔙 Asosiy Menyu", async (ctx) => ctx.reply("Asosiy menyu:", mainKeyboard));
+  bot.hears(MAIN_MENU.backToMenu, async (ctx) => ctx.reply("Asosiy menyu:", mainKeyboard));
 
   bot.on("contact", async (ctx) => {
     const contact = ctx.message.contact;
@@ -91,7 +86,7 @@ export function registerAccountHandlers(bot: Telegraf) {
     );
   });
 
-  bot.hears(["🆘 Mentor / Operator", "🆘 Operator bilan bog'lanish"], async (ctx) => {
+  bot.hears([MAIN_MENU.operator, "🆘 Operator bilan bog'lanish"], async (ctx) => {
     const result = await handleOperatorHandoff({
       tgUserId: ctx.from.id.toString(),
       tgUsername: ctx.from.username,

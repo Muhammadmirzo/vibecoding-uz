@@ -15,6 +15,4 @@ export function isValidUzbekPhone(value: string): boolean {
   return digits.length === 12 && digits.startsWith("998");
 }
 
-export function isValidTelegramUsername(value: string): boolean {
-  return /^@[A-Za-z0-9_]{3,}$/.test(value.trim());
-}
+export { isValidTelegramUsername } from "../domain/telegram-username";
