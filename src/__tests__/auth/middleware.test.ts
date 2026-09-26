@@ -1,4 +1,6 @@
 import { describe, it, expect } from "vitest";
+import { NextRequest } from "next/server";
+import { middleware } from "@/middleware";
 
 describe("Middleware & RBAC Authorization Rules", () => {
   const ADMIN_ROLES = ["superadmin", "admin", "manager"];
@@ -19,5 +21,42 @@ describe("Middleware & RBAC Authorization Rules", () => {
     ALL_ROLES.forEach((role) => {
       expect(ALL_ROLES.includes(role)).toBe(true);
     });
+  });
+});
+
+describe("Middleware route protection and guest LCP bypass", () => {
+  it("allows guest access to /kabinet with CSP and nonce without redirecting", async () => {
+    const req = new NextRequest("http://localhost/kabinet");
+    const res = await middleware(req);
+    expect(res.status).toBe(200);
+    expect(res.headers.get("location")).toBeNull();
+    expect(res.headers.get("content-security-policy")).toBeDefined();
+  });
+
+  it("allows guest access to /kabinet/ without redirecting", async () => {
+    const req = new NextRequest("http://localhost/kabinet/");
+    const res = await middleware(req);
+    expect(res.status).toBe(200);
+    expect(res.headers.get("location")).toBeNull();
+  });
+
+  it("redirects guest accessing /kabinet nested routes to login", async () => {
+    const req = new NextRequest("http://localhost/kabinet/to-lovlar");
+    const res = await middleware(req);
+    expect(res.status).toBe(307);
+    expect(res.headers.get("location")).toContain("/?auth=1&redirect=%2Fkabinet%2Fto-lovlar");
+  });
+
+  it("returns 401 for guest accessing /api/kabinet routes", async () => {
+    const req = new NextRequest("http://localhost/api/kabinet/settings");
+    const res = await middleware(req);
+    expect(res.status).toBe(401);
+  });
+
+  it("redirects guest accessing /admin routes to /admin/login", async () => {
+    const req = new NextRequest("http://localhost/admin/users");
+    const res = await middleware(req);
+    expect(res.status).toBe(307);
+    expect(res.headers.get("location")).toContain("/admin/login?redirect=%2Fadmin%2Fusers");
   });
 });
