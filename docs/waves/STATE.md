@@ -23,9 +23,16 @@
 
 ## Phase 2 (started 2026-09-24)
 
+### ▶ RELEASE 2026-09-26 (release-e3): Wave E slice E3 — home "Dastur" section + weave strand — merged + verified by Gemini (Antigravity)
+- **Shipped:** replaces legacy `Roadmap` with `DasturSection` inside `<HomeLoom>` on `/`. 8-week curriculum breakdown rendered as an over-under weave; copy derived purely from published `COURSES["vibe-coding-express"].roadmap` in `src/features/courses/content.ts` (L14 clean). Apostrophes normalized to U+02BB for display font (§3). Registers `{ id: "dastur", strand: "weave" }` in `HOME_LOOM_SECTIONS`. Third strand of the girih star is now active and scrubs with scroll. Retired `src/components/sections/home/Roadmap.tsx`.
+- **Gates on committed main:** `npm run lessons:check` → 0 failures, 3 known debt · `npm run build` → exit 0 (103 kB shared JS) · `npx vitest run` → 112 files / 745 tests passed.
+- **Agent:** dispatched `space-bunny-free` via `scripts/waves/dispatch.sh e3-dastur space-bunny-free main`. Report at `reports/E3-DASTUR.md`.
+- **Next:** Wave E slice E4: "Natijalar" (portfolio / real student projects) section with ring strand (`ring`).
+
 ### ▶ RELEASE 2026-09-26 (release-e2): Wave E slice E2 — home "Usul" section + diamond strand — merged + pushed
 - **Shipped:** replaces Transformation with `UsulSection` (3 steps: 01 Muammoni aniqlash, 02 AI bilan tezkor iteratsiya, 03 Qaror va sifat nazorati); registers `{ id: "usul", strand: "diamond" }` in `HOME_LOOM_SECTIONS`; renders inside `<HomeLoom>` on `/`. Second strand of the girih star (gold diamond) is now active and scrubs with scroll.
 - **Gates on committed main:** `npm run lessons:check` → 0 failures, 3 known debt · `npm run build` → exit 0 (103 kB shared JS) · `npx vitest run` → 110 files / 736 tests passed.
+- **Next:** Wave E slice E3: "Dastur" (curriculum) section with over-under weave strand (`weave`).
 - **Next:** Wave E slice E3: "Dastur" (curriculum) section with over-under weave strand (`weave`).
 
 ### ▶ RELEASE 2026-09-26 (release-f2): Wave F2 Portability Kit — merged + verified by Gemini (Antigravity)

@@ -51,10 +51,10 @@ live DB: 15 migrations, anon/authenticated revoked, RLS on all tables). **Owner 
 0. **Verify prod first:** `curl https://master-2-jade.vercel.app/api/health` must be 200 `{"status":"ok"}` and responses must carry
    `x-request-id`. If 404, production is on pre-F1 code: from a clean main run `vercel deploy --prod --yes` (NOT `vercel redeploy <alias>`,
    which rebuilt old code on 2026-09-26). Then ask the owner to send `/start` to the bot and confirm it answers (new token).
-1. **E2 Usul — MERGED into main.** Diamond strand active on `/`. BuildStory overlap to be resolved in E3.
-2. **Wave E continues with E3: Dastur (Curriculum) section**, then E4 → E6, one section per slice, owner checks each.
-   Pattern: add `<DasturSection/>` inside `<HomeLoom>` + `{ id: "dastur", strand: "weave" }` in `src/features/lab-naqsh/domain/homeLoom.ts`. Build with space-bunny; review screenshots (L24/L25: verify token classes exist in built CSS).
-3. **F2 portability kit: MERGED by Gemini (Antigravity).** Merged to main with all pre-merge checklist items completed:
+1. **E2 Usul — MERGED into main.** Diamond strand active on `/`.
+2. **E3 Dastur (Curriculum) — MERGED into main by Gemini (Antigravity).** Weave strand active on `/`. Replaces legacy `Roadmap`. Honest 8-week breakdown derived from published course data. All 745 vitest tests pass, build 0, responsive e2e 12/12 pass.
+3. **Next: Wave E continues with E4: Natijalar (Portfolio / Student Projects) section**, with ring strand (`ring`). Only real student projects (e.g. Clash Nexus), no invented metrics.
+4. **F2 portability kit: MERGED by Gemini (Antigravity).** Merged to main with all pre-merge checklist items completed:
    (a) replaced `vercel redeploy` with `vercel deploy --prod --yes` in `move.ts` and `move-db.yml`; (b) resolved `package.json` conflict with F1;
    (c) reviewed and verified freeze SQL; (d) all gates on main passed: tsc 0, vitest 736/736, lessons:check 0 failures, build exit 0.
    Owner setup remaining: create 2 `age` key pairs and set GitHub secrets/vars listed in `docs/ops/KOCHIRISH.md`.
