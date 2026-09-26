@@ -23,6 +23,11 @@
 
 ## Phase 2 (started 2026-09-24)
 
+### ▶ W8B deploy order (2026-09-26): MIGRATE LIVE BEFORE DEPLOY
+- Branch `wave/w8b-mcp` (bf3abe9) adds per-manager MCP access (owner decision: managers may use MCP incl. write tools only if an admin turns it on in Admin → MCP → "Menejerlar uchun MCP ruxsati"; PII scope stays admin-only; turning it off revokes the manager's tokens in one transaction).
+- Migration **0013** adds `users.mcp_access`, and `getDbSession`/`getBearerSession` now select it on EVERY login check. Deploying before `0012` + `0013` are applied live breaks ALL logins. Order: run new SQL on live → `npx drizzle-kit migrate` → merge → deploy.
+- Gate on bf3abe9: tsc 0, vitest 623/623, build OK.
+
 ### ▶ HANDOFF 2026-09-25 (evening), wave "Q1 quality + skills + Awwwards phase 1-2", read this first
 - **Skills:** everything is managed by `skillkit` (`~/.skillkit`, private repo github.com/Muhammadmirzo/skillkit; new laptop: clone + `install.sh`).
   Dispatch agents with `skillkit dispatch <task> <model> <prompt> [dir]` (`.orchestra/run.sh` delegates to it): mandatory LESSON footer,
