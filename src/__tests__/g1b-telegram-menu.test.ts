@@ -8,8 +8,9 @@ import { COURSES, getCoursePricing } from "@/features/courses/content";
 
 /** Flatten every label a visitor can tap in the reply keyboard. */
 function keyboardLabels(): string[] {
-  const rows = (mainKeyboard.reply_keyboard ?? []) as { text: string }[][];
-  return rows.flat().map((button) => button.text);
+  type Cell = string | { text: string };
+  const rows = mainKeyboard.reply_markup.keyboard as Cell[][];
+  return rows.flat().map((cell) => (typeof cell === "string" ? cell : cell.text));
 }
 
 /** The bot message is HTML, so decode entities before comparing with config text. */
