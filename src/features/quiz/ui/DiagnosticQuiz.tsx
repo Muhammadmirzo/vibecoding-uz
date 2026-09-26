@@ -27,6 +27,15 @@ export function DiagnosticQuiz() {
   const [leadName, setLeadName] = React.useState("");
   const headingRef = React.useRef<HTMLLegendElement>(null);
 
+  // Funnel step "Diagnostika" was always 0: nobody fired `diagnostic_start`.
+  React.useEffect(() => {
+    let cancelled = false;
+    void import("@/features/analytics/client/tracker").then((module) => {
+      if (!cancelled) module.trackDiagnosticStart();
+    });
+    return () => { cancelled = true; };
+  }, []);
+
   const totalSteps = QUIZ_QUESTIONS.length;
   const question = QUIZ_QUESTIONS[stepIndex];
   const selected = answers[stepIndex];
