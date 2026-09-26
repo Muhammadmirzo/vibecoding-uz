@@ -10,7 +10,7 @@ module.exports = {
         brand: { DEFAULT: "var(--brand)", hover: "var(--brand-hover)", soft: "var(--brand-soft)", surface: "var(--brand-surface)" },
         accent: { DEFAULT: "var(--accent)", hover: "var(--accent-hover)", soft: "var(--accent-soft)" },
         gold: { DEFAULT: "var(--gold)", hover: "var(--gold-hover)", soft: "var(--gold-soft)" },
-        border: { DEFAULT: "var(--border)", strong: "var(--border-strong)" },
+        border: { DEFAULT: "var(--border)", strong: "var(--border-strong)", onBrand: "var(--border-on-brand-surface)" },
         success: { DEFAULT: "var(--success)", soft: "var(--success-soft)", line: "var(--success-line)" },
         danger: { DEFAULT: "var(--danger)", soft: "var(--danger-soft)" },
         telegram: { DEFAULT: "var(--telegram)", hover: "var(--telegram-hover)", soft: "var(--telegram-soft)", solid: "var(--telegram-solid)" },

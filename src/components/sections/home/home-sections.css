@@ -115,7 +115,6 @@ html[data-motion="full"][data-motion-ambient="on"] .demo-caret { animation: demo
   .roadmap-step .roadmap-dot { display: none; }
 }
 @media (max-width: 639px) {
-  .hero-proof { right: .5rem; }.hero-orbit { inset: -12px; }
   .bento-tile,.bento-wide { grid-column: 1 / -1; min-height: 310px; }
   .bento-facts { flex-wrap: wrap; margin-top: 1.25rem; }
   .bento-facts span { padding: .38rem .55rem; }

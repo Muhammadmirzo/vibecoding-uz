@@ -18,6 +18,10 @@
        unlike --brand itself, which turns light blue in dark mode. */
     --brand-surface: #0d1f4d;
     --on-brand-surface: #ffffff;
+    /* Border for content sitting on --brand-surface (both themes: that
+       surface is fixed navy either way). Alpha is baked into the value
+       itself — never add a Tailwind opacity modifier to a var() color. */
+    --border-on-brand-surface: rgba(255, 255, 255, 0.15);
     --accent: #0fa3a3;
     --accent-hover: #0b8585;
     --accent-soft: #ddf4f3;
