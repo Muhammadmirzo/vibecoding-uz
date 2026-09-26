@@ -23,12 +23,11 @@ export function HeroDemo() {
   return (
     <section className="border-b border-white/10 py-16 sm:py-20" aria-label="Jonli namuna: g'oyadan saytga">
       <div className="mx-auto max-w-container px-5 sm:px-8">
-        <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-accent">Jonli namuna</p>
         <h1
           className="mt-4 max-w-2xl text-balance font-display font-bold leading-[0.98] tracking-[-0.035em] text-on-brand-surface"
           style={{ fontSize: "clamp(1.75rem, 4vw, 3.5rem)" }}
         >
-          G'oyangizni yozing — sayt shu yerda to'qiladi.
+          Gʻoyangizni yozing — sayt shu yerda toʻqiladi.
         </h1>
 
         <div className="mt-10 grid gap-6 lg:grid-cols-2 lg:gap-10">
