@@ -15,8 +15,9 @@ Never paste a database URL into chat, an issue, a commit or a command line. Use 
 2. `vercel env update DATABASE_URL production --yes < /tmp/newdb.txt`
 3. Same for Preview if Preview should also use it: `vercel env update DATABASE_URL preview --yes < /tmp/newdb.txt`
    then `rm /tmp/newdb.txt`.
-4. Redeploy (env changes only apply to new deployments):
-   `vercel redeploy https://master-2-jade.vercel.app --target=production`
+4. Redeploy (env changes only apply to new deployments). From a clean `main`
+   (`git status --porcelain` empty), build and deploy the current code:
+   `vercel deploy --prod --yes`
    (or Vercel dashboard → Deployments → latest production → Redeploy).
 5. Smoke test: `curl -s -o /dev/null -w '%{http_code}' https://master-2-jade.vercel.app/api/health` = 200,
    log in, submit one lead form, check it in the admin panel.
