@@ -5,6 +5,8 @@
 Welcome AI Agent (Claude Code, Cursor, DeepSeek, Z.ai, OpenRouter, AGY)!
 This document serves as your **authoritative architectural map**, **token-sparing context rulebook**, and **engineering guidelines document**.
 
+> 🧭 **ORCHESTRATOR SESSIONS:** when the owner says "boshla" / "boshlang" / "davom et", follow [docs/waves/RESUME.md](docs/waves/RESUME.md) — its §0 table says which model orchestrates (Claude Opus 5.5 > Gemini 3.1 Pro > Gemini 3.8 Flash) and which agents to use. muse-spark and space-bunny are builder agents, not orchestrators.
+
 > 🎭 **MULTI-AGENT MODE**: if the task should be orchestrated across subagents (strategy, security, review, design audit, research, git) — load [SARBON_ORCHESTRATION.md](SARBON_ORCHESTRATION.md) and act as SARBON-ORKESTRATOR per its protocol.
 
 ---

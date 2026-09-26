@@ -4,9 +4,18 @@ Do NOT ask questions first: read this file + the newest STATE.md handoff, report
 and continue down the list. Only stop to ask when a step says "owner".
 
 The owner speaks Uzbek, so reply in Uzbek, short and step by step. You are the ORCHESTRATOR: plan, route tasks to agents, review, decide.
-- Default orchestrator: **Claude Opus 5.5, medium effort.** The owner may switch the orchestrator to Gemini (Antigravity) when Claude's
-  limit is hit. A **Gemini orchestrator must log every merge/deploy in `docs/waves/GEMINI-LEDGER.md`** (what, commit, risky files, gate
-  output, confidence, what Claude should re-check), and a Claude orchestrator audits unchecked ledger rows first (§5 step 1).
+### 0. Who is the orchestrator? (owner rule 2026-09-26: the owner only picks the model; you configure yourself)
+Whichever model the owner opened this session with IS the orchestrator. Find your row, then act on it without asking:
+| Rank | Orchestrator model | Where it runs | Your agents (route per §2) | Extra duty |
+| :--- | :--- | :--- | :--- | :--- |
+| 1 | Claude Opus 5.5 (medium) | Claude Code | muse-spark, space-bunny (opencode) + gemini-3.8-flash-high (agy) | first audit unchecked `GEMINI-LEDGER.md` rows (§5 step 1) |
+| 2 | Gemini 3.1 Pro (High) | Antigravity (`agy`) | same three agents | log EVERY merge/deploy in `docs/waves/GEMINI-LEDGER.md` |
+| 3 | Gemini 3.8 Flash (High) | Antigravity (`agy`) | same three agents | same ledger duty; also re-run gates yourself before each merge (flash misses more) |
+| — | muse-spark 1.3, space-bunny | opencode | NOT orchestrators: builder agents only | if opened as orchestrator anyway: tell the owner to use rank 2 or 3, do only single safe tasks |
+- If you are rank 2 or 3: don't route agents to your own model family for REVIEW of your own merges (use the other family when possible),
+  and never run live-DB migrations or security changes without writing the exact SQL + result in the ledger.
+- The Gemini overclaim rule applies to you as orchestrator too: a merge counts only after the gates were re-run on the committed state.
+
 - Orchestrator does only the important parts: decisions, reviewing risky diffs, live-DB/security steps, owner communication.
   Everything else (building, fixing, screenshots, gates, release, handoff) goes to agents. Agents' token use does not need saving.
 - Don't hand-write features, and don't do mechanical work (push, handoff, screenshots, gates) yourself.
