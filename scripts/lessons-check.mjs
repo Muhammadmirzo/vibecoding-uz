@@ -25,6 +25,13 @@ function grepLines(file, re, lesson, msg) {
     if (re.test(line) && !line.includes(IGNORE)) hit(lesson, file, `${msg} (line ${i + 1})`);
   });
 }
+/** Same, but skips comment-only lines: a lesson is often named in the code that documents it. */
+function grepCodeLines(file, re, lesson, msg) {
+  read(file).split("\n").forEach((line, i) => {
+    if (/^\s*(\/\/|\*|\/\*)/.test(line)) return;
+    if (re.test(line) && !line.includes(IGNORE)) hit(lesson, file, `${msg} (line ${i + 1})`);
+  });
+}
 
 for (const f of files) {
   if (isSrc(f)) {
@@ -72,6 +79,34 @@ if (!staged) {
   }
   for (const a of wanted) {
     if (!ids.has(a)) failures.push(`L27 site chrome deep-links to /#${a} but no id="${a}" exists in any src/**/*.tsx`);
+  }
+}
+
+// L30: a PUBLIC, unauthenticated page must not select PII. /shahodatnoma/[code]
+// fell back to users.phone, so any visitor could read a student's phone number
+// from the certificate URL. Public pages: no phone, no email, no address.
+if (!staged) {
+  for (const f of sh("git ls-files 'src/lib/certificates' 'src/app/shahodatnoma'")) {
+    grepCodeLines(f, /users\.phone|users\.email|\bphone:\s*row/, "L30", "PII selected in a public certificate query; /shahodatnoma/[code] is unauthenticated");
+  }
+  // L31: a public DB read must not bubble as a 404/500. verifyCertificate may
+  // throw when the DB is down; that is "could not check", not "does not exist".
+  const verify = read("src/app/shahodatnoma/[code]/page.tsx");
+  if (!/try\s*\{/.test(verify) || !/catch/.test(verify)) {
+    failures.push("L31 src/app/shahodatnoma/[code]/page.tsx: a DB failure is not caught, so a DB hiccup renders a 500 on a public trust page");
+  }
+  // L34: randomness behind a public trust artefact (certificate codes) or a
+  // secret (OTP, token) is CSPRNG-only. Non-security jitter (retry backoff) is fine.
+  for (const f of sh("git ls-files 'src/lib/certificates'")) {
+    grepCodeLines(f, /Math\.random/, "L34", "Math.random in certificate-code code; use node:crypto randomInt (CODER_AGENT_RULES \u00a76)");
+  }
+  // L37: a notFound() raised INSIDE a try/catch is swallowed unless the catch
+  // re-throws it. Next 15 throws digest "NEXT_HTTP_ERROR_FALLBACK;404", not the
+  // legacy "NEXT_NOT_FOUND", so a digest=== "NEXT_NOT_FOUND" re-throw check
+  // silently turns a 404 into a 200. Never branch on the old digest; call
+  // notFound() after the try/catch.
+  for (const f of sh("git ls-files 'src/app'")) {
+    grepCodeLines(f, /NEXT_NOT_FOUND/, "L37", 'legacy "NEXT_NOT_FOUND" digest check; in Next 15 notFound() throws NEXT_HTTP_ERROR_FALLBACK;404 and a catch that re-throws only the old digest swallows the 404');
   }
 }
 

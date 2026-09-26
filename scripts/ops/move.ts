@@ -9,7 +9,7 @@
  *
  * `--switch-vercel` runs only after a fully verified copy, asks again, and pipes the new URL to
  * `vercel env update DATABASE_URL production` through stdin (never argv/history), then runs
- * `vercel redeploy <prod> --target=production`. Manual path: scripts/ops/switch-host.md.
+ * `vercel deploy --prod --yes` from a clean main. Manual path: scripts/ops/switch-host.md.
  */
 import { spawnSync } from "node:child_process";
 import path from "node:path";

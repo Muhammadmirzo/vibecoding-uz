@@ -44,6 +44,8 @@ export const drizzleKabinetRepository: KabinetDashboardRepository = {
     return row ?? null;
   },
   async listPayments(userId) {
+    // A malformed id would make Postgres raise 22P02 and burn a round trip.
+    if (!UUID.test(userId)) return [];
     return db
       .select({ enrollmentId: payments.enrollmentId, status: payments.status })
       .from(payments)

@@ -12,6 +12,9 @@ import { createPat } from "@/features/mcp/server/oauth.service";
 // Mocked/unit tests never caught it because they never hit real SQL. This suite only runs
 // against a real DB, same convention as src/__tests__/hardening/db.test.ts.
 const TAG = `zz_w8b_live_${Date.now()}`;
+// These tests hit the real Supabase pooler: seed + 7 inserts + several joins easily
+// exceed vitest's 5 s default over a distant region, which is a flake, not a failure.
+const LIVE_TIMEOUT_MS = 20_000;
 const cleanupIds = { userIds: [] as string[], courseIds: [] as string[], sectionIds: [] as string[], lessonIds: [] as string[], cohortIds: [] as string[], enrollmentIds: [] as string[], paymentIds: [] as string[] };
 
 async function seed() {
@@ -50,13 +53,13 @@ describe.skipIf(!process.env.DATABASE_URL)("W8B MCP live SQL (real Postgres only
   it("listStudents runs without a snake_case/camelCase column error", async () => {
     const page = await listStudents({ limit: 20, search: TAG.slice(0, 6) }, false);
     expect(page.rows.find((r: any) => r.id === seeded.student.id)).toBeTruthy();
-  });
+  }, LIVE_TIMEOUT_MS);
 
   it("studentProfile joins enrollments/lessons/homework/payments without column errors", async () => {
     const profile = await studentProfile(seeded.student.id, true);
     expect(profile?.enrollments.length).toBeGreaterThan(0);
     expect(profile?.payments[0]?.amountUzs).toBe(500000);
-  });
+  }, LIVE_TIMEOUT_MS);
 
   it("salesByCourse joins cohorts/enrollments/payments without column errors", async () => {
     const from = new Date(Date.now() - 3600_000);
@@ -64,7 +67,7 @@ describe.skipIf(!process.env.DATABASE_URL)("W8B MCP live SQL (real Postgres only
     const rows = await salesByCourse(from, to);
     const row = rows.find((r) => r.courseId === seeded.course.id);
     expect(row?.revenueUzs).toBe(500000);
-  });
+  }, LIVE_TIMEOUT_MS);
 
   it("access token and PAT last_used_at actually persist (not a lost fire-and-forget)", async () => {
     const [admin] = await db.insert(users).values({ phone: `+998908${Date.now() % 1000000}`, fullName: `${TAG} admin`, role: "superadmin", mcpAccess: true }).returning();
@@ -77,5 +80,5 @@ describe.skipIf(!process.env.DATABASE_URL)("W8B MCP live SQL (real Postgres only
     const [row] = await db.select({ lastUsedAt: mcpPersonalAccessTokens.lastUsedAt }).from(mcpPersonalAccessTokens).where(eq(mcpPersonalAccessTokens.id, pat.id)).limit(1);
     expect(row.lastUsedAt).toBeTruthy();
     await db.delete(mcpPersonalAccessTokens).where(eq(mcpPersonalAccessTokens.id, pat.id));
-  }, 15000);
+  }, LIVE_TIMEOUT_MS);
 });
