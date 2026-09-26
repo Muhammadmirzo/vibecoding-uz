@@ -116,12 +116,14 @@ export async function listManagers() {
 export async function updateManagerMcpAccess(adminId: string, managerId: string, mcpAccess: boolean) {
   const [user] = await db.select({ role: users.role }).from(users).where(eq(users.id, managerId)).limit(1);
   if (!user || user.role !== "manager") throw new ServiceError("NOT_FOUND", "Menejer topilmadi", 404);
-  await db.update(users).set({ mcpAccess }).where(eq(users.id, managerId));
-  if (!mcpAccess) {
-    // Revoke all tokens for this manager
-    await db.update(mcpAccessTokens).set({ revokedAt: new Date() }).where(and(eq(mcpAccessTokens.userId, managerId), isNull(mcpAccessTokens.revokedAt)));
-    await db.update(mcpRefreshTokens).set({ revokedAt: new Date() }).where(and(eq(mcpRefreshTokens.userId, managerId), isNull(mcpRefreshTokens.revokedAt)));
-    await db.update(mcpPersonalAccessTokens).set({ revokedAt: new Date() }).where(and(eq(mcpPersonalAccessTokens.createdBy, managerId), isNull(mcpPersonalAccessTokens.revokedAt)));
-  }
+  // One transaction: access flag + token revocation succeed or fail together.
+  await db.transaction(async (tx) => {
+    await tx.update(users).set({ mcpAccess }).where(eq(users.id, managerId));
+    if (mcpAccess) return;
+    const now = new Date();
+    await tx.update(mcpAccessTokens).set({ revokedAt: now }).where(and(eq(mcpAccessTokens.userId, managerId), isNull(mcpAccessTokens.revokedAt)));
+    await tx.update(mcpRefreshTokens).set({ revokedAt: now }).where(and(eq(mcpRefreshTokens.userId, managerId), isNull(mcpRefreshTokens.revokedAt)));
+    await tx.update(mcpPersonalAccessTokens).set({ revokedAt: now }).where(and(eq(mcpPersonalAccessTokens.createdBy, managerId), isNull(mcpPersonalAccessTokens.revokedAt)));
+  });
   await db.insert(auditLogs).values({ userId: adminId, action: "admin.mcp.manager.update", entityType: "user", entityId: managerId, details: { mcpAccess } });
 }
