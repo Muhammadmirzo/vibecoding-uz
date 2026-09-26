@@ -62,7 +62,7 @@ writes the handoff and pushes. Code then verifies the push, CI and the live URL,
 If the free agent stalls for more than ~10 min, stop it by PID and hand the same job to a Claude subagent (Haiku for mechanical work).
 Skill: `wave-handoff`.
 
-## 5. Next work, in order (updated 2026-09-26 night by Claude after the Gemini-orchestrated waves)
+## 5. Next work, in order (updated 2026-09-26 after wave g1-growth)
 Done and live on main (tags `wave/2026-09-26-*`): `/lab/naqsh`, W8B MCP, the whole Awwwards home E0–E6 (6-strand loom),
 F1 foundations (migration 0014 live, lockdown, /api/health, crons, idempotency), F2 portability kit, D1 debt (0 known debt),
 D2 color-mix alpha tokens, C1 real certificate verification, P1 /kabinet LCP (~0.9 s). Owner rotated the leaked DB password and the
@@ -72,13 +72,19 @@ Telegram bot token on 2026-09-26. Full per-wave detail: STATE.md "Phase 2" RELEA
    cert PII leak L30, cert DB-down + real 404 L31/L37, CSPRNG codes L34, /kabinet 401 loop L32, `listPayments` UUID guard L33,
    `vercel redeploy` in docs, live-test timeout L35). New lessons L30–L38, 4 enforced in `scripts/lessons-check.mjs`.
    Still open from that audit: the D2 light/dark visual check, and the prod smoke of this wave's certificate/401 behaviour.
-0b. **Verify THIS wave on the prod alias** (agents do it, you read the result): `https://master-2-jade.vercel.app` —
-   `/api/health` = 200 `{"status:"ok"}` with `x-request-id`; an unknown `/shahodatnoma/<code>` shows the not-found body (the HTTP
-   status is still 200 because root `loading.tsx` streams first — L21, accepted); an expired session in `/kabinet` shows the login
-   link, not a reload button. If `/api/health` is 404, prod is on old code → deploy the latest main (`vercel deploy --prod --yes`
-   from a clean main; never `vercel redeploy <alias>`).
-0c. **Growth audit synthesis → `docs/roadmap/07`** (the `m1`–`m4` audit reports are not in `reports/` yet: collect them, then write
-   the synthesis in the same shape as 06), then **R0 foundations** in the roadmap order.
+0b. **Verify the g1-growth wave on the prod alias** (agents do it, you read the result) — **wait until the Production deployment
+   reads `Ready` in `vercel ls`, then curl (L42)**: `/api/health` = 200 `{"status":"ok"}` with `x-request-id`; `/kurs` = 200;
+   `/ekspertlar` shows the honest "closed until real profiles" state; the Telegram bot's `/start` prices match the site; a brand-new
+   student reaches checkout (or sees the waitlist when no cohort is open). If `/api/health` is 404, prod is on old code → deploy the
+   latest main (`vercel deploy --prod --yes` from a clean main; never `vercel redeploy <alias>`).
+0c. ~~Growth audit synthesis~~ **DONE: `docs/roadmap/07-growth-audit.md`** (plus `08-pricing-plans.md` and
+   `09-admin-mentors-community.md`, all written 2026-09-26). **R0 foundations** next in the roadmap order.
+1. **Wave A1 admin panel — the next build (muse-spark, roadmap [09 §A](../roadmap/09-admin-mentors-community.md)):**
+   courses, plans **Start / Pro / Premium**, lessons, free-lesson flag, with the **DB as the single price source** (already the
+   stated source in `a1f4526`). Prerequisite: **F3 money (bigint tiyin + currency) and 68 `timestamp` → `timestamptz`**, expand/contract.
+   All SQL on **naqsh-dev first** (agents use `.env.agents`), then prod via migration BEFORE the deploy. Also in A1: make gate runs
+   in the main repo use `.env.agents`, not the prod `.env`. Owner must then set the real prices + free lesson in admin — until then
+   prod cohorts hold TEST prices (2 990 000, past dates) and the site still advertises 550 000.
 2. **Parity web ↔ /api/v1 ↔ MCP (no DB schema change, can start now, muse-spark):** a `docs/features.json` manifest + a test that fails when
    a feature lacks its v1 endpoint (in OpenAPI) or MCP tool (or `n/a` + reason); enforce min app version (426 `update_required`);
    `meta.nextCursor` on v1 lists. Then the missing v1 endpoints: lead signup (bepul-dars/meetlar), diagnostika, portfolio, referral claim,
@@ -91,10 +97,10 @@ Telegram bot token on 2026-09-26. Full per-wave detail: STATE.md "Phase 2" RELEA
    `timestamptz` + `lib/time.ts` (Asia/Tashkent), money canonical in `bigint` tiyin + currency (expand/contract), `org_id` (B2B possible),
    stored `users.referral_code`, unique tg_user_id / lower(email), one `toE164()`, `can()` permissions (48 role literals), Sentry.
    Every new SQL runs once on a real DB before merge (L2); migrations applied live BEFORE the deploy that needs them.
-5. **Roadmap (owner request 2026-09-26): [docs/roadmap/README.md](../roadmap/README.md)** — lesson media (YouTube + stream + live),
-   MCP for every role (superadmin/accountant/manager/mentor/student, all AI clients), quality control, subdomain triggers,
-   mobile/desktop/Telegram Mini App, growth, and pricing (**Start / Pro / Premium**, 1–3 plans per course → 08). Order
-   R0 → F3 → R1…R7. Each session: check the growth triggers (roadmap 06 §3) and tell the owner in one message if one is reached.
+5. **Roadmap (owner request 2026-09-26): [docs/roadmap/README.md](../roadmap/README.md)** — 01 lesson media, 02 AI/MCP roles,
+   03 quality control, 04 subdomains, 05 clients/apps, 06 platform growth, **07 growth audit ✅**, **08 pricing plans ✅**,
+   **09 admin/mentors/community ✅ (admin panel = wave A1, mentor pages M1, course community C-1 — the last two are owner-approved)**.
+   Order R0 → F3 → R1…R7. Each session: check the growth triggers (roadmap 06 §3) and tell the owner in one message if one is reached.
 6. After this: tell the skillkit session (vibecoding-uz-87, if alive) that F1+F2 are merged; it runs `skillkit init-project` (db-check gate).
 
 ## 6. Settled owner decisions (don't re-ask)
@@ -103,6 +109,8 @@ Telegram bot token on 2026-09-26. Full per-wave detail: STATE.md "Phase 2" RELEA
 - 2026-09-26: free nightly encrypted backups (no Supabase Pro) · a separate dev DB project · B2B is possible → `org_id` early ·
   one-command portability.
 - 2026-09-26 (wave a1-fixes): the domain **naqsh.uz** is to be bought · pricing = **Start / Pro / Premium**, 1–3 plans per course.
+- 2026-09-26 (wave g1-growth): prices and the free lesson are **admin-managed test data** until the owner sets the real ones ·
+  **mentor pages + per-course community approved** (roadmap 09 §B/§C) · `/ekspertlar` stays closed until real profiles exist.
 
 ## Hard rules
 Never `pkill -f` (stop servers by PID from `ss -ltnp | grep :<port>`). Never print secrets. Deploy = push main + main:master (release agent). After changing Vercel env vars, deploy the latest main (`vercel deploy --prod --yes` from a clean main), never `vercel redeploy <alias>`.

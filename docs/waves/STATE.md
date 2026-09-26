@@ -23,6 +23,38 @@
 
 ## Phase 2 (started 2026-09-24)
 
+### ▶ RELEASE 2026-09-26 (release-g1-growth): Wave G1 — growth: new student reaches checkout, honest prices, /kurs + /ekspertlar — merged + pushed
+- **Shipped** (wave `g1-growth`, branches `wave/g1a` + `wave/g1b`, merged in `398649f`, 24 commits since `wave/2026-09-26-a1-fixes`):
+  1. **A brand-new student can now actually pay (L44)** — `/kabinet/to-lovlar` derived the checkout target from the student's *payment history*, so a student with no payments sent neither `enrollmentId` nor `cohortId` and `POST /api/payments/checkout` answered **400**. The cohort is now resolved **server-side**, and with no open cohort the page shows an honest **waitlist** instead of a pay button. Tests: `g1a-to-lovlar-new-student.test.ts`, `g1a-checkout-target.test.ts`.
+  2. **The pay page shows the cohort price actually charged** (not a config/site price that can drift).
+  3. **Course CTAs open the pay page for THAT course** (`?course=<slug>`).
+  4. **Telegram bot prices and links come from `siteConfig` (L39)** — the bot quoted 2 990 000 / 990 000 while the site sells 550 000, and offered a "💡 G'oya Kalkulyatori" button pointing at an anchor that exists nowhere. One `MAIN_MENU` const (`src/lib/telegram/handlers/menu.ts`), no `#kalkulyator`, no hardcoded domain.
+  5. **New-lead Telegram alert to the manager chat** (`TELEGRAM_ADMIN_CHAT_ID`) — fired in Next's **`after()` (L41)**, because `void notifyNewLead(...)` was dropped the instant the response flushed. Test: `g1b-lead-alert-after.test.ts`.
+  6. **`/kurs` index page** (in the sitemap, linked from the footer) and **`/ekspertlar` closed** until real mentor profiles exist (L14 — no invented people).
+  7. **Funnel plumbing:** `utm_*` survives `/ref/[code]`, `ref_code` cookie attaches at Telegram login, `diagnostic_start` emitted from `/diagnostika` on the existing W8A contract.
+  8. **SEO:** ISO 8601 `Course.startDate` + a per-course OG image.
+  9. **Copy:** 5 Uzbek typos fixed, Telegram handle accepted with or without `@`, warmer next-step copy.
+  10. **Hardening:** the OTP rate limiter stays **in memory** in tests (it was flipping `NODE_ENV` to `development` and writing real `rate_limit_buckets` rows into the dev DB, so a second suite run inside 5 minutes answered 429 — L40). Checks added for L40/L41.
+  11. **`naqsh-dev` dev DB is live**; agents use `cp <main>/.env.agents .env` — never the prod `.env`. Vercel Preview/Development point at it, Production stays on prod.
+- **Gates on committed main (`398649f`, release agent, real output):** `scripts/waves/locked.sh npm run lessons:check` → `lessons-check: 0 failure(s), 0 known debt (repo)` · `scripts/waves/locked.sh npm run build` → exit 0 (103 kB shared First Load JS) · `scripts/waves/locked.sh npx vitest run` → **134 files / 902 tests passed**, run **twice in a row** (L40). Was 122/826.
+- **Migrations:** no `.sql` migrations changed since `wave/2026-09-26-a1-fixes` (`git diff --name-only wave/2026-09-26-a1-fixes..HEAD -- '*.sql'` = empty) → no live-DB step needed.
+- **Next, in order:**
+  1. **Wave A1 admin panel** (`docs/roadmap/09` §A): courses, plans **Start / Pro / Premium**, lessons, a free-lesson flag — with the **DB as the single price source**. **F3 money (bigint tiyin) + timestamptz are the prerequisite** (expand/contract). All SQL runs on **naqsh-dev first**, then prod via migration before the deploy. The DB is already the source of truth (`a1f4526`).
+  2. **Also in A1:** make gate runs **in the main repo** use `.env.agents` instead of the prod `.env`.
+  3. **Verify this wave on the prod alias** `https://master-2-jade.vercel.app` (only after the Production deployment reads `Ready`, L42): `/api/health` = 200; `/kurs` 200; `/ekspertlar` renders the "closed" state; the bot's `/start` prices match the site; a new student reaches checkout (or the waitlist when no cohort is open).
+  4. Roadmap: **07 growth audit** → **08 pricing/plans** → **09 admin/mentors/community**. Then **R0 → F3 → R1…R7** (`docs/roadmap/README.md`).
+  5. **Parity web ↔ /api/v1 ↔ MCP** (still open, no schema change): `docs/features.json` manifest + the test that fails on a missing endpoint/tool, then lead signup, diagnostika, portfolio, referral claim, certificate verify.
+  6. **Mentor pages (M1) + per-course community (C-1)** — approved by the owner, roadmap 09 §B / §C, on top of the R2 Q&A infrastructure.
+  7. **Owner actions** (ask once): buy **naqsh.uz** · 2 `age` key pairs + GitHub secrets for nightly backups · free uptime monitor on `/api/health`.
+- **In progress:** no agent running. `wave/g1a` + `wave/g1b` are merged into `main` (`398649f`); their worktrees can be dropped. Untracked and left alone: `scripts/db-check.ts` (owner debug script), `.claude/worktrees/`.
+- **Settled owner decisions (don't re-ask):** domain **naqsh.uz** is to be bought · pricing = **Start / Pro / Premium**, 1–3 plans per course, **admin-managed, prices in the DB** · current prices (550 000) and the free-lesson flag are **test data** until the owner sets the real ones in admin (A1) · free nightly encrypted backups · a separate dev DB project (`naqsh-dev`) · B2B possible → `org_id` early · one-command portability · mentor pages + per-course community approved (roadmap 09 triggers) · Telegram reply → site chat works; `ANTHROPIC_API_KEY` deferred.
+- **Risks / debt:**
+  - **Prod cohorts hold TEST prices** (2 990 000, past start dates) and the site config still advertises **550 000**. The owner supplies the real prices and the free lesson through the admin panel (A1); until then the pay page and the marketing copy can disagree.
+  - **`/shahodatnoma/<unknown code>` still returns HTTP 200 with a 404 body** on production, because the root `loading.tsx` streams first (L21). Body correct and `noindex`; a true status needs the root loading file restructured. Low priority, still open.
+  - Carried debt: `src/features/**` tests missing from the vitest include; split `chat.service.ts`; /kabinet simulated LCP; BuildStory blank track in full-page screenshots; first real MCP client connection still not tested end-to-end in production; D2 light/dark visual check (390/1440) still open.
+  - 68 `timestamp` columns have no time zone (F3) — the admin `datetime-local` input is 5 h off and analytics day buckets are UTC. Will bite A1's datetime fields, so F3 timestamptz goes first.
+- **Resume:** open the repo, say "davom et" — a new session reads [RESUME.md](RESUME.md) and this section. Roll back: `skillkit wave status`, then `skillkit wave rollback <tag>`.
+
 ### ▶ RELEASE 2026-09-26 (release-a1-fixes): Wave A1 — Claude audit of the Gemini-orchestrated merges, fixes applied — merged + pushed
 - **Shipped:** the audit of every Gemini-orchestrated merge (`docs/waves/GEMINI-LEDGER.md`) and the fixes it found. Merged as `fbc04de` from `wave/a1-fixes`; audit verdicts recorded in the ledger commit `e2d213c`.
   1. **Public certificate page PII leak (L30)** — `/shahodatnoma/[code]` fell back `holderName` to `users.phone`, so an unauthenticated visitor could read a student's phone number from the URL. The public page no longer even SELECTs PII.
