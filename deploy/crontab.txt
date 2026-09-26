@@ -1,0 +1,5 @@
+# Portable replacement for Vercel Crons (vercel.json "crons"). Keep both lists in sync:
+# src/__tests__/ops/cron-sync.test.ts fails when they drift.
+# Format: MM HH PATH   (UTC, two digits, or * for "every")
+00 04 /api/cron/reminders
+00 22 /api/cron/analytics-retention

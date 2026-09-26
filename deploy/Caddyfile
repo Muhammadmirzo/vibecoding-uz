@@ -1,0 +1,20 @@
+# Caddy = TLS (automatic Let's Encrypt) + the only public door to the app (docker-compose.yml).
+# DOMAIN and ACME_EMAIL come from the compose environment.
+{
+	email {$ACME_EMAIL}
+}
+
+{$DOMAIN} {
+	encode zstd gzip
+
+	reverse_proxy app:3000 {
+		# The rate limiter (src/lib/security/rateLimit) trusts x-vercel-forwarded-for, then x-real-ip.
+		# Off Vercel a client could forge those, so drop them and set X-Real-IP to the real peer.
+		# Behind Cloudflare/another proxy: add `trusted_proxies` in the global options so
+		# {client_ip} resolves to the visitor, not the proxy.
+		header_up -X-Vercel-Forwarded-For
+		header_up -X-Vercel-Ip-Country
+		header_up -Cf-Ipcountry
+		header_up X-Real-IP {client_ip}
+	}
+}

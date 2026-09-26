@@ -1,0 +1,18 @@
+name: pg-tools
+description: Install PostgreSQL 17 client tools (PGDG apt repo) and age, and put v17 first on PATH.
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        set -euo pipefail
+        sudo apt-get update -qq
+        sudo apt-get install -y -qq postgresql-common age
+        # https://www.postgresql.org/download/linux/ubuntu/ (automated repository configuration)
+        sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y || echo | sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh
+        sudo apt-get install -y -qq postgresql-client-17
+        # The runner image ships an older cluster; pg_wrapper could pick its version. Force 17.
+        echo "/usr/lib/postgresql/17/bin" >> "$GITHUB_PATH"
+        echo "PG_BIN=/usr/lib/postgresql/17/bin" >> "$GITHUB_ENV"
+        /usr/lib/postgresql/17/bin/pg_dump --version
+        age --version

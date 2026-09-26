@@ -1,0 +1,111 @@
+# Move the production database to another Postgres, from anywhere (phone: GitHub app / gh CLI).
+#   gh workflow run move-db -f rehearsal=true                  # copy prod into a throwaway DB on the runner (safe)
+#   gh workflow run move-db                                     # dry run: read-only checks against the target
+#   gh workflow run move-db -f dry_run=false -f confirm=KOCHIR  # the real move (freezes writes on the old DB)
+# Secrets (Settings → Secrets → Actions): SOURCE_DATABASE_URL (or DATABASE_URL) and the target secret
+# (default NEW_DATABASE_URL). Guide: docs/ops/KOCHIRISH.md.
+name: move-db
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run: read-only checks, nothing is written"
+        type: boolean
+        default: true
+      rehearsal:
+        description: "Rehearsal: copy into a throwaway Postgres 17 on the runner (source is only read)"
+        type: boolean
+        default: false
+      target_secret:
+        description: "Name of the repo secret holding the NEW database URL"
+        type: string
+        default: NEW_DATABASE_URL
+      confirm:
+        description: "Real move only (dry_run=false): type KOCHIR"
+        type: string
+        default: ""
+      switch_vercel:
+        description: "After a verified real move: set Vercel DATABASE_URL and redeploy (needs VERCEL_* secrets)"
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: db-ops
+  cancel-in-progress: false
+jobs:
+  move:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - uses: ./.github/actions/pg-tools
+      - name: Decide mode
+        id: mode
+        env:
+          DRY_RUN: ${{ inputs.dry_run }}
+          REHEARSAL: ${{ inputs.rehearsal }}
+          CONFIRM: ${{ inputs.confirm }}
+          TARGET_SECRET: ${{ inputs.target_secret }}
+        run: |
+          set -euo pipefail
+          [[ "$TARGET_SECRET" =~ ^[A-Z][A-Z0-9_]{1,63}$ ]] || { echo "::error::target_secret must be a secret NAME"; exit 1; }
+          if [ "$REHEARSAL" = "true" ]; then mode=rehearsal
+          elif [ "$DRY_RUN" = "true" ]; then mode=dry
+          elif [ "$CONFIRM" = "KOCHIR" ]; then mode=real
+          else echo "::error::Real move needs confirm=KOCHIR / haqiqiy ko'chirish uchun confirm=KOCHIR yozing"; exit 1
+          fi
+          echo "mode=$mode" >> "$GITHUB_OUTPUT"
+          echo "Mode: $mode"
+      - name: Throwaway Postgres 17 (rehearsal)
+        if: steps.mode.outputs.mode == 'rehearsal'
+        run: |
+          set -euo pipefail
+          PW="$(openssl rand -hex 24)"; echo "::add-mask::$PW"
+          docker run -d --name scratch -e POSTGRES_PASSWORD="$PW" -p 127.0.0.1:55432:5432 postgres:17 >/dev/null
+          for i in $(seq 1 60); do docker exec scratch pg_isready -U postgres >/dev/null 2>&1 && break; sleep 1; done
+          echo "REHEARSAL_URL=postgres://postgres:$PW@127.0.0.1:55432/postgres" >> "$GITHUB_ENV"
+      - name: Move database
+        env:
+          MODE: ${{ steps.mode.outputs.mode }}
+          SOURCE_DATABASE_URL: ${{ secrets.SOURCE_DATABASE_URL || secrets.DATABASE_URL }}
+          TARGET_FROM_SECRET: ${{ secrets[inputs.target_secret] }}
+        run: |
+          set -euo pipefail
+          case "$MODE" in
+            rehearsal) export MOVE_TARGET_URL="$REHEARSAL_URL"
+                       npx tsx scripts/ops/move-db.ts --from SOURCE_DATABASE_URL --to MOVE_TARGET_URL --no-freeze --yes ;;
+            dry)       export MOVE_TARGET_URL="$TARGET_FROM_SECRET"
+                       npx tsx scripts/ops/move-db.ts --from SOURCE_DATABASE_URL --to MOVE_TARGET_URL --dry-run ;;
+            real)      export MOVE_TARGET_URL="$TARGET_FROM_SECRET"
+                       npx tsx scripts/ops/move-db.ts --from SOURCE_DATABASE_URL --to MOVE_TARGET_URL --yes ;;
+          esac
+      - name: Switch Vercel to the new database
+        if: steps.mode.outputs.mode == 'real' && inputs.switch_vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_PROD_URL: ${{ vars.VERCEL_PROD_URL || 'https://master-2-jade.vercel.app' }}
+          APP_URL: ${{ secrets[format('{0}_APP', inputs.target_secret)] || secrets[inputs.target_secret] }}
+        run: |
+          set -euo pipefail
+          printf '%s' "$APP_URL" | npx --yes vercel@latest env update DATABASE_URL production --yes --token "$VERCEL_TOKEN"
+          npx --yes vercel@latest deploy --prod --yes --token "$VERCEL_TOKEN"
+          echo "Switched. Old DB stays read-only. Smoke test now (switch-host.md step 5)."
+      - name: Remove throwaway Postgres
+        if: always() && steps.mode.outputs.mode == 'rehearsal'
+        run: docker rm -f scratch >/dev/null 2>&1 || true
+      - name: Alert owner on failure
+        if: failure()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_ADMIN_CHAT_ID: ${{ secrets.TELEGRAM_ADMIN_CHAT_ID }}
+        run: bash .github/scripts/alert.sh "move-db failed"
