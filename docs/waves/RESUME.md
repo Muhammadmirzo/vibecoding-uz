@@ -60,15 +60,15 @@ live DB: 15 migrations, anon/authenticated revoked, RLS on all tables). **Owner 
    (a) replaced `vercel redeploy` with `vercel deploy --prod --yes` in `move.ts` and `move-db.yml`; (b) resolved `package.json` conflict with F1;
    (c) reviewed and verified freeze SQL; (d) all gates on main passed: tsc 0, vitest 736/736, lessons:check 0 failures, build exit 0.
    Owner setup remaining: create 2 `age` key pairs and set GitHub secrets/vars listed in `docs/ops/KOCHIRISH.md`.
-4. **F3 data foundations** (after the owner creates the `naqsh-dev` Supabase project and puts its URL into Vercel Preview + Development
+7. **D1 Debt Cleanup: MERGED into main.** Eliminated all 3 known debts in `scripts/lessons-baseline.json` (0 failures, 0 known debt on `npm run lessons:check`). Split `chat.service.ts` (224 lines <= 240) + `chat-helpers.ts`, added dynamic 404 validation for lesson player and certificate code routes with regression test suite (770/770 vitest pass, tsc 0, build 0).
+8. **F3 data foundations** (after the owner creates the `naqsh-dev` Supabase project and puts its URL into Vercel Preview + Development
    `DATABASE_URL`; agents then stop using prod): 68 `timestamp` → `timestamptz` + `lib/time.ts` (Asia/Tashkent), money canonical in
    `bigint` tiyin + currency (expand/contract), `org_id`, stored `users.referral_code`, unique tg_user_id/lower(email), one `toE164()`,
    `can()` permissions (48 role literals), parity manifest web↔v1↔MCP test, 426 min-app-version, v1 cursor pagination, Sentry.
    Full audit with evidence: this session's foundations audit (summary in STATE.md handoff 2026-09-26 "foundations").
-5. After F1+F2 merge: ping session vibecoding-uz-87 (skillkit) — it will run `skillkit init-project` on Naqsh (db-check gate).
+9. After F1+F2 merge: ping session vibecoding-uz-87 (skillkit) — it will run `skillkit init-project` on Naqsh (db-check gate).
    `skillkit improve` is being built by the skillkit session, not here.
-6. Debt: 121 Tailwind opacity classes on var() colours produce no CSS; `src/features/**` tests not in vitest include; true 404 for unknown
-   kurs/blog slugs; split `chat.service.ts` (263 lines); /kabinet LCP 3.5 s; uptime monitor on /api/health (owner, free UptimeRobot).
+10. Remaining debt: 121 Tailwind opacity classes on var() colours produce no CSS; `src/features/**` tests not in vitest include; /kabinet LCP 3.5 s; uptime monitor on /api/health (owner, free UptimeRobot).
 
 ## 6. Settled owner decisions (don't re-ask)
 - Telegram reply → site chat works. `ANTHROPIC_API_KEY` is deferred. Supabase stays in Sydney for now.

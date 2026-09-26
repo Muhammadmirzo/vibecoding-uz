@@ -23,6 +23,17 @@
 
 ## Phase 2 (started 2026-09-24)
 
+### ▶ RELEASE 2026-09-26 (release-d1): Wave D1 Repo Debt Cleanup (0 known debt) — merged + verified by Gemini (Antigravity)
+- **Shipped:** eliminated all 3 known debts in `scripts/lessons-baseline.json` (baseline is now `{}`):
+  1. `src/features/chat/server/chat.service.ts`: split from 263 lines to 224 lines (<= 240, satisfying L19) by extracting helpers (`audit()`, `messageDtos()`, `requireConversation()`, cursor constants) into `src/features/chat/server/chat-helpers.ts` (49 lines).
+  2. `src/app/kabinet/kurs/[id]/dars/[lessonId]/page.tsx`: added UUID check and `notFound()` (satisfies L13 soft-404 rule).
+  3. `src/app/shahodatnoma/[code]/page.tsx`: added certificate code format validation and `notFound()` + updated `generateMetadata` (satisfies L13).
+  4. Added regression test suite `src/__tests__/d1-dynamic-page-404.test.ts` (13 tests) covering all 404 paths and demo e2e routes.
+  5. Recorded generalized soft-404 verification lesson into `skillkit` (`verification-before-completion`) and synchronized kit repository.
+- **Gates on committed main:** `npm run lessons:check` → **0 failure(s), 0 known debt (repo)** · `npx tsc --noEmit` → exit 0 · `npx vitest run` → **113 files / 770 tests passed (0 failed)** · `npm run build` → exit 0 (103 kB shared JS, all static/dynamic routes compiled).
+- **Tag:** `wave/2026-09-26-d1-debt`.
+- **Report:** `reports/D1-DEBT.md`.
+
 ### ▶ RELEASE 2026-09-26 (release-e6): Wave E slice E6 — home "Boshlash" section + glow strand (Awwwards 6-strand culmination) — merged + pushed by Gemini (Antigravity)
 - **Shipped:** completes the 6-strand Girih star redesign on the home page (`/`)! Adds `BoshlashSection.tsx` (156 lines <= 250, L19) with primary `/diagnostika` and secondary `/bepul-dars` CTAs, honest 7-day guarantee derived from `siteConfig.guaranteeText` (L14), and gold glow motif. Registers `{ id: "boshlash", strand: "glow" }` in `HOME_LOOM_SECTIONS`, wires `glow` into `HomeLoomMotionImpl` for scrub animation, and removes redundant `NextStepCTA` invocation from `/`. All 6 story strands (`square`, `diamond`, `weave`, `ring`, `fill`, `glow`) are fully woven; `mutedHomeStrands()` returns `[]`.
 - **Gates on committed main:** `npm run lessons:check` → 0 failures, 3 known debt · `npx tsc --noEmit` → exit 0 · `npx vitest run` → 112 files / 757 tests passed · `npm run build` → exit 0 · Playwright responsive `e2e/responsive.spec.ts` → 12/12 passed (375-1440 × light/dark, 0 errors, no horizontal scroll).
