@@ -1,4 +1,14 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
+
+// The OTP preset is 3 per 5 minutes. This file flips NODE_ENV to
+// "development", which makes checkRateLimit use the shared Postgres limiter
+// against the configured DATABASE_URL — so the suite WROTE rate_limit_buckets
+// rows and a second run inside the window answered 429 (L2/L40). Keep the
+// limiter in memory here; the Postgres limiter has its own tests
+// (w10-rate-limit-pg / w10-rate-limit-order).
+vi.mock("@/lib/security/rateLimit/redisLimiter", () => ({ checkRedisRateLimit: vi.fn(async () => null) }));
+vi.mock("@/lib/security/rateLimit/postgresLimiter", () => ({ checkPostgresRateLimit: vi.fn(async () => null) }));
+
 import { db } from "@/db";
 import { clearEskizTokenCache, redactPhone, sendOtpSms, sendSms } from "@/lib/sms/eskiz";
 import { POST as sendOtpHandler } from "@/app/api/auth/otp/send/route";

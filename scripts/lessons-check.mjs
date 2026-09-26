@@ -108,6 +108,12 @@ if (!staged) {
   for (const f of sh("git ls-files 'src/app'")) {
     grepCodeLines(f, /NEXT_NOT_FOUND/, "L37", 'legacy "NEXT_NOT_FOUND" digest check; in Next 15 notFound() throws NEXT_HTTP_ERROR_FALLBACK;404 and a catch that re-throws only the old digest swallows the 404');
   }
+  // L41: fire-and-forget work inside a request is dropped when the serverless
+  // function freezes after the response. The new-lead alert must go through
+  // after() (scheduleNewLeadAlert), never as a bare `void notifyNewLead(...)`.
+  for (const f of sh("git ls-files 'src' 'src/features'")) {
+    grepCodeLines(f, /void notifyNewLead\(/, "L41", "bare `void notifyNewLead(...)` is lost when the function freezes; use scheduleNewLeadAlert() (after())");
+  }
 }
 
 for (const d of debt) console.log(`debt  ${d}`);
