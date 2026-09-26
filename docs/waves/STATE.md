@@ -23,6 +23,22 @@
 
 ## Phase 2 (started 2026-09-24)
 
+### ▶ RELEASE 2026-09-26 (release-d): Wave E slice E0 — home hero = live prompt→site demo — merged + pushed
+- **Shipped:** the home hero (`/`) is now the owner-approved live prompt→site demo (from `/lab/naqsh`). SSR headline = LCP element, the demo lazy-loads after idle, static fallback renders in the SAME box → **CLS 0**. Bundle: First Load JS 125 → 129 kB on `/`. Removed the Samarkand signature text, the eyebrow and the mesh/orbit decorations, plus a duplicated cohort date. Merged to main as `10dd9ab` (branch `wave/e0-hero`, 3 commits). Owner said **"Zo'r"** on the preview 2026-09-26.
+- **Gates on the committed state (release agent, real output):** `npm run lessons:check` → 0 failures, 3 known debt (L13 `kabinet/kurs/[id]/dars/[lessonId]`, L13 `shahodatnoma/[code]`, L19 `chat.service.ts` 263 lines) · `npm run build` → exit 0 (shared First Load JS 103 kB) · `npx vitest run` → 96 files / 659 tests passed.
+- **Migrations:** no `.sql` migrations changed since `wave/2026-09-26-w8b-mcp` → no live-DB step was needed for this slice.
+- **Owner decision (accepted, don't re-ask):** the headline is kept smaller than the art-direction clamp so the demo fits in the first screen.
+- **Risks / debt:** the BuildStory scroll section shows a blank track in full-page screenshots — pre-existing, to be rebuilt in a later slice. Untracked and left alone: `scripts/db-check.ts` (owner debug script) and `.claude/worktrees/`.
+- **Next, in order:**
+  1. **Wave E1: the home "Muammo" section** (square strand), then **E2 → E6, one section per slice**; the owner checks each preview before the next slice starts. This is still step 1 of the release-c list below.
+  2. After the E0 deploy: smoke-test `https://master-2-jade.vercel.app/` (prod alias from `vercel inspect` → Aliases, never the per-deployment URL — L20/L22) and check the hero demo hydrates (it only lazy-loads after idle) with **CLS 0**.
+  3. `skillkit improve` (auto-actions per verdict; design in the `wave/a-fixes` STATE handoff "session B"). Measurement (`skillkit eval outcome`, `skillkit stats skills`) already exists.
+  4. **Debt:** 121 Tailwind opacity classes on `var()` colours produce no CSS (fix `tailwind.config.js` with `<alpha-value>`, then a visual review of all pages); `src/features/**` tests missing from the vitest include (one CountUp test fails to parse); true 404 status for unknown kurs/blog slugs (noindex already, low priority); split `src/features/chat/server/chat.service.ts` (263 lines); /kabinet simulated LCP 3.5 s.
+- **In progress:** no agent running. The `wave/e0-hero` worktree (`../vibecoding-uz-wt/e0-hero`) can be dropped — its content is on main. The `wave/w8b-mcp` and `release-b` worktrees from release-c can be dropped too.
+- **Settled (carried over, still valid):** the redesign has no Samarkand/historic-city theme and the girih logo stays (concept A + C); `/lab/naqsh` stays `noindex` and unlinked; Telegram reply → site chat confirmed working; `ANTHROPIC_API_KEY` deferred (AI chat off); Supabase stays in Sydney for now; owner approved deploying slice 2 and W8B on 2026-09-26 — do not re-ask; heavy commands go through `scripts/waves/locked.sh` (7.6 GB RAM).
+- **Still unverified from release-c:** the first real MCP client connection is not yet tested end-to-end in production (smoke-test `/.well-known/oauth-authorization-server` + login, which reads `users.mcp_access`).
+- **Resume:** open the repo, say "davom et" — a new session reads [RESUME.md](RESUME.md) and this section. Roll back: `skillkit wave status`, then `skillkit wave rollback <tag>`.
+
 ### ▶ RELEASE 2026-09-26 (release-c): W8B remote MCP (OAuth 2.1 + PKCE, PATs, visual charts) + per-manager access — merged + pushed
 - **Shipped:** W8B merged to main as `823796b` (from `wave/w8b-mcp`, SQL fixes in `61876a9`). Remote MCP over HTTP with OAuth 2.1 + PKCE, personal access tokens, and the visual chart tools. Plus per-manager MCP access: an admin toggles it in **Admin → MCP** ("Menejerlar uchun MCP ruhsati"); PII scope stays admin-only; turning it off revokes the manager's tokens in one transaction.
 - **Migrations order respected:** 0012 + 0013 were applied on the LIVE DB **before** this deploy (verified: 14 migrations, 5 `mcp_*` tables, `users.mcp_access`). Deploying 0013's `users.mcp_access` before migrating would have broken EVERY login (`getDbSession`/`getBearerSession` select it).
