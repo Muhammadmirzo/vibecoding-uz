@@ -12,3 +12,4 @@ export * from "./chat";
 export * from "./security";
 export * from "./analytics";
 export * from "./mobile";
+export * from "./mcp";

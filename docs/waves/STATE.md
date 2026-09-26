@@ -59,6 +59,10 @@ Skillkit (`~/.skillkit`, commit 253e989): `skillkit eval outcome` measures skill
   **Next (designed, not built):** `skillkit improve` auto-actions: TOO FEW RUNS → queue more runs; REGRESSION → confirm with 3 reruns then roll back the skill + lesson + notify; NO EFFECT → improver model proposes a SKILL.md edit, keep only if +0.10 on hidden holdout cases and no check regresses, max 3 tries, then propose hub/remove to the owner; third-party skills via overlays; every new `skillkit lesson` auto-creates an outcome case; weekly run/token budget; nightly run.
 Models: Claude session limit hit 2026-09-25 ~22:00; Gemini via `agy -p ... --model gemini-3.1-pro-high|gemini-3.8-flash-high|medium` works. LESSON: Gemini reports overclaim ("all gates pass" while its commit didn't typecheck; "404 fixed" unverified) — always re-run the gate on the committed state.
 Site-wide debt found by session A: 121 Tailwind opacity classes on var() colors produce no CSS (fix tailwind.config.js with <alpha-value>).
+### ▶ W8B deploy order (2026-09-26): MIGRATE LIVE BEFORE DEPLOY
+- Branch `wave/w8b-mcp` (bf3abe9) adds per-manager MCP access (owner decision: managers may use MCP incl. write tools only if an admin turns it on in Admin → MCP → "Menejerlar uchun MCP ruxsati"; PII scope stays admin-only; turning it off revokes the manager's tokens in one transaction).
+- Migration **0013** adds `users.mcp_access`, and `getDbSession`/`getBearerSession` now select it on EVERY login check. Deploying before `0012` + `0013` are applied live breaks ALL logins. Order: run new SQL on live → `npx drizzle-kit migrate` → merge → deploy.
+- Gate on bf3abe9: tsc 0, vitest 623/623, build OK.
 
 ### ▶ HANDOFF 2026-09-25 (evening), wave "Q1 quality + skills + Awwwards phase 1-2", read this first
 - **Skills:** everything is managed by `skillkit` (`~/.skillkit`, private repo github.com/Muhammadmirzo/skillkit; new laptop: clone + `install.sh`).

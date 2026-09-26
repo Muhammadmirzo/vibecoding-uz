@@ -22,7 +22,7 @@ function makeUser(overrides: Partial<AuthUser> = {}): AuthUser {
     tgUserId: null,
     tgUsername: null,
     role: "student",
-    locale: "uz",
+    mcpAccess: false, locale: "uz",
     lastLoginAt: null,
     createdAt: new Date("2026-01-01T00:00:00Z"),
     ...overrides,

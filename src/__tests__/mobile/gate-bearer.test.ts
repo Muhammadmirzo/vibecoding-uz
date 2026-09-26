@@ -9,7 +9,7 @@ function deps(role = "student") {
   return {
     verifyToken: async () => ({ userId: USER, role, sessionId: SESSION, expiresAt: Date.now() + 3600_000 }),
     findSessionById: async () => ({ id: SESSION, userId: USER, expiresAt: new Date(Date.now() + 3600_000) }),
-    findUserRole: async () => role,
+    findUserRole: async () => ({ role, mcpAccess: false }),
   };
 }
 

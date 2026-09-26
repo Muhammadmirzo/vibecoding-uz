@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, integer, uuid, varchar } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, integer, uuid, varchar, boolean } from "drizzle-orm/pg-core";
 import { userRoleEnum } from "./enums";
 
 export const users = pgTable("users", {
@@ -11,6 +11,7 @@ export const users = pgTable("users", {
   tgUserId: text("tg_user_id"),
   tgUsername: text("tg_username"),
   role: userRoleEnum("role").default("student").notNull(),
+  mcpAccess: boolean("mcp_access").default(false).notNull(),
   locale: varchar("locale", { length: 5 }).default("uz").notNull(),
   lastLoginAt: timestamp("last_login_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),

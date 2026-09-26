@@ -197,13 +197,14 @@ export async function postReply(
   clientId = crypto.randomUUID(),
   ip?: string,
   replyToId: string | null = null,
+  sender: "admin" | "ai" = "admin",
 ): Promise<ChatMessageDto> {
   await requireConversation(conversationId);
   // clientId is the idempotency key: a retried request (Telegram re-delivers a webhook
   // that failed) returns the stored reply instead of inserting a duplicate or failing.
   const [message] = await db.transaction(async (tx) => {
     const inserted = await tx.insert(chatMessages).values({
-      conversationId, clientId, sender: "admin", authorUserId: actorId, body: body.trim(), replyToId,
+      conversationId, clientId, sender, authorUserId: actorId, body: body.trim(), replyToId,
     }).onConflictDoNothing({ target: [chatMessages.conversationId, chatMessages.clientId] }).returning();
     if (!inserted.length) return [];
     await tx.update(chatConversations).set({
@@ -213,7 +214,7 @@ export async function postReply(
     }).where(eq(chatConversations.id, conversationId));
     await tx.insert(auditLogs).values({
       userId: actorId, action: "chat.reply.send", entityType: "chat_conversation",
-      entityId: conversationId, details: { messageId: inserted[0].id }, ipAddress: ip || null,
+      entityId: conversationId, details: { messageId: inserted[0].id, sender }, ipAddress: ip || null,
     });
     return inserted;
   });
