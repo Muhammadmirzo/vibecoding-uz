@@ -15,6 +15,10 @@ const HIDDEN_VARS: Partial<Record<StrandKey, gsap.TweenVars>> = {
   ring: { attr: { "stroke-dashoffset": 1 } },
   fill: { attr: { "fill-opacity": 0 } },
   weave: { opacity: 0, scale: 0.6, transformOrigin: "16px 16px" },
+  // glow: the halo rests at opacity 0 in LoomStar (same default as the /lab/naqsh
+  // prototype), so `boshlash` scrubs it up to the prototype's 0.55 and it stays
+  // there — the finished star radiating once the last section has passed.
+  glow: { opacity: 0, scale: 0.86, transformOrigin: "16px 16px" },
 };
 
 const DRAWN_VARS: Partial<Record<StrandKey, gsap.TweenVars>> = {
@@ -23,6 +27,7 @@ const DRAWN_VARS: Partial<Record<StrandKey, gsap.TweenVars>> = {
   ring: { attr: { "stroke-dashoffset": 0 } },
   fill: { attr: { "fill-opacity": 0.85 } },
   weave: { opacity: 1, scale: 1, transformOrigin: "16px 16px" },
+  glow: { opacity: 0.55, scale: 1, transformOrigin: "16px 16px" },
 };
 
 /**

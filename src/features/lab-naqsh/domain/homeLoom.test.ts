@@ -3,14 +3,25 @@ import { STRAND_KEYS } from "./strands";
 import { HOME_LOOM_SECTIONS, mutedHomeStrands } from "./homeLoom";
 
 describe("HOME_LOOM_SECTIONS", () => {
-  it("registers slices E1-E5 (muammo -> square, usul -> diamond, dastur -> weave, natijalar -> ring, narx -> fill)", () => {
+  it("registers slices E1-E6 (muammo -> square, usul -> diamond, dastur -> weave, natijalar -> ring, narx -> fill, boshlash -> glow)", () => {
     expect(HOME_LOOM_SECTIONS).toEqual([
       { id: "muammo", strand: "square" },
       { id: "usul", strand: "diamond" },
       { id: "dastur", strand: "weave" },
       { id: "natijalar", strand: "ring" },
       { id: "narx", strand: "fill" },
+      { id: "boshlash", strand: "glow" },
     ]);
+  });
+
+  it("registers all 6 story sections, one per strand in STRAND_KEYS", () => {
+    expect(HOME_LOOM_SECTIONS).toHaveLength(STRAND_KEYS.length);
+    expect(HOME_LOOM_SECTIONS.map((section) => section.strand).sort()).toEqual([...STRAND_KEYS].sort());
+  });
+
+  it("includes the boshlash section that claims the glow strand (the finished star)", () => {
+    expect(HOME_LOOM_SECTIONS.some((section) => section.id === "boshlash")).toBe(true);
+    expect(HOME_LOOM_SECTIONS.find((section) => section.id === "boshlash")?.strand).toBe("glow");
   });
 
   it("includes the natijalar section that claims the ring strand", () => {
@@ -36,7 +47,7 @@ describe("HOME_LOOM_SECTIONS", () => {
 });
 
 describe("mutedHomeStrands", () => {
-  it("mutes nothing now that every story section has shipped its strand (except glow)", () => {
+  it("mutes nothing now that all 6 story sections have shipped their strand", () => {
     const muted = mutedHomeStrands();
     expect(muted).not.toContain("square");
     expect(muted).not.toContain("diamond");
@@ -44,9 +55,23 @@ describe("mutedHomeStrands", () => {
     expect(muted).not.toContain("ring");
     expect(muted).not.toContain("fill");
     expect(muted).not.toContain("glow");
-    // Every strand is either registered or is the glow, which already rests at
-    // opacity 0 in the SVG (boshlash, slice E6, claims it).
+    // The star is fully woven: nothing is left as a faint guide.
     expect(muted).toEqual([]);
+  });
+
+  it("un-mutes glow now that boshlash is registered", () => {
+    expect(mutedHomeStrands()).not.toContain("glow");
+  });
+
+  it("mutes glow again when boshlash is absent (no special case any more)", () => {
+    const withoutBoshlash = mutedHomeStrands([
+      { id: "muammo", strand: "square" },
+      { id: "usul", strand: "diamond" },
+      { id: "dastur", strand: "weave" },
+      { id: "natijalar", strand: "ring" },
+      { id: "narx", strand: "fill" },
+    ]);
+    expect(withoutBoshlash).toEqual(["glow"]);
   });
 
   it("un-mutes ring now that natijalar is registered", () => {
@@ -94,7 +119,7 @@ describe("mutedHomeStrands", () => {
     expect(withoutDastur).toContain("weave");
   });
 
-  it("never mutes glow even with an empty registry", () => {
-    expect(mutedHomeStrands([])).not.toContain("glow");
+  it("mutes every strand with an empty registry, glow included", () => {
+    expect(mutedHomeStrands([])).toEqual([...STRAND_KEYS]);
   });
 });
