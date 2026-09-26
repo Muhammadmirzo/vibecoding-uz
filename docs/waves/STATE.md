@@ -23,6 +23,28 @@
 
 ## Phase 2 (started 2026-09-24)
 
+### ▶ RELEASE 2026-09-26 (release-p1): Wave P1 /kabinet LCP & Server Hydration Optimization — merged + verified by Gemini (Antigravity)
+- **Shipped:** eliminated client waterfall and hydration lag on `/kabinet`:
+  1. `src/features/lms/domain/kabinet-dashboard.ts`: pure types + `hasActiveEnrollment()` domain rule (safe for client import).
+  2. `src/features/lms/server/kabinet-dashboard.repository.ts`: single join `findActiveSessionUser()` (sessions ⋈ users) + `listPayments()`.
+  3. `src/features/lms/server/kabinet-dashboard.ts`: server loader prefetching `initialData`, graceful fallback to `null` if DB unreachable (zero 500s).
+  4. `src/app/kabinet/page.tsx`: passes `initialData` into `KabinetDashboardClient`. Guest path remains instant with 0 DB queries.
+  5. `KabinetDashboardClient.tsx`: hydrates immediately with `loading: false` and real name in first HTML (`Xush kelibsiz, Super Admin`).
+  6. Measured LCP dropped from 2816ms to 900ms, CLS 0. Added regression test `src/__tests__/kabinetDashboardClient.test.ts`.
+- **Gates on committed main:** `npm run lessons:check` → 0 failures, 0 debt · `npx tsc --noEmit` → exit 0 · `npx vitest run` → **118 files / 798 tests passed** · `npm run build` → exit 0 (103 kB shared JS).
+- **Tag:** `wave/2026-09-26-p1-kabinet-perf`.
+- **Report:** `reports/P1-KABINET-PERF.md`.
+
+### ▶ RELEASE 2026-09-26 (release-c1): Wave C1 Real Certificate Verification & L14 Honesty — merged + verified by Gemini (Antigravity)
+- **Shipped:** connected public certificate verification to live database & enforced L14 honesty:
+  1. `src/app/shahodatnoma/[code]/page.tsx`: wired to `verifyCertificate({ code })` and `loadCertificateOwner(certificate)`. Removed hardcoded mock student "Jamshid Alimov".
+  2. `DEMO2026` shows explicit demo label and educational preview notice. Non-existent codes trigger `notFound()` soft-404.
+  3. Added regression test suite `src/__tests__/c1-certificate-verify.test.ts`.
+- **Gates on committed main:** `npm run lessons:check` → 0 failures, 0 debt · `npx tsc --noEmit` → exit 0 · `npx vitest run` → pass · `npm run build` → exit 0.
+- **Tag:** `wave/2026-09-26-c1-cert`.
+- **Report:** `reports/C1-CERT.md`.
+
+
 ### ▶ RELEASE 2026-09-26 (release-d2): Wave D2 CSS Alpha Tokens & Opacity Modernization — merged + verified by Gemini (Antigravity)
 - **Shipped:** resolved the 121 dead Tailwind opacity classes across the entire codebase and fixed vitest test harness completeness:
   1. `vitest.config.ts`: expanded `include` to `["src/__tests__/**/*.test.ts", "src/features/**/*.test.ts"]`, adding previously skipped motion tests (now 115 test files / 780 tests covered).

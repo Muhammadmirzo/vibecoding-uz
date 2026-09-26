@@ -62,14 +62,17 @@ live DB: 15 migrations, anon/authenticated revoked, RLS on all tables). **Owner 
    Owner setup remaining: create 2 `age` key pairs and set GitHub secrets/vars listed in `docs/ops/KOCHIRISH.md`.
 7. **D1 Debt Cleanup: MERGED into main.** Eliminated all 3 known debts in `scripts/lessons-baseline.json` (0 failures, 0 known debt on `npm run lessons:check`). Split `chat.service.ts` (224 lines <= 240) + `chat-helpers.ts`, added dynamic 404 validation for lesson player and certificate code routes with regression test suite (770/770 vitest pass, tsc 0, build 0).
 8. **D2 CSS Alpha Tokens & Test Harness: MERGED into main.** (a) Added `src/features/**/*.test.ts` to `vitest.config.ts` (all 115 test files / 780 tests now covered); (b) Added modern `color-mix` alpha helper to `tailwind.config.js` resolving all 121 opacity classes (58 `color-mix()` rules emitted in production CSS, verified with Playwright 12/12 responsive pass, tsc 0, lessons-check 0, build 0).
-9. **F3 data foundations** (after the owner creates the `naqsh-dev` Supabase project and puts its URL into Vercel Preview + Development
+9. **C1 Real Certificate Verification: MERGED into main.** Public verification wired to live DB + L14 honesty, nonexistent codes soft-404, demo label explicit.
+10. **P1 /kabinet LCP Optimization: MERGED into main.** Server prefetch + instant hydration (118 test files / 798 tests pass, LCP dropped from 2816ms to 900ms, CLS 0).
+11. **F3 data foundations** (after the owner creates the `naqsh-dev` Supabase project and puts its URL into Vercel Preview + Development
    `DATABASE_URL`; agents then stop using prod): 68 `timestamp` → `timestamptz` + `lib/time.ts` (Asia/Tashkent), money canonical in
    `bigint` tiyin + currency (expand/contract), `org_id`, stored `users.referral_code`, unique tg_user_id/lower(email), one `toE164()`,
    `can()` permissions (48 role literals), parity manifest web↔v1↔MCP test, 426 min-app-version, v1 cursor pagination, Sentry.
    Full audit with evidence: this session's foundations audit (summary in STATE.md handoff 2026-09-26 "foundations").
-10. After F1+F2 merge: ping session vibecoding-uz-87 (skillkit) — it will run `skillkit init-project` on Naqsh (db-check gate).
+12. After F1+F2 merge: ping session vibecoding-uz-87 (skillkit) — it will run `skillkit init-project` on Naqsh (db-check gate).
    `skillkit improve` is being built by the skillkit session, not here.
-11. Remaining debt: /kabinet LCP 3.5 s; uptime monitor on /api/health (owner, free UptimeRobot).
+13. Remaining debt: uptime monitor on /api/health (owner, free UptimeRobot). (/kabinet LCP 3.5s resolved in P1).
+
 
 ## 6. Settled owner decisions (don't re-ask)
 - Telegram reply → site chat works. `ANTHROPIC_API_KEY` is deferred. Supabase stays in Sydney for now.
